@@ -16,16 +16,18 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.email_verified == true;
     }
 
-    function isOwner(emailId) {
-      return isSignedIn() && request.auth.token.email.lower() == emailId.lower();
+    function isOwner(userId) {
+      return isSignedIn() && (request.auth.uid == userId || (request.auth.token.email != null && request.auth.token.email.lower() == userId.lower()));
     }
 
     function isMasterAdmin() {
-      return isSignedIn() && request.auth.token.email.lower() == 'allen32@gmail.com';
+      return isSignedIn() && 
+             request.auth.token.email != null && 
+             request.auth.token.email.lower() == 'allen32@gmail.com';
     }
 
     function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.]+$');
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.\\@]+$');
     }
 
     function incoming() {
@@ -46,7 +48,12 @@ service cloud.firestore {
              data.status in ['active', 'suspended', 'pending'] &&
              data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'status']) &&
              (!('organizationName' in data) || (data.organizationName is string && data.organizationName.size() <= 128)) &&
-             (!('licenseNumber' in data) || (data.licenseNumber is string && data.licenseNumber.size() <= 64));
+             (!('licenseNumber' in data) || (data.licenseNumber is string && data.licenseNumber.size() <= 64)) &&
+             (!('isPhotoRequirementEnabled' in data) || data.isPhotoRequirementEnabled is bool) &&
+             (!('migratedFromUid' in data) || (data.migratedFromUid is string && data.migratedFromUid.size() <= 128)) &&
+             (!('migratedToUid' in data) || (data.migratedToUid is string && data.migratedToUid.size() <= 128)) &&
+             (!('createdAt' in data) || data.createdAt == request.time || data.createdAt is timestamp) &&
+             (!('updatedAt' in data) || data.updatedAt == request.time || data.updatedAt is timestamp);
     }
 
     function isValidSubstance(data) {
@@ -76,18 +83,20 @@ service cloud.firestore {
 
     // --- Rules ---
 
-    match /users/{emailId} {
-      allow get: if isMasterAdmin() || isOwner(emailId);
+    match /users/{userId} {
+      allow get: if isMasterAdmin() || isOwner(userId);
       allow list: if isMasterAdmin();
       
-      allow create: if isSignedIn() && 
-                      isOwner(emailId) && 
-                      isValidId(emailId) &&
+      allow create: if isMasterAdmin() || (
+                      isSignedIn() && 
+                      isOwner(userId) && 
+                      isValidId(userId) &&
                       isValidUserProfile(incoming()) && 
-                      (emailId.lower() == 'allen32@gmail.com' ? incoming().status == 'active' : incoming().status == 'pending');
+                      (request.auth.token.email.lower() == 'allen32@gmail.com' ? incoming().status == 'active' : incoming().status == 'pending')
+                    );
       
       allow update: if isMasterAdmin() || (
-        isOwner(emailId) && 
+        isOwner(userId) && 
         isValidUserProfile(incoming()) && 
         incoming().status == existing().status && 
         incoming().role == existing().role && 
@@ -99,15 +108,15 @@ service cloud.firestore {
 
       // Sub-collections
       match /substances/{substanceId} {
-        allow read: if isMasterAdmin() || (isOwner(emailId) && get(/databases/$(database)/documents/users/$(emailId)).data.status == 'active');
-        allow write: if isMasterAdmin() || (isOwner(emailId) && get(/databases/$(database)/documents/users/$(emailId)).data.status == 'active' && 
+        allow read: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
+        allow write: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active' && 
                         (request.method == 'delete' || isValidSubstance(incoming())) &&
                         isValidId(substanceId));
       }
 
       match /transactions/{transactionId} {
-        allow read: if isMasterAdmin() || (isOwner(emailId) && get(/databases/$(database)/documents/users/$(emailId)).data.status == 'active');
-        allow create: if (isMasterAdmin() || (isOwner(emailId) && get(/databases/$(database)/documents/users/$(emailId)).data.status == 'active')) && 
+        allow read: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
+        allow create: if (isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active')) && 
                          isValidTransaction(incoming()) &&
                          isValidId(transactionId) &&
                          incoming().performedBy == request.auth.uid; // Identity Integrity
@@ -115,10 +124,13 @@ service cloud.firestore {
       }
 
       match /staff/{staffId} {
-        allow read: if isMasterAdmin() || (isOwner(emailId) && get(/databases/$(database)/documents/users/$(emailId)).data.status == 'active');
-        allow write: if isMasterAdmin() || (isOwner(emailId) && get(/databases/$(database)/documents/users/$(emailId)).data.status == 'active' && 
-                        (request.method == 'delete' || isValidStaff(incoming())) &&
-                        isValidId(staffId));
+        allow read: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
+        allow create: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active' && 
+                         isValidStaff(incoming()) &&
+                         isValidId(staffId));
+        allow update: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active' && 
+                         isValidStaff(incoming()));
+        allow delete: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
       }
     }
     

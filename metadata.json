@@ -1,5 +1,5 @@
 {
-  "name": "PharmaGuard Registry",
+  "name": "PharmaGuard",
   "description": "Secure DEA-compliant digital registry for controlled substance management and distribution tracking.",
   "requestFramePermissions": [
     "camera"

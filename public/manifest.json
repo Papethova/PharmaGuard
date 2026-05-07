@@ -1,5 +1,5 @@
 {
-  "name": "PharmaGuard Registry",
+  "name": "PharmaGuard",
   "short_name": "PharmaGuard",
   "start_url": "/",
   "display": "standalone",
@@ -11,12 +11,6 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "https://img.icons8.com/color/512/security-shield.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }

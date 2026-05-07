@@ -46,4 +46,6 @@ export interface UserProfile {
   status: 'active' | 'suspended' | 'pending';
   isPhotoRequirementEnabled?: boolean;
   docId?: string; // Track exact document key in Firestore
+  createdAt?: any;
+  updatedAt?: any;
 }
