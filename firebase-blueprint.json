@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Public and private profile data for a user.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["pharmacist", "technician", "admin"] },
+        "status": { "type": "string", "enum": ["active", "suspended", "pending"] },
+        "licenseNumber": { "type": "string" },
+        "organizationName": { "type": "string" },
+        "isPhotoRequirementEnabled": { "type": "boolean" },
+        "migratedFromUid": { "type": "string" }
+      },
+      "required": ["uid", "email", "displayName", "role", "status"]
+    },
+    "Substance": {
+      "title": "Substance (Inventory Item)",
+      "description": "Controlled substance inventory record.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "strength": { "type": "string" },
+        "schedule": { "type": "string", "enum": ["C-II", "C-III", "C-IV", "C-V"] },
+        "ndc": { "type": "string" },
+        "currentStock": { "type": "number" },
+        "unit": { "type": "string" },
+        "packageSize": { "type": "number" },
+        "minThreshold": { "type": "number" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "strength", "schedule", "currentStock"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Inventory movement transaction.",
+      "type": "object",
+      "properties": {
+        "substanceId": { "type": "string" },
+        "substanceName": { "type": "string" },
+        "strength": { "type": "string" },
+        "ndc": { "type": "string" },
+        "type": { "type": "string", "enum": ["IN", "OUT", "ADJUST", "VERIFY"] },
+        "quantity": { "type": "number" },
+        "previousStock": { "type": "number" },
+        "newStock": { "type": "number" },
+        "performedBy": { "type": "string" },
+        "performedByName": { "type": "string" },
+        "performedByTitle": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "reason": { "type": "string" },
+        "referenceNumber": { "type": "string" },
+        "signature": { "type": "string" },
+        "photo": { "type": "string" },
+        "witnessId": { "type": "string" }
+      },
+      "required": ["substanceId", "type", "quantity", "timestamp", "performedBy"]
+    },
+    "Staff": {
+      "title": "Staff",
+      "description": "Staff member authorized to perform transactions on a node.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "title": { "type": "string" }
+      },
+      "required": ["name"]
+    }
+  },
+  "firestore": {
+    "/users/{emailId}": {
+      "schema": "UserProfile",
+      "description": "Root user profiles."
+    },
+    "/users/{emailId}/substances/{substanceId}": {
+      "schema": "Substance",
+      "description": "Sub-collection of inventory items for a user/node."
+    },
+    "/users/{emailId}/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Sub-collection of transactions for a user/node."
+    },
+    "/users/{emailId}/staff/{staffId}": {
+      "schema": "Staff",
+      "description": "Sub-collection of staff members for a user/node."
+    }
+  }
+}

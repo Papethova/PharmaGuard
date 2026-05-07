@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Outer Shield Border -->
+  <path 
+    d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+    fill="#facc15"
+  />
+  <path 
+    d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+    fill="none"
+    stroke="#1e68cf"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+  />
+  <!-- Pill Icon -->
+  <g transform="translate(6, 9) scale(0.5)">
+    <path 
+      d="M18 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z" 
+      fill="#1e68cf" 
+    />
+    <path 
+      d="M20 12c0-4.4-3.6-8-8-8s-8 3.6-8 8" 
+      fill="none" 
+      stroke="white" 
+      stroke-width="2" 
+    />
+  </g>
+  <!-- Simplified Pill matching the app's look -->
+  <rect x="8" y="10.5" width="8" height="3" rx="1.5" fill="#1e68cf" />
+  <path d="M12 10.5v3" stroke="white" stroke-width="0.5" />
+</svg>

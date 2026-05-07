@@ -1,0 +1,11 @@
+{
+  "name": "PharmaGuard Registry",
+  "description": "Secure DEA-compliant digital registry for controlled substance management and distribution tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "authentication",
+    "realtime-db"
+  ]
+}
