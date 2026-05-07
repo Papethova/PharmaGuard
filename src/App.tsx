@@ -97,7 +97,8 @@ import {
   addDoc,
   getDocFromServer,
   updateDoc,
-  deleteDoc
+  deleteDoc,
+  limit
 } from "firebase/firestore";
 
 
@@ -197,7 +198,9 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 const getIdentityString = (profile: UserProfile | null, userEmail?: string | null) => {
-  return profile?.organizationName || profile?.displayName || userEmail || "Identity Unverified";
+  const identity = profile?.organizationName || profile?.displayName || userEmail || "Identity Unverified";
+  // Inject zero-width spaces to prevent browser email auto-detection and linking
+  return typeof identity === 'string' ? identity.replace("@", "\u200B@\u200B") : identity;
 };
 
 const tableHeadClass = "font-semibold text-sm tracking-wider text-brand-blue text-center";
@@ -530,93 +533,56 @@ export default function App() {
 
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
       // Set Auth Ready state as soon as we get even a null response
-      // This ensures we at least move past the initial spinner
       setUser(currentUser);
-      console.log("Auth State Changed:", currentUser?.email || "No User");
       
       try {
         if (currentUser) {
+          // Identity Recovery & Profile Synchronization
           const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
           const userDocRef = doc(db, "users", emailId);
           
-          let userDoc;
-          try {
-            userDoc = await getDoc(userDocRef);
-          } catch (e) {
-            console.warn("Initial user doc fetch failed:", e);
-          }
-          
-          // Identity Recovery: Handle UID-based legacy records migrating to Email path
-          // CRITICAL: We migrate if either the user doc is missing OR substances are missing at the new path
-          const checkAndMigrate = async () => {
-            try {
-              const legacyDocRef = doc(db, "users", currentUser.uid);
-              const legacyDoc = await getDoc(legacyDocRef);
-              
-              if (legacyDoc.exists()) {
-                console.log("Legacy Identity Found at UID path. Checking for unified data presence...");
-                
-                const currentSubstances = await getDocs(collection(db, "users", emailId, "substances"));
-                const legacySubstances = await getDocs(collection(db, "users", currentUser.uid, "substances"));
-                
-                // If legacy has data but current doesn't, we MUST migrate
-                if (legacySubstances.size > 0 && currentSubstances.size === 0) {
-                   console.log(`Data Loss Prevention: Migrating ${legacySubstances.size} records to Unified Node...`);
-                   const batch = writeBatch(db);
-                   
-                   // Ensure parent doc exists at new path
-                   if (!userDoc || !userDoc.exists()) {
-                     const legacyData = legacyDoc.data();
-                     batch.set(userDocRef, { ...legacyData, migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
-                   }
+          let userDoc = await getDoc(userDocRef).catch((e) => {
+             console.warn("Initial user doc fetch failed:", e);
+             return null;
+          });
 
-                   // Migrate substances
-                   for (const sDoc of legacySubstances.docs) {
-                     batch.set(doc(db, "users", emailId, "substances", sDoc.id), sDoc.data());
-                   }
-                   
-                   // Migrate Transactions
-                   const legacyTransactions = await getDocs(collection(db, "users", currentUser.uid, "transactions"));
-                   for (const tDoc of legacyTransactions.docs) {
-                     batch.set(doc(db, "users", emailId, "transactions", tDoc.id), tDoc.data());
-                   }
-                   
-                   // Migrate Staff
-                   const legacyStaff = await getDocs(collection(db, "users", currentUser.uid, "staff"));
-                   for (const stDoc of legacyStaff.docs) {
-                     batch.set(doc(db, "users", emailId, "staff", stDoc.id), stDoc.data());
-                   }
-                   
-                   await batch.commit();
-                   toast.success("Identity Unification Successful", { 
-                     description: "We found your legacy inventory and automatically moved it to your secure email identity." 
-                   });
-                } else if (!userDoc || !userDoc.exists()) {
-                  // If just the user doc is missing but no data to migrate, just copy the profile
-                  const legacyData = legacyDoc.data();
-                  await setDoc(userDocRef, { ...legacyData, migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
+          // 1. Identity Recovery: Handle UID-based legacy records migrating to Email identifier
+          if (currentUser.uid !== emailId) {
+            try {
+              const legacyDoc = await getDoc(doc(db, "users", currentUser.uid));
+              if (legacyDoc.exists()) {
+                const legacySubstances = await getDocs(collection(db, "users", currentUser.uid, "substances"));
+                const currentSubstances = await getDocs(collection(db, "users", emailId, "substances"));
+                
+                if (legacySubstances.size > 0 && currentSubstances.size === 0) {
+                  const batch = writeBatch(db);
+                  if (!userDoc?.exists()) {
+                    batch.set(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
+                  }
+                  for (const s of legacySubstances.docs) batch.set(doc(db, "users", emailId, "substances", s.id), s.data());
+                  const legacyTx = await getDocs(collection(db, "users", currentUser.uid, "transactions"));
+                  for (const t of legacyTx.docs) batch.set(doc(db, "users", emailId, "transactions", t.id), t.data());
+                  const legacyStaff = await getDocs(collection(db, "users", currentUser.uid, "staff"));
+                  for (const s of legacyStaff.docs) batch.set(doc(db, "users", emailId, "staff", s.id), s.data());
+                  await batch.commit();
+                  toast.success("Identity Unification Successful");
+                  userDoc = await getDoc(userDocRef);
+                } else if (!userDoc?.exists()) {
+                  await setDoc(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
+                  userDoc = await getDoc(userDocRef);
                 }
               }
             } catch (e) {
-              console.warn("Identity Migration Assistant failed:", e);
-            }
-          };
-
-          checkAndMigrate();
-
-          if (userDoc && userDoc.exists()) {
-            const data = userDoc.data() as UserProfile;
-            if (currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && data.status !== 'active') {
-              console.log("Master Admin: Authority verification required - Synchronizing state...");
-              await updateDoc(userDocRef, { status: 'active' });
+              console.warn("Migration Assistant deferred:", e);
             }
           }
 
+          // 2. Profile Creation for New Users
           if (!userDoc || !userDoc.exists()) {
             const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
             const newProfile: UserProfile = {
               uid: currentUser.uid,
-              email: currentUser.email,
+              email: currentUser.email || "",
               displayName: currentUser.displayName || "User",
               role: isMaster ? "admin" : "pharmacist",
               status: isMaster ? "active" : "pending",
@@ -625,17 +591,13 @@ export default function App() {
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp()
             };
-            try {
-              await setDoc(userDocRef, newProfile);
-              setUserProfile(newProfile);
-              console.log("Master Node created/synchronized in registry.");
-            } catch (e) {
-              console.error("Critical: Registry entry failed:", e);
-              handleFirestoreError(e, OperationType.WRITE, `users/${uid}`);
-            }
+            await setDoc(userDocRef, newProfile);
+          } else if (currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && userDoc.data()?.status !== 'active') {
+            // Master Admin Authority Verification
+            await updateDoc(userDocRef, { status: 'active', role: 'admin' });
           }
 
-          // Real-time profile listener on the stable UID path
+          // 3. Real-time profile listener on the stable primary identifier
           if (unsubProfile) unsubProfile();
           unsubProfile = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
@@ -698,7 +660,7 @@ export default function App() {
       }
     });
 
-    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc")), (snapshot) => {
+    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(500)), (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
       setTransactions(items);
     }, (error) => {
@@ -769,8 +731,6 @@ export default function App() {
           uid: data.uid || doc.id
         } as UserProfile;
       });
-      console.log(`Registry Sync Detail: Found ${items.length} raw profile entries in database.`);
-      items.forEach(i => console.log(` - Node: ${i.docId} (${i.email || 'No Email'})`));
       setAllUserProfiles(items);
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, "users");
@@ -1282,7 +1242,7 @@ export default function App() {
   }, [allUserProfiles, userSearchTerm]);
 
   const masterAccountProfile = useMemo(() => 
-    allUserProfiles.find((p: UserProfile) => p.email?.toLowerCase() === MASTER_ADMIN_EMAIL),
+    allUserProfiles.find((p: UserProfile) => p.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase()),
   [allUserProfiles]);
 
 
@@ -1746,7 +1706,7 @@ export default function App() {
                 <div 
                   className="flex items-center gap-3 cursor-pointer group" 
                   onClick={() => {
-                    if (user?.email?.toLowerCase() === MASTER_ADMIN_EMAIL) {
+                    if (user?.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase()) {
                       setIsSuperAdminOpen(true);
                       toast.success("Super Admin Portal Unlocked", { 
                         icon: (
@@ -1810,7 +1770,7 @@ export default function App() {
           <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-10 sticky top-24 shrink-0 overflow-visible">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
-                <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 ${
+                <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
                   (getIdentityString(userProfile, user?.email).length || 0) > 20 ? "text-lg" : 
                   (getIdentityString(userProfile, user?.email).length || 0) > 15 ? "text-xl" : "text-2xl"
                 }`}>
@@ -3310,7 +3270,7 @@ export default function App() {
               <div className="flex gap-4 items-center">
                 <div className="flex flex-col">
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Authenticated Master Identity</span>
-                  <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2">
+                  <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
                     {getIdentityString(userProfile, user?.email)} 
                     <span className={`h-1.5 w-1.5 rounded-full ${isMasterAdmin ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} title={isMasterAdmin ? 'Authority Verified' : 'Standard User Restricted'} />
                   </span>
@@ -3417,8 +3377,8 @@ export default function App() {
                               </Badge>
                             </div>
                             <div className="flex items-center gap-2">
-                               <span className="text-[10px] text-brand-grey font-medium truncate block pointer-events-none no-underline">
-                                 <span className="cursor-default select-none no-underline">{profile.email || "No Email Bound"}</span>
+                               <span className="text-[10px] text-brand-grey font-medium truncate block no-interact">
+                                 <span className="cursor-default select-none no-underline">{profile.email ? profile.email.replace("@", "\u200B@\u200B") : "No Email Bound"}</span>
                                </span>
                                <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10">
                                  UID: {profile.docId}
@@ -3494,7 +3454,7 @@ export default function App() {
         
         <div className="p-3 px-4 bg-brand-blue/5 flex justify-between items-center border-t border-brand-blue/10">
           <div className="flex flex-col">
-            <p className="text-[8px] text-brand-grey/40 uppercase tracking-widest font-black pointer-events-none no-underline">
+            <p className="text-[8px] text-brand-grey/40 uppercase tracking-widest font-black no-interact">
               Authority: <span className="cursor-default select-none no-underline">{getIdentityString(userProfile, user?.email)}</span>
             </p>
             <p className="text-[8px] text-brand-blue/40 uppercase tracking-widest font-black">
@@ -3546,9 +3506,9 @@ export default function App() {
               <span className="text-brand-blue/80 font-bold">{nodeToDelete?.organizationName || nodeToDelete?.displayName}</span>
             </div>
             <div className="h-[1px] bg-brand-grey/5 w-full" />
-            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-brand-grey/40">
+            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-brand-grey/40 no-interact">
               <span>Node Identity</span>
-              <span className="text-brand-grey font-medium cursor-default select-none no-underline">{nodeToDelete?.email}</span>
+              <span className="text-brand-grey font-medium cursor-default select-none no-underline">{nodeToDelete?.email ? nodeToDelete.email.replace("@", "\u200B@\u200B") : ""}</span>
             </div>
             <div className="h-[1px] bg-brand-grey/5 w-full" />
             <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-brand-grey/40">

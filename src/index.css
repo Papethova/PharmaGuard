@@ -51,6 +51,21 @@
     user-select: none !important;
     -webkit-user-select: none !important;
   }
+
+  /* Robust protection against mobile auto-linking for emails and phone numbers */
+  a[href^="mailto:"], 
+  [x-apple-data-detectors],
+  .no-interact,
+  .no-interact * {
+    color: inherit !important;
+    text-decoration: none !important;
+    font-size: inherit !important;
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    pointer-events: none !important;
+    cursor: default !important;
+  }
 }
 
 @theme inline {
