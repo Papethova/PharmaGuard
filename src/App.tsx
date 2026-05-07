@@ -197,10 +197,14 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
+const escapeEmail = (text: string | null | undefined) => {
+  if (!text) return "";
+  return typeof text === 'string' ? text.replace("@", "\u200B@\u200B") : text;
+};
+
 const getIdentityString = (profile: UserProfile | null, userEmail?: string | null) => {
   const identity = profile?.organizationName || profile?.displayName || userEmail || "Identity Unverified";
-  // Inject zero-width spaces to prevent browser email auto-detection and linking
-  return typeof identity === 'string' ? identity.replace("@", "\u200B@\u200B") : identity;
+  return escapeEmail(identity);
 };
 
 const tableHeadClass = "font-semibold text-sm tracking-wider text-brand-blue text-center";
@@ -605,7 +609,7 @@ export default function App() {
               setUserProfile(data);
             }
           }, (error) => {
-            handleFirestoreError(error, OperationType.GET, `users/${uid}`);
+            handleFirestoreError(error, OperationType.GET, `users/${emailId}`);
           });
         } else {
           setUserProfile(null);
@@ -1604,7 +1608,7 @@ export default function App() {
               </p>
               <div className="bg-brand-blue/5 p-4 rounded-lg border border-brand-blue/10 mt-4">
                 <p className="text-[10px] text-brand-blue font-bold tracking-wider">Node Identification</p>
-                <p className="text-xs font-mono mt-1 text-brand-grey no-interact">{userProfile.email}</p>
+                <p className="text-xs font-mono mt-1 text-brand-grey no-interact">{escapeEmail(userProfile.email)}</p>
               </div>
               <p className="text-brand-dark-grey/60 text-xs mt-4">
                 Please notify your system administrator if access is not granted within 24 hours.
@@ -2537,8 +2541,8 @@ export default function App() {
                           </div>
                           <div className="space-y-1">
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Performed By</Label>
-                            <div className="text-sm text-brand-dark-grey">
-                              {viewingTransaction.performedByName}
+                            <div className="text-sm text-brand-dark-grey no-interact">
+                              {escapeEmail(viewingTransaction.performedByName)}
                               {viewingTransaction.performedByTitle ? (
                                 <span className="ml-1 text-xs text-brand-dark-grey">({viewingTransaction.performedByTitle})</span>
                               ) : (
@@ -2974,8 +2978,8 @@ export default function App() {
                                   {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                                 </TableCell>
                                 <TableCell className="text-center font-mono font-bold text-brand-dark-grey text-sm">{t.newStock}</TableCell>
-                                <TableCell className="text-brand-dark-grey text-[10px] text-center">
-                                  {t.performedByName}
+                                <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact">
+                                  {escapeEmail(t.performedByName)}
                                   {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
                                     <span className="ml-1 text-brand-dark-grey">
                                       ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
@@ -3173,8 +3177,8 @@ export default function App() {
                       <TableCell className="text-center font-mono text-sm text-brand-dark-grey">
                         {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                       </TableCell>
-                      <TableCell className="text-xs text-brand-dark-grey text-center">
-                        {t.performedByName}
+                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
+                        {escapeEmail(t.performedByName)}
                         {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
                           <span className="ml-1 text-brand-dark-grey">
                             ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
@@ -3356,8 +3360,8 @@ export default function App() {
                         <td className="py-2 px-4 w-[80%]">
                           <div className="flex flex-col gap-0 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-xs text-brand-dark-grey truncate">
-                                {profile.organizationName || profile.displayName || "Unregistered Node"}
+                              <span className="font-bold text-xs text-brand-dark-grey truncate no-interact">
+                                {escapeEmail(profile.organizationName || profile.displayName || "Unregistered Node")}
                               </span>
                               {profile.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && (
                                 <Badge className="bg-brand-blue text-white text-[7px] font-black px-1.5 h-3.5 rounded-sm uppercase tracking-tighter">
@@ -3378,7 +3382,7 @@ export default function App() {
                             </div>
                             <div className="flex items-center gap-2">
                                <span className="text-[10px] text-brand-grey font-medium truncate block no-interact">
-                                 <span className="cursor-default select-none no-underline">{profile.email ? profile.email.replace("@", "\u200B@\u200B") : "No Email Bound"}</span>
+                                 <span className="cursor-default select-none no-underline">{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
                                </span>
                                <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10">
                                  UID: {profile.docId}
