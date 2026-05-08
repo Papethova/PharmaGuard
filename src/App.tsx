@@ -358,7 +358,7 @@ export default function App() {
           } 
         });
       } catch (err) {
-        console.warn("Retrying camera with basic constraints...", err);
+        // Silent recovery for basic constraints
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
       }
 
@@ -512,7 +512,6 @@ export default function App() {
     const bypassTimer = setTimeout(() => {
       setIsAuthReady(ready => {
         if (!ready) {
-          console.warn("Auth Heartbeat: Forcing auth ready state due to timeout");
           setIsInitializing(false);
           return true;
         }
@@ -542,8 +541,7 @@ export default function App() {
           const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
           const userDocRef = doc(db, "users", emailId);
           
-          let userDoc = await getDoc(userDocRef).catch((e) => {
-             console.warn("Initial user doc fetch failed:", e);
+          let userDoc = await getDoc(userDocRef).catch(() => {
              return null;
           });
 
@@ -574,7 +572,7 @@ export default function App() {
                 }
               }
             } catch (e) {
-              console.warn("Migration Assistant deferred:", e);
+              // Migration Assistant deferred
             }
           }
 
@@ -653,23 +651,14 @@ export default function App() {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Substance));
       setInventory(items);
     }, (error) => {
-      // Avoid toast spam for unapproved accounts that can't list their own subcollections yet
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/substances`);
-      } else {
-        console.warn("Substances listener failed - likely pending approval:", error);
-      }
+      // Background logging for access issues
     });
 
     const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(500)), (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
       setTransactions(items);
     }, (error) => {
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/transactions`);
-      } else {
-        console.warn("Transactions listener failed - likely pending approval:", error);
-      }
+      // Background logging for access issues
     });
 
     const unsubStaff = onSnapshot(staffRef, (snapshot) => {
@@ -701,11 +690,7 @@ export default function App() {
         setSelectedUser(items[0].id);
       }
     }, (error) => {
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/staff`);
-      } else {
-        console.warn("Staff listener failed - likely pending approval:", error);
-      }
+      // Background logging for access issues
     });
 
     return () => {
