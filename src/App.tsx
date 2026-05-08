@@ -432,9 +432,6 @@ export default function App() {
   const isMasterAdmin = useMemo(() => {
     const email = user?.email?.toLowerCase();
     const isMaster = email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
-    if (user) {
-      console.log(`Identity Check: ${email} | Master: ${isMaster}`);
-    }
     return isMaster;
   }, [user]);
 
