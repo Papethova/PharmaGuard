@@ -503,15 +503,15 @@ export default function App() {
   // Auth Listener
   useEffect(() => {
     // Advanced Safety Heartbeat: Ensure we never stay on a white screen
-    // If auth hasn't responded in 5 seconds, show the delay box
+    // If auth hasn't responded in 3 seconds, show the delay box
     const delayTimer = setTimeout(() => {
       setIsAuthReady(ready => {
         if (!ready) setBootTimeout(true);
         return ready;
       });
-    }, 5000);
+    }, 3000);
 
-    // Hard Bypass: If auth hasn't responded in 10 seconds, force show the login screen
+    // Hard Bypass: If auth hasn't responded in 6 seconds, force show the login screen
     const bypassTimer = setTimeout(() => {
       setIsAuthReady(ready => {
         if (!ready) {
@@ -521,7 +521,7 @@ export default function App() {
         }
         return ready;
       });
-    }, 10000);
+    }, 6000);
 
     // Connection Test
     const testConnection = async () => {
@@ -1347,7 +1347,10 @@ export default function App() {
             {!bootTimeout ? (
               <>
                 <div className="h-16 w-16 border-4 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-brand-blue font-black uppercase tracking-widest text-[10px] animate-pulse">Initializing Terminal Node...</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-brand-blue font-black uppercase tracking-widest text-[10px] animate-pulse">Initializing Terminal Node...</p>
+                  <p className="text-[9px] text-brand-dark-grey/40 font-bold uppercase tracking-tighter italic">Restoring encrypted sessions</p>
+                </div>
                 <p className="text-[8px] text-brand-grey/30 font-mono mt-2">{APP_VERSION}</p>
               </>
             ) : (
