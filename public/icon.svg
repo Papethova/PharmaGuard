@@ -1,27 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 34 34">
-  <!-- Solid square background for standard app icon appearance -->
-  <rect x="-5" y="-5" width="34" height="34" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Solid background for app icon crispness -->
+  <rect width="512" height="512" fill="white" />
   
-  <!-- Outer white glow/border -->
-  <path 
-    d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-    fill="white"
-    stroke="white"
-    stroke-width="2.5"
-  />
-  <!-- Main Shield Path with outlines -->
-  <path 
-    d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-    fill="#ffd700" 
-    stroke="#1e68cf" 
-    stroke-width="3" 
-    stroke-linejoin="round"
-  />
-  <!-- Inner Detail Pill -->
-  <g transform="translate(12, 12.5) scale(0.65)">
-    <g transform="translate(-10, -5)">
-      <rect x="0" y="0" width="20" height="10" rx="5" fill="#1e68cf" />
-      <path d="M10 0v10" stroke="white" stroke-width="1.5" />
+  <g transform="translate(256, 256) scale(18)">
+    <g transform="translate(-12, -12.5)">
+      <!-- 1. Outermost white outline for extra contrast -->
+      <path 
+        d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+        fill="none"
+        stroke="white"
+        stroke-width="6"
+        stroke-linejoin="round"
+      />
+      
+      <!-- 2. Thick blue border -->
+      <path 
+        d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+        fill="none"
+        stroke="#1e68cf"
+        stroke-width="4.5"
+        stroke-linejoin="round"
+      />
+      
+      <!-- 3. Yellow shield fill -->
+      <path 
+        d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+        fill="#ffd700"
+        stroke="white"
+        stroke-width="0.8"
+        stroke-linejoin="round"
+      />
+
+      <!-- 4. Central Pill Detail -->
+      <g transform="translate(12, 12.5) scale(0.65)">
+        <g transform="translate(-10, -5)">
+          <rect x="0" y="0" width="20" height="10" rx="5" fill="#1e68cf" />
+          <path d="M10 0v10" stroke="white" stroke-width="1.8" />
+        </g>
+      </g>
     </g>
   </g>
 </svg>

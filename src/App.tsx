@@ -106,42 +106,45 @@ const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center shrink-0 ${className}`}>
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-visible">
       <svg 
-        viewBox="-3 -3 30 30" 
+        viewBox="0 0 512 512" 
         className="h-[120%] w-[120%] overflow-visible"
       >
-        {/* 1. Outermost white outline for the blue border */}
-        <path 
-          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="none"
-          stroke="white"
-          strokeWidth="5.5"
-          strokeLinejoin="round"
-        />
-        {/* 2. Thicker blue border around the shield */}
-        <path 
-          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="none"
-          stroke="var(--color-brand-blue)"
-          strokeWidth="4.5"
-          strokeLinejoin="round"
-        />
-        {/* 3. Yellow shield fill with its own white outline */}
-        <path 
-          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="var(--color-brand-yellow)"
-          stroke="white"
-          strokeWidth="0.75"
-          strokeLinejoin="round"
-        />
+        <g transform="translate(256, 256) scale(18)">
+          <g transform="translate(-12, -12.5)">
+            {/* 1. Outermost white outline */}
+            <path 
+              d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+              fill="none"
+              stroke="white"
+              strokeWidth="6"
+              strokeLinejoin="round"
+            />
+            {/* 2. Thicker blue border around the shield */}
+            <path 
+              d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+              fill="none"
+              stroke="#1e68cf"
+              strokeWidth="4.5"
+              strokeLinejoin="round"
+            />
+            {/* 3. Yellow shield fill with white outline */}
+            <path 
+              d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+              fill="#ffd700"
+              stroke="white"
+              strokeWidth="0.8"
+              strokeLinejoin="round"
+            />
+            {/* 4. Central Pill Detail */}
+            <g transform="translate(12, 12.5) scale(0.65)">
+              <g transform="translate(-10, -5)">
+                <rect x="0" y="0" width="20" height="10" rx="5" fill="#1e68cf" />
+                <path d="M10 0v10" stroke="white" strokeWidth="1.8" />
+              </g>
+            </g>
+          </g>
+        </g>
       </svg>
-    </div>
-    <div className="relative z-10 flex items-center justify-center h-full w-full">
-      <Pill 
-        className="h-[55%] w-[55%] drop-shadow-sm" 
-        fill="var(--color-brand-blue)" 
-        color="white" 
-        strokeWidth={1.2} 
-      />
     </div>
   </div>
 );
