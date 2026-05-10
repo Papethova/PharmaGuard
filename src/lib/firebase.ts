@@ -20,14 +20,19 @@ import firebaseConfig from '../../firebase-applet-config.json';
 
 // Handle cases where firebase-applet-config.json might be empty or invalid
 const validConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig?.apiKey || "placeholder",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig?.authDomain || "placeholder",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig?.projectId || "placeholder",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig?.storageBucket || "placeholder",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig?.messagingSenderId || "placeholder",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig?.appId || "placeholder",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig?.apiKey,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig?.authDomain,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig?.projectId,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig?.storageBucket,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig?.messagingSenderId,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig?.appId,
   firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || firebaseConfig?.firestoreDatabaseId || "(default)"
 };
+
+// Log warning if config is likely invalid (missing key)
+if (!validConfig.apiKey || validConfig.apiKey === "placeholder") {
+  console.warn("Firebase API Key is missing. Login will not work until VITE_FIREBASE_API_KEY is set in environment variables.");
+}
 
 const app = initializeApp(validConfig);
 export const auth = getAuth(app);
