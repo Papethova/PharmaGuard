@@ -726,18 +726,31 @@ export default function App() {
   }, [user]);
 
   const handleGoogleLogin = async () => {
+    console.log("Starting Google Login...");
     setIsSubmitting(true);
     try {
+      // For Safari in iframes, popups are often blocked or fail to communicate.
+      // We try to catch this and provide better feedback.
       await signInWithPopup(auth, googleProvider);
       toast.success("Signed in successfully");
     } catch (error: any) {
-      console.error("Google login error:", error);
+      console.error("Google login error detail:", error);
+      const currentDomain = window.location.hostname;
+      
       if (error.code === 'auth/unauthorized-domain') {
-        toast.error("Auth Error: Domain not authorized. Please add this domain to Firebase Authorized Domains.");
+        toast.error(
+          <div>
+            <p className="font-bold">Domain Not Authorized</p>
+            <p className="text-xs mt-1">Please add <b>{currentDomain}</b> to your Firebase Console under Auth &gt; Settings &gt; Authorized Domains.</p>
+          </div>,
+          { duration: 6000 }
+        );
       } else if (error.code === 'auth/popup-blocked') {
-        toast.error("Login popup blocked. Please enable popups or open the app in a new tab.");
+        toast.error("Login popup blocked. Please enable popups in Safari or open the app in a new tab.");
+      } else if (error.code === 'auth/internal-error' || error.code === 'auth/network-request-failed') {
+        toast.error("Network or Safari restriction detected. Try opening the app in a new tab or checking your browser privacy settings.");
       } else {
-        toast.error("Login Failed: " + error.message);
+        toast.error("Login Failed: " + (error.message || "Unknown error occurred"));
       }
     } finally {
       setIsSubmitting(false);
@@ -1403,9 +1416,20 @@ export default function App() {
                     {isSubmitting ? "Syncing..." : "Continue with Google"}
                   </Button>
 
-                  <div className="text-center">
-                    <p className="text-[10px] text-brand-grey/60 font-medium px-4">
-                      Note: If the login popup doesn't appear, please ensure popups are allowed or try "Open in New Tab" from the top menu.
+                  <div className="text-center space-y-1">
+                    <p className="text-[10px] text-brand-dark-grey/50 font-medium px-4 leading-relaxed">
+                      If the login popup doesn't appear, please ensure popups are allowed in your browser settings.
+                    </p>
+                    <p className="text-[10px] text-brand-dark-grey/50">
+                      Still having trouble?{" "}
+                      <a 
+                        href={window.location.href} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-brand-blue font-bold hover:underline"
+                      >
+                        Open in a new tab
+                      </a>
                     </p>
                   </div>
 
