@@ -19,14 +19,14 @@ import {
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Handle cases where firebase-applet-config.json might be empty or invalid
-const validConfig = firebaseConfig && firebaseConfig.apiKey ? firebaseConfig : {
-  apiKey: "placeholder",
-  authDomain: "placeholder",
-  projectId: "placeholder",
-  storageBucket: "placeholder",
-  messagingSenderId: "placeholder",
-  appId: "placeholder",
-  firestoreDatabaseId: "(default)"
+const validConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig?.apiKey || "placeholder",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig?.authDomain || "placeholder",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig?.projectId || "placeholder",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig?.storageBucket || "placeholder",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig?.messagingSenderId || "placeholder",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig?.appId || "placeholder",
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || firebaseConfig?.firestoreDatabaseId || "(default)"
 };
 
 const app = initializeApp(validConfig);
