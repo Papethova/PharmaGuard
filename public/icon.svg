@@ -1,17 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <!-- Solid Background for App Icon -->
-  <rect width="24" height="24" fill="white" />
-  <!-- Outer Shield Shell -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 34 34">
+  <!-- Solid square background for standard app icon appearance -->
+  <rect x="-5" y="-5" width="34" height="34" fill="white" />
+  
+  <!-- Outer white glow/border -->
   <path 
-    d="M12 23C12 23 22 18.5 22 12V5.5C22 5.5 19.5 3.5 12 1.5C4.5 3.5 2 5.5 2 5.5V12C2 18.5 12 23 12 23Z" 
+    d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+    fill="white"
+    stroke="white"
+    stroke-width="2.5"
+  />
+  <!-- Main Shield Path with outlines -->
+  <path 
+    d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
     fill="#ffd700" 
     stroke="#1e68cf" 
-    stroke-width="2" 
+    stroke-width="3" 
     stroke-linejoin="round"
   />
-  <!-- Pill Icon Center -->
-  <g transform="translate(6, 9.5)">
-    <rect x="0" y="0" width="12" height="5" rx="2.5" fill="#1e68cf" />
-    <path d="M6 0v5" stroke="white" stroke-width="0.75" />
+  <!-- Inner Detail Pill -->
+  <g transform="translate(12, 12.5) scale(0.65)">
+    <g transform="translate(-10, -5)">
+      <rect x="0" y="0" width="20" height="10" rx="5" fill="#1e68cf" />
+      <path d="M10 0v10" stroke="white" stroke-width="1.5" />
+    </g>
   </g>
 </svg>
