@@ -726,7 +726,6 @@ export default function App() {
   }, [user]);
 
   const handleGoogleLogin = async () => {
-    console.log("Starting Google Login...");
     setIsSubmitting(true);
     try {
       // For Safari in iframes, popups are often blocked or fail to communicate.
