@@ -1368,10 +1368,6 @@ export default function App() {
             </div>
           )}
         </div>
-        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
-          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
-          {APP_VERSION}
-        </div>
       </div>
     );
   }
@@ -1581,10 +1577,6 @@ export default function App() {
           </Card>
         </motion.div>
         
-        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
-          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
-          {APP_VERSION}
-        </div>
       </div>
     );
   }
@@ -1647,10 +1639,6 @@ export default function App() {
             </div>
           </div>
         </motion.div>
-        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
-          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
-          {APP_VERSION}
-        </div>
       </div>
     );
   }
@@ -1685,10 +1673,6 @@ export default function App() {
             </div>
           </div>
         </motion.div>
-        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
-          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
-          {APP_VERSION}
-        </div>
       </div>
     );
   }
@@ -1878,12 +1862,14 @@ export default function App() {
                       <span className="text-[7px] font-black bg-brand-yellow text-brand-blue px-1 rounded-sm w-fit uppercase tracking-tighter mt-0.5 animate-pulse">Setup Required</span>
                     )}
                     <span className="text-[10px] text-brand-grey font-medium truncate no-interact">{user.email}</span>
-                    <div className="mt-4 pt-4 border-t border-brand-blue/10 flex flex-col gap-1">
-                      <div className="flex items-center gap-2 opacity-40">
-                        <div className="h-1 w-1 bg-brand-blue rounded-full animate-pulse" />
-                        <span className="text-[8px] font-mono font-black tracking-widest uppercase text-brand-blue">{APP_VERSION}</span>
+                    {user?.email === MASTER_ADMIN_EMAIL && (
+                      <div className="mt-4 pt-4 border-t border-brand-blue/10 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 opacity-40">
+                          <div className="h-1 w-1 bg-brand-blue rounded-full animate-pulse" />
+                          <span className="text-[8px] font-mono font-black tracking-widest uppercase text-brand-blue">{APP_VERSION}</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <Button 
@@ -3950,11 +3936,6 @@ export default function App() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-
-    <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
-      <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
-      {APP_VERSION}
-    </div>
   </div>
   );
 }
