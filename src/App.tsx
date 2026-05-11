@@ -121,14 +121,14 @@ const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
         <path 
           d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
           fill="none"
-          stroke="var(--color-brand-blue)"
+          stroke="#1e68cf"
           strokeWidth="4.5"
           strokeLinejoin="round"
         />
         {/* 3. Yellow shield fill with its own white outline */}
         <path 
           d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="var(--color-brand-yellow)"
+          fill="#ffd700"
           stroke="white"
           strokeWidth="0.75"
           strokeLinejoin="round"

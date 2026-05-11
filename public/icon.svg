@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -3 30 30" width="512" height="512" fill="none">
-  <!-- Solid white rounded square for base -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -3 30 30" width="512" height="512" fill="white">
+  <!-- Solid white square for base -->
   <rect x="-3" y="-3" width="30" height="30" fill="white" />
   
   <!-- 1. Outermost white outline -->
