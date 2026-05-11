@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { Clock, X, AlertTriangle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { PharmaLogo } from "../common/Icons";
 import { escapeEmail } from "../../lib/formatters";
 
@@ -100,5 +101,3 @@ export const SuspendedAccount = ({ onLogout }: { onLogout: () => void }) => (
     </motion.div>
   </div>
 );
-
-import { Card } from "@/components/ui/card";

@@ -91,22 +91,27 @@ export default function App() {
     return inventory.filter(item => item.currentStock <= item.minThreshold);
   }, [inventory]);
 
-  if (isInitializing) {
+  // If loading, show professional loading state
+  if (isInitializing || !isAuthReady) {
     return (
       <div className="min-h-screen bg-brand-light-grey flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <PharmaLogo className="h-16 w-16 animate-pulse" />
-          <p className="text-brand-blue font-black uppercase tracking-widest text-xs animate-pulse">Synchronizing Secure Registry...</p>
+        <div className="flex flex-col items-center gap-6">
+          <PharmaLogo className="h-20 w-20 animate-pulse" />
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-brand-blue font-black uppercase tracking-widest text-[10px] animate-pulse font-mono">Synchronizing Secure Registry...</p>
+            <div className="h-[1px] w-24 bg-brand-blue/20 overflow-hidden rounded-full">
+              <div className="h-full bg-brand-blue w-full -translate-x-full animate-[progress_1.5s_infinite_linear]" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
+  // If connected but profile is taking too long to load (and we have a user)
   if (bootTimeout && userProfile === null && user !== null) {
     return <InitializationDelay onRetry={() => window.location.reload()} />;
   }
-
-  if (!isAuthReady) return null;
 
   if (!user) {
     return <AuthScreen />;

@@ -41,7 +41,7 @@ export function useInventory(userEmail: string | null) {
         setInventory(snap.docs.map(d => ({ ...d.data(), id: d.id } as Substance)));
         setLoading(false);
       },
-      (err) => handleFirestoreError(err, OperationType.LIST, `users/${emailId}/substances`)
+      (err) => console.error(`Inventory substances fetch error:`, err)
     );
 
     const unsubTransactions = onSnapshot(
@@ -49,7 +49,7 @@ export function useInventory(userEmail: string | null) {
       (snap) => {
         setTransactions(snap.docs.map(d => ({ ...d.data(), id: d.id } as Transaction)));
       },
-      (err) => handleFirestoreError(err, OperationType.LIST, `users/${emailId}/transactions`)
+      (err) => console.error(`Inventory transactions fetch error:`, err)
     );
 
     const unsubStaff = onSnapshot(
@@ -57,7 +57,7 @@ export function useInventory(userEmail: string | null) {
       (snap) => {
         setStaff(snap.docs.map(d => ({ ...d.data(), id: d.id } as any)));
       },
-      (err) => handleFirestoreError(err, OperationType.LIST, `users/${emailId}/staff`)
+      (err) => console.error(`Inventory staff fetch error:`, err)
     );
 
     return () => {

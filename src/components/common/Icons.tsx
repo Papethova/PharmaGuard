@@ -12,30 +12,42 @@ export const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) =>
           d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
           fill="none"
           stroke="white"
-          strokeWidth="5.5"
+          strokeWidth="5"
           strokeLinejoin="round"
         />
         <path 
           d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="none"
-          stroke="#1e68cf"
-          strokeWidth="4.5"
-          strokeLinejoin="round"
-        />
-        <path 
-          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="#ffd700"
+          fill="#1e68cf"
           stroke="white"
-          strokeWidth="0.75"
+          strokeWidth="0.5"
           strokeLinejoin="round"
         />
       </svg>
     </div>
     <div className="relative z-10 flex items-center justify-center h-full w-full">
-      <div className="h-[40%] w-[40%] border-4 border-white rounded-full flex items-center justify-center">
-         <div className="h-full w-[2px] bg-white absolute" />
-         <div className="w-full h-[2px] bg-white absolute" />
-      </div>
+      <svg viewBox="0 0 24 24" className="h-[65%] w-[65%] overflow-visible">
+        <g transform="translate(12, 12) rotate(-45)">
+          <rect 
+            x="-7" 
+            y="-2.5" 
+            width="14" 
+            height="5" 
+            rx="2.5" 
+            fill="white"
+            stroke="white"
+            strokeWidth="1.5"
+          />
+          <rect 
+            x="-6.5" 
+            y="-2" 
+            width="13" 
+            height="4" 
+            rx="2" 
+            fill="#1e68cf"
+          />
+          <path d="M0 -2.5V2.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
+        </g>
+      </svg>
     </div>
   </div>
 );

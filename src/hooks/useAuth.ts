@@ -28,29 +28,34 @@ export function useAuth() {
       
       if (currentUser) {
         const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
-        
-        // Listen to user profile
         const userDocRef = doc(db, "users", emailId);
         
+        // Timeout for profile readiness - fallback if Firestore is slow
+        const profileTimeout = setTimeout(() => {
+          setIsAuthReady(true);
+        }, 5000);
+
         const unsubProfile = onSnapshot(userDocRef, (docSnap) => {
           if (docSnap.exists()) {
             setUserProfile({ ...docSnap.data(), docId: docSnap.id } as UserProfile);
           } else {
             setUserProfile(null);
           }
+          clearTimeout(profileTimeout);
           setIsAuthReady(true);
-          setIsInitializing(false);
         }, (error) => {
           console.error("Auth profile listener error:", error);
+          clearTimeout(profileTimeout);
           setIsAuthReady(true);
-          setIsInitializing(false);
         });
 
-        return () => unsubProfile();
+        return () => {
+          unsubProfile();
+          clearTimeout(profileTimeout);
+        };
       } else {
         setUserProfile(null);
         setIsAuthReady(true);
-        setIsInitializing(false);
       }
     });
 
