@@ -116,30 +116,24 @@ export function AuthScreen() {
                   </div>
                 </div>
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
-                  <div className="relative flex justify-center text-[10px] uppercase font-black px-2 bg-brand-surface text-brand-blue/40">or use email credentials</div>
-                </div>
 
-                <div className="flex flex-col gap-3">
-                  <div className="flex gap-3">
-                    <Button 
-                      type="button"
-                      variant="outline"
-                      onClick={() => setAuthMode("login")}
-                      className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all shadow-sm"
-                    >
-                      Login
-                    </Button>
-                    <Button 
-                      type="button"
-                      variant="outline"
-                      onClick={() => setAuthMode("signup")}
-                      className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all shadow-sm"
-                    >
-                      Register New User
-                    </Button>
-                  </div>
+                <div className="flex flex-col gap-4">
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={() => setAuthMode("login")}
+                    className="w-full h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all shadow-sm"
+                  >
+                    Log In with Email
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={() => setAuthMode("signup")}
+                    className="w-full h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all shadow-sm"
+                  >
+                    Register New User
+                  </Button>
                 </div>
               </div>
             ) : authMode === "login" ? (
