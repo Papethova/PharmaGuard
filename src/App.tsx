@@ -106,45 +106,40 @@ const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center shrink-0 ${className}`}>
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-visible">
       <svg 
-        viewBox="0 0 512 512" 
+        viewBox="-3 -3 30 30" 
         className="h-[120%] w-[120%] overflow-visible"
       >
-        <g transform="translate(256, 256) scale(18)">
-          <g transform="translate(-12, -12.5)">
-            {/* 1. Outermost white outline */}
-            <path 
-              d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-              fill="none"
-              stroke="white"
-              strokeWidth="6"
-              strokeLinejoin="round"
-            />
-            {/* 2. Thicker blue border around the shield */}
-            <path 
-              d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-              fill="none"
-              stroke="#1e68cf"
-              strokeWidth="4.5"
-              strokeLinejoin="round"
-            />
-            {/* 3. Yellow shield fill with white outline */}
-            <path 
-              d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-              fill="#ffd700"
-              stroke="white"
-              strokeWidth="0.8"
-              strokeLinejoin="round"
-            />
-            {/* 4. Central Pill Detail */}
-            <g transform="translate(12, 12.5) scale(0.65)">
-              <g transform="translate(-10, -5)">
-                <rect x="0" y="0" width="20" height="10" rx="5" fill="#1e68cf" />
-                <path d="M10 0v10" stroke="white" strokeWidth="1.8" />
-              </g>
-            </g>
-          </g>
-        </g>
+        {/* 1. Outermost white outline for the blue border */}
+        <path 
+          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+          fill="none"
+          stroke="white"
+          strokeWidth="5.5"
+          strokeLinejoin="round"
+        />
+        {/* 2. Thicker blue border around the shield */}
+        <path 
+          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+          fill="none"
+          stroke="var(--color-brand-blue)"
+          strokeWidth="4.5"
+          strokeLinejoin="round"
+        />
+        {/* 3. Yellow shield fill with its own white outline */}
+        <path 
+          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
+          fill="var(--color-brand-yellow)"
+          stroke="white"
+          strokeWidth="0.75"
+          strokeLinejoin="round"
+        />
       </svg>
+    </div>
+    <div className="relative z-10 flex items-center justify-center h-full w-full">
+      <Pill 
+        className="h-[55%] w-[55%] drop-shadow-sm transition-all text-white fill-brand-blue" 
+        strokeWidth={1.2} 
+      />
     </div>
   </div>
 );
@@ -1338,6 +1333,7 @@ export default function App() {
   };
 
   if (!isAuthReady || isInitializing) {
+    console.log("App Initialization Phase:", APP_VERSION);
     return (
       <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-6 text-center">
         <div className="flex flex-col items-center gap-6 max-w-sm">
@@ -1371,6 +1367,10 @@ export default function App() {
               </div>
             </div>
           )}
+        </div>
+        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
+          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
+          {APP_VERSION}
         </div>
       </div>
     );
@@ -1422,39 +1422,24 @@ export default function App() {
                     <p className="text-[10px] text-brand-dark-grey/50 font-medium px-4 leading-relaxed">
                       If the login popup doesn't appear, please ensure popups are allowed in your browser settings.
                     </p>
-                    <p className="text-[10px] text-brand-dark-grey/50">
-                      Still having trouble?{" "}
-                      <a 
-                        href={window.location.href} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-brand-blue font-bold hover:underline"
-                      >
-                        Open in a new tab
-                      </a>
-                    </p>
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="text-[10px] text-brand-dark-grey/50">
+                        Still having trouble?{" "}
+                        <a 
+                          href={window.location.href} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-brand-blue font-bold hover:underline"
+                        >
+                          Open in a new tab
+                        </a>
+                      </p>
+                    </div>
                   </div>
 
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
                     <div className="relative flex justify-center text-[10px] uppercase font-bold px-2 bg-brand-surface text-brand-grey/40">or use terminal credentials</div>
-                  </div>
-
-                  <Button 
-                    onClick={() => setAuthMode("login")}
-                    variant="outline"
-                    className="w-full h-12 border-brand-blue/20 text-brand-blue font-bold text-sm rounded-xl"
-                  >
-                    Sign In with Email
-                  </Button>
-                  
-                  <div className="text-center">
-                    <button 
-                      onClick={() => setAuthMode("signup")}
-                      className="text-[10px] uppercase font-black text-brand-blue/60 hover:text-brand-blue tracking-widest transition-colors"
-                    >
-                      Create New Organization Nodes
-                    </button>
                   </div>
                 </div>
               ) : authMode === "login" ? (
@@ -1595,6 +1580,11 @@ export default function App() {
             </CardContent>
           </Card>
         </motion.div>
+        
+        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
+          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
+          {APP_VERSION}
+        </div>
       </div>
     );
   }
@@ -1657,6 +1647,10 @@ export default function App() {
             </div>
           </div>
         </motion.div>
+        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
+          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
+          {APP_VERSION}
+        </div>
       </div>
     );
   }
@@ -1691,6 +1685,10 @@ export default function App() {
             </div>
           </div>
         </motion.div>
+        <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
+          <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
+          {APP_VERSION}
+        </div>
       </div>
     );
   }
@@ -1880,6 +1878,12 @@ export default function App() {
                       <span className="text-[7px] font-black bg-brand-yellow text-brand-blue px-1 rounded-sm w-fit uppercase tracking-tighter mt-0.5 animate-pulse">Setup Required</span>
                     )}
                     <span className="text-[10px] text-brand-grey font-medium truncate no-interact">{user.email}</span>
+                    <div className="mt-4 pt-4 border-t border-brand-blue/10 flex flex-col gap-1">
+                      <div className="flex items-center gap-2 opacity-40">
+                        <div className="h-1 w-1 bg-brand-blue rounded-full animate-pulse" />
+                        <span className="text-[8px] font-mono font-black tracking-widest uppercase text-brand-blue">{APP_VERSION}</span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button 
@@ -3946,6 +3950,11 @@ export default function App() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <div className="fixed bottom-3 right-3 z-[10000] pointer-events-auto opacity-100 flex items-center gap-1.5 bg-brand-blue text-white px-3 py-1.5 rounded-full text-[9px] font-black font-mono tracking-widest uppercase shadow-2xl border-2 border-white/40 translate-z-50">
+      <div className="h-1.5 w-1.5 bg-brand-yellow rounded-full animate-pulse" />
+      {APP_VERSION}
+    </div>
   </div>
   );
 }

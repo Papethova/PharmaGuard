@@ -7,15 +7,15 @@
   "theme_color": "#1e68cf",
   "icons": [
     {
-      "src": "/icon.svg?v=2",
+      "src": "/icon.svg?v=v1.1.9_FINAL",
       "sizes": "192x192 512x512",
       "type": "image/svg+xml"
     },
     {
-      "src": "/icon.svg?v=2",
+      "src": "/icon.svg?v=v1.1.9_FINAL",
       "sizes": "180x180",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any apple-touch-icon"
     }
   ]
 }
