@@ -91,7 +91,7 @@ export default function App() {
     return inventory.filter(item => item.currentStock <= item.minThreshold);
   }, [inventory]);
 
-  if (isInitializing && !bootTimeout) {
+  if (isInitializing) {
     return (
       <div className="min-h-screen bg-brand-light-grey flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -102,7 +102,7 @@ export default function App() {
     );
   }
 
-  if (bootTimeout && isInitializing) {
+  if (bootTimeout && userProfile === null && user !== null) {
     return <InitializationDelay onRetry={() => window.location.reload()} />;
   }
 
