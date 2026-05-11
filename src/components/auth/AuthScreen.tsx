@@ -84,6 +84,32 @@ export function AuthScreen() {
                   </p>
                 </div>
                 
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-3">
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      onClick={() => setAuthMode("login")}
+                      className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all shadow-sm"
+                    >
+                      Login
+                    </Button>
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      onClick={() => setAuthMode("signup")}
+                      className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all shadow-sm"
+                    >
+                      Register New User
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
+                  <div className="relative flex justify-center text-[10px] uppercase font-black px-2 bg-brand-surface text-brand-blue/40">or sync with institution</div>
+                </div>
+                
                 <Button 
                   onClick={handleGoogleLogin}
                   disabled={isSubmitting}
@@ -96,49 +122,6 @@ export function AuthScreen() {
                   )}
                   {isSubmitting ? "Syncing..." : "Continue with Google"}
                 </Button>
-
-                <div className="text-center space-y-1">
-                  <p className="text-[10px] text-brand-dark-grey/50 font-medium px-4 leading-relaxed">
-                    If the login popup doesn't appear, please ensure popups are allowed in your browser settings.
-                  </p>
-                  <div className="flex flex-col items-center gap-1">
-                    <p className="text-[10px] text-brand-dark-grey/50">
-                      Still having trouble?{" "}
-                      <a 
-                        href={window.location.href} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-brand-blue font-bold hover:underline"
-                      >
-                        Open in a new tab
-                      </a>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
-                  <div className="relative flex justify-center text-[10px] uppercase font-black px-2 bg-brand-surface text-brand-blue/40">or use terminal credentials</div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={() => setAuthMode("login")}
-                    className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all"
-                  >
-                    Login
-                  </Button>
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={() => setAuthMode("signup")}
-                    className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all"
-                  >
-                    Register
-                  </Button>
-                </div>
               </div>
             ) : authMode === "login" ? (
               <form onSubmit={handleEmailLogin} className="space-y-4">

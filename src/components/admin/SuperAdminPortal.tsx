@@ -27,6 +27,7 @@ interface SuperAdminPortalProps {
   onDeleteNode: (docId: string) => void;
   onResetNode: (docId: string) => void;
   isActionPending: boolean;
+  appVersion: string;
 }
 
 export function SuperAdminPortal({
@@ -41,7 +42,8 @@ export function SuperAdminPortal({
   onUpdateStatus,
   onDeleteNode,
   onResetNode,
-  isActionPending
+  isActionPending,
+  appVersion
 }: SuperAdminPortalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -67,6 +69,10 @@ export function SuperAdminPortal({
                   <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2">
                     {getIdentityString(userProfile, currentUser?.email)} 
                   </span>
+                  <div className="flex items-center gap-2 opacity-40 mt-0.5">
+                    <div className="h-1 w-1 bg-brand-blue rounded-full" />
+                    <span className="text-[8px] font-mono font-black tracking-widest uppercase text-brand-blue">Build {appVersion}</span>
+                  </div>
                 </div>
                 <div className="h-6 w-px bg-brand-blue/10" />
                 <div className="flex flex-col">

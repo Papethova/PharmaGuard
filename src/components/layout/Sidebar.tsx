@@ -139,14 +139,6 @@ export function Sidebar({
                 <span className="text-[7px] font-black bg-brand-yellow text-brand-blue px-1 rounded-sm w-fit uppercase tracking-tighter mt-0.5 animate-pulse">Setup Required</span>
               )}
               <span className="text-[10px] text-brand-grey font-medium truncate no-interact">{user.email}</span>
-              {user?.email?.toLowerCase() === masterAdminEmail.toLowerCase() && (
-                <div className="mt-4 pt-4 border-t border-brand-blue/10 flex flex-col gap-1">
-                  <div className="flex items-center gap-2 opacity-40">
-                    <div className="h-1 w-1 bg-brand-blue rounded-full animate-pulse" />
-                    <span className="text-[8px] font-mono font-black tracking-widest uppercase text-brand-blue">{appVersion}</span>
-                  </div>
-                </div>
-              )}
             </div>
             <div className="flex items-center gap-2">
               <Button 

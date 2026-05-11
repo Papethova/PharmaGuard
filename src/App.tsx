@@ -235,6 +235,7 @@ export default function App() {
         }}
         onResetNode={() => toast.info("Reset logic pending specialized auth")}
         isActionPending={isActionPending}
+        appVersion={APP_VERSION}
       />
 
       <UserManagementDialog 
