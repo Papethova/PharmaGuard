@@ -41,7 +41,10 @@ export function useInventory(userEmail: string | null) {
         setInventory(snap.docs.map(d => ({ ...d.data(), id: d.id } as Substance)));
         setLoading(false);
       },
-      (err) => console.error(`Inventory substances fetch error:`, err)
+      (err) => {
+        console.error(`Inventory substances fetch error:`, err);
+        setLoading(false);
+      }
     );
 
     const unsubTransactions = onSnapshot(
