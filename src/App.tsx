@@ -137,7 +137,7 @@ const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
     </div>
     <div className="relative z-10 flex items-center justify-center h-full w-full">
       <Pill 
-        className="h-[55%] w-[55%] drop-shadow-sm transition-all text-white fill-brand-blue" 
+        className="h-[55%] w-[55%] transition-all text-white fill-brand-blue" 
         strokeWidth={1.2} 
       />
     </div>
@@ -1344,7 +1344,9 @@ export default function App() {
                   <p className="text-brand-blue font-black uppercase tracking-widest text-[10px] animate-pulse">Initializing Terminal Node...</p>
                   <p className="text-[9px] text-brand-dark-grey/40 font-bold uppercase tracking-tighter italic">Restoring encrypted sessions</p>
                 </div>
-                <p className="text-[8px] text-brand-grey/30 font-mono mt-2">{APP_VERSION}</p>
+                {user?.email === MASTER_ADMIN_EMAIL && (
+                  <p className="text-[8px] text-brand-grey/30 font-mono mt-2">{APP_VERSION}</p>
+                )}
               </>
             ) : (
             <div className="bg-white p-8 rounded-2xl shadow-xl border-2 border-brand-yellow space-y-4">
@@ -1360,10 +1362,12 @@ export default function App() {
                 >
                   Force Restart Terminal
                 </Button>
-                <div className="flex items-center justify-center gap-2 opacity-40">
-                  <div className="h-1 w-1 bg-brand-blue rounded-full animate-pulse" />
-                  <span className="text-[9px] font-mono tracking-widest uppercase text-brand-blue">{APP_VERSION}</span>
-                </div>
+                {user?.email === MASTER_ADMIN_EMAIL && (
+                  <div className="flex items-center justify-center gap-2 opacity-40">
+                    <div className="h-1 w-1 bg-brand-blue rounded-full animate-pulse" />
+                    <span className="text-[9px] font-mono tracking-widest uppercase text-brand-blue">{APP_VERSION}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1435,7 +1439,26 @@ export default function App() {
 
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
-                    <div className="relative flex justify-center text-[10px] uppercase font-bold px-2 bg-brand-surface text-brand-grey/40">or use terminal credentials</div>
+                    <div className="relative flex justify-center text-[10px] uppercase font-black px-2 bg-brand-surface text-brand-blue/40">or use terminal credentials</div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      onClick={() => setAuthMode("login")}
+                      className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all"
+                    >
+                      Login
+                    </Button>
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      onClick={() => setAuthMode("signup")}
+                      className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 transition-all"
+                    >
+                      Register
+                    </Button>
                   </div>
                 </div>
               ) : authMode === "login" ? (
@@ -2356,7 +2379,7 @@ export default function App() {
                                       <Camera className="h-8 w-8" />
                                     </Button>
                                   </div>
-                                  <div className="relative w-full aspect-video rounded-lg overflow-hidden border-2 border-brand-blue/10 bg-black flex items-center justify-center">
+                                  <div className="relative w-full aspect-video rounded-lg overflow-hidden border-2 border-brand-blue/10 bg-brand-blue/5 flex items-center justify-center">
                                     <video 
                                       ref={videoRef} 
                                       autoPlay 
