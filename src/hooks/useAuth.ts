@@ -33,6 +33,7 @@ export function useAuth() {
         // Timeout for profile readiness - fallback if Firestore is slow
         const profileTimeout = setTimeout(() => {
           setIsAuthReady(true);
+          setIsInitializing(false);
         }, 5000);
 
         const unsubProfile = onSnapshot(userDocRef, (docSnap) => {
@@ -43,10 +44,12 @@ export function useAuth() {
           }
           clearTimeout(profileTimeout);
           setIsAuthReady(true);
+          setIsInitializing(false);
         }, (error) => {
           console.error("Auth profile listener error:", error);
           clearTimeout(profileTimeout);
           setIsAuthReady(true);
+          setIsInitializing(false);
         });
 
         return () => {
@@ -56,6 +59,7 @@ export function useAuth() {
       } else {
         setUserProfile(null);
         setIsAuthReady(true);
+        setIsInitializing(false);
       }
     });
 

@@ -242,7 +242,7 @@ export default function App() {
         isOpen={isEditProfileOpen}
         onOpenChange={setIsEditProfileOpen}
         userProfile={userProfile}
-        userEmail={user.email}
+        userEmail={user.email || ""}
       />
 
       <TransactionDetailDialog 
@@ -276,7 +276,7 @@ export default function App() {
       <UserManagementDialog 
         isOpen={isUserManagementOpen}
         onOpenChange={setIsUserManagementOpen}
-        userEmail={user.email!}
+        userEmail={user.email || ""}
         users={staff}
         isSubmitting={isActionPending}
         setIsSubmitting={setIsActionPending}
