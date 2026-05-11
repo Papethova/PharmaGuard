@@ -20,7 +20,9 @@ import { AuditLogView } from "./components/history/AuditLogView";
 import { AlertsView } from "./components/alerts/AlertsView";
 import { SuperAdminPortal } from "./components/admin/SuperAdminPortal";
 import { UserManagementDialog } from "./components/users/UserManagementDialog";
-import { LogTransactionDialog } from "./components/forms/LogTransactionDialog";
+import { DispenseDialog } from "./components/forms/DispenseDialog";
+import { AddStockDialog } from "./components/forms/AddStockDialog";
+import { AdjustStockDialog } from "./components/forms/AdjustStockDialog";
 import { AddSubstanceDialog } from "./components/inventory/AddSubstanceDialog";
 import { TransactionDetailDialog } from "./components/history/TransactionDetailDialog";
 import { PharmaLogo } from "./components/common/Icons";
@@ -44,8 +46,9 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState("inventory");
   
   // Dialog States
-  const [isLogOpen, setIsLogOpen] = useState(false);
-  const [logType, setLogType] = useState<TransactionType>("OUT");
+  const [isDispenseOpen, setIsDispenseOpen] = useState(false);
+  const [isAddStockOpen, setIsAddStockOpen] = useState(false);
+  const [isAdjustStockOpen, setIsAdjustStockOpen] = useState(false);
   const [isAddMedOpen, setIsAddMedOpen] = useState(false);
   const [isSuperAdminOpen, setIsSuperAdminOpen] = useState(false);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
@@ -153,9 +156,9 @@ export default function App() {
             isUserManagementOpen={isUserManagementOpen}
             lowStockCount={lowStockItems.length}
             onTabChange={setCurrentTab}
-            onDispense={() => { setLogType("OUT"); setIsLogOpen(true); }}
-            onAdd={() => { setLogType("IN"); setIsLogOpen(true); }}
-            onAdjust={() => { setLogType("ADJUST"); setIsLogOpen(true); }}
+            onDispense={() => setIsDispenseOpen(true)}
+            onAdd={() => setIsAddStockOpen(true)}
+            onAdjust={() => setIsAdjustStockOpen(true)}
             onEditProfile={() => setIsAddMedOpen(true)} // Or dedicated profile edit
             onLogout={logout}
             masterAdminEmail={MASTER_ADMIN_EMAIL}
@@ -195,10 +198,27 @@ export default function App() {
       </main>
 
       {/* Dialogs */}
-      <LogTransactionDialog 
-        isOpen={isLogOpen}
-        onOpenChange={setIsLogOpen}
-        type={logType}
+      <DispenseDialog 
+        isOpen={isDispenseOpen}
+        onOpenChange={setIsDispenseOpen}
+        inventory={inventory}
+        users={staff}
+        onLog={addTransaction}
+        isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
+      />
+
+      <AddStockDialog 
+        isOpen={isAddStockOpen}
+        onOpenChange={setIsAddStockOpen}
+        inventory={inventory}
+        users={staff}
+        onLog={addTransaction}
+        isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
+      />
+
+      <AdjustStockDialog 
+        isOpen={isAdjustStockOpen}
+        onOpenChange={setIsAdjustStockOpen}
         inventory={inventory}
         users={staff}
         onLog={addTransaction}
