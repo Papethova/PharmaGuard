@@ -84,6 +84,24 @@ export function AuthScreen() {
                   </p>
                 </div>
                 
+                <Button 
+                  onClick={handleGoogleLogin}
+                  disabled={isSubmitting}
+                  className="w-full h-12 bg-white border border-brand-blue/10 hover:bg-gray-50 text-brand-dark-grey font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <div className="h-5 w-5 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
+                  )}
+                  {isSubmitting ? "Syncing..." : "Continue with Google"}
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
+                  <div className="relative flex justify-center text-[10px] uppercase font-black px-2 bg-brand-surface text-brand-blue/40">or use email credentials</div>
+                </div>
+
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-3">
                     <Button 
@@ -104,20 +122,6 @@ export function AuthScreen() {
                     </Button>
                   </div>
                 </div>
-
-                
-                <Button 
-                  onClick={handleGoogleLogin}
-                  disabled={isSubmitting}
-                  className="w-full h-12 bg-white border border-brand-blue/10 hover:bg-gray-50 text-brand-dark-grey font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <div className="h-5 w-5 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
-                  )}
-                  {isSubmitting ? "Syncing..." : "Continue with Google"}
-                </Button>
               </div>
             ) : authMode === "login" ? (
               <form onSubmit={handleEmailLogin} className="space-y-4">
