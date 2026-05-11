@@ -40,8 +40,8 @@ export function Sidebar({
   const identity = getIdentityString(userProfile, user?.email);
 
   return (
-    <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-10 sticky top-24 shrink-0 overflow-visible">
-      <div className="flex flex-col gap-3 w-full shrink-0">
+    <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-12 sticky top-24 shrink-0 overflow-visible">
+      <div className="flex flex-col gap-4 w-full shrink-0">
         <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
           <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
             (identity.length || 0) > 20 ? "text-lg" : 
@@ -79,8 +79,8 @@ export function Sidebar({
         </Button>
       </div>
       
-      <div className="flex flex-col w-full">
-        <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-2 w-full">
+      <div className="flex flex-col w-full shrink-0">
+        <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-3 w-full">
           <TabsTrigger 
             value="inventory" 
             className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
@@ -130,7 +130,7 @@ export function Sidebar({
         </TabsList>
         
         {user && (
-          <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-8">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-10">
             <div className="flex flex-col overflow-hidden">
               <span className="text-xs font-black text-brand-blue/60 truncate tracking-tight">
                 {userProfile?.organizationName || userProfile?.displayName || user.displayName}

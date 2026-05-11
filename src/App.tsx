@@ -130,6 +130,7 @@ export default function App() {
       <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12">
         <Tabs 
           value={isUserManagementOpen ? "users" : currentTab} 
+          orientation="vertical"
           onValueChange={(val) => {
             if (val === "users") {
               setIsUserManagementOpen(true);
