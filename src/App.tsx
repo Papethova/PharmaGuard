@@ -23,6 +23,7 @@ import { UserManagementDialog } from "./components/users/UserManagementDialog";
 import { DispenseDialog } from "./components/forms/DispenseDialog";
 import { AddStockDialog } from "./components/forms/AddStockDialog";
 import { AdjustStockDialog } from "./components/forms/AdjustStockDialog";
+import { EditProfileDialog } from "./components/layout/EditProfileDialog";
 import { AddSubstanceDialog } from "./components/inventory/AddSubstanceDialog";
 import { TransactionDetailDialog } from "./components/history/TransactionDetailDialog";
 import { PharmaLogo } from "./components/common/Icons";
@@ -50,6 +51,7 @@ export default function App() {
   const [isAddStockOpen, setIsAddStockOpen] = useState(false);
   const [isAdjustStockOpen, setIsAdjustStockOpen] = useState(false);
   const [isAddMedOpen, setIsAddMedOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isSuperAdminOpen, setIsSuperAdminOpen] = useState(false);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
@@ -159,7 +161,7 @@ export default function App() {
             onDispense={() => setIsDispenseOpen(true)}
             onAdd={() => setIsAddStockOpen(true)}
             onAdjust={() => setIsAdjustStockOpen(true)}
-            onEditProfile={() => setIsAddMedOpen(true)} // Or dedicated profile edit
+            onEditProfile={() => setIsEditProfileOpen(true)}
             onLogout={logout}
             masterAdminEmail={MASTER_ADMIN_EMAIL}
             appVersion={APP_VERSION}
@@ -229,6 +231,13 @@ export default function App() {
         isOpen={isAddMedOpen}
         onOpenChange={setIsAddMedOpen}
         onAdd={addSubstance}
+      />
+
+      <EditProfileDialog 
+        isOpen={isEditProfileOpen}
+        onOpenChange={setIsEditProfileOpen}
+        userProfile={userProfile}
+        userEmail={user.email}
       />
 
       <TransactionDetailDialog 

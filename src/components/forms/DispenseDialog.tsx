@@ -245,16 +245,12 @@ export function DispenseDialog({
               </Select>
             </div>
 
-            <div className="space-y-6 pt-4 border-t border-brand-grey/10">
-              <CapturePhoto 
-                onCapture={setCapturedPhoto}
-                capturedData={capturedPhoto}
-                onReset={() => setCapturedPhoto(null)}
-              />
-              <CaptureSignature 
-                onCapture={setSignature}
-                capturedData={signature}
-                onReset={() => setSignature(null)}
+            <div className="border-t border-brand-grey/10 pt-4">
+              <CaptureIdentity 
+                mode={isPhotoRequirementEnabled ? "photo" : "signature"}
+                onCapture={(data) => isPhotoRequirementEnabled ? setCapturedPhoto(data) : setSignature(data)}
+                capturedData={isPhotoRequirementEnabled ? capturedPhoto : signature}
+                onReset={() => isPhotoRequirementEnabled ? setCapturedPhoto(null) : setSignature(null)}
               />
             </div>
           </div>
@@ -263,7 +259,7 @@ export function DispenseDialog({
         <DialogFooter className="p-6 bg-brand-light-grey/50 border-t border-brand-blue/10">
           <Button 
             onClick={handleSubmit}
-            disabled={!selectedSubstance || !quantity || !selectedUser || !patientName || !capturedPhoto || !signature}
+            disabled={!selectedSubstance || !quantity || !selectedUser || !patientName || (isPhotoRequirementEnabled ? !capturedPhoto : !signature)}
             className="w-full h-14 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest rounded-xl shadow-xl hover:scale-[1.01] transition-all disabled:opacity-50"
           >
             Authorize Dispensation

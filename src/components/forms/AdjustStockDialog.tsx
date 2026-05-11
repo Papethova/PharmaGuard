@@ -254,16 +254,12 @@ export function AdjustStockDialog({
               </Select>
             </div>
 
-            <div className="space-y-6 pt-4 border-t border-amber-100">
-              <CapturePhoto 
-                onCapture={setCapturedPhoto}
-                capturedData={capturedPhoto}
-                onReset={() => setCapturedPhoto(null)}
-              />
-              <CaptureSignature 
-                onCapture={setSignature}
-                capturedData={signature}
-                onReset={() => setSignature(null)}
+            <div className="border-t border-amber-100 pt-4">
+              <CaptureIdentity 
+                mode={isPhotoRequirementEnabled ? "photo" : "signature"}
+                onCapture={(data) => isPhotoRequirementEnabled ? setCapturedPhoto(data) : setSignature(data)}
+                capturedData={isPhotoRequirementEnabled ? capturedPhoto : signature}
+                onReset={() => isPhotoRequirementEnabled ? setCapturedPhoto(null) : setSignature(null)}
               />
             </div>
           </div>
@@ -272,7 +268,7 @@ export function AdjustStockDialog({
         <DialogFooter className="p-6 bg-amber-50 border-t border-amber-100">
           <Button 
             onClick={handleSubmit}
-            disabled={!selectedSubstance || !quantity || !selectedUser || !reasonCategory || !capturedPhoto || !signature}
+            disabled={!selectedSubstance || !quantity || !selectedUser || !reasonCategory || (isPhotoRequirementEnabled ? !capturedPhoto : !signature)}
             className="w-full h-14 bg-amber-500 text-brand-blue font-black uppercase tracking-widest rounded-xl shadow-xl hover:scale-[1.01] transition-all disabled:opacity-50"
           >
             Confirm Audit Correction

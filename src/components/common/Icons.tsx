@@ -32,10 +32,10 @@ export const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) =>
       </svg>
     </div>
     <div className="relative z-10 flex items-center justify-center h-full w-full">
-      <div className="h-[40%] w-[40%] border-4 border-white rounded-full flex items-center justify-center">
-         <div className="h-full w-[2px] bg-white absolute" />
-         <div className="w-full h-[2px] bg-white absolute" />
-      </div>
+      <Pill 
+        className="h-[55%] w-[55%] transition-all text-white fill-brand-blue" 
+        strokeWidth={1.2} 
+      />
     </div>
   </div>
 );

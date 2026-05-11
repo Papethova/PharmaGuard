@@ -245,16 +245,12 @@ export function AddStockDialog({
               </Select>
             </div>
 
-            <div className="space-y-6 pt-4 border-t border-emerald-100">
-              <CapturePhoto 
-                onCapture={setCapturedPhoto}
-                capturedData={capturedPhoto}
-                onReset={() => setCapturedPhoto(null)}
-              />
-              <CaptureSignature 
-                onCapture={setSignature}
-                capturedData={signature}
-                onReset={() => setSignature(null)}
+            <div className="border-t border-emerald-100 pt-4">
+              <CaptureIdentity 
+                mode={isPhotoRequirementEnabled ? "photo" : "signature"}
+                onCapture={(data) => isPhotoRequirementEnabled ? setCapturedPhoto(data) : setSignature(data)}
+                capturedData={isPhotoRequirementEnabled ? capturedPhoto : signature}
+                onReset={() => isPhotoRequirementEnabled ? setCapturedPhoto(null) : setSignature(null)}
               />
             </div>
           </div>
@@ -263,7 +259,7 @@ export function AddStockDialog({
         <DialogFooter className="p-6 bg-emerald-50 border-t border-emerald-100">
           <Button 
             onClick={handleSubmit}
-            disabled={!selectedSubstance || !quantity || !selectedUser || !invoiceNumber || !capturedPhoto || !signature}
+            disabled={!selectedSubstance || !quantity || !selectedUser || !invoiceNumber || (isPhotoRequirementEnabled ? !capturedPhoto : !signature)}
             className="w-full h-14 bg-emerald-600 text-white font-black uppercase tracking-widest rounded-xl shadow-xl hover:scale-[1.01] transition-all disabled:opacity-50"
           >
             Confirm Stock Receipt
