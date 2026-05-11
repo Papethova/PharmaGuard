@@ -86,7 +86,7 @@ export function Sidebar({
             className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-              <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+              <PharmaLogo className="h-5 w-5" />
             </div>
             <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
           </TabsTrigger>

@@ -11,15 +11,13 @@ interface CaptureIdentityProps {
   onReset: () => void;
 }
 
-export function CaptureIdentity({
-  mode,
+export function CapturePhoto({
   onCapture,
   capturedData,
   onReset
-}: CaptureIdentityProps) {
+}: { onCapture: (data: string) => void; capturedData: string | null; onReset: () => void }) {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const sigCanvasRef = useRef<SignatureCanvas>(null);
 
   const startCamera = async () => {
     try {
@@ -41,21 +39,70 @@ export function CaptureIdentity({
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(videoRef.current, 0, 0);
-        const data = canvas.toDataURL('image/jpeg');
-        onCapture(data);
+        onCapture(canvas.toDataURL('image/jpeg'));
         stopCamera();
       }
     }
   };
 
   const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-      tracks.forEach(track => track.stop());
+    if (videoRef.current?.srcObject) {
+      (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
       videoRef.current.srcObject = null;
       setIsCameraActive(false);
     }
   };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs font-bold text-brand-dark-grey">Identity Verification Capture</Label>
+      <div className="relative aspect-video rounded-xl overflow-hidden bg-brand-blue/5 border-2 border-dashed border-brand-blue/20">
+        {capturedData ? (
+          <div className="relative h-full">
+            <img src={capturedData} alt="Captured identity" className="h-full w-full object-cover" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="absolute top-2 right-2 h-7 bg-white/80 backdrop-blur"
+              onClick={onReset}
+            >
+              <RefreshCcw className="h-3 w-3 mr-1" /> Retake
+            </Button>
+          </div>
+        ) : isCameraActive ? (
+          <div className="relative h-full">
+            <video ref={videoRef} autoPlay playsInline className="h-full w-full object-cover grayscale contrast-125" />
+            <Button 
+              onClick={capturePhoto}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-brand-yellow text-brand-blue font-black h-10 px-6 rounded-full shadow-xl"
+            >
+              Capture Verification
+            </Button>
+          </div>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div className="h-12 w-12 rounded-full bg-brand-blue/10 flex items-center justify-center">
+              <CameraIcon className="h-6 w-6 text-brand-blue" />
+            </div>
+            <p className="text-[10px] text-brand-dark-grey/60 max-w-[200px]">
+              Camera access required for secure identity binding.
+            </p>
+            <Button onClick={startCamera} size="sm" variant="outline" className="border-brand-blue/20 text-brand-blue h-8">
+              Initialize Camera
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function CaptureSignature({
+  onCapture,
+  capturedData,
+  onReset
+}: { onCapture: (data: string) => void; capturedData: string | null; onReset: () => void }) {
+  const sigCanvasRef = useRef<SignatureCanvas>(null);
 
   const saveSignature = () => {
     if (sigCanvasRef.current && !sigCanvasRef.current.isEmpty()) {
@@ -63,59 +110,9 @@ export function CaptureIdentity({
     }
   };
 
-  const clearSignature = () => {
-    sigCanvasRef.current?.clear();
-    onReset();
-  };
-
-  if (mode === "photo") {
-    return (
-      <div className="space-y-2">
-        <Label className="text-xs font-bold text-brand-dark-grey">Identity Verification Capture</Label>
-        <div className="relative aspect-video rounded-xl overflow-hidden bg-brand-blue/5 border-2 border-dashed border-brand-blue/20">
-          {capturedData ? (
-            <div className="relative h-full">
-              <img src={capturedData} alt="Captured identity" className="h-full w-full object-cover" />
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="absolute top-2 right-2 h-7 bg-white/80 backdrop-blur"
-                onClick={onReset}
-              >
-                <RefreshCcw className="h-3 w-3 mr-1" /> Retake
-              </Button>
-            </div>
-          ) : isCameraActive ? (
-            <div className="relative h-full">
-              <video ref={videoRef} autoPlay playsInline className="h-full w-full object-cover grayscale contrast-125" />
-              <Button 
-                onClick={capturePhoto}
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-brand-yellow text-brand-blue font-black h-10 px-6 rounded-full shadow-xl"
-              >
-                Capture Verification
-              </Button>
-            </div>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center p-6 text-center space-y-4">
-              <div className="h-12 w-12 rounded-full bg-brand-blue/10 flex items-center justify-center">
-                <CameraIcon className="h-6 w-6 text-brand-blue" />
-              </div>
-              <p className="text-[10px] text-brand-dark-grey/60 max-w-[200px]">
-                Camera access required for secure identity binding.
-              </p>
-              <Button onClick={startCamera} size="sm" variant="outline" className="border-brand-blue/20 text-brand-blue h-8">
-                Initialize Camera
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-bold text-brand-dark-grey">Registry Signature binding</Label>
+      <Label className="text-xs font-bold text-brand-dark-grey">Registry Signature Binding</Label>
       <div className="border-2 border-dashed border-brand-blue/20 rounded-xl bg-white overflow-hidden relative">
         {capturedData ? (
           <div className="h-32 flex items-center justify-center p-2 relative bg-brand-blue/5">
@@ -147,7 +144,7 @@ export function CaptureIdentity({
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={clearSignature}
+              onClick={() => { sigCanvasRef.current?.clear(); onReset(); }}
               className="absolute top-1 right-1 h-6 w-6 text-brand-blue hover:text-red-500 bg-white shadow-sm"
             >
               <Eraser className="h-3 w-3" />
@@ -157,4 +154,16 @@ export function CaptureIdentity({
       </div>
     </div>
   );
+}
+
+export function CaptureIdentity({
+  mode,
+  onCapture,
+  capturedData,
+  onReset
+}: CaptureIdentityProps) {
+  if (mode === "photo") {
+    return <CapturePhoto onCapture={onCapture} capturedData={capturedData} onReset={onReset} />;
+  }
+  return <CaptureSignature onCapture={onCapture} capturedData={capturedData} onReset={onReset} />;
 }
