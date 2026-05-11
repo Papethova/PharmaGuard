@@ -105,10 +105,6 @@ export function AuthScreen() {
                   </div>
                 </div>
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
-                  <div className="relative flex justify-center text-[10px] uppercase font-black px-2 bg-brand-surface text-brand-blue/40">or sync with institution</div>
-                </div>
                 
                 <Button 
                   onClick={handleGoogleLogin}
