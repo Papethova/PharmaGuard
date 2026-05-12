@@ -17,7 +17,7 @@ export const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) =>
         />
         <path 
           d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="#1e68cf"
+          fill="#ffd700"
           stroke="white"
           strokeWidth="0.5"
           strokeLinejoin="round"
@@ -59,10 +59,10 @@ export const TransactionBadge = ({ type, size = "md" }: { type: TransactionType,
   return (
     <div className="relative flex items-center justify-center px-3 py-1 group overflow-hidden rounded-lg min-w-[100px] h-9">
       <div className="absolute inset-0 flex items-center justify-center translate-y-1 opacity-100 transition-opacity pointer-events-none">
-        {type === 'IN' && <Plus className={`${iconSize} text-brand-yellow`} strokeWidth={2} />}
-        {type === 'OUT' && <ArrowDown className={`${iconSize} text-brand-yellow`} strokeWidth={2} />}
-        {type === 'ADJUST' && <RefreshCcw className={`${iconSize} text-brand-yellow`} strokeWidth={2} />}
-        {type === 'VERIFY' && <Check className={`${iconSize} text-brand-yellow`} strokeWidth={2} />}
+        {type === 'IN' && <Plus className={`${iconSize} text-brand-blue/30`} strokeWidth={2} />}
+        {type === 'OUT' && <ArrowDown className={`${iconSize} text-brand-blue/30`} strokeWidth={2} />}
+        {type === 'ADJUST' && <RefreshCcw className={`${iconSize} text-brand-blue/30`} strokeWidth={2} />}
+        {type === 'VERIFY' && <Check className={`${iconSize} text-brand-blue/30`} strokeWidth={2} />}
       </div>
       
       <span className="relative z-10 text-[10px] font-black text-brand-blue/50 uppercase tracking-widest whitespace-nowrap">
