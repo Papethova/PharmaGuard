@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Substance } from "../../types";
-import { CapturePhoto, CaptureSignature } from "./CaptureIdentity";
+import { CaptureIdentity } from "./CaptureIdentity";
 
 interface DispenseDialogProps {
   isOpen: boolean;

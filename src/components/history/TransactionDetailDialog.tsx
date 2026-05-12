@@ -21,6 +21,7 @@ interface TransactionDetailDialogProps {
 
 export function TransactionDetailDialog({
   transaction,
+  inventory,
   onOpenChange
 }: TransactionDetailDialogProps) {
   if (!transaction) return null;

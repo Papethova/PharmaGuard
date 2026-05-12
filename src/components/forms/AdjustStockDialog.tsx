@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Substance } from "../../types";
-import { CapturePhoto, CaptureSignature } from "./CaptureIdentity";
+import { CaptureIdentity } from "./CaptureIdentity";
 
 interface AdjustStockDialogProps {
   isOpen: boolean;
