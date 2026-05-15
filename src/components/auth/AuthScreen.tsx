@@ -20,6 +20,8 @@ export function AuthScreen() {
     setIsSubmitting(true);
     try {
       await loginWithGoogle();
+    } catch (error: any) {
+      console.error("Google Auth Error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -64,13 +66,13 @@ export function AuthScreen() {
         className="max-w-md w-full"
       >
         <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden">
-          <div className="bg-brand-blue p-6 text-center relative overflow-hidden">
+          <div className="bg-brand-blue p-6 text-center">
             <div className="flex justify-center mb-4">
-              <PharmaLogo className="h-16 w-16" />
+              <PharmaLogo className="h-12 w-12" />
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
-            <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.15em] mt-1">
-              secure controlled substance perpetual inventory system
+            <h1 className="text-2xl font-bold text-white tracking-tight">PharmaGuard</h1>
+            <p className="text-white/80 font-bold text-[10px] uppercase tracking-widest mt-1">
+              Controlled Substance Inventory System
             </p>
           </div>
 
@@ -78,9 +80,9 @@ export function AuthScreen() {
             {authMode === "google" ? (
               <div className="space-y-6">
                 <div className="text-center space-y-2">
-                  <h2 className="text-lg font-bold text-brand-blue uppercase tracking-tight">Identity Verification Required</h2>
+                  <h2 className="text-lg font-bold text-brand-blue uppercase tracking-tight">Sign In Required</h2>
                   <p className="text-brand-dark-grey/60 text-xs">
-                    Access to the controlled substance registry is restricted to authorized personnel.
+                    Access to the inventory system is restricted to authorized users.
                   </p>
                 </div>
                 
@@ -140,7 +142,7 @@ export function AuthScreen() {
               <form onSubmit={handleEmailLogin} className="space-y-4">
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] uppercase font-black text-brand-blue/80">Authorized Email</Label>
+                    <Label className="text-[10px] uppercase font-black text-brand-blue/80">Email Address</Label>
                     <Input 
                       type="email" 
                       placeholder=""
@@ -175,8 +177,8 @@ export function AuthScreen() {
                   </div>
                 </div>
 
-                <Button className="w-full h-12 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
-                  {isSubmitting ? "Verifying..." : "Verify & Enter"}
+                <Button className="w-full h-12 bg-brand-blue text-white font-bold uppercase tracking-widest text-xs" disabled={isSubmitting}>
+                  {isSubmitting ? "Signing in..." : "Sign In"}
                 </Button>
 
                 <div className="flex flex-col gap-2 pt-2">
@@ -227,7 +229,7 @@ export function AuthScreen() {
                   </div>
                 </div>
 
-                <Button className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-2" disabled={isSubmitting}>
+                <Button className="w-full h-11 bg-brand-blue text-white font-bold uppercase tracking-widest text-xs mt-2" disabled={isSubmitting}>
                   {isSubmitting ? "Provisioning..." : "Register Organization"}
                 </Button>
 
@@ -253,7 +255,7 @@ export function AuthScreen() {
                   className="h-11 border-brand-blue/10"
                   required
                 />
-                <Button className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
+                <Button className="w-full h-11 bg-brand-blue text-white font-bold tracking-widest uppercase text-xs" disabled={isSubmitting}>
                   {isSubmitting ? "Sending..." : "Send Recovery Link"}
                 </Button>
                 <button 
@@ -267,8 +269,8 @@ export function AuthScreen() {
             )}
 
             <div className="pt-6 border-t border-brand-grey/10 text-center mt-6">
-              <p className="text-[9px] text-brand-dark-grey/30 uppercase font-black tracking-widest">
-                Compliant with DEA Title 21 CFR Part 1300-1321
+              <p className="text-[9px] text-brand-dark-grey/30 uppercase font-bold tracking-widest">
+                DEA Compliant Inventory Management
               </p>
             </div>
           </CardContent>

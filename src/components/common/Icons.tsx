@@ -3,51 +3,43 @@ import { TransactionType } from "../../types";
 
 export const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center shrink-0 ${className}`}>
+    {/* The SVG structure provided by the user for the professional PharmaGuard brand */}
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-visible">
       <svg 
         viewBox="-3 -3 30 30" 
         className="h-[120%] w-[120%] overflow-visible"
       >
+        <defs>
+          <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1e68cf" />
+            <stop offset="100%" stopColor="#0f3d7a" />
+          </linearGradient>
+        </defs>
         <path 
-          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="none"
-          stroke="white"
-          strokeWidth="5"
-          strokeLinejoin="round"
+          d="M12 2L4 5V11C4 16.1 7.4 20.8 12 22C16.6 20.8 20 16.1 20 11V5L12 2Z" 
+          fill="url(#shieldGrad)"
+          stroke="#ffd700"
+          strokeWidth="0.5"
         />
         <path 
-          d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="#ffd700"
-          stroke="white"
-          strokeWidth="0.5"
-          strokeLinejoin="round"
+          d="M12 7V17" 
+          stroke="#ffd700" 
+          strokeWidth="2" 
+          strokeLinecap="round"
+          className="opacity-90"
+        />
+        <path 
+          d="M8 12H16" 
+          stroke="#ffd700" 
+          strokeWidth="2" 
+          strokeLinecap="round"
+          className="opacity-90"
         />
       </svg>
     </div>
+    {/* Inner symbol for brand recognition */}
     <div className="relative z-10 flex items-center justify-center h-full w-full">
-      <svg viewBox="0 0 24 24" className="h-[65%] w-[65%] overflow-visible">
-        <g transform="translate(12, 12) rotate(-45)">
-          <rect 
-            x="-7" 
-            y="-2.5" 
-            width="14" 
-            height="5" 
-            rx="2.5" 
-            fill="white"
-            stroke="white"
-            strokeWidth="1.5"
-          />
-          <rect 
-            x="-6.5" 
-            y="-2" 
-            width="13" 
-            height="4" 
-            rx="2" 
-            fill="#1e68cf"
-          />
-          <path d="M0 -2.5V2.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
-        </g>
-      </svg>
+      <Pill className="h-[55%] w-[55%] text-brand-yellow drop-shadow-sm" strokeWidth={3} />
     </div>
   </div>
 );
@@ -65,7 +57,7 @@ export const TransactionBadge = ({ type, size = "md" }: { type: TransactionType,
         {type === 'VERIFY' && <Check className={`${iconSize} text-brand-blue/30`} strokeWidth={2} />}
       </div>
       
-      <span className="relative z-10 text-[10px] font-black text-brand-blue/50 uppercase tracking-widest whitespace-nowrap">
+      <span className="relative z-10 text-[10px] font-bold text-brand-blue/50 uppercase tracking-widest whitespace-nowrap">
         {type === 'IN' ? 'ADDED' : 
          type === 'OUT' ? 'DISPENSED' : 
          type === 'ADJUST' ? 'ADJUSTED' : 

@@ -47,18 +47,16 @@ export function SuperAdminPortal({
 }: SuperAdminPortalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
-        <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg">
-          <div className="flex flex-col gap-4 relative z-10 w-full">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-brand-blue border-2 border-white flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-                <Settings className="h-6 w-6 text-white fill-brand-yellow" strokeWidth={2} />
+      <DialogContent showCloseButton={false} className="sm:max-w-2xl bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none shrink-0">
+          <div className="flex flex-col gap-1 relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
+                <Settings className="h-5 w-5 text-brand-blue" strokeWidth={3} />
               </div>
-              <div className="flex-1 min-w-0">
-                <DialogTitle className="text-lg font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 leading-tight truncate">
-                  Real-time registry management and global subscription authority terminal.
-                </DialogDescription>
+              <div>
+                <DialogTitle className="text-xl font-black tracking-tight leading-none text-white">Super Admin Command Center</DialogTitle>
+                <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] uppercase tracking-[0.12em] mt-1">Registry Management & Subscription Authority</DialogDescription>
               </div>
             </div>
 
@@ -200,6 +198,14 @@ export function SuperAdminPortal({
             </div>
           </div>
         </div>
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
+          <Button 
+            onClick={() => onOpenChange(false)} 
+            className="w-full h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all"
+          >
+            Done
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

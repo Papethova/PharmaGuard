@@ -24,6 +24,7 @@ import { DispenseDialog } from "./components/forms/DispenseDialog";
 import { AddStockDialog } from "./components/forms/AddStockDialog";
 import { AdjustStockDialog } from "./components/forms/AdjustStockDialog";
 import { EditProfileDialog } from "./components/layout/EditProfileDialog";
+import { LogoutConfirmDialog } from "./components/layout/LogoutConfirmDialog";
 import { AddSubstanceDialog } from "./components/inventory/AddSubstanceDialog";
 import { TransactionDetailDialog } from "./components/history/TransactionDetailDialog";
 import { PharmaLogo } from "./components/common/Icons";
@@ -34,7 +35,7 @@ import { useInventory } from "./hooks/useInventory";
 import { useAppInitialization } from "./hooks/useAppInitialization";
 
 // Lib
-import { MASTER_ADMIN_EMAIL, APP_VERSION } from "./lib/constants";
+import { MASTER_ADMIN_EMAIL, APP_VERSION, SCHEDULES } from "./lib/constants";
 import { Schedule, Transaction, Substance, TransactionType, UserProfile } from "./types";
 import { handleFirestoreError, OperationType } from "./lib/errorHandlers";
 
@@ -54,6 +55,7 @@ export default function App() {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isSuperAdminOpen, setIsSuperAdminOpen] = useState(false);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [selectedSubstanceDetail, setSelectedSubstanceDetail] = useState<Substance | null>(null);
   
@@ -98,7 +100,7 @@ export default function App() {
         <div className="flex flex-col items-center gap-6">
           <PharmaLogo className="h-20 w-20 animate-pulse" />
           <div className="flex flex-col items-center gap-2">
-            <p className="text-brand-blue font-black uppercase tracking-widest text-[10px] animate-pulse font-mono">Synchronizing Secure Registry...</p>
+            <p className="text-black font-bold tracking-widest text-[10px] animate-pulse font-mono">Loading data...</p>
             <div className="h-[1px] w-24 bg-brand-blue/20 overflow-hidden rounded-full">
               <div className="h-full bg-brand-blue w-full -translate-x-full animate-[progress_1.5s_infinite_linear]" />
             </div>
@@ -132,9 +134,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-brand-light-grey font-sans text-brand-grey">
       <AppHeader 
-        activeSchedule={activeSchedule} 
-        onScheduleChange={setActiveSchedule}
         onLogoClick={() => isMasterAdmin && setIsSuperAdminOpen(true)}
+        activeSchedule={activeSchedule}
+        onScheduleChange={setActiveSchedule}
       />
 
       <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12">
@@ -164,15 +166,15 @@ export default function App() {
             lowStockCount={lowStockItems.length}
             onTabChange={setCurrentTab}
             onDispense={() => setIsDispenseOpen(true)}
-            onAdd={() => setIsAddStockOpen(true)}
+            onAdd={() => setIsAddMedOpen(true)}
             onAdjust={() => setIsAdjustStockOpen(true)}
             onEditProfile={() => setIsEditProfileOpen(true)}
-            onLogout={logout}
+            onLogout={() => setIsLogoutConfirmOpen(true)}
             masterAdminEmail={MASTER_ADMIN_EMAIL}
             appVersion={APP_VERSION}
           />
 
-          <div className="w-full relative min-w-0 flex-1 z-10">
+          <div className="w-full relative min-w-0 flex-1 z-10 space-y-6">
             <TabsContent value="inventory" className="m-0">
               <InventoryView 
                 inventory={inventory} 
@@ -180,6 +182,10 @@ export default function App() {
                 isInitializing={inventoryLoading}
                 onSubstanceClick={setSelectedSubstanceDetail}
                 onNDCClick={(ndc) => window.open(`https://ndclist.com/?s=${ndc}`, '_blank')}
+                onDispense={() => setIsDispenseOpen(true)}
+                onAddStock={() => setIsAddStockOpen(true)}
+                onAdjustStock={() => setIsAdjustStockOpen(true)}
+                onEnroll={() => setIsAddMedOpen(true)}
               />
             </TabsContent>
 
@@ -230,12 +236,16 @@ export default function App() {
         users={staff}
         onLog={addTransaction}
         isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
+        nextAdjustCount={transactions.filter(t => t.type === "ADJUST").length + 1}
       />
 
       <AddSubstanceDialog 
         isOpen={isAddMedOpen}
         onOpenChange={setIsAddMedOpen}
         onAdd={addSubstance}
+        onLog={addTransaction}
+        users={staff}
+        isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
       />
 
       <EditProfileDialog 
@@ -248,6 +258,7 @@ export default function App() {
       <TransactionDetailDialog 
         transaction={viewingTransaction}
         inventory={inventory}
+        staff={staff}
         onOpenChange={(open) => !open && setViewingTransaction(null)}
       />
 
@@ -275,11 +286,21 @@ export default function App() {
 
       <UserManagementDialog 
         isOpen={isUserManagementOpen}
-        onOpenChange={setIsUserManagementOpen}
+        onOpenChange={(open) => {
+          setIsUserManagementOpen(open);
+          if (!open) setCurrentTab("inventory");
+        }}
         userEmail={user.email || ""}
+        userProfile={userProfile}
         users={staff}
         isSubmitting={isActionPending}
         setIsSubmitting={setIsActionPending}
+      />
+
+      <LogoutConfirmDialog 
+        isOpen={isLogoutConfirmOpen}
+        onOpenChange={setIsLogoutConfirmOpen}
+        onConfirm={logout}
       />
 
       <Toaster 

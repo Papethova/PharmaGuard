@@ -14,7 +14,6 @@ import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from "firebase/fires
 import { auth, db, googleProvider } from "../lib/firebase";
 import { UserProfile } from "../types";
 import { handleFirestoreError, OperationType } from "../lib/errorHandlers";
-import { toast } from "sonner";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -23,47 +22,97 @@ export function useAuth() {
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
+    let unsubProfile: (() => void) | undefined;
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
-      if (currentUser) {
-        const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
-        const userDocRef = doc(db, "users", emailId);
-        
-        // Timeout for profile readiness - fallback if Firestore is slow
-        const profileTimeout = setTimeout(() => {
-          setIsAuthReady(true);
-          setIsInitializing(false);
-        }, 5000);
+      try {
+        if (currentUser) {
+          const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
+          const userDocRef = doc(db, "users", emailId);
+          
+          let userDoc = await getDoc(userDocRef).catch(() => {
+             return null;
+          });
 
-        const unsubProfile = onSnapshot(userDocRef, (docSnap) => {
-          if (docSnap.exists()) {
-            setUserProfile({ ...docSnap.data(), docId: docSnap.id } as UserProfile);
-          } else {
-            setUserProfile(null);
+          // Identity Recovery: Handle UID-based legacy records migrating to Email identifier
+          if (currentUser.uid !== emailId) {
+            try {
+              const { collection, getDocs, writeBatch } = await import("firebase/firestore");
+              const legacyDoc = await getDoc(doc(db, "users", currentUser.uid));
+              if (legacyDoc.exists()) {
+                const legacySubstances = await getDocs(collection(db, "users", currentUser.uid, "substances"));
+                const currentSubstances = await getDocs(collection(db, "users", emailId, "substances"));
+                
+                if (legacySubstances.size > 0 && currentSubstances.size === 0) {
+                  const batch = writeBatch(db);
+                  if (!userDoc?.exists()) {
+                    batch.set(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
+                  }
+                  for (const s of legacySubstances.docs) batch.set(doc(db, "users", emailId, "substances", s.id), s.data());
+                  const legacyTx = await getDocs(collection(db, "users", currentUser.uid, "transactions"));
+                  for (const t of legacyTx.docs) batch.set(doc(db, "users", emailId, "transactions", t.id), t.data());
+                  const legacyStaff = await getDocs(collection(db, "users", currentUser.uid, "staff"));
+                  for (const s of legacyStaff.docs) batch.set(doc(db, "users", emailId, "staff", s.id), s.data());
+                  await batch.commit();
+                  userDoc = await getDoc(userDocRef);
+                } else if (!userDoc?.exists()) {
+                  await setDoc(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
+                  userDoc = await getDoc(userDocRef);
+                }
+              }
+            } catch (e) {
+              console.error("Migration check failed:", e);
+            }
           }
-          clearTimeout(profileTimeout);
-          setIsAuthReady(true);
-          setIsInitializing(false);
-        }, (error) => {
-          console.error("Auth profile listener error:", error);
-          clearTimeout(profileTimeout);
-          setIsAuthReady(true);
-          setIsInitializing(false);
-        });
 
-        return () => {
-          unsubProfile();
-          clearTimeout(profileTimeout);
-        };
-      } else {
-        setUserProfile(null);
+          // Profile Creation for New Users
+          if (!userDoc || !userDoc.exists()) {
+            const newProfile: UserProfile = {
+              uid: currentUser.uid,
+              email: currentUser.email || "",
+              displayName: currentUser.displayName || "User",
+              role: "pharmacist",
+              status: "pending",
+              organizationName: "",
+              licenseNumber: "",
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            };
+            await setDoc(userDocRef, newProfile);
+          }
+
+          // Real-time profile listener
+          if (unsubProfile) unsubProfile();
+          unsubProfile = onSnapshot(userDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+              setUserProfile({ ...docSnap.data(), docId: docSnap.id } as UserProfile);
+            } else {
+              setUserProfile(null);
+            }
+            setIsAuthReady(true);
+            setIsInitializing(false);
+          }, (error) => {
+            handleFirestoreError(error, OperationType.GET, `users/${emailId}`);
+          });
+        } else {
+          setUserProfile(null);
+          setIsAuthReady(true);
+          setIsInitializing(false);
+          if (unsubProfile) unsubProfile();
+        }
+      } catch (error) {
+        console.error("Auth state processing error:", error);
         setIsAuthReady(true);
         setIsInitializing(false);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (unsubProfile) unsubProfile();
+    };
   }, []);
 
   const loginWithGoogle = async () => {
@@ -90,7 +139,6 @@ export function useAuth() {
       return user;
     } catch (error: any) {
       console.error("Google login error:", error);
-      toast.error(`Login Failed: ${error.message}`);
       throw error;
     }
   };
@@ -100,7 +148,6 @@ export function useAuth() {
       const result = await signInWithEmailAndPassword(auth, email, pass);
       return result.user;
     } catch (error: any) {
-      toast.error(`Login Failed: ${error.message}`);
       throw error;
     }
   };
@@ -125,10 +172,8 @@ export function useAuth() {
       });
 
       await sendEmailVerification(user);
-      toast.success("Verification email sent. Please check your inbox.");
       return user;
     } catch (error: any) {
-      toast.error(`Registration Failed: ${error.message}`);
       throw error;
     }
   };
@@ -136,9 +181,7 @@ export function useAuth() {
   const resetPassword = async (email: string) => {
     try {
       await sendPasswordResetEmail(auth, email);
-      toast.success("Password reset email sent.");
     } catch (error: any) {
-      toast.error(`Reset Failed: ${error.message}`);
       throw error;
     }
   };
@@ -146,9 +189,8 @@ export function useAuth() {
   const logout = async () => {
     try {
       await firebaseSignOut(auth);
-      toast.success("Signed out successfully");
     } catch (error: any) {
-      toast.error(`Sign out error: ${error.message}`);
+      console.error("Sign out error:", error);
     }
   };
 

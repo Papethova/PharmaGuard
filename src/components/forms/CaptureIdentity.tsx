@@ -1,8 +1,7 @@
 import { useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { Camera as CameraIcon, RefreshCcw, Eraser, CheckCircle2 } from "lucide-react";
+import { Camera as CameraIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 
 interface CaptureIdentityProps {
   mode: "photo" | "signature";
@@ -54,29 +53,19 @@ export function CapturePhoto({
   };
 
   return (
-    <div className="space-y-2">
-      <Label className="text-xs font-bold text-brand-dark-grey">Identity Verification Capture</Label>
-      <div className="relative aspect-video rounded-xl overflow-hidden bg-brand-blue/5 border-2 border-dashed border-brand-blue/20">
+    <div className="relative aspect-video rounded-xl overflow-hidden bg-brand-blue/5 border-2 border-dashed border-brand-blue/20">
         {capturedData ? (
           <div className="relative h-full">
             <img src={capturedData} alt="Captured identity" className="h-full w-full object-cover" />
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="absolute top-2 right-2 h-7 bg-white/80 backdrop-blur"
-              onClick={onReset}
-            >
-              <RefreshCcw className="h-3 w-3 mr-1" /> Retake
-            </Button>
           </div>
         ) : isCameraActive ? (
           <div className="relative h-full">
-            <video ref={videoRef} autoPlay playsInline className="h-full w-full object-cover grayscale contrast-125" />
+            <video ref={videoRef} autoPlay playsInline className="h-full w-full object-cover" />
             <Button 
               onClick={capturePhoto}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-brand-yellow text-brand-blue font-black h-10 px-6 rounded-full shadow-xl"
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-brand-blue text-white h-10 px-6 rounded-full shadow-xl font-normal"
             >
-              Capture Verification
+              Capture Photo
             </Button>
           </div>
         ) : (
@@ -85,7 +74,7 @@ export function CapturePhoto({
               <CameraIcon className="h-6 w-6 text-brand-blue" />
             </div>
             <p className="text-[10px] text-brand-dark-grey/60 max-w-[200px]">
-              Camera access required for secure identity binding.
+              Camera access required for identity verification.
             </p>
             <Button onClick={startCamera} size="sm" variant="outline" className="border-brand-blue/20 text-brand-blue h-8">
               Initialize Camera
@@ -93,7 +82,6 @@ export function CapturePhoto({
           </div>
         )}
       </div>
-    </div>
   );
 }
 
@@ -111,47 +99,21 @@ export function CaptureSignature({
   };
 
   return (
-    <div className="space-y-2">
-      <Label className="text-xs font-bold text-brand-dark-grey">Registry Signature Binding</Label>
-      <div className="border-2 border-dashed border-brand-blue/20 rounded-xl bg-white overflow-hidden relative">
-        {capturedData ? (
-          <div className="h-32 flex items-center justify-center p-2 relative bg-brand-blue/5">
-            <img src={capturedData} alt="Signature" className="max-h-full max-w-full object-contain" />
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              className="absolute top-1 right-1 h-6 w-6 text-brand-blue hover:text-red-500"
-              onClick={onReset}
-            >
-              <RefreshCcw className="h-3 w-3" />
-            </Button>
-            <div className="absolute top-1 left-2 flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3 text-green-500" />
-              <span className="text-[8px] font-black uppercase text-green-600 tracking-widest">Linked</span>
-            </div>
-          </div>
-        ) : (
-          <div className="h-32 relative">
-            <SignatureCanvas 
-              ref={sigCanvasRef}
-              penColor="#1e68cf"
-              canvasProps={{ className: "signature-canvas w-full h-full" }}
-              onEnd={saveSignature}
-            />
-            <div className="absolute top-1 left-2 pointer-events-none">
-              <span className="text-[10px] uppercase font-black text-brand-blue/20 tracking-widest italic">Electronic binding area</span>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => { sigCanvasRef.current?.clear(); onReset(); }}
-              className="absolute top-1 right-1 h-6 w-6 text-brand-blue hover:text-red-500 bg-white shadow-sm"
-            >
-              <Eraser className="h-3 w-3" />
-            </Button>
-          </div>
-        )}
-      </div>
+    <div className="border border-brand-blue/10 rounded-xl bg-brand-light-grey/30 overflow-hidden relative">
+      {capturedData ? (
+        <div className="h-32 flex items-center justify-center p-2 relative bg-transparent">
+          <img src={capturedData} alt="Signature" className="max-h-full max-w-full object-contain" />
+        </div>
+      ) : (
+        <div className="h-32 relative">
+          <SignatureCanvas 
+            ref={sigCanvasRef}
+            penColor="#000000"
+            canvasProps={{ className: "signature-canvas w-full h-full" }}
+            onEnd={saveSignature}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -102,12 +102,12 @@ export function useInventory(userEmail: string | null) {
     if (!userEmail) return;
     const emailId = userEmail.toLowerCase();
     try {
-      await addDoc(collection(db, "users", emailId, "substances"), {
+      const docRef = await addDoc(collection(db, "users", emailId, "substances"), {
         ...substance,
-        currentStock: 0,
         lastUpdated: serverTimestamp()
       });
       toast.success("New Catalog Entry Verified");
+      return docRef.id;
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${emailId}/substances`);
     }

@@ -33,10 +33,10 @@ export function AlertsView({
                   <h3 className="text-2xl font-black text-brand-blue tracking-tight">{item.name}{" "}{item.strength}</h3>
                   <div className="flex items-center gap-3 mt-1">
                     <p className="text-lg text-brand-dark-grey">
-                      Current Stock: <span className="font-mono font-black text-brand-yellow text-xl">{item.currentStock}</span> / Min Threshold: <span className="font-mono font-bold text-xl">{item.minThreshold}</span>
+                      Current Stock: <span className="font-black text-brand-yellow text-xl">{item.currentStock}</span> / Min Threshold: <span className="font-bold text-xl">{item.minThreshold}</span>
                     </p>
                     <div className="h-4 w-[1px] bg-brand-grey/30" />
-                    <div className="flex items-center gap-1.5 text-sm font-mono">
+                    <div className="flex items-center gap-1.5 text-sm">
                       <span className="text-brand-dark-grey/60">NDC:</span>
                       <button 
                         onClick={() => onNDCClick(item.ndc)}
@@ -49,7 +49,7 @@ export function AlertsView({
                 </div>
               </div>
               <Button 
-                className="bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 h-12 px-6 font-extrabold rounded-xl transition-all border-none"
+                className="bg-brand-yellow text-brand-blue hover:brightness-100 shadow-lg shadow-brand-yellow/20 h-12 px-6 font-extrabold rounded-xl transition-all border-none"
                 onClick={() => onDismissAlert(item.id)}
               >
                 Dismiss Alert

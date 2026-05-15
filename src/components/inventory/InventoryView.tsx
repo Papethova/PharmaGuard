@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { Pill } from "lucide-react";
+import { Pill, ArrowDown, Plus, RefreshCcw, PlusCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Substance, Schedule } from "../../types";
 
@@ -11,6 +12,10 @@ interface InventoryViewProps {
   isInitializing: boolean;
   onSubstanceClick: (item: Substance) => void;
   onNDCClick: (ndc: string) => void;
+  onDispense: () => void;
+  onAddStock: () => void;
+  onAdjustStock: () => void;
+  onEnroll: () => void;
 }
 
 export function InventoryView({
@@ -18,16 +23,20 @@ export function InventoryView({
   activeSchedule,
   isInitializing,
   onSubstanceClick,
-  onNDCClick
+  onNDCClick,
+  onDispense,
+  onAddStock,
+  onAdjustStock,
+  onEnroll
 }: InventoryViewProps) {
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => activeSchedule === "ALL" || item.schedule === activeSchedule);
   }, [inventory, activeSchedule]);
 
-  const tableHeadClass = "text-[10px] uppercase font-black text-brand-blue/60 tracking-widest text-center h-10";
+  const tableHeadClass = "text-[10px] font-black text-brand-blue tracking-widest text-center h-10";
 
   return (
-    <div className="space-y-4 relative z-10 m-0">
+    <div className="space-y-6 relative z-10 m-0">
       <div className="flex flex-col gap-4">
         <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface">
           <div className="overflow-x-auto">
@@ -55,16 +64,16 @@ export function InventoryView({
                     className="hover:bg-brand-blue/5 transition-colors cursor-pointer group h-14"
                     onClick={() => onSubstanceClick(item)}
                   >
-                    <TableCell className="text-sm text-brand-dark-grey text-center">
+                    <TableCell className="text-sm text-brand-blue text-center">
                       <span className="font-bold">{item.name}</span>{" "}
-                      <span className="text-xs text-brand-dark-grey/80">{item.strength}</span>
+                      <span className="text-xs text-brand-blue/80">{item.strength}</span>
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge variant="outline" className={`border-brand-blue/20 text-brand-blue bg-brand-blue/5 text-[10px] px-2 py-0.5 mx-auto`}>
                         {item.schedule}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-center">
+                    <TableCell className="text-xs text-center">
                       <button 
                         onClick={(e) => { e.stopPropagation(); onNDCClick(item.ndc); }}
                         className="text-brand-blue hover:underline font-bold transition-colors"
@@ -74,11 +83,11 @@ export function InventoryView({
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-sm font-mono font-black ${item.currentStock <= item.minThreshold ? "text-red-500" : "text-brand-blue"}`}>
+                        <span className={`text-sm font-bold ${item.currentStock <= item.minThreshold ? "text-red-500" : "text-brand-blue"}`}>
                           {item.currentStock} {item.unit}
                         </span>
                         {item.currentStock <= item.minThreshold && (
-                          <span className="text-[8px] uppercase font-black text-red-400 tracking-tighter">Low Stock Alert</span>
+                          <span className="text-[8px] font-bold text-red-400 tracking-tighter">Low Stock Alert</span>
                         )}
                       </div>
                     </TableCell>

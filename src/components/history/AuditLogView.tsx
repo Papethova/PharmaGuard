@@ -58,50 +58,50 @@ export function AuditLogView({
     });
   }, [transactions, activeSchedule, startDate, endDate, historyMedicationFilter, inventory]);
 
-  const tableHeadClass = "text-[10px] uppercase font-black text-brand-blue/60 tracking-widest text-center h-10";
+  const tableHeadClass = "text-[10px] font-black text-brand-blue tracking-widest text-center h-10";
 
   return (
     <div className="space-y-4 relative z-10 m-0">
-      <div className="flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
-        <div className="flex items-end gap-10">
-          <div className="grid gap-1.5">
-            <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
+      <div className="flex flex-wrap items-end gap-6 bg-brand-surface p-3 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
+        <div className="flex items-center gap-6 pb-0">
+          <div className="grid gap-1 transition-all">
+            <Label htmlFor="start-date" className="text-[10px] font-bold text-brand-blue text-left tracking-wider uppercase">Start Date</Label>
             <Input 
               id="start-date"
               type="date" 
               value={startDate} 
               onChange={(e) => setStartDate(e.target.value)}
-              className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center"
+              className="h-9 w-36 text-xs border-brand-grey/20 focus:ring-1 focus:ring-brand-blue/20 text-center text-black px-2"
             />
           </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
+          <div className="grid gap-1 transition-all">
+            <Label htmlFor="end-date" className="text-[10px] font-bold text-brand-blue text-left tracking-wider uppercase">End Date</Label>
             <Input 
               id="end-date"
               type="date" 
               value={endDate} 
               onChange={(e) => setEndDate(e.target.value)}
-              className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center"
+              className="h-9 w-36 text-xs border-brand-grey/20 focus:ring-1 focus:ring-brand-blue/20 text-center text-black px-2"
             />
           </div>
         </div>
 
-        <div className="grid gap-1.5 min-w-[320px] relative">
-          <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
+        <div className="grid gap-1 flex-1 min-w-[200px] relative transition-all">
+          <Label htmlFor="history-med-search" className="text-[10px] font-bold text-brand-blue text-left tracking-wider uppercase">Medication Filter</Label>
           <Input
             id="history-med-search"
-            placeholder="Search medication..."
+            placeholder="Type to search medication..."
             value={historyMedicationSearch}
             onChange={(e) => {
-              setHistoryMedicationSearch(e.target.value);
-              setHistoryMedicationFilter(""); 
-              setIsHistorySearchFocused(true);
+               setHistoryMedicationSearch(e.target.value);
+               setHistoryMedicationFilter(""); 
+               setIsHistorySearchFocused(true);
             }}
             onFocus={() => setIsHistorySearchFocused(true)}
             onBlur={() => {
               setTimeout(() => setIsHistorySearchFocused(false), 200);
             }}
-            className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4"
+            className="h-9 text-xs border-brand-grey/20 focus:ring-1 focus:ring-brand-blue/20 bg-brand-surface text-left pl-3 text-black placeholder:text-brand-grey/50"
           />
           {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
             <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
@@ -123,7 +123,7 @@ export function AuditLogView({
                       <span className="font-medium group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
-                        <span className="text-[10px] font-mono text-brand-blue/70 font-bold">{s.ndc}</span>
+                        <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
                       </div>
                     </div>
                     <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -142,7 +142,7 @@ export function AuditLogView({
             setHistoryMedicationFilter("");
             setHistoryMedicationSearch("");
           }}
-          className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5"
+          className="h-9 px-4 text-[10px] border-brand-grey/20 hover:bg-brand-blue/5 font-bold uppercase tracking-widest text-brand-blue/60 transition-colors"
         >
           Clear Filter
         </Button>
@@ -162,8 +162,8 @@ export function AuditLogView({
                 <TableHead className={tableHeadClass}>Medication & Strength</TableHead>
                 <TableHead className={tableHeadClass}>NDC</TableHead>
                 <TableHead className={tableHeadClass}>Type</TableHead>
-                <TableHead className={tableHeadClass}>Qty</TableHead>
-                <TableHead className={tableHeadClass}>Performed By</TableHead>
+                <TableHead className={tableHeadClass}>Quantity</TableHead>
+                <TableHead className={tableHeadClass}>Performed by</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -176,7 +176,7 @@ export function AuditLogView({
                 </TableRow>
               ) : filteredTransactions.map((t) => (
                 <TableRow key={t.id} className="h-14">
-                  <TableCell className="text-xs font-mono text-brand-dark-grey/70 whitespace-nowrap text-center">
+                  <TableCell className="text-xs text-brand-dark-grey/70 whitespace-nowrap text-center font-bold">
                     {formatDateTime(t.timestamp)}
                   </TableCell>
                   <TableCell className="text-center">
@@ -194,7 +194,7 @@ export function AuditLogView({
                   <TableCell className="text-center">
                     <div className="text-sm font-bold text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                   </TableCell>
-                  <TableCell className="text-xs font-mono text-center">
+                  <TableCell className="text-xs text-center">
                     <button 
                       onClick={() => onNDCClick(t.ndc)}
                       className="text-brand-blue hover:underline font-bold transition-colors"
@@ -207,7 +207,7 @@ export function AuditLogView({
                       <TransactionBadge type={t.type} size="sm" />
                     </div>
                   </TableCell>
-                  <TableCell className="text-center font-mono text-sm text-brand-dark-grey">
+                  <TableCell className="text-center text-sm text-brand-dark-grey font-bold">
                     {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                   </TableCell>
                   <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
