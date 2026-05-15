@@ -130,7 +130,7 @@ export function AdjustStockDialog({
             {/* Selection Section */}
             <div className="space-y-4 pb-2">
               <div className="grid gap-2">
-                <Label className="text-black font-bold text-[10px] tracking-wider">Medication</Label>
+                <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Medication</Label>
                 <div className="relative">
                   <Input
                     placeholder="Type to search medication..."
@@ -175,13 +175,13 @@ export function AdjustStockDialog({
               {selectedItem && (
                 <div className="grid grid-cols-2 gap-4 pt-2">
                   <div className="space-y-1">
-                    <Label className="text-black font-bold text-[10px] tracking-wider">Current Balance</Label>
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Current Balance</Label>
                     <p className="text-2xl font-bold text-brand-blue leading-tight flex items-baseline gap-2">
                       {selectedItem.currentStock} <span className="text-xs font-bold opacity-60">{selectedItem.unit}</span>
                     </p>
                   </div>
                   <div className="text-right space-y-1">
-                    <Label className="text-black font-bold text-[10px] tracking-wider">Target NDC</Label>
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Target NDC</Label>
                     <p className="text-sm font-mono font-bold text-brand-blue leading-none mt-2">
                       {selectedItem.ndc}
                     </p>
@@ -194,15 +194,15 @@ export function AdjustStockDialog({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-1">
-                  <Label className="text-black font-bold text-[10px] tracking-wider">Reference Number</Label>
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Reference #</Label>
                   <Input 
                     value={referenceNumber} 
                     readOnly
-                    className="h-10 border-brand-blue/10 bg-white text-black/60 cursor-not-allowed"
+                    className="h-10 border-brand-blue/10 bg-brand-surface text-black font-bold"
                   />
                 </div>
                 <div className="grid gap-1">
-                  <Label className="text-black font-bold text-[10px] tracking-wider">Adjustment Amount (-/+)</Label>
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Adjustment Amount (-/+)</Label>
                   <Input 
                     type="number" 
                     value={quantity} 
@@ -214,7 +214,7 @@ export function AdjustStockDialog({
               </div>
 
               <div className="grid gap-1">
-                <Label className="text-black font-bold text-[10px] tracking-wider">Notes/Reason</Label>
+                <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Notes/Reason</Label>
                 <Textarea 
                   value={notes} 
                   onChange={(e) => setNotes(e.target.value)} 
@@ -226,15 +226,15 @@ export function AdjustStockDialog({
               <div className="grid gap-1">
                 <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
                 <Select value={selectedUser} onValueChange={setSelectedUser}>
-                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black px-3 font-bold">
-                    <SelectValue placeholder="Select user" />
+                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold">
+                    <SelectValue placeholder="Select user..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-brand-surface">
+                  <SelectContent className="bg-brand-surface" align="start">
                     {users.map(u => (
-                      <SelectItem key={u.id} value={u.id} className="text-black font-medium focus:bg-brand-blue/5 focus:text-black">
+                      <SelectItem key={u.id} value={u.id} className="text-black font-bold focus:bg-brand-blue/5 focus:text-black">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold">{u.name}</span>
-                          {u.title && <span className="text-sm font-bold text-black/60 uppercase tracking-tighter">({u.title})</span>}
+                          <span className="text-sm">{u.name}</span>
+                          {u.title && <span className="text-sm text-black/60 uppercase tracking-tighter">({u.title})</span>}
                         </div>
                       </SelectItem>
                     ))}
@@ -245,7 +245,7 @@ export function AdjustStockDialog({
               {isPhotoRequirementEnabled && (
                 <div className="grid gap-1">
                   <div className="flex items-center justify-between">
-                    <Label className="text-black font-bold text-[10px] tracking-wider">Identity Photo</Label>
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Photo</Label>
                     {capturedPhoto && (
                       <button 
                         type="button"
@@ -266,7 +266,7 @@ export function AdjustStockDialog({
 
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-black font-bold text-[10px] tracking-wider">Identity Signature</Label>
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Signature</Label>
                   {signature && (
                     <button 
                       type="button"
@@ -298,7 +298,7 @@ export function AdjustStockDialog({
           <Button 
             onClick={handleSubmit}
             disabled={isSubmitting || !selectedSubstance || !quantity || !selectedUser || (!signature && !isPhotoRequirementEnabled)}
-            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 active:scale-[0.98] rounded-xl transition-all disabled:opacity-50 border-none shadow-xl shadow-yellow-400/30"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] rounded-xl transition-all disabled:opacity-50 border-none shadow-xl shadow-[#FFE600]/30"
           >
             {isSubmitting ? "Adjusting..." : "Adjust"}
           </Button>

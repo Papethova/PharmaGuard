@@ -49,7 +49,7 @@ export function ConfirmDialog({
         </DialogHeader>
         
         <div className="p-6 py-8">
-          <div className="p-5 rounded-2xl bg-brand-blue/5 border border-brand-blue/10 text-brand-dark-grey text-sm font-medium leading-relaxed whitespace-pre-line">
+          <div className="p-5 rounded-2xl bg-brand-blue/5 border border-brand-blue/10 text-brand-grey text-sm font-medium leading-relaxed whitespace-pre-line">
             {description}
           </div>
         </div>

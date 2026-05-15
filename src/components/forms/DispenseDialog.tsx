@@ -211,15 +211,15 @@ export function DispenseDialog({
               <div className="grid gap-1">
                 <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
                 <Select value={selectedUser} onValueChange={setSelectedUser}>
-                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black px-3 font-bold">
-                    <SelectValue placeholder="Select user" />
+                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold">
+                    <SelectValue placeholder="Select user..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-brand-surface">
+                  <SelectContent className="bg-brand-surface" align="start">
                     {users.map(u => (
-                      <SelectItem key={u.id} value={u.id} className="text-black font-medium focus:bg-brand-blue/5 focus:text-black">
+                      <SelectItem key={u.id} value={u.id} className="text-black font-bold focus:bg-brand-blue/5 focus:text-black">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold">{u.name}</span>
-                          {u.title && <span className="text-sm font-bold text-black/60 uppercase tracking-tighter">({u.title})</span>}
+                          <span className="text-sm">{u.name}</span>
+                          {u.title && <span className="text-sm text-black/60 uppercase tracking-tighter">({u.title})</span>}
                         </div>
                       </SelectItem>
                     ))}
@@ -283,7 +283,7 @@ export function DispenseDialog({
           <Button 
             onClick={handleSubmit}
             disabled={isSubmitting || !selectedSubstance || !quantity || !selectedUser || !rxNumber || (isPhotoRequirementEnabled ? !capturedPhoto : !signature)}
-            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 active:scale-[0.98] rounded-xl transition-all disabled:opacity-50 border-none shadow-xl shadow-yellow-400/30"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] rounded-xl transition-all disabled:opacity-50 border-none shadow-xl shadow-[#FFE600]/30"
           >
             {isSubmitting ? "Dispensing..." : "Dispense"}
           </Button>

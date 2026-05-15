@@ -154,11 +154,11 @@ export function AddSubstanceDialog({
                 <div className="grid gap-2">
                   <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Schedule</Label>
                   <Select value={schedule} onValueChange={(v: Schedule) => setSchedule(v)}>
-                    <SelectTrigger className="h-10 border-brand-blue/20 bg-white text-black px-3 font-bold">
-                      <SelectValue />
+                    <SelectTrigger className="h-10 border-brand-blue/20 bg-white text-black/40 px-3 font-bold">
+                      <SelectValue placeholder="Select..." />
                     </SelectTrigger>
-                    <SelectContent>
-                      {SCHEDULES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    <SelectContent className="bg-brand-surface">
+                      {SCHEDULES.map(s => <SelectItem key={s} value={s} className="text-black font-bold focus:bg-brand-blue/5">{s}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -185,15 +185,15 @@ export function AddSubstanceDialog({
               <div className="grid gap-1">
                 <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
                 <Select value={performerId} onValueChange={setPerformerId}>
-                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black px-3 font-bold focus:ring-brand-blue/20">
-                    <SelectValue placeholder="Select user" />
+                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold focus:ring-brand-blue/20">
+                    <SelectValue placeholder="Select user..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-brand-surface">
+                  <SelectContent className="bg-brand-surface" align="start">
                     {users.map(u => (
-                      <SelectItem key={u.id} value={u.id} className="text-black font-medium focus:bg-brand-blue/5 focus:text-black">
+                      <SelectItem key={u.id} value={u.id} className="text-black font-bold focus:bg-brand-blue/5 focus:text-black">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold">{u.name}</span>
-                          {u.title && <span className="text-sm font-bold text-black/60 uppercase tracking-tighter">({u.title})</span>}
+                          <span className="text-sm">{u.name}</span>
+                          {u.title && <span className="text-sm text-black/60 uppercase tracking-tighter">({u.title})</span>}
                         </div>
                       </SelectItem>
                     ))}
@@ -204,7 +204,7 @@ export function AddSubstanceDialog({
               {isPhotoRequirementEnabled && (
                 <div className="grid gap-1">
                   <div className="flex items-center justify-between">
-                    <Label className="text-black font-bold text-[10px] tracking-wider">Identity Photo</Label>
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Photo</Label>
                     {photo && (
                       <button 
                         type="button"
@@ -225,7 +225,7 @@ export function AddSubstanceDialog({
 
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-black font-bold text-[10px] tracking-wider">Identity Signature</Label>
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Signature</Label>
                   {signature && (
                     <button 
                       type="button"
@@ -256,8 +256,8 @@ export function AddSubstanceDialog({
           </Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={isSubmitting || !name || !strength || !ndc || !quantityReceived || !performerId || !signature}
-            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 active:scale-[0.98] rounded-xl transition-all border-none shadow-xl shadow-yellow-400/30"
+            disabled={isSubmitting || !name || !strength || !ndc || !quantityReceived || !performerId || (!signature && !isPhotoRequirementEnabled)}
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] rounded-xl transition-all border-none shadow-xl shadow-[#FFE600]/30"
           >
             {isSubmitting ? "Adding..." : "Add"}
           </Button>

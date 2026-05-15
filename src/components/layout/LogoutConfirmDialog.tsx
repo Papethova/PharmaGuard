@@ -34,10 +34,10 @@ export function LogoutConfirmDialog({ isOpen, onOpenChange, onConfirm }: LogoutC
           </div>
         </DialogHeader>
 
-        <div className="p-8 flex flex-col items-center justify-center text-center space-y-4">
-          <div className="space-y-4">
-            <p className="text-brand-dark-grey text-sm font-medium leading-relaxed max-w-[320px] mx-auto whitespace-pre-line">
-              Are you sure you want to sign out of the PharmaGuard registry?
+        <div className="p-8">
+          <div className="p-5 rounded-2xl bg-brand-blue/5 border border-brand-blue/10">
+            <p className="text-brand-grey text-sm font-medium leading-relaxed max-w-[320px] mx-auto whitespace-pre-line text-center">
+              Are you sure you want to sign out of the <span className="text-brand-grey font-bold">PharmaGuard</span> registry?
               {"\n\n"}
               All active database sync connections will be safely terminated.
             </p>

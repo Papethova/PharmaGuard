@@ -87,7 +87,7 @@ export function Sidebar({
         <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-3 w-full">
           <TabsTrigger 
             value="inventory" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
               <Pill className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -96,7 +96,7 @@ export function Sidebar({
           </TabsTrigger>
           <TabsTrigger 
             value="history" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
               <History className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -105,7 +105,7 @@ export function Sidebar({
           </TabsTrigger>
           <TabsTrigger 
             value="alerts" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
               <AlertTriangle className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -120,7 +120,7 @@ export function Sidebar({
           <div className="h-px bg-brand-blue/10 my-1" />
           <TabsTrigger 
             value="users" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
               <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -132,7 +132,7 @@ export function Sidebar({
         {user && (
           <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-10">
             <div className="flex flex-col overflow-hidden">
-              <span className="text-xs font-bold text-black/60 truncate tracking-tight">
+              <span className="text-xs font-bold text-brand-blue/60 truncate tracking-tight">
                 {userProfile?.organizationName || userProfile?.displayName || user.displayName}
               </span>
               {!userProfile?.organizationName && (

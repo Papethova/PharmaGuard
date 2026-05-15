@@ -139,10 +139,10 @@ export function UserManagementDialog({
                   <Camera className={`h-6 w-6 transition-colors duration-300 ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/60'}`} />
                 </div>
                 <div className="space-y-0.5">
-                  <Label className="text-sm font-black uppercase tracking-tight text-brand-blue/40">
+                  <Label className={`text-sm font-black uppercase tracking-tight transition-colors duration-300 ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>
                     Photo Verification
                   </Label>
-                  <p className="text-[10px] text-brand-blue/40 font-bold uppercase tracking-wider">
+                  <p className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue/80' : 'text-brand-blue/40'}`}>
                     Capture photos for each transaction
                   </p>
                 </div>
@@ -189,14 +189,14 @@ export function UserManagementDialog({
                 <Table>
                   <TableHeader className="bg-brand-light-grey/50">
                     <TableRow>
-                      <TableHead className={tableHeadClass}>Name</TableHead>
+                      <TableHead className={`${tableHeadClass} text-left pl-6`}>Name</TableHead>
                       <TableHead className={`${tableHeadClass} text-center`}>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.map((u) => (
                       <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                        <TableCell className="text-black py-3 text-center text-sm">
+                        <TableCell className="text-black py-3 text-left pl-6 text-sm">
                           {editingUser?.id === u.id ? (
                             <div className="flex gap-2 items-center">
                               <Input 
@@ -220,7 +220,7 @@ export function UserManagementDialog({
                               </Select>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-center gap-2">
+                            <div className="flex items-center justify-start gap-2">
                               <span className="text-black text-sm">{u.name}</span>
                               {u.title && <span className="text-black text-sm uppercase tracking-tight">({u.title})</span>}
                             </div>
