@@ -57,28 +57,28 @@ export function Sidebar({
         <div className="space-y-3 mb-10 px-1">
           <Button 
             onClick={onDispense}
-            className="w-full h-12 gap-3 justify-start px-4 text-xs font-black tracking-widest bg-brand-blue text-white hover:brightness-110 active:scale-[0.98] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none"
+            className="w-full h-12 gap-3 justify-start px-4 text-sm font-black tracking-widest bg-brand-blue text-white hover:brightness-110 active:scale-[0.98] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none"
           >
             <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
-              <ArrowDown className="h-3.5 w-3.5 text-brand-blue" strokeWidth={4} />
+              <ArrowDown className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
             </div>
             Dispense
           </Button>
           <Button 
             onClick={onAdd}
-            className="w-full h-12 gap-3 justify-start px-4 text-xs font-black tracking-widest bg-brand-blue text-white hover:brightness-110 active:scale-[0.98] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none"
+            className="w-full h-12 gap-3 justify-start px-4 text-sm font-black tracking-widest bg-brand-blue text-white hover:brightness-110 active:scale-[0.98] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none"
           >
             <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
-              <Plus className="h-3.5 w-3.5 text-brand-blue" strokeWidth={4} />
+              <Plus className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
             </div>
             Add
           </Button>
           <Button 
             onClick={onAdjust}
-            className="w-full h-12 gap-3 justify-start px-4 text-xs font-black tracking-widest bg-brand-blue text-white hover:brightness-110 active:scale-[0.98] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none"
+            className="w-full h-12 gap-3 justify-start px-4 text-sm font-black tracking-widest bg-brand-blue text-white hover:brightness-110 active:scale-[0.98] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none"
           >
             <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
-              <RefreshCcw className="h-3.5 w-3.5 text-brand-blue" strokeWidth={4} />
+              <RefreshCcw className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
             </div>
             Adjust
           </Button>
@@ -87,28 +87,28 @@ export function Sidebar({
         <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-3 w-full">
           <TabsTrigger 
             value="inventory" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <Pill className="h-4 w-4 text-brand-blue" strokeWidth={3} />
+              <Pill className="h-4 w-4 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">Inventory View</span>
           </TabsTrigger>
           <TabsTrigger 
             value="history" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <History className="h-4 w-4 text-brand-blue" strokeWidth={3} />
+              <History className="h-4 w-4 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">Audit Log</span>
           </TabsTrigger>
           <TabsTrigger 
             value="alerts" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <AlertTriangle className="h-4 w-4 text-brand-blue" strokeWidth={3} />
+              <AlertTriangle className="h-4 w-4 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">Alerts</span>
             {lowStockCount > 0 && (
@@ -117,13 +117,12 @@ export function Sidebar({
               </Badge>
             )}
           </TabsTrigger>
-          <div className="h-px bg-brand-blue/10 my-1" />
           <TabsTrigger 
             value="users" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-sm font-bold group transition-colors"
+            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
           >
             <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
+              <Users className="h-4 w-4 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">User Management</span>
           </TabsTrigger>
@@ -148,7 +147,7 @@ export function Sidebar({
                 className="hover:brightness-100 h-8 w-8 shrink-0 rounded-full p-0 overflow-hidden"
               >
                 <div className="h-full w-full bg-brand-yellow flex items-center justify-center shadow-sm">
-                  <Edit className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                  <Edit className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
                 </div>
               </Button>
               <Button 
@@ -158,7 +157,7 @@ export function Sidebar({
                 className="hover:brightness-100 h-8 w-8 shrink-0 rounded-full p-0 overflow-hidden"
               >
                 <div className="h-full w-full bg-brand-yellow flex items-center justify-center shadow-sm">
-                  <LogOut className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                  <LogOut className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
                 </div>
               </Button>
             </div>
