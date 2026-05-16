@@ -49,7 +49,7 @@ export function AlertsView({
                     <div className="text-sm font-bold text-brand-dark-grey">{item.name}&nbsp;{item.strength}</div>
                     <button 
                       onClick={() => onNDCClick(item.ndc)}
-                      className="text-[10px] font-mono text-brand-blue/60 hover:underline"
+                      className="text-[10px] font-black text-brand-blue/60 hover:underline"
                     >
                       NDC: {item.ndc}
                     </button>
@@ -57,7 +57,7 @@ export function AlertsView({
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
                       <span className="text-sm font-black text-brand-yellow">{item.currentStock}&nbsp;{item.unit}</span>
-                      <span className="text-[8px] font-bold text-brand-dark-grey/40 uppercase">Threshold: {item.minThreshold}</span>
+                      <span className="text-[8px] font-black text-brand-dark-grey/40 uppercase">Threshold: {item.minThreshold}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-center">

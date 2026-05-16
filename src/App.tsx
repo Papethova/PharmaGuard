@@ -1119,7 +1119,7 @@ export default function App() {
     setIsCameraActive(false);
     setUseSignatureFallback(false);
     setCameraPermissionError(false);
-    if (users.length > 0) setSelectedUser(users[0].id);
+    setSelectedUser("");
     setNewMed({
       name: "",
       strength: "",
@@ -2636,7 +2636,7 @@ export default function App() {
                 <ScrollArea className="flex-1 overflow-y-auto">
                   <div className="p-6 space-y-8">
                     <div className="space-y-4">
-                      <Label className="text-[10px] uppercase font-black tracking-widest text-brand-blue/60 mb-2 block">System Configuration</Label>
+                      <Label className="text-sm font-bold text-brand-dark-grey">System Configuration</Label>
                       <div 
                         className="flex items-center justify-between p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                         onClick={togglePhotoRequirement}
