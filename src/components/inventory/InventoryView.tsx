@@ -81,13 +81,13 @@ export function InventoryView({
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-base font-black ${item.currentStock <= item.minThreshold ? "text-brand-yellow" : "text-black"}`}>
+                        <span className={`text-base font-black ${item.currentStock <= item.minThreshold ? "!text-[#FFE600]" : "text-black"}`}>
                           {item.currentStock}
                         </span>
                         {item.currentStock <= item.minThreshold && (
                           <div className="flex items-center gap-1 mt-1">
-                            <div className="h-2 w-2 rounded-full bg-brand-yellow animate-pulse shadow-[0_0_10px_rgba(255,230,0,0.8)]" />
-                            <span className="text-[9px] font-black text-brand-yellow tracking-tighter uppercase">Low Stock</span>
+                            <div className="h-2 w-2 rounded-full bg-[#FFE600] animate-pulse shadow-[0_0_10px_#FFE600]" />
+                            <span className="text-[9px] font-black !text-[#FFE600] tracking-tighter uppercase">Low Stock</span>
                           </div>
                         )}
                       </div>
