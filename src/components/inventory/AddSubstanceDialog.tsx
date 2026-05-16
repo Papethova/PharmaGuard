@@ -28,7 +28,7 @@ export function AddSubstanceDialog({
 }: AddSubstanceDialogProps) {
   const [name, setName] = useState("");
   const [strength, setStrength] = useState("");
-  const [schedule, setSchedule] = useState<Schedule>("C-II");
+  const [schedule, setSchedule] = useState<Schedule | undefined>(undefined);
   const [ndc, setNdc] = useState("");
   const [unit, setUnit] = useState("");
   const [packageSize, setPackageSize] = useState("");
@@ -66,7 +66,7 @@ export function AddSubstanceDialog({
       <DialogContent className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-black text-brand-blue">Catalog New Substance</DialogTitle>
-          <DialogDescription className="text-brand-dark-grey/60 text-xs uppercase tracking-widest font-bold">Registry Entry Creation</DialogDescription>
+          <DialogDescription className="text-brand-dark-grey/60 text-[10px] uppercase tracking-widest font-bold">Registry Entry Creation</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-1.5">
@@ -82,9 +82,9 @@ export function AddSubstanceDialog({
               <Label className="text-xs font-bold text-brand-blue">Schedule</Label>
               <Select value={schedule} onValueChange={(v: Schedule) => setSchedule(v)}>
                 <SelectTrigger className="h-10 border-brand-blue/10">
-                  <SelectValue />
+                  <SelectValue placeholder="Select..." />
                 </SelectTrigger>
-                <SelectContent className="bg-brand-surface" align="start">
+                <SelectContent className="bg-brand-surface">
                   {SCHEDULES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>

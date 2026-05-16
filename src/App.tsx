@@ -1390,8 +1390,8 @@ export default function App() {
                 <PharmaLogo className="h-16 w-16" />
               </div>
               <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
-              <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.15em] mt-1">
-                secure controlled substance perpetual inventory system
+              <p className="text-brand-yellow font-bold text-[10px] uppercase tracking-[0.15em] mt-1">
+                SECURE CONTROLLED SUBSTANCE PERPETUAL INVENTORY SYSTEM
               </p>
             </div>
 
@@ -1910,13 +1910,13 @@ export default function App() {
                     </div>
                     
                     <div className="flex flex-col gap-0 text-left">
-                      <DialogTitle className="text-sm font-black tracking-tight text-white leading-none">
+                      <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                         {transactionType === "OUT" ? "Dispense Medication" : 
                          transactionType === "IN" ? "Add to Inventory" : 
                          transactionType === "ADJUST" ? "Adjust Inventory" : 
                          "Verify Inventory Count"}
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[8px] uppercase tracking-widest mt-0.5">
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
                         AUDIT LOG ACTIVE
                       </DialogDescription>
                     </div>
@@ -2133,12 +2133,22 @@ export default function App() {
                         </div>
                         <div className="space-y-1">
                           <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                          <p className="text-xs text-brand-dark-grey/70 leading-relaxed">
-                            I, <span className="font-bold text-brand-blue">{(() => { const u = users.find(u => u.id === selectedUser); return u ? `${u.name}${u.title ? ` (${u.title})` : ''}` : (user?.displayName || "User"); })()}</span>, confirm that the current physical count of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength} (NDC: {selectedSubstanceDetail?.ndc})</span> matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
+                          <p className="text-xs text-brand-dark-grey/70 leading-relaxed italic">
+                            I confirm that the current physical count of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength} (NDC: {selectedSubstanceDetail?.ndc})</span> matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
                           </p>
                         </div>
-                        <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest">
-                          Timestamp: {new Date().toLocaleString()}
+                        
+                        <div className="pt-3 border-t border-brand-blue/10 w-full">
+                          <div className="text-[9px] font-black text-brand-blue/40 uppercase tracking-widest mb-1">Authorization Identity</div>
+                          <div className="text-sm font-bold text-brand-dark-grey">
+                            {(() => {
+                              const u = users.find(u => u.id === selectedUser);
+                              return u ? `${u.name}${u.title ? ` (${u.title})` : ''}` : (user?.displayName || "User");
+                            })()}
+                          </div>
+                          <div className="text-[9px] text-brand-dark-grey/30 uppercase font-bold tracking-widest mt-2">
+                             {new Date().toLocaleString()}
+                          </div>
                         </div>
                       </div>
                     ) : (
@@ -2531,7 +2541,7 @@ export default function App() {
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">
                               {viewingTransaction.type === 'VERIFY' ? 'Quantity Verified' : 'Quantity'}
                             </Label>
-                            <div className="text-sm font-mono font-bold text-brand-dark-grey">
+                            <div className="text-sm font-bold text-brand-dark-grey">
                               {viewingTransaction.type === 'VERIFY' 
                                 ? viewingTransaction.newStock 
                                 : (viewingTransaction.type === 'IN' ? '+' : viewingTransaction.type === 'OUT' ? '-' : (viewingTransaction.type === 'ADJUST' && viewingTransaction.quantity > 0 ? '+' : '')) + viewingTransaction.quantity}
@@ -2539,7 +2549,7 @@ export default function App() {
                           </div>
                           <div className="space-y-1">
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Reference #</Label>
-                            <div className="text-sm font-mono text-brand-blue font-bold">{formatRefForDisplay(viewingTransaction.referenceNumber)}</div>
+                            <div className="text-sm text-brand-blue font-bold">{formatRefForDisplay(viewingTransaction.referenceNumber)}</div>
                           </div>
                           <div className="space-y-1">
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Performed By</Label>
@@ -2844,10 +2854,10 @@ export default function App() {
                       <History className="h-5 w-5 text-brand-blue" />
                     </div>
                     <div className="flex flex-col gap-0">
-                        <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
+                        <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                           Transaction History: {selectedSubstanceDetail?.name}&nbsp;{selectedSubstanceDetail?.strength}
                         </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/80 font-bold text-sm tracking-widest mt-1">
+                      <DialogDescription className="text-brand-yellow/80 font-bold text-[10px] tracking-widest mt-1">
                         NDC: {selectedSubstanceDetail?.ndc}
                       </DialogDescription>
                     </div>
@@ -3078,7 +3088,7 @@ export default function App() {
                             <span className="font-medium group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
-                              <span className="text-[10px] font-mono text-brand-blue/70 font-bold">{s.ndc}</span>
+                              <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
                             </div>
                           </div>
                           <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -3098,7 +3108,7 @@ export default function App() {
                   </div>
                   <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[140px]">
                     <Label className="text-xs text-brand-blue uppercase font-bold leading-none">NDC</Label>
-                    <div className="text-sm font-mono font-bold text-brand-dark-grey truncate">
+                    <div className="text-sm font-bold text-brand-dark-grey truncate">
                       {inventory.find(i => i.id === historyMedicationFilter)?.ndc}
                     </div>
                   </div>
@@ -3264,7 +3274,7 @@ export default function App() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <DialogTitle className="text-lg font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
+                <DialogTitle className="text-xl font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 leading-tight truncate">
                   REAL-TIME REGISTRY MANAGEMENT AND GLOBAL SUBSCRIPTION AUTHORITY TERMINAL.
                 </DialogDescription>
@@ -3714,7 +3724,7 @@ export default function App() {
                 Edit Medication Details
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
-                Update the permanent records for this medication.
+                UPDATE THE PERMANENT RECORDS FOR THIS MEDICATION.
               </DialogDescription>
             </div>
           </div>
@@ -3912,7 +3922,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tighter text-white leading-none">
                 Reset Node Data
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
                 AUTHORIZED INDIVIDUAL DATA PURGE
               </DialogDescription>
             </div>

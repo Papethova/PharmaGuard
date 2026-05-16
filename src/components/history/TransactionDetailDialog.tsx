@@ -38,7 +38,7 @@ export function TransactionDetailDialog({
             </div>
             <div className="flex flex-col">
               <DialogTitle className="text-xl font-black tracking-tight leading-none text-white whitespace-nowrap overflow-hidden">Registry Evidence File</DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] uppercase tracking-[0.12em] mt-1">TRANSACTION IDENTITY BINDING</DialogDescription>
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-[0.12em] mt-1">TRANSACTION IDENTITY BINDING</DialogDescription>
             </div>
           </div>
         </DialogHeader>
@@ -55,7 +55,7 @@ export function TransactionDetailDialog({
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-1">
               <p className="text-[10px] font-black text-brand-blue/40 uppercase tracking-widest leading-none">Security Timestamp</p>
-              <p className="text-xs font-mono font-bold text-brand-dark-grey no-interact">{formatDateTime(transaction.timestamp)}</p>
+              <p className="text-xs font-bold text-brand-dark-grey no-interact">{formatDateTime(transaction.timestamp)}</p>
             </div>
             <div className="space-y-1 text-right">
               <p className="text-[10px] font-black text-brand-blue/40 uppercase tracking-widest leading-none">Authorization Identity</p>
