@@ -107,8 +107,11 @@ export function Sidebar({
             value="alerts" 
             className="w-full justify-start gap-4 h-10 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-[13px] font-black group transition-colors"
           >
-            <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+            <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 relative">
               <AlertTriangle className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
+              {lowStockCount > 0 && (
+                <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-brand-yellow animate-pulse shadow-[0_0_8px_rgba(255,230,0,0.8)] border border-brand-blue/10" />
+              )}
             </div>
             <span className="whitespace-nowrap">Alerts</span>
             {lowStockCount > 0 && (

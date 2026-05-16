@@ -33,40 +33,11 @@ export function InventoryView({
     return inventory.filter(item => activeSchedule === "ALL" || item.schedule === activeSchedule);
   }, [inventory, activeSchedule]);
 
-  const tableHeadClass = "text-base font-black text-brand-blue tracking-tighter text-center h-12 uppercase";
-  const actionBarButtonClass = "h-11 px-5 text-base font-black uppercase tracking-tighter bg-brand-blue text-white hover:brightness-110 active:scale-[0.95] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none flex items-center gap-2 w-fit";
+  const tableHeadClass = "text-xs font-black text-brand-blue tracking-widest text-center h-10 uppercase";
 
   return (
     <div className="space-y-6 relative z-10 m-0">
-      <div className="flex flex-col gap-6">
-        {/* Action Bar */}
-        <div className="flex flex-wrap items-center gap-3 bg-brand-surface p-4 rounded-2xl border border-brand-grey/10 shadow-sm">
-          <Button onClick={onDispense} className={actionBarButtonClass}>
-            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
-              <ArrowDown className="h-3 w-3 text-brand-blue" strokeWidth={3} />
-            </div>
-            Dispense
-          </Button>
-          <Button onClick={onAddStock} className={actionBarButtonClass}>
-            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
-              <Plus className="h-3 w-3 text-brand-blue" strokeWidth={3} />
-            </div>
-            Add stock
-          </Button>
-          <Button onClick={onAdjustStock} className={actionBarButtonClass}>
-            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
-              <RefreshCcw className="h-3 w-3 text-brand-blue" strokeWidth={3} />
-            </div>
-            Adjust
-          </Button>
-          <Button onClick={onEnroll} className={actionBarButtonClass}>
-            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
-              <PlusCircle className="h-3 w-3 text-brand-blue" strokeWidth={3} />
-            </div>
-            Enroll
-          </Button>
-        </div>
-
+      <div className="flex flex-col gap-4">
         <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface rounded-2xl">
           <div className="overflow-x-auto">
             <Table>
@@ -110,13 +81,13 @@ export function InventoryView({
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-base font-black ${item.currentStock <= item.minThreshold ? "text-yellow-600" : "text-black"}`}>
+                        <span className={`text-base font-black ${item.currentStock <= item.minThreshold ? "text-brand-yellow" : "text-black"}`}>
                           {item.currentStock}
                         </span>
                         {item.currentStock <= item.minThreshold && (
                           <div className="flex items-center gap-1 mt-1">
-                            <div className="h-1.5 w-1.5 rounded-full bg-yellow-500 animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-                            <span className="text-[8px] font-bold text-yellow-600 tracking-tighter uppercase">Low Stock</span>
+                            <div className="h-2 w-2 rounded-full bg-brand-yellow animate-pulse shadow-[0_0_10px_rgba(255,230,0,0.8)]" />
+                            <span className="text-[9px] font-black text-brand-yellow tracking-tighter uppercase">Low Stock</span>
                           </div>
                         )}
                       </div>

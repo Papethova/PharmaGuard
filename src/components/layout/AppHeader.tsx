@@ -32,15 +32,15 @@ export function AppHeader({
             </div>
           </div>
 
-          <div className="hidden lg:flex flex-1 items-center justify-between gap-2">
+          <div className="hidden lg:flex items-center justify-end gap-3 flex-1 overflow-visible">
             {["ALL", ...SCHEDULES].map((sched) => (
               <button
                 key={sched}
                 onClick={() => onScheduleChange(sched as any)}
-                className={`flex-1 py-2 px-4 text-[10px] font-black tracking-widest transition-all rounded-full border ${
+                className={`h-9 px-0 w-[110px] text-xs font-black tracking-tighter transition-all rounded-xl border-2 ${
                   activeSchedule === sched
-                    ? "bg-brand-blue text-white shadow-xl shadow-brand-blue/30 border-brand-blue"
-                    : "text-brand-blue/50 hover:bg-brand-blue/10 hover:text-brand-blue border-brand-blue/20 bg-brand-blue/5"
+                    ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/30 border-brand-blue scale-105"
+                    : "text-brand-blue hover:bg-brand-blue/10 border-brand-blue/10 bg-white"
                 }`}
               >
                 {sched}

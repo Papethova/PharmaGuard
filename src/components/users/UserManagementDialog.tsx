@@ -175,7 +175,7 @@ export function UserManagementDialog({
                 </Select>
                 <Button 
                   onClick={handleAddUser} 
-                  className="bg-[#FFE600] text-brand-blue hover:brightness-110 active:scale-[0.9] h-8 px-4 border-none shadow-lg shadow-yellow-400/30 font-bold transition-all"
+                  className="bg-[#FFE600] text-brand-blue hover:brightness-110 active:scale-[0.9] h-8 px-4 border-none shadow-lg shadow-brand-yellow/30 font-bold transition-all"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}

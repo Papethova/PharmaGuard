@@ -32,28 +32,24 @@ export function AuditLogView({
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
 
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(t => {
+    const filtered = transactions.filter(t => {
       // Schedule Filter
       if (activeSchedule !== "ALL") {
         const sub = inventory.find(i => i.id === t.substanceId);
-        // If we found the substance and it's a different schedule, hide it.
-        // If we didn't find the substance (deleted), we hide it if a specific schedule is selected 
-        // because we can't verify it belongs to that schedule.
         if (sub) {
           if (sub.schedule !== activeSchedule) return false;
         } else {
-          // If substance is missing, we don't know its schedule, so we exclude it from specific schedule views
           return false;
         }
       }
       
       // Date Range Filter
       if (startDate) {
-        const tDate = t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
+        const tDate = t.timestamp?.toDate ? t.timestamp.toDate() : (t.timestamp ? new Date(t.timestamp) : new Date());
         if (tDate < new Date(startDate)) return false;
       }
       if (endDate) {
-        const tDate = t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
+        const tDate = t.timestamp?.toDate ? t.timestamp.toDate() : (t.timestamp ? new Date(t.timestamp) : new Date());
         const end = new Date(endDate);
         end.setHours(23, 59, 59);
         if (tDate > end) return false;
@@ -63,6 +59,15 @@ export function AuditLogView({
       if (historyMedicationFilter && t.substanceId !== historyMedicationFilter) return false;
       
       return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const getTime = (timestamp: any) => {
+        if (!timestamp) return Date.now() + 1000; // Put new/pending at the very top
+        if (timestamp.toDate) return timestamp.toDate().getTime();
+        return new Date(timestamp).getTime();
+      };
+      return getTime(b.timestamp) - getTime(a.timestamp);
     });
   }, [transactions, activeSchedule, startDate, endDate, historyMedicationFilter, inventory]);
 
