@@ -66,7 +66,7 @@ export function AuditLogView({
     });
   }, [transactions, activeSchedule, startDate, endDate, historyMedicationFilter, inventory]);
 
-  const tableHeadClass = "text-[10px] font-black text-brand-blue tracking-widest text-center h-10";
+  const tableHeadClass = "text-sm font-black text-brand-blue tracking-tighter text-center h-10 uppercase";
 
   return (
     <div className="space-y-4 relative z-10 m-0">

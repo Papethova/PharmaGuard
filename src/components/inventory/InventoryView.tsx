@@ -33,12 +33,41 @@ export function InventoryView({
     return inventory.filter(item => activeSchedule === "ALL" || item.schedule === activeSchedule);
   }, [inventory, activeSchedule]);
 
-  const tableHeadClass = "text-[10px] font-black text-brand-blue tracking-widest text-center h-10";
+  const tableHeadClass = "text-base font-black text-brand-blue tracking-tighter text-center h-12 uppercase";
+  const actionBarButtonClass = "h-11 px-5 text-base font-black uppercase tracking-tighter bg-brand-blue text-white hover:brightness-110 active:scale-[0.95] rounded-xl shadow-lg shadow-brand-blue/20 transition-all border-none flex items-center gap-2 w-fit";
 
   return (
     <div className="space-y-6 relative z-10 m-0">
-      <div className="flex flex-col gap-4">
-        <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface">
+      <div className="flex flex-col gap-6">
+        {/* Action Bar */}
+        <div className="flex flex-wrap items-center gap-3 bg-brand-surface p-4 rounded-2xl border border-brand-grey/10 shadow-sm">
+          <Button onClick={onDispense} className={actionBarButtonClass}>
+            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
+              <ArrowDown className="h-3 w-3 text-brand-blue" strokeWidth={3} />
+            </div>
+            Dispense
+          </Button>
+          <Button onClick={onAddStock} className={actionBarButtonClass}>
+            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
+              <Plus className="h-3 w-3 text-brand-blue" strokeWidth={3} />
+            </div>
+            Add stock
+          </Button>
+          <Button onClick={onAdjustStock} className={actionBarButtonClass}>
+            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
+              <RefreshCcw className="h-3 w-3 text-brand-blue" strokeWidth={3} />
+            </div>
+            Adjust
+          </Button>
+          <Button onClick={onEnroll} className={actionBarButtonClass}>
+            <div className="h-5 w-5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0">
+              <PlusCircle className="h-3 w-3 text-brand-blue" strokeWidth={3} />
+            </div>
+            Enroll
+          </Button>
+        </div>
+
+        <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface rounded-2xl">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-brand-light-grey/50">
@@ -52,11 +81,11 @@ export function InventoryView({
               <TableBody>
                 {isInitializing ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50">Loading inventory...</TableCell>
+                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50 font-bold uppercase tracking-widest text-[10px]">Loading inventory...</TableCell>
                   </TableRow>
                 ) : filteredInventory.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50">No entries found.</TableCell>
+                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50 font-bold uppercase tracking-widest text-[10px]">No entries found.</TableCell>
                   </TableRow>
                 ) : filteredInventory.map((item) => (
                   <TableRow 
@@ -74,14 +103,14 @@ export function InventoryView({
                         {item.schedule}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-center">
-                      <span className="text-brand-blue font-bold px-2 py-0.5 rounded bg-brand-blue/5 border border-brand-blue/10">
+                    <TableCell className="text-sm text-center">
+                      <span className="text-brand-blue font-bold">
                         {item.ndc}
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-sm font-bold ${item.currentStock <= item.minThreshold ? "text-yellow-600" : "text-black"}`}>
+                        <span className={`text-base font-black ${item.currentStock <= item.minThreshold ? "text-yellow-600" : "text-black"}`}>
                           {item.currentStock}
                         </span>
                         {item.currentStock <= item.minThreshold && (

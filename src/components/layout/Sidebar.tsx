@@ -46,7 +46,7 @@ export function Sidebar({
     <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-12 sticky top-24 shrink-0 overflow-visible">
       <div className="flex flex-col w-full shrink-0">
         <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px] mb-4">
-          <h3 className={`font-bold text-brand-blue/60 tracking-tight leading-tight transition-colors duration-300 no-interact ${
+          <h3 className={`font-bold text-brand-blue tracking-tight leading-tight transition-colors duration-300 no-interact ${
             (identity.length || 0) > 20 ? "text-lg" : 
             (identity.length || 0) > 15 ? "text-xl" : "text-2xl"
           }`}>
@@ -131,13 +131,13 @@ export function Sidebar({
         {user && (
           <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-10">
             <div className="flex flex-col overflow-hidden">
-              <span className="text-xs font-bold text-brand-blue/60 truncate tracking-tight">
+              <span className="text-xs font-bold text-brand-blue/70 truncate tracking-tight">
                 {userProfile?.organizationName || userProfile?.displayName || user.displayName}
               </span>
               {!userProfile?.organizationName && (
                 <span className="text-[7px] font-bold bg-brand-blue/5 text-brand-blue px-1 rounded-sm w-fit uppercase tracking-tighter mt-0.5">Setup required</span>
               )}
-              <span className="text-[10px] text-black font-medium truncate no-interact">{user.email}</span>
+              <span className="text-[10px] text-brand-blue font-bold truncate no-interact">{user.email}</span>
             </div>
             <div className="flex items-center gap-2">
               <Button 

@@ -94,8 +94,13 @@ export function AddSubstanceDialog({
       if (substanceId) {
         await onLog({
           substanceId,
+          substanceName: name,
+          strength,
+          ndc,
           type: "IN",
           quantity: Number(quantityReceived),
+          previousStock: 0,
+          newStock: Number(quantityReceived),
           referenceNumber: invoiceNumber || "INITIAL-STOCK",
           performedBy: performerId,
           performedByName: users.find(u => u.id === performerId)?.name || "",

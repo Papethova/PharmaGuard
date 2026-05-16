@@ -86,7 +86,7 @@ export function AdjustStockDialog({
     setIsSubmitting(true);
     try {
       const qty = Number(quantity); // Can be negative for Adjustment
-      const prevStock = item.currentStock;
+      const prevStock = Number(item.currentStock) || 0;
       const newStock = prevStock + qty;
 
       await onLog({
@@ -97,7 +97,7 @@ export function AdjustStockDialog({
         type: "ADJUST",
         quantity: qty,
         previousStock: prevStock,
-        newStock,
+        newStock: isNaN(newStock) ? prevStock : newStock,
         performedBy: selectedUser,
         performedByName: users.find(u => u.id === selectedUser)?.name || "Unknown",
         witnessId: null,

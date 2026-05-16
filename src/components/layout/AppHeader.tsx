@@ -40,7 +40,7 @@ export function AppHeader({
                 className={`flex-1 py-2 px-4 text-[10px] font-black tracking-widest transition-all rounded-full border ${
                   activeSchedule === sched
                     ? "bg-brand-blue text-white shadow-xl shadow-brand-blue/30 border-brand-blue"
-                    : "text-black/50 hover:bg-brand-blue/5 hover:text-black border-brand-blue/10 bg-brand-blue/5"
+                    : "text-brand-blue/50 hover:bg-brand-blue/10 hover:text-brand-blue border-brand-blue/20 bg-brand-blue/5"
                 }`}
               >
                 {sched}

@@ -71,7 +71,7 @@ export function DispenseDialog({
     setIsSubmitting(true);
     try {
       const qty = Number(quantity);
-      const prevStock = item.currentStock;
+      const prevStock = Number(item.currentStock) || 0;
       const newStock = prevStock - qty;
 
       await onLog({
@@ -82,7 +82,7 @@ export function DispenseDialog({
         type: "OUT",
         quantity: qty,
         previousStock: prevStock,
-        newStock,
+        newStock: isNaN(newStock) ? prevStock : newStock,
         performedBy: selectedUser,
         performedByName: users.find(u => u.id === selectedUser)?.name || "Unknown",
         witnessId: witnessId || null,
