@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { SCHEDULES } from "../../lib/constants";
 import { Schedule } from "../../types";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,6 +21,7 @@ import { CaptureSignature, CapturePhoto } from "../forms/CaptureIdentity";
 interface AddSubstanceDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  inventory?: any[];
   onAdd: (substance: any) => Promise<string | void>;
   onLog: (transaction: any) => Promise<void>;
   users: any[];
@@ -29,6 +31,7 @@ interface AddSubstanceDialogProps {
 export function AddSubstanceDialog({ 
   isOpen, 
   onOpenChange,
+  inventory = [],
   onAdd,
   onLog,
   users,
@@ -49,6 +52,7 @@ export function AddSubstanceDialog({
   const [signature, setSignature] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
   
+  const [isSearching, setIsSearching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -155,7 +159,50 @@ export function AddSubstanceDialog({
               <div className="space-y-4 p-4 rounded-xl bg-brand-blue/5 border border-brand-blue/10">
                 <div className="grid gap-2">
                   <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Medication</Label>
-                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Oxycodone" className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                  <div className="relative">
+                    <Input 
+                      value={name} 
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        setIsSearching(true);
+                      }} 
+                      onFocus={() => setIsSearching(true)}
+                      placeholder="e.g. Oxycodone" 
+                      className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" 
+                    />
+                    {name && isSearching && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-brand-grey/20 rounded-xl shadow-2xl max-h-64 overflow-y-auto overflow-x-hidden p-1">
+                        {inventory.length > 0 && (
+                          <div className="px-3 py-2 text-[10px] font-bold text-brand-blue/40 uppercase tracking-widest border-b border-brand-grey/5 mb-1">
+                            Current Inventory
+                          </div>
+                        )}
+                        {inventory
+                          .filter(s => s.name.toLowerCase().includes(name.toLowerCase()))
+                          .map(s => (
+                            <div
+                              key={s.id}
+                              className="px-3 py-3 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group border-b border-brand-grey/5 last:border-0 rounded-lg"
+                              onClick={() => {
+                                setName(s.name);
+                                setStrength(s.strength);
+                                setNdc(s.ndc);
+                                setDosageForm(s.unit);
+                                setPackageSize(s.packageSize.toString());
+                                setSchedule(s.schedule);
+                                setIsSearching(false);
+                              }}
+                            >
+                              <div className="flex flex-col text-left">
+                                <span className="group-hover:text-brand-blue text-brand-blue font-bold">{s.name} {s.strength}</span>
+                                <span className="text-[10px] text-brand-blue/70 font-mono uppercase tracking-tighter">NDC: {s.ndc}</span>
+                              </div>
+                              <Badge variant="outline" className="text-[10px] font-medium border-brand-blue/30 text-brand-blue px-2">{s.schedule}</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -184,8 +231,8 @@ export function AddSubstanceDialog({
                   <div className="grid gap-2">
                     <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Schedule</Label>
                     <Select value={schedule} onValueChange={(v: Schedule) => setSchedule(v)}>
-                      <SelectTrigger className="h-9 border-brand-blue/20 bg-white text-black/40 px-3 font-bold">
-                        <SelectValue placeholder="Select..." />
+                      <SelectTrigger className="h-9 border-brand-blue/20 bg-white text-brand-blue px-3 font-bold">
+                        <SelectValue placeholder="Select...." />
                       </SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {SCHEDULES.map(s => <SelectItem key={s} value={s} className="text-black font-bold focus:bg-brand-blue/5">{s}</SelectItem>)}
@@ -215,7 +262,7 @@ export function AddSubstanceDialog({
                 <div className="grid gap-1">
                   <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
                   <Select value={performerId} onValueChange={setPerformerId}>
-                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold focus:ring-brand-blue/20">
+                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-brand-blue px-3 font-bold focus:ring-brand-blue/20">
                       <SelectValue placeholder="Select user..." />
                     </SelectTrigger>
                     <SelectContent className="bg-brand-surface" align="start">

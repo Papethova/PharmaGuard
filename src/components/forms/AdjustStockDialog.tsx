@@ -57,6 +57,7 @@ export function AdjustStockDialog({
   const [signature, setSignature] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const referenceNumber = `ADJ-${nextAdjustCount.toString().padStart(3, "0")}`;
 
@@ -69,6 +70,7 @@ export function AdjustStockDialog({
     setSelectedUser("");
     setCapturedPhoto(null);
     setSignature(null);
+    setShowConfirm(false);
   };
 
   const handleInitialSubmit = () => {
@@ -255,7 +257,7 @@ export function AdjustStockDialog({
                 <div className="grid gap-1">
                   <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
                   <Select value={selectedUser} onValueChange={setSelectedUser}>
-                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold">
+                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-brand-blue px-3 font-bold">
                       <SelectValue placeholder="Select user..." />
                     </SelectTrigger>
                     <SelectContent className="bg-brand-surface" align="start">
@@ -331,23 +333,6 @@ export function AdjustStockDialog({
             className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] rounded-xl transition-all disabled:opacity-50 border-none shadow-xl shadow-[#FFE600]/30"
           >
             {isSubmitting ? (showConfirm ? "Finalizing..." : "Processing...") : (showConfirm ? "Confirm Adjust" : "Adjust")}
-          </Button>
-        </DialogFooter>
-
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4">
-          <Button 
-            onClick={() => { onOpenChange(false); resetForm(); }}
-            disabled={isSubmitting}
-            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 rounded-xl shadow-lg transition-all border-none"
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={isSubmitting || !selectedSubstance || !quantity || !selectedUser || (!signature && !isPhotoRequirementEnabled)}
-            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] rounded-xl transition-all disabled:opacity-50 border-none shadow-xl shadow-[#FFE600]/30"
-          >
-            {isSubmitting ? "Adjusting..." : "Adjust"}
           </Button>
         </DialogFooter>
       </DialogContent>

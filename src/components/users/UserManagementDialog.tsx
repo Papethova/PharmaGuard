@@ -164,7 +164,7 @@ export function UserManagementDialog({
                   className="bg-brand-surface border-brand-blue/20 text-sm h-8 flex-1 text-black placeholder:text-brand-grey/50"
                 />
                 <Select value={userTitle} onValueChange={setUserTitle}>
-                  <SelectTrigger className="w-32 h-8 bg-brand-surface border-brand-blue/20 text-xs text-black/40 px-3 text-left justify-start font-bold">
+                  <SelectTrigger className="w-32 h-8 bg-brand-surface border-brand-blue/20 text-xs text-brand-blue px-3 text-left justify-start font-bold">
                     <SelectValue placeholder="Title..." />
                   </SelectTrigger>
                   <SelectContent className="bg-brand-surface" align="start">

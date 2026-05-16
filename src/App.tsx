@@ -242,6 +242,7 @@ export default function App() {
       <AddSubstanceDialog 
         isOpen={isAddMedOpen}
         onOpenChange={setIsAddMedOpen}
+        inventory={inventory}
         onAdd={addSubstance}
         onLog={addTransaction}
         users={staff}

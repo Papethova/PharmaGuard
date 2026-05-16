@@ -67,7 +67,6 @@ export function InventoryView({
                     <TableCell className="text-sm text-black text-center">
                       <div className="flex flex-col items-center">
                         <span className="font-bold">{item.name} {item.strength}</span>
-                        <span className="text-[10px] text-black/50 uppercase tracking-tighter">{item.unit}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-center">

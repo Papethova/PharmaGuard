@@ -211,7 +211,7 @@ export function AuditLogView({
                     {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                   </TableCell>
                   <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
-                    {escapeEmail(t.performedByName)}
+                    {t.performedByName}
                   </TableCell>
                 </TableRow>
               ))}

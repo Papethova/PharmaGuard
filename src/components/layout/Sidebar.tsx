@@ -87,42 +87,42 @@ export function Sidebar({
         <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-3 w-full">
           <TabsTrigger 
             value="inventory" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
+            className="w-full justify-start gap-4 h-10 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-[13px] font-black group transition-colors"
           >
-            <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <Pill className="h-4 w-4 text-brand-blue" strokeWidth={2} />
+            <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+              <Pill className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">Inventory View</span>
           </TabsTrigger>
           <TabsTrigger 
             value="history" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
+            className="w-full justify-start gap-4 h-10 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-[13px] font-black group transition-colors"
           >
-            <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <History className="h-4 w-4 text-brand-blue" strokeWidth={2} />
+            <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+              <History className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">Audit Log</span>
           </TabsTrigger>
           <TabsTrigger 
             value="alerts" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
+            className="w-full justify-start gap-4 h-10 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-[13px] font-black group transition-colors"
           >
-            <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <AlertTriangle className="h-4 w-4 text-brand-blue" strokeWidth={2} />
+            <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+              <AlertTriangle className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">Alerts</span>
             {lowStockCount > 0 && (
-              <Badge className="ml-auto h-5 w-5 flex items-center justify-center text-[10px] bg-brand-blue text-white border-none font-bold rounded-full p-0">
+              <Badge className="ml-auto h-4 w-4 flex items-center justify-center text-[9px] bg-brand-blue text-white border-none font-bold rounded-full p-0">
                 {lowStockCount}
               </Badge>
             )}
           </TabsTrigger>
           <TabsTrigger 
             value="users" 
-            className="w-full justify-start gap-4 h-12 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue/60 hover:bg-brand-blue/5 border border-transparent text-[15px] font-black group transition-colors"
+            className="w-full justify-start gap-4 h-10 px-3 rounded-lg data-[state=active]:bg-brand-blue/10 data-[state=active]:!text-brand-blue text-brand-blue hover:bg-brand-blue/5 border border-transparent text-[13px] font-black group transition-colors"
           >
-            <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-              <Users className="h-4 w-4 text-brand-blue" strokeWidth={2} />
+            <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+              <Users className="h-3.5 w-3.5 text-brand-blue" strokeWidth={2} />
             </div>
             <span className="whitespace-nowrap">User Management</span>
           </TabsTrigger>

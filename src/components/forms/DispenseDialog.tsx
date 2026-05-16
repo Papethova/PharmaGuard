@@ -242,7 +242,7 @@ export function DispenseDialog({
                 <div className="grid gap-1">
                   <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
                   <Select value={selectedUser} onValueChange={setSelectedUser}>
-                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold">
+                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-brand-blue px-3 font-bold">
                       <SelectValue placeholder="Select user..." />
                     </SelectTrigger>
                     <SelectContent className="bg-brand-surface" align="start">
