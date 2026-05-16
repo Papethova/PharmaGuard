@@ -2649,8 +2649,8 @@ export default function App() {
                             <Camera className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-brand-dark-grey group-hover:text-brand-blue transition-colors">Photo Verification</p>
-                            <p className="text-[10px] text-brand-grey font-medium uppercase tracking-tight">Capture photos for each transaction</p>
+                            <p className={`text-sm transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                            <p className={`text-[10px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
                           </div>
                         </div>
                         <div className={`w-12 h-6 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
@@ -2819,7 +2819,7 @@ export default function App() {
                           {item.schedule}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-mono text-xs text-center">
+                      <TableCell className="font-bold text-xs text-center">
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleNDCClick(item.ndc); }}
                           className="text-brand-blue hover:underline font-bold transition-colors"
@@ -2827,7 +2827,7 @@ export default function App() {
                           {item.ndc}
                         </button>
                       </TableCell>
-                      <TableCell className={`text-center font-mono text-sm ${item.currentStock <= item.minThreshold ? 'text-brand-yellow font-black' : 'text-brand-dark-grey'}`}>
+                      <TableCell className={`text-center font-bold text-sm ${item.currentStock <= item.minThreshold ? 'text-brand-yellow font-black' : 'text-brand-dark-grey'}`}>
                         {item.currentStock} {item.unit}
                       </TableCell>
                     </TableRow>
@@ -3166,7 +3166,7 @@ export default function App() {
                       <TableCell className="text-center">
                         <div className="text-sm font-bold text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                       </TableCell>
-                      <TableCell className="text-xs font-mono text-center">
+                      <TableCell className="text-xs font-bold text-center">
                         <button 
                           onClick={() => handleNDCClick(t.ndc)}
                           className="text-brand-blue hover:underline font-bold transition-colors"
@@ -3177,8 +3177,8 @@ export default function App() {
                       <TableCell>
                         <TransactionBadge type={t.type} />
                       </TableCell>
-                      <TableCell className="text-center font-mono text-sm text-brand-dark-grey">
-                        {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
+                      <TableCell className="text-center font-bold text-sm text-brand-dark-grey">
+                        {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                       </TableCell>
                       <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
                         {escapeEmail(t.performedByName)}
@@ -3572,7 +3572,7 @@ export default function App() {
         </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2 p-6 bg-brand-blue/5 border-t border-brand-blue/10">
-          <Button variant="outline" onClick={() => setUserToDeleteConfirm(null)} className="flex-1 border-brand-blue/20 text-brand-blue font-black uppercase tracking-widest text-[10px] h-11">
+          <Button variant="default" onClick={() => setUserToDeleteConfirm(null)} className="flex-1 bg-brand-blue text-white hover:bg-brand-blue/90 font-black uppercase tracking-widest text-[10px] h-11 border-none shadow-lg shadow-brand-blue/10">
             Keep User
           </Button>
           <Button 

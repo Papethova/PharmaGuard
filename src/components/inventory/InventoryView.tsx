@@ -64,7 +64,7 @@ export function InventoryView({
                         {item.schedule}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-center">
+                    <TableCell className="font-bold text-xs text-center">
                       <button 
                         onClick={(e) => { e.stopPropagation(); onNDCClick(item.ndc); }}
                         className="text-brand-blue hover:underline font-bold transition-colors"
@@ -74,7 +74,7 @@ export function InventoryView({
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-sm font-mono font-black ${item.currentStock <= item.minThreshold ? "text-brand-yellow" : "text-brand-blue"}`}>
+                        <span className={`text-sm font-bold font-black ${item.currentStock <= item.minThreshold ? "text-brand-yellow" : "text-brand-blue"}`}>
                           {item.currentStock} {item.unit}
                         </span>
                         {item.currentStock <= item.minThreshold && (

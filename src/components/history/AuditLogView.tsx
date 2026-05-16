@@ -194,7 +194,7 @@ export function AuditLogView({
                   <TableCell className="text-center">
                     <div className="text-sm font-bold text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                   </TableCell>
-                  <TableCell className="text-xs font-mono text-center">
+                  <TableCell className="text-xs font-bold text-center">
                     <button 
                       onClick={() => onNDCClick(t.ndc)}
                       className="text-brand-blue hover:underline font-bold transition-colors"
@@ -207,8 +207,8 @@ export function AuditLogView({
                       <TransactionBadge type={t.type} size="sm" />
                     </div>
                   </TableCell>
-                  <TableCell className="text-center font-mono text-sm text-brand-dark-grey">
-                    {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
+                  <TableCell className="text-center font-bold text-sm text-brand-dark-grey">
+                    {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                   </TableCell>
                   <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
                     {escapeEmail(t.performedByName)}
