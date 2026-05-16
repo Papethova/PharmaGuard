@@ -74,11 +74,11 @@ export function InventoryView({
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-sm font-mono font-black ${item.currentStock <= item.minThreshold ? "text-red-500" : "text-brand-blue"}`}>
+                        <span className={`text-sm font-mono font-black ${item.currentStock <= item.minThreshold ? "text-brand-yellow" : "text-brand-blue"}`}>
                           {item.currentStock} {item.unit}
                         </span>
                         {item.currentStock <= item.minThreshold && (
-                          <span className="text-[8px] uppercase font-black text-red-400 tracking-tighter">Low Stock Alert</span>
+                          <span className="text-[8px] uppercase font-black text-brand-yellow/80 tracking-tighter">Low Stock Alert</span>
                         )}
                       </div>
                     </TableCell>

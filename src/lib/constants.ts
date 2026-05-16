@@ -1,7 +1,7 @@
 import { Schedule } from "../types";
 
 export const MASTER_ADMIN_EMAIL = "allen32@gmail.com";
-export const APP_VERSION = "v1.2.2-PHARMA-GUARD-SYNC";
+export const APP_VERSION = "v1.1.1-PHARMA-GUARD";
 
 export const SCHEDULES: Schedule[] = ['C-II', 'C-III', 'C-IV', 'C-V'];
 

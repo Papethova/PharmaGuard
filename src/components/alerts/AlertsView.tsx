@@ -19,10 +19,10 @@ export function AlertsView({
 
   return (
     <div className="space-y-4 relative z-10 m-0">
-      <Card className="border-red-100 shadow-sm overflow-hidden bg-brand-surface">
+      <Card className="border-brand-yellow/20 shadow-sm overflow-hidden bg-brand-surface">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-red-50/50">
+            <TableHeader className="bg-brand-yellow/5">
               <TableRow>
                 <TableHead className={tableHeadClass}>Alert Type</TableHead>
                 <TableHead className={tableHeadClass}>Medication</TableHead>
@@ -40,7 +40,7 @@ export function AlertsView({
               ) : lowStockItems.map((item) => (
                 <TableRow key={item.id} className="h-20 lg:h-14">
                   <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2 text-red-500 font-black text-[10px] uppercase tracking-tighter">
+                    <div className="flex items-center justify-center gap-2 text-brand-yellow font-black text-[10px] uppercase tracking-tighter">
                       <AlertTriangle className="h-4 w-4" />
                       Critical Stock
                     </div>
@@ -56,7 +56,7 @@ export function AlertsView({
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
-                      <span className="text-sm font-black text-red-500">{item.currentStock}&nbsp;{item.unit}</span>
+                      <span className="text-sm font-black text-brand-yellow">{item.currentStock}&nbsp;{item.unit}</span>
                       <span className="text-[8px] font-bold text-brand-dark-grey/40 uppercase">Threshold: {item.minThreshold}</span>
                     </div>
                   </TableCell>
@@ -65,7 +65,7 @@ export function AlertsView({
                       variant="outline" 
                       size="sm" 
                       onClick={() => onDismissAlert(item.id)}
-                      className="h-8 text-[10px] font-black uppercase tracking-widest border-brand-grey/20 hover:bg-red-50 hover:text-red-500 hover:border-red-100"
+                      className="h-8 text-[10px] font-black uppercase tracking-widest border-brand-grey/20 hover:bg-brand-yellow/10 hover:text-brand-yellow hover:border-brand-yellow/20"
                     >
                       Acknowledge
                     </Button>
