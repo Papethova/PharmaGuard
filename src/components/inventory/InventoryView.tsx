@@ -75,12 +75,9 @@ export function InventoryView({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs text-center">
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); onNDCClick(item.ndc); }}
-                        className="text-brand-blue hover:underline font-bold transition-colors"
-                      >
+                      <span className="text-brand-blue font-bold px-2 py-0.5 rounded bg-brand-blue/5 border border-brand-blue/10">
                         {item.ndc}
-                      </button>
+                      </span>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">

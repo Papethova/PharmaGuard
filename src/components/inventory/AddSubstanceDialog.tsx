@@ -162,6 +162,9 @@ export function AddSubstanceDialog({
                   <div className="relative">
                     <Input 
                       value={name} 
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck="false"
                       onChange={(e) => {
                         setName(e.target.value);
                         setIsSearching(true);
@@ -255,7 +258,7 @@ export function AddSubstanceDialog({
                   </div>
                   <div className="grid gap-2">
                     <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Quantity Received</Label>
-                    <Input type="number" value={quantityReceived} onChange={(e) => setQuantityReceived(e.target.value)} placeholder="0" className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50" />
+                    <Input type="number" value={quantityReceived} autoComplete="off" onChange={(e) => setQuantityReceived(e.target.value)} placeholder="0" className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50" />
                   </div>
                 </div>
   

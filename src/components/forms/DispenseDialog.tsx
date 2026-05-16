@@ -135,7 +135,7 @@ export function DispenseDialog({
                    <span>RX #</span>
                    <span className="text-brand-blue">{rxNumber}</span>
                  </div>
-                 <div className="flex justify-between text-[10px) font-bold uppercase tracking-wider text-brand-blue/40">
+                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-brand-blue/40">
                    <span>Remaining</span>
                    <span className="text-brand-blue">{(selectedItem?.currentStock || 0) - Number(quantity)}</span>
                  </div>
@@ -151,6 +151,8 @@ export function DispenseDialog({
                     <Input
                       placeholder="Type to search medication..."
                       value={substanceSearch}
+                      autoComplete="off"
+                      autoCorrect="off"
                       onChange={(e) => {
                         setSubstanceSearch(e.target.value);
                         setSelectedSubstance("");
@@ -215,6 +217,7 @@ export function DispenseDialog({
                       value={rxNumber} 
                       onChange={(e) => setRxNumber(e.target.value)} 
                       placeholder="Enter RX #" 
+                      autoComplete="off"
                       className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50"
                     />
                   </div>
@@ -223,6 +226,7 @@ export function DispenseDialog({
                     <Input 
                       type="number" 
                       value={quantity} 
+                      autoComplete="off"
                       onChange={(e) => setQuantity(e.target.value)} 
                       placeholder="0" 
                       className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50 text-sm"

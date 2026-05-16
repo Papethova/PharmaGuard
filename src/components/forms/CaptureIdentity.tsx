@@ -105,11 +105,14 @@ export function CaptureSignature({
           <img src={capturedData} alt="Signature" className="max-h-full max-w-full object-contain" />
         </div>
       ) : (
-        <div className="h-32 relative">
+        <div className="h-32 relative touch-none">
           <SignatureCanvas 
             ref={sigCanvasRef}
             penColor="#000000"
-            canvasProps={{ className: "signature-canvas w-full h-full" }}
+            canvasProps={{ 
+               className: "signature-canvas w-full h-full",
+               style: { touchAction: 'none' }
+            }}
             onEnd={saveSignature}
           />
         </div>

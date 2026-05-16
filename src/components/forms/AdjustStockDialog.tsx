@@ -166,6 +166,9 @@ export function AdjustStockDialog({
                     <Input
                       placeholder="Type to search medication..."
                       value={substanceSearch}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck="false"
                       onChange={(e) => {
                         setSubstanceSearch(e.target.value);
                         setSelectedSubstance("");
@@ -237,6 +240,7 @@ export function AdjustStockDialog({
                     <Input 
                       type="number" 
                       value={quantity} 
+                      autoComplete="off"
                       onChange={(e) => setQuantity(e.target.value)} 
                       placeholder="e.g. -10 or 10" 
                       className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50 text-sm"

@@ -36,7 +36,15 @@ export function AuditLogView({
       // Schedule Filter
       if (activeSchedule !== "ALL") {
         const sub = inventory.find(i => i.id === t.substanceId);
-        if (sub?.schedule !== activeSchedule) return false;
+        // If we found the substance and it's a different schedule, hide it.
+        // If we didn't find the substance (deleted), we hide it if a specific schedule is selected 
+        // because we can't verify it belongs to that schedule.
+        if (sub) {
+          if (sub.schedule !== activeSchedule) return false;
+        } else {
+          // If substance is missing, we don't know its schedule, so we exclude it from specific schedule views
+          return false;
+        }
       }
       
       // Date Range Filter
