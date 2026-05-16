@@ -36,7 +36,7 @@ export function AddSubstanceDialog({
 }: AddSubstanceDialogProps) {
   const [name, setName] = useState("");
   const [strength, setStrength] = useState("");
-  const [schedule, setSchedule] = useState<Schedule>("C-II");
+  const [schedule, setSchedule] = useState<Schedule | "">("");
   const [ndc, setNdc] = useState("");
   const [dosageForm, setDosageForm] = useState("");
   const [packageSize, setPackageSize] = useState("");
@@ -50,6 +50,7 @@ export function AddSubstanceDialog({
   const [photo, setPhoto] = useState<string | null>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const resetForm = () => {
     setName("");
@@ -58,21 +59,27 @@ export function AddSubstanceDialog({
     setDosageForm("");
     setPackageSize("");
     setMinThreshold("");
+    setSchedule("");
     setInvoiceNumber("");
     setQuantityReceived("");
     setPerformerId("");
     setSignature("");
     setPhoto(null);
+    setShowConfirm(false);
+  };
+
+  const handleIntialSubmit = () => {
+    if (!name || !strength || !ndc || !quantityReceived || !performerId || !schedule || (!signature && !isPhotoRequirementEnabled)) return;
+    setShowConfirm(true);
   };
 
   const handleSubmit = async () => {
-    if (!name || !strength || !ndc || !quantityReceived || !performerId || !signature) return;
     setIsSubmitting(true);
     try {
       const substanceId = await onAdd({
         name,
         strength,
-        schedule,
+        schedule: schedule as Schedule,
         ndc,
         unit: dosageForm,
         packageSize: Number(packageSize),
@@ -120,146 +127,170 @@ export function AddSubstanceDialog({
         </DialogHeader>
         
         <ScrollArea className="flex-1 overflow-y-auto">
-          <div className="p-6 space-y-6">
-            {/* Substance Info */}
-            <div className="space-y-4 p-4 rounded-xl bg-brand-blue/5 border border-brand-blue/10">
-              <div className="grid gap-2">
-                <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Medication</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Oxycodone" className="h-10 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+          {showConfirm ? (
+            <div className="p-12 flex flex-col items-center justify-center text-center space-y-6 animate-in fade-in zoom-in duration-300">
+              <div className="h-20 w-20 rounded-full bg-brand-yellow/20 flex items-center justify-center">
+                <Plus className="h-10 w-10 text-brand-blue" strokeWidth={3} />
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-brand-blue uppercase tracking-tight">Confirm Enrollment</h3>
+                <p className="text-sm text-brand-blue/60 font-medium max-w-[280px] mx-auto">
+                  You are about to add <span className="font-bold text-brand-blue">{name} {strength}</span> to the registry with an initial stock of <span className="font-bold text-brand-blue">{quantityReceived}</span> units.
+                </p>
+              </div>
+              <div className="bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/10 w-full text-left space-y-2">
+                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-brand-blue/40">
+                   <span>NDC</span>
+                   <span className="text-brand-blue">{ndc}</span>
+                 </div>
+                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-brand-blue/40">
+                   <span>Schedule</span>
+                   <span className="text-brand-blue">{schedule}</span>
+                 </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6 space-y-6">
+              {/* Substance Info */}
+              <div className="space-y-4 p-4 rounded-xl bg-brand-blue/5 border border-brand-blue/10">
                 <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Strength</Label>
-                  <Input value={strength} onChange={(e) => setStrength(e.target.value)} placeholder="e.g. 10mg" className="h-10 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Medication</Label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Oxycodone" className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
                 </div>
-                <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Dosage Form</Label>
-                  <Input value={dosageForm} onChange={(e) => setDosageForm(e.target.value)} placeholder="e.g. Tablets" className="h-10 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Strength</Label>
+                    <Input value={strength} onChange={(e) => setStrength(e.target.value)} placeholder="e.g. 10mg" className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Dosage Form</Label>
+                    <Input value={dosageForm} onChange={(e) => setDosageForm(e.target.value)} placeholder="e.g. Tablets" className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                  </div>
+                </div>
+  
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">NDC</Label>
+                    <Input value={ndc} onChange={(e) => setNdc(e.target.value)} placeholder="00000-0000-00" className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Package Size</Label>
+                    <Input type="number" value={packageSize} onChange={(e) => setPackageSize(e.target.value)} placeholder="e.g. 100" className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                  </div>
+                </div>
+  
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Schedule</Label>
+                    <Select value={schedule} onValueChange={(v: Schedule) => setSchedule(v)}>
+                      <SelectTrigger className="h-9 border-brand-blue/20 bg-white text-black/40 px-3 font-bold">
+                        <SelectValue placeholder="Select..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-brand-surface">
+                        {SCHEDULES.map(s => <SelectItem key={s} value={s} className="text-black font-bold focus:bg-brand-blue/5">{s}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                   <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Minimum Threshold</Label>
+                    <Input type="number" value={minThreshold} onChange={(e) => setMinThreshold(e.target.value)} placeholder="e.g. 50" className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+                  </div>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">NDC</Label>
-                  <Input value={ndc} onChange={(e) => setNdc(e.target.value)} placeholder="00000-0000-00" className="h-10 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
+  
+              {/* Initial Intake Info */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Invoice Number</Label>
+                    <Input value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} placeholder="Enter Invoice #" className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Quantity Received</Label>
+                    <Input type="number" value={quantityReceived} onChange={(e) => setQuantityReceived(e.target.value)} placeholder="0" className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50" />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Package Size</Label>
-                  <Input type="number" value={packageSize} onChange={(e) => setPackageSize(e.target.value)} placeholder="e.g. 100" className="h-10 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Schedule</Label>
-                  <Select value={schedule} onValueChange={(v: Schedule) => setSchedule(v)}>
-                    <SelectTrigger className="h-10 border-brand-blue/20 bg-white text-black/40 px-3 font-bold">
-                      <SelectValue placeholder="Select..." />
+  
+                <div className="grid gap-1">
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
+                  <Select value={performerId} onValueChange={setPerformerId}>
+                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold focus:ring-brand-blue/20">
+                      <SelectValue placeholder="Select user..." />
                     </SelectTrigger>
-                    <SelectContent className="bg-brand-surface">
-                      {SCHEDULES.map(s => <SelectItem key={s} value={s} className="text-black font-bold focus:bg-brand-blue/5">{s}</SelectItem>)}
+                    <SelectContent className="bg-brand-surface" align="start">
+                      {users.map(u => (
+                        <SelectItem key={u.id} value={u.id} className="text-black font-bold focus:bg-brand-blue/5 focus:text-black">
+                          {u.name} {u.title ? `(${u.title})` : ""}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-                 <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Minimum Threshold</Label>
-                  <Input type="number" value={minThreshold} onChange={(e) => setMinThreshold(e.target.value)} placeholder="e.g. 50" className="h-10 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50" />
-                </div>
-              </div>
-            </div>
-
-            {/* Initial Intake Info */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+  
+                {isPhotoRequirementEnabled && (
+                  <div className="grid gap-1">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Photo</Label>
+                      {photo && (
+                        <button 
+                          type="button"
+                          onClick={() => setPhoto(null)}
+                          className="text-[10px] text-brand-blue/50 hover:text-brand-blue uppercase tracking-widest transition-colors font-normal"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    <CapturePhoto 
+                      onCapture={setPhoto} 
+                      capturedData={photo} 
+                      onReset={() => setPhoto(null)} 
+                    />
+                  </div>
+                )}
+  
                 <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Invoice Number</Label>
-                  <Input value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} placeholder="Enter Invoice #" className="h-10 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50" />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Quantity Received</Label>
-                  <Input type="number" value={quantityReceived} onChange={(e) => setQuantityReceived(e.target.value)} placeholder="0" className="h-10 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50" />
-                </div>
-              </div>
-
-              <div className="grid gap-1">
-                <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
-                <Select value={performerId} onValueChange={setPerformerId}>
-                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold focus:ring-brand-blue/20">
-                    <SelectValue placeholder="Select user..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-brand-surface" align="start">
-                    {users.map(u => (
-                      <SelectItem key={u.id} value={u.id} className="text-black font-bold focus:bg-brand-blue/5 focus:text-black">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{u.name}</span>
-                          {u.title && <span className="text-sm text-black/60 uppercase tracking-tighter">({u.title})</span>}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {isPhotoRequirementEnabled && (
-                <div className="grid gap-1">
                   <div className="flex items-center justify-between">
-                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Photo</Label>
-                    {photo && (
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Signature</Label>
+                    {signature && (
                       <button 
                         type="button"
-                        onClick={() => setPhoto(null)}
+                        onClick={() => setSignature("")}
                         className="text-[10px] text-brand-blue/50 hover:text-brand-blue uppercase tracking-widest transition-colors font-normal"
                       >
                         Clear
                       </button>
                     )}
                   </div>
-                  <CapturePhoto 
-                    onCapture={setPhoto} 
-                    capturedData={photo} 
-                    onReset={() => setPhoto(null)} 
+                  <CaptureSignature 
+                    onCapture={setSignature} 
+                    capturedData={signature} 
+                    onReset={() => setSignature(null)}
                   />
                 </div>
-              )}
-
-              <div className="grid gap-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Signature</Label>
-                  {signature && (
-                    <button 
-                      type="button"
-                      onClick={() => setSignature("")}
-                      className="text-[10px] text-brand-blue/50 hover:text-brand-blue uppercase tracking-widest transition-colors font-normal"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-                <CaptureSignature 
-                  onCapture={setSignature} 
-                  capturedData={signature} 
-                  onReset={() => setSignature(null)}
-                />
               </div>
             </div>
-          </div>
+          )}
         </ScrollArea>
-
+  
         <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4">
           <Button 
-            onClick={() => onOpenChange(false)}
+            onClick={() => {
+              if (showConfirm) setShowConfirm(false);
+              else { onOpenChange(false); resetForm(); }
+            }}
             disabled={isSubmitting}
             className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 rounded-xl shadow-lg transition-all border-none"
           >
-            Cancel
+            {showConfirm ? "Back" : "Cancel"}
           </Button>
           <Button 
-            onClick={handleSubmit} 
-            disabled={isSubmitting || !name || !strength || !ndc || !quantityReceived || !performerId || (!signature && !isPhotoRequirementEnabled)}
+            onClick={showConfirm ? handleSubmit : handleIntialSubmit} 
+            disabled={isSubmitting || !name || !strength || !ndc || !quantityReceived || !performerId || !schedule || (!signature && !isPhotoRequirementEnabled)}
             className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] rounded-xl transition-all border-none shadow-xl shadow-[#FFE600]/30"
           >
-            {isSubmitting ? "Adding..." : "Add"}
+            {isSubmitting ? (showConfirm ? "Finalizing..." : "Processing...") : (showConfirm ? "Confirm Add" : "Add")}
           </Button>
         </DialogFooter>
       </DialogContent>

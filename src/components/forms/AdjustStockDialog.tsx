@@ -71,6 +71,12 @@ export function AdjustStockDialog({
     setSignature(null);
   };
 
+  const handleInitialSubmit = () => {
+    const item = inventory.find(i => i.id === selectedSubstance);
+    if (!item || !selectedUser || !quantity || (!signature && !isPhotoRequirementEnabled)) return;
+    setShowConfirm(true);
+  };
+
   const handleSubmit = async () => {
     const item = inventory.find(i => i.id === selectedSubstance);
     if (!item || !selectedUser || !quantity || (!signature && !isPhotoRequirementEnabled)) return;
@@ -126,166 +132,207 @@ export function AdjustStockDialog({
         </DialogHeader>
         
         <ScrollArea className="flex-1 overflow-y-auto">
-          <div className="p-6 space-y-6">
-            {/* Selection Section */}
-            <div className="space-y-4 pb-2">
-              <div className="grid gap-2">
-                <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Medication</Label>
-                <div className="relative">
-                  <Input
-                    placeholder="Type to search medication..."
-                    value={substanceSearch}
-                    onChange={(e) => {
-                      setSubstanceSearch(e.target.value);
-                      setSelectedSubstance("");
-                      setIsSearching(true);
-                    }}
-                    onFocus={() => setIsSearching(true)}
-                    className="h-10 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50"
-                  />
-                  {substanceSearch && !selectedSubstance && isSearching && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-brand-grey/20 rounded-xl shadow-2xl max-h-64 overflow-y-auto overflow-x-hidden p-1">
-                      {inventory
-                        .filter(s => 
-                          s.name.toLowerCase().includes(substanceSearch.toLowerCase()) || 
-                          s.ndc.includes(substanceSearch)
-                        )
-                        .map(s => (
-                          <div
-                            key={s.id}
-                            className="px-3 py-3 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group border-b border-brand-grey/5 last:border-0 rounded-lg"
-                            onClick={() => {
-                              setSelectedSubstance(s.id);
-                              setSubstanceSearch(s.name);
-                              setIsSearching(false);
-                            }}
-                          >
-                            <div className="flex flex-col text-left">
-                              <span className="group-hover:text-brand-blue text-brand-blue font-bold">{s.name} {s.strength}</span>
-                              <span className="text-[10px] text-brand-blue/70 font-mono uppercase tracking-tighter">NDC: {s.ndc}</span>
-                            </div>
-                            <Badge variant="outline" className="text-[10px] font-medium border-brand-blue/30 text-brand-blue px-2">{s.schedule}</Badge>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
+          {showConfirm ? (
+            <div className="p-12 flex flex-col items-center justify-center text-center space-y-6 animate-in fade-in zoom-in duration-300">
+              <div className="h-20 w-20 rounded-full bg-brand-yellow/20 flex items-center justify-center">
+                <RefreshCcw className="h-10 w-10 text-brand-blue" strokeWidth={3} />
               </div>
-
-              {selectedItem && (
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="space-y-1">
-                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Current Balance</Label>
-                    <p className="text-2xl font-bold text-brand-blue leading-tight flex items-baseline gap-2">
-                      {selectedItem.currentStock} <span className="text-xs font-bold opacity-60">{selectedItem.unit}</span>
-                    </p>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Target NDC</Label>
-                    <p className="text-sm font-mono font-bold text-brand-blue leading-none mt-2">
-                      {selectedItem.ndc}
-                    </p>
-                  </div>
-                </div>
-              )}
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-brand-blue uppercase tracking-tight">Confirm Adjustment</h3>
+                <p className="text-sm text-brand-blue/60 font-medium max-w-[280px] mx-auto">
+                  You are about to adjust <span className="font-bold text-brand-blue">{quantity} units</span> for <span className="font-bold text-brand-blue">{selectedItem?.name} {selectedItem?.strength}</span>.
+                </p>
+              </div>
+              <div className="bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/10 w-full text-left space-y-2">
+                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-brand-blue/40">
+                   <span>Reference #</span>
+                   <span className="text-brand-blue">{referenceNumber}</span>
+                 </div>
+                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-brand-blue/40">
+                   <span>New Total</span>
+                   <span className="text-brand-blue">{(selectedItem?.currentStock || 0) + Number(quantity)}</span>
+                 </div>
+              </div>
             </div>
-
-            {/* Transaction Details */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+          ) : (
+            <div className="p-6 space-y-6">
+              {/* Selection Section */}
+              <div className="space-y-4 pb-2">
+                <div className="grid gap-2">
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Medication</Label>
+                  <div className="relative">
+                    <Input
+                      placeholder="Type to search medication..."
+                      value={substanceSearch}
+                      onChange={(e) => {
+                        setSubstanceSearch(e.target.value);
+                        setSelectedSubstance("");
+                        setIsSearching(true);
+                      }}
+                      onFocus={() => setIsSearching(true)}
+                      className="h-9 border-brand-blue/20 bg-white text-black placeholder:text-brand-grey/50"
+                    />
+                    {substanceSearch && !selectedSubstance && isSearching && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-brand-grey/20 rounded-xl shadow-2xl max-h-64 overflow-y-auto overflow-x-hidden p-1">
+                        {inventory
+                          .filter(s => 
+                            s.name.toLowerCase().includes(substanceSearch.toLowerCase()) || 
+                            s.ndc.includes(substanceSearch)
+                          )
+                          .map(s => (
+                            <div
+                              key={s.id}
+                              className="px-3 py-3 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group border-b border-brand-grey/5 last:border-0 rounded-lg"
+                              onClick={() => {
+                                setSelectedSubstance(s.id);
+                                setSubstanceSearch(s.name);
+                                setIsSearching(false);
+                              }}
+                            >
+                              <div className="flex flex-col text-left">
+                                <span className="group-hover:text-brand-blue text-brand-blue font-bold">{s.name} {s.strength}</span>
+                                <span className="text-[10px] text-brand-blue/70 font-mono uppercase tracking-tighter">NDC: {s.ndc}</span>
+                              </div>
+                              <Badge variant="outline" className="text-[10px] font-medium border-brand-blue/30 text-brand-blue px-2">{s.schedule}</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+  
+                {selectedItem && (
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="space-y-1">
+                      <Label className="text-black font-bold text-[10px] tracking-wider uppercase leading-none">Current Balance</Label>
+                      <p className="text-2xl font-bold text-brand-blue leading-tight flex items-baseline gap-2">
+                        {selectedItem.currentStock}
+                      </p>
+                    </div>
+                    <div className="text-right space-y-1">
+                      <Label className="text-black font-bold text-[10px] tracking-wider uppercase leading-none">NDC</Label>
+                      <p className="text-sm font-mono font-bold text-brand-blue leading-none mt-2">
+                        {selectedItem.ndc}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+  
+              {/* Transaction Details */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-1">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Reference #</Label>
+                    <Input 
+                      value={referenceNumber} 
+                      readOnly
+                      className="h-9 border-brand-blue/10 bg-brand-surface text-black font-bold"
+                    />
+                  </div>
+                  <div className="grid gap-1">
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Adjustment Amount (-/+)</Label>
+                    <Input 
+                      type="number" 
+                      value={quantity} 
+                      onChange={(e) => setQuantity(e.target.value)} 
+                      placeholder="e.g. -10 or 10" 
+                      className="h-9 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50 text-sm"
+                    />
+                  </div>
+                </div>
+  
                 <div className="grid gap-1">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Reference #</Label>
-                  <Input 
-                    value={referenceNumber} 
-                    readOnly
-                    className="h-10 border-brand-blue/10 bg-brand-surface text-black font-bold"
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Notes/Reason</Label>
+                  <Textarea 
+                    value={notes} 
+                    onChange={(e) => setNotes(e.target.value)} 
+                    placeholder="Enter reason for adjustment" 
+                    className="bg-brand-surface border-brand-blue/10 min-h-[80px] resize-none text-sm text-black placeholder:text-brand-grey/50"
                   />
                 </div>
+  
                 <div className="grid gap-1">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Adjustment Amount (-/+)</Label>
-                  <Input 
-                    type="number" 
-                    value={quantity} 
-                    onChange={(e) => setQuantity(e.target.value)} 
-                    placeholder="e.g. -10 or 10" 
-                    className="h-10 border-brand-blue/10 bg-brand-surface text-black placeholder:text-brand-grey/50 text-sm"
-                  />
+                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
+                  <Select value={selectedUser} onValueChange={setSelectedUser}>
+                    <SelectTrigger className="h-9 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold">
+                      <SelectValue placeholder="Select user..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-brand-surface" align="start">
+                      {users.map(u => (
+                        <SelectItem key={u.id} value={u.id} className="text-black font-bold focus:bg-brand-blue/5 focus:text-black">
+                          {u.name} {u.title ? `(${u.title})` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-
-              <div className="grid gap-1">
-                <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Notes/Reason</Label>
-                <Textarea 
-                  value={notes} 
-                  onChange={(e) => setNotes(e.target.value)} 
-                  placeholder="Enter reason for adjustment" 
-                  className="bg-brand-surface border-brand-blue/10 min-h-[80px] resize-none text-sm text-black placeholder:text-brand-grey/50"
-                />
-              </div>
-
-              <div className="grid gap-1">
-                <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Performing User</Label>
-                <Select value={selectedUser} onValueChange={setSelectedUser}>
-                  <SelectTrigger className="h-10 border-brand-blue/10 bg-brand-surface text-black/40 px-3 font-bold">
-                    <SelectValue placeholder="Select user..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-brand-surface" align="start">
-                    {users.map(u => (
-                      <SelectItem key={u.id} value={u.id} className="text-black font-bold focus:bg-brand-blue/5 focus:text-black">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{u.name}</span>
-                          {u.title && <span className="text-sm text-black/60 uppercase tracking-tighter">({u.title})</span>}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {isPhotoRequirementEnabled && (
-                <div className="grid gap-1">
+  
+                {isPhotoRequirementEnabled && (
+                  <div className="grid gap-1">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Photo</Label>
+                      {capturedPhoto && (
+                        <button 
+                          type="button"
+                          onClick={() => setCapturedPhoto(null)}
+                          className="text-[10px] text-brand-blue/50 hover:text-brand-blue uppercase tracking-widest transition-colors font-normal"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    <CapturePhoto 
+                      onCapture={setCapturedPhoto} 
+                      capturedData={capturedPhoto} 
+                      onReset={() => setCapturedPhoto(null)} 
+                    />
+                  </div>
+                )}
+  
+                <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Photo</Label>
-                    {capturedPhoto && (
+                    <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Signature</Label>
+                    {signature && (
                       <button 
                         type="button"
-                        onClick={() => setCapturedPhoto(null)}
+                        onClick={() => setSignature(null)}
                         className="text-[10px] text-brand-blue/50 hover:text-brand-blue uppercase tracking-widest transition-colors font-normal"
                       >
                         Clear
                       </button>
                     )}
                   </div>
-                  <CapturePhoto 
-                    onCapture={setCapturedPhoto} 
-                    capturedData={capturedPhoto} 
-                    onReset={() => setCapturedPhoto(null)} 
+                  <CaptureSignature 
+                    onCapture={setSignature} 
+                    capturedData={signature} 
+                    onReset={() => setSignature(null)}
                   />
                 </div>
-              )}
-
-              <div className="grid gap-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-black font-bold text-[10px] tracking-wider uppercase">Identity Signature</Label>
-                  {signature && (
-                    <button 
-                      type="button"
-                      onClick={() => setSignature(null)}
-                      className="text-[10px] text-brand-blue/50 hover:text-brand-blue uppercase tracking-widest transition-colors font-normal"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-                <CaptureSignature 
-                  onCapture={setSignature} 
-                  capturedData={signature} 
-                  onReset={() => setSignature(null)}
-                />
               </div>
             </div>
-          </div>
+          )}
         </ScrollArea>
+  
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4">
+          <Button 
+            onClick={() => {
+              if (showConfirm) setShowConfirm(false);
+              else { onOpenChange(false); resetForm(); }
+            }}
+            disabled={isSubmitting}
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 rounded-xl shadow-lg transition-all border-none"
+          >
+            {showConfirm ? "Back" : "Cancel"}
+          </Button>
+          <Button 
+            onClick={showConfirm ? handleSubmit : handleInitialSubmit}
+            disabled={isSubmitting || !selectedSubstance || !quantity || !selectedUser || (!signature && !isPhotoRequirementEnabled)}
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-[#FFE600] text-brand-blue hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] rounded-xl transition-all disabled:opacity-50 border-none shadow-xl shadow-[#FFE600]/30"
+          >
+            {isSubmitting ? (showConfirm ? "Finalizing..." : "Processing...") : (showConfirm ? "Confirm Adjust" : "Adjust")}
+          </Button>
+        </DialogFooter>
 
         <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4">
           <Button 
