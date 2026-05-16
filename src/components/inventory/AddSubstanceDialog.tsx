@@ -28,7 +28,7 @@ export function AddSubstanceDialog({
 }: AddSubstanceDialogProps) {
   const [name, setName] = useState("");
   const [strength, setStrength] = useState("");
-  const [schedule, setSchedule] = useState<Schedule>("C-II");
+  const [schedule, setSchedule] = useState<Schedule>("" as any);
   const [ndc, setNdc] = useState("");
   const [unit, setUnit] = useState("");
   const [packageSize, setPackageSize] = useState("");
@@ -81,9 +81,11 @@ export function AddSubstanceDialog({
             <div className="grid gap-1.5">
               <Label className="text-xs font-bold text-brand-blue">Schedule</Label>
               <Select value={schedule} onValueChange={(v: Schedule) => setSchedule(v)}>
-                <SelectTrigger className="h-10 border-brand-blue/10"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-brand-surface">
-                  {SCHEDULES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                <SelectTrigger className="h-10 border-brand-blue/10">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent className="bg-brand-surface" align="start">
+                  {SCHEDULES.map(s => <SelectItem key={s} value={s} className="pl-3">{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

@@ -70,7 +70,7 @@ export function TransactionDetailDialog({
             </div>
             <div className="space-y-1">
               <h3 className="text-lg font-black text-brand-blue tracking-tight leading-none">{transaction.substanceName}</h3>
-              <p className="text-xs font-black text-brand-dark-grey/60 uppercase">{transaction.strength} | NDC: {transaction.ndc}</p>
+              <p className="text-xs font-bold text-brand-dark-grey/60 uppercase">{transaction.strength} | NDC: {transaction.ndc}</p>
             </div>
             <div className="pt-2 flex items-center justify-between border-t border-brand-blue/10">
               <div className="flex flex-col">

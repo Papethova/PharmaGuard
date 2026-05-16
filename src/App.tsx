@@ -493,7 +493,7 @@ export default function App() {
   const [newMed, setNewMed] = useState({
     name: "",
     strength: "",
-    schedule: "C-II" as Schedule,
+    schedule: "" as any as Schedule,
     ndc: "",
     unit: "",
     packageSize: "",
@@ -2013,7 +2013,7 @@ export default function App() {
                                           <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                          <span className="text-[10px] font-mono text-brand-blue/70 font-bold">{s.ndc}</span>
+                                          <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
                                         </div>
                                       </div>
                                       <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -2093,10 +2093,12 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface text-brand-dark-grey h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}><SelectValue /></SelectTrigger>
-                              <SelectContent className="bg-brand-surface">
+                              <SelectTrigger className={`bg-brand-surface text-brand-dark-grey h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                                <SelectValue placeholder="Select..." />
+                              </SelectTrigger>
+                              <SelectContent className="bg-brand-surface" align="start">
                                 {SCHEDULES.map(s => (
-                                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                                  <SelectItem key={s} value={s} className="pl-3">{s}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -2185,7 +2187,7 @@ export default function App() {
                                       <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <span className="text-[10px] font-mono text-brand-blue/70 font-bold">{s.ndc}</span>
+                                      <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
                                     </div>
                                   </div>
                                   <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -2210,7 +2212,7 @@ export default function App() {
                           </div>
                           <div className="p-2 bg-brand-blue/5 rounded border border-brand-blue/10">
                             <Label className="text-xs text-brand-blue uppercase font-bold">NDC</Label>
-                            <div className="text-sm font-mono font-medium text-brand-dark-grey">
+                            <div className="text-sm font-medium text-brand-dark-grey">
                               {inventory.find(i => i.id === selectedSubstance)?.ndc}
                             </div>
                           </div>
@@ -2948,10 +2950,10 @@ export default function App() {
                             })
                             .map((t) => (
                               <TableRow key={t.id} className="text-xs h-12">
-                                <TableCell className="font-mono whitespace-nowrap text-brand-dark-grey/70 text-center">
+                                <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center">
                                   {formatDateTime(t.timestamp)}
                                 </TableCell>
-                                <TableCell className="font-mono text-[10px] text-center">
+                                <TableCell className="text-[10px] text-center">
                                   <button 
                                     onClick={() => handleNDCClick(t.ndc)}
                                     className="text-brand-blue hover:underline font-bold transition-colors"
@@ -2974,10 +2976,10 @@ export default function App() {
                       <TableCell>
                         <TransactionBadge type={t.type} size="sm" />
                       </TableCell>
-                                <TableCell className="text-center font-mono text-brand-dark-grey text-sm">
+                                <TableCell className="text-center text-brand-dark-grey text-sm">
                                   {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                                 </TableCell>
-                                <TableCell className="text-center font-mono font-bold text-brand-dark-grey text-sm">{t.newStock}</TableCell>
+                                <TableCell className="text-center font-bold text-brand-dark-grey text-sm">{t.newStock}</TableCell>
                                 <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact">
                                   {escapeEmail(t.performedByName)}
                                   {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
@@ -3204,17 +3206,16 @@ export default function App() {
                   <CardContent className="flex items-center justify-between p-6">
                     <div className="flex items-center gap-4">
                       <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20 relative">
-                        <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-40 animate-ping" style={{ transform: 'translateZ(0)' }} />
                         <AlertTriangle className="h-6 w-6 text-brand-blue relative z-10" />
                       </div>
                       <div>
                         <h3 className="text-2xl font-black text-brand-blue tracking-tight">{item.name}{" "}{item.strength}</h3>
                         <div className="flex items-center gap-3 mt-1">
                           <p className="text-lg text-brand-dark-grey">
-                            Current Stock: <span className="font-mono font-black text-brand-yellow text-xl">{item.currentStock}</span> / Min Threshold: <span className="font-mono font-bold text-xl">{item.minThreshold}</span>
+                            Current Stock: <span className="font-black text-brand-yellow text-xl">{item.currentStock}</span> / Min Threshold: <span className="font-bold text-xl">{item.minThreshold}</span>
                           </p>
                           <div className="h-4 w-[1px] bg-brand-grey/30" />
-                          <div className="flex items-center gap-1.5 text-sm font-mono">
+                          <div className="flex items-center gap-1.5 text-sm">
                             <span className="text-brand-dark-grey/60">NDC:</span>
                             <button 
                               onClick={() => handleNDCClick(item.ndc)}
