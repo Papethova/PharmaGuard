@@ -700,9 +700,6 @@ export default function App() {
       });
 
       setUsers(items);
-      if (items.length > 0 && !selectedUser) {
-        setSelectedUser(items[0].id);
-      }
     }, (error) => {
       if (userProfile?.status === 'active') {
         handleFirestoreError(error, OperationType.LIST, `users/${uid}/staff`);
@@ -981,7 +978,7 @@ export default function App() {
         strength: currentMed.strength,
         ndc: currentMed.ndc,
         type: transactionType,
-        quantity: transactionType === "VERIFY" ? 0 : amount,
+        quantity: transactionType === "VERIFY" ? previousStock : amount,
         previousStock,
         newStock,
         performedBy: user.uid,
@@ -2276,7 +2273,7 @@ export default function App() {
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
                         <SelectTrigger id="user-select" className="border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9">
-                          <SelectValue placeholder="Select User">
+                          <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
                               return u ? (
@@ -2680,7 +2677,7 @@ export default function App() {
                         </Select>
                         <Button 
                           onClick={handleAddUser} 
-                          className="bg-brand-blue text-white hover:bg-brand-blue/90 h-8 px-4"
+                          className="bg-brand-yellow text-brand-blue hover:brightness-110 h-8 px-4 font-black shadow-sm"
                           disabled={isSubmitting}
                         >
                           {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
@@ -3601,17 +3598,20 @@ export default function App() {
                 Sign Out Confirmation
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                Are you sure you want to sign out of the PharmaGuard registry?
+                Authentication Session End
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
-          <div className="p-6 space-y-4">
-            <div className="text-sm text-brand-grey font-medium">
+        <div className="p-6 space-y-4">
+          <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-2 text-left">
+            <p className="text-brand-grey text-xs font-medium leading-relaxed">
+              Are you sure you want to sign out of the PharmaGuard registry? 
               All active database sync connections will be safely terminated.
-            </div>
+            </p>
           </div>
-          <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+        </div>
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => setIsLogoutConfirmOpen(false)} 
             className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
