@@ -1771,7 +1771,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.02] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-14 sticky top-24 shrink-0 overflow-visible">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-24 shrink-0 overflow-visible">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -1843,7 +1843,7 @@ export default function App() {
                   {lowStockItems.length > 0 && (
                     <div className="ml-auto relative flex items-center justify-center h-5 w-5">
                       <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
-                      <Badge className="relative h-5 w-5 flex items-center justify-center text-[10px] bg-brand-yellow text-brand-blue border-none font-black rounded-full p-0 shadow-sm leading-none ring-2 ring-brand-blue/20">
+                      <Badge className="relative h-5 w-5 flex items-center justify-center text-[10px] bg-brand-yellow text-brand-blue border-none font-black rounded-full p-0 shadow-sm leading-none">
                         {lowStockItems.length}
                       </Badge>
                     </div>
@@ -1860,7 +1860,7 @@ export default function App() {
                 </TabsTrigger>
               </TabsList>
               {user && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-12">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-9">
                   <div className="flex flex-col overflow-hidden">
                     <span className="text-xs font-black text-brand-blue/60 truncate tracking-tight">
                       {userProfile?.organizationName || userProfile?.displayName || user.displayName}
@@ -2284,7 +2284,7 @@ export default function App() {
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
                           {users.map(u => (
-                            <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey">
+                            <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-2.5">
                               {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
                             </SelectItem>
                           ))}
