@@ -1917,7 +1917,7 @@ export default function App() {
                          "Verify Inventory Count"}
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[8px] uppercase tracking-widest mt-0.5">
-                        Audit Log Active
+                        AUDIT LOG ACTIVE
                       </DialogDescription>
                     </div>
                   </div>
@@ -2134,7 +2134,7 @@ export default function App() {
                         <div className="space-y-1">
                           <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
                           <p className="text-xs text-brand-dark-grey/70 leading-relaxed">
-                            I, <span className="font-bold text-brand-blue">{users.find(u => u.id === selectedUser)?.name || user?.displayName || "User"}</span>, confirm that the current physical count of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength} (NDC: {selectedSubstanceDetail?.ndc})</span> matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
+                            I, <span className="font-bold text-brand-blue">{(() => { const u = users.find(u => u.id === selectedUser); return u ? `${u.name}${u.title ? ` (${u.title})` : ''}` : (user?.displayName || "User"); })()}</span>, confirm that the current physical count of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength} (NDC: {selectedSubstanceDetail?.ndc})</span> matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
                           </p>
                         </div>
                         <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest">
@@ -2228,7 +2228,7 @@ export default function App() {
                       </Label>
                       <Input 
                         id="referenceNumber" 
-                        placeholder={transactionType === "OUT" ? "Enter Number" : transactionType === "IN" ? "Enter Number" : "Auto-assigned"} 
+                        placeholder={transactionType === "OUT" ? "Enter RX #" : transactionType === "IN" ? "Enter invoice #" : "Auto-assigned"} 
                         className={`border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 ${transactionType === "ADJUST" ? "opacity-70 cursor-not-allowed bg-brand-blue/5" : ""}`}
                         value={referenceNumber}
                         onChange={(e) => {
@@ -2484,7 +2484,7 @@ export default function App() {
                         Transaction Details
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
-                        Full audit record for reference # {formatRefForDisplay(viewingTransaction?.referenceNumber)}
+                        FULL AUDIT RECORD FOR REFERENCE # {formatRefForDisplay(viewingTransaction?.referenceNumber)}
                       </DialogDescription>
                     </div>
                   </div>
@@ -2504,7 +2504,7 @@ export default function App() {
                             <div>
                               <button 
                                 onClick={() => handleNDCClick(viewingTransaction.ndc)}
-                                className="text-lg font-mono text-brand-blue hover:underline font-black transition-colors"
+                                className="text-lg text-brand-blue hover:underline font-black transition-colors"
                               >
                                 {viewingTransaction.ndc}
                               </button>
@@ -2629,7 +2629,7 @@ export default function App() {
                         User Management
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                        Add, edit, or remove authorized users for this system.
+                        ADD, EDIT, OR REMOVE AUTHORIZED USERS FOR THIS SYSTEM.
                       </DialogDescription>
                     </div>
                   </div>
@@ -2977,7 +2977,7 @@ export default function App() {
                         <TransactionBadge type={t.type} size="sm" />
                       </TableCell>
                                 <TableCell className="text-center text-brand-dark-grey text-sm">
-                                  {t.type === 'VERIFY' ? '-' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
+                                  {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
                                 </TableCell>
                                 <TableCell className="text-center font-bold text-brand-dark-grey text-sm">{t.newStock}</TableCell>
                                 <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact">
@@ -3266,7 +3266,7 @@ export default function App() {
               <div className="flex-1 min-w-0">
                 <DialogTitle className="text-lg font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 leading-tight truncate">
-                  Real-time registry management and global subscription authority terminal.
+                  REAL-TIME REGISTRY MANAGEMENT AND GLOBAL SUBSCRIPTION AUTHORITY TERMINAL.
                 </DialogDescription>
               </div>
             </div>
@@ -3493,7 +3493,7 @@ export default function App() {
                 Confirm Purge
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                Authorized Node Revocation Process
+                AUTHORIZED NODE REVOCATION PROCESS
               </DialogDescription>
             </div>
           </div>
@@ -3554,7 +3554,7 @@ export default function App() {
                 Remove User
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                Credential Revocation
+                CREDENTIAL REVOCATION
               </DialogDescription>
             </div>
           </div>
@@ -3599,7 +3599,7 @@ export default function App() {
                 Sign Out Confirmation
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                Authentication Session End
+                AUTHENTICATION SESSION END
               </DialogDescription>
             </div>
           </div>
@@ -3649,7 +3649,7 @@ export default function App() {
                 Edit Minimum Threshold
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                Update the low-stock alert threshold for this medication.
+                UPDATE THE LOW-STOCK ALERT THRESHOLD FOR THIS MEDICATION.
               </DialogDescription>
             </div>
           </div>
@@ -3660,7 +3660,7 @@ export default function App() {
             <>
               <div className="p-3 bg-brand-blue/5 rounded-md border border-brand-blue/10 mb-4">
               <div className="text-sm font-bold text-brand-blue">{editingMed.name}{" "}{editingMed.strength}</div>
-              <div className="text-xs text-brand-dark-grey/60 font-mono">NDC: {editingMed.ndc}</div>
+              <div className="text-xs text-brand-dark-grey/60">NDC: {editingMed.ndc}</div>
             </div>
 
               <div className="grid gap-2">
@@ -3764,7 +3764,7 @@ export default function App() {
                       value={editingMed.ndc} 
                       onChange={e => setEditingMed({...editingMed, ndc: e.target.value})} 
                       placeholder="00000-0000-00"
-                      className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue font-mono h-11"
+                      className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -3852,7 +3852,7 @@ export default function App() {
             <div className="flex flex-col">
               <DialogTitle className="text-xl font-black tracking-tight leading-none text-white">Profile Identity</DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
-                Establish Organizational Authority
+                ESTABLISH ORGANIZATIONAL AUTHORITY
               </DialogDescription>
             </div>
           </div>
@@ -3913,7 +3913,7 @@ export default function App() {
                 Reset Node Data
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                Authorized Individual Data Purge
+                AUTHORIZED INDIVIDUAL DATA PURGE
               </DialogDescription>
             </div>
           </div>

@@ -38,7 +38,7 @@ export function TransactionDetailDialog({
             </div>
             <div className="flex flex-col">
               <DialogTitle className="text-xl font-black tracking-tight leading-none text-white whitespace-nowrap overflow-hidden">Registry Evidence File</DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] uppercase tracking-[0.12em] mt-1">Transaction Identity Binding</DialogDescription>
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] uppercase tracking-[0.12em] mt-1">TRANSACTION IDENTITY BINDING</DialogDescription>
             </div>
           </div>
         </DialogHeader>
@@ -76,7 +76,7 @@ export function TransactionDetailDialog({
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-brand-blue/40 uppercase">Action Magnitude</span>
                 <span className="text-lg font-black text-brand-blue">
-                   {transaction.type === 'VERIFY' ? '-' : (transaction.type === 'IN' ? '+' : transaction.type === 'OUT' ? '-' : (transaction.type === 'ADJUST' && transaction.quantity > 0 ? '+' : '')) + transaction.quantity}
+                   {transaction.type === 'VERIFY' ? '=' : (transaction.type === 'IN' ? '+' : transaction.type === 'OUT' ? '-' : (transaction.type === 'ADJUST' && transaction.quantity > 0 ? '+' : ''))}{transaction.quantity}
                 </span>
               </div>
               <div className="flex flex-col text-right">
