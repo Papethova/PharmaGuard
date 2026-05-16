@@ -1,6 +1,7 @@
 import { AlertTriangle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Substance } from "../../types";
 
 interface AlertsViewProps {
@@ -14,50 +15,67 @@ export function AlertsView({
   onNDCClick,
   onDismissAlert
 }: AlertsViewProps) {
+  const tableHeadClass = "text-[10px] uppercase font-black text-brand-blue/60 tracking-widest text-center h-10";
+
   return (
     <div className="space-y-4 relative z-10 m-0">
-      <div className="grid gap-4">
-        {lowStockItems.length === 0 ? (
-          <Card className="border-brand-grey/10 shadow-sm p-12 text-center text-brand-dark-grey/50 bg-brand-surface">
-            <p>All stock levels are currently above minimum thresholds.</p>
-          </Card>
-        ) : lowStockItems.map(item => (
-          <Card key={item.id} className="border-brand-grey/20 bg-brand-surface shadow-sm">
-            <CardContent className="flex items-center justify-between p-6">
-              <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20 relative">
-                  <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-40 animate-ping" />
-                  <AlertTriangle className="h-6 w-6 text-brand-blue relative z-10" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-brand-blue tracking-tight">{item.name}{" "}{item.strength}</h3>
-                  <div className="flex items-center gap-3 mt-1">
-                    <p className="text-lg text-brand-dark-grey">
-                      Current Stock: <span className="font-black text-brand-yellow text-xl">{item.currentStock}</span> / Min Threshold: <span className="font-bold text-xl">{item.minThreshold}</span>
-                    </p>
-                    <div className="h-4 w-[1px] bg-brand-grey/30" />
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <span className="text-brand-dark-grey/60">NDC:</span>
-                      <button 
-                        onClick={() => onNDCClick(item.ndc)}
-                        className="text-brand-blue hover:underline font-bold transition-colors"
-                      >
-                        {item.ndc}
-                      </button>
+      <Card className="border-red-100 shadow-sm overflow-hidden bg-brand-surface">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-red-50/50">
+              <TableRow>
+                <TableHead className={tableHeadClass}>Alert Type</TableHead>
+                <TableHead className={tableHeadClass}>Medication</TableHead>
+                <TableHead className={tableHeadClass}>Current Level</TableHead>
+                <TableHead className={tableHeadClass}>Action Required</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {lowStockItems.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-12 text-brand-dark-grey/50">
+                    <p>No active inventory alerts.</p>
+                  </TableCell>
+                </TableRow>
+              ) : lowStockItems.map((item) => (
+                <TableRow key={item.id} className="h-20 lg:h-14">
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-2 text-red-500 font-black text-[10px] uppercase tracking-tighter">
+                      <AlertTriangle className="h-4 w-4" />
+                      Critical Stock
                     </div>
-                  </div>
-                </div>
-              </div>
-              <Button 
-                className="bg-brand-yellow text-brand-blue hover:brightness-100 shadow-lg shadow-brand-yellow/20 h-12 px-6 font-extrabold rounded-xl transition-all border-none"
-                onClick={() => onDismissAlert(item.id)}
-              >
-                Dismiss Alert
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="text-sm font-bold text-brand-dark-grey">{item.name}&nbsp;{item.strength}</div>
+                    <button 
+                      onClick={() => onNDCClick(item.ndc)}
+                      className="text-[10px] font-mono text-brand-blue/60 hover:underline"
+                    >
+                      NDC: {item.ndc}
+                    </button>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center">
+                      <span className="text-sm font-black text-red-500">{item.currentStock}&nbsp;{item.unit}</span>
+                      <span className="text-[8px] font-bold text-brand-dark-grey/40 uppercase">Threshold: {item.minThreshold}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => onDismissAlert(item.id)}
+                      className="h-8 text-[10px] font-black uppercase tracking-widest border-brand-grey/20 hover:bg-red-50 hover:text-red-500 hover:border-red-100"
+                    >
+                      Acknowledge
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
     </div>
   );
 }

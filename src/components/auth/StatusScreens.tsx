@@ -1,9 +1,9 @@
 import { motion } from "motion/react";
 import { Clock, X, AlertTriangle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { PharmaLogo } from "../common/Icons";
 import { escapeEmail } from "../../lib/formatters";
+import { Card } from "@/components/ui/card";
 
 export const InitializationDelay = ({ onRetry }: { onRetry: () => void }) => (
   <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-4">

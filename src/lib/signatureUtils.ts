@@ -1,4 +1,3 @@
-
 export function trimSignatureCanvas(originalCanvas: HTMLCanvasElement): HTMLCanvasElement {
   const ctx = originalCanvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) {

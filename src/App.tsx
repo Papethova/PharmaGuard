@@ -20,11 +20,7 @@ import { AuditLogView } from "./components/history/AuditLogView";
 import { AlertsView } from "./components/alerts/AlertsView";
 import { SuperAdminPortal } from "./components/admin/SuperAdminPortal";
 import { UserManagementDialog } from "./components/users/UserManagementDialog";
-import { DispenseDialog } from "./components/forms/DispenseDialog";
-import { AddStockDialog } from "./components/forms/AddStockDialog";
-import { AdjustStockDialog } from "./components/forms/AdjustStockDialog";
-import { EditProfileDialog } from "./components/layout/EditProfileDialog";
-import { LogoutConfirmDialog } from "./components/layout/LogoutConfirmDialog";
+import { LogTransactionDialog } from "./components/forms/LogTransactionDialog";
 import { AddSubstanceDialog } from "./components/inventory/AddSubstanceDialog";
 import { TransactionDetailDialog } from "./components/history/TransactionDetailDialog";
 import { PharmaLogo } from "./components/common/Icons";
@@ -35,7 +31,7 @@ import { useInventory } from "./hooks/useInventory";
 import { useAppInitialization } from "./hooks/useAppInitialization";
 
 // Lib
-import { MASTER_ADMIN_EMAIL, APP_VERSION, SCHEDULES } from "./lib/constants";
+import { MASTER_ADMIN_EMAIL, APP_VERSION } from "./lib/constants";
 import { Schedule, Transaction, Substance, TransactionType, UserProfile } from "./types";
 import { handleFirestoreError, OperationType } from "./lib/errorHandlers";
 
@@ -48,14 +44,11 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState("inventory");
   
   // Dialog States
-  const [isDispenseOpen, setIsDispenseOpen] = useState(false);
-  const [isAddStockOpen, setIsAddStockOpen] = useState(false);
-  const [isAdjustStockOpen, setIsAdjustStockOpen] = useState(false);
+  const [isLogOpen, setIsLogOpen] = useState(false);
+  const [logType, setLogType] = useState<TransactionType>("OUT");
   const [isAddMedOpen, setIsAddMedOpen] = useState(false);
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isSuperAdminOpen, setIsSuperAdminOpen] = useState(false);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
-  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [selectedSubstanceDetail, setSelectedSubstanceDetail] = useState<Substance | null>(null);
   
@@ -93,27 +86,22 @@ export default function App() {
     return inventory.filter(item => item.currentStock <= item.minThreshold);
   }, [inventory]);
 
-  // If loading, show professional loading state
-  if (isInitializing || !isAuthReady) {
+  if (isInitializing && !bootTimeout) {
     return (
       <div className="min-h-screen bg-brand-light-grey flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <PharmaLogo className="h-20 w-20 animate-pulse" />
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-black font-bold tracking-widest text-[10px] animate-pulse font-mono">Loading data...</p>
-            <div className="h-[1px] w-24 bg-brand-blue/20 overflow-hidden rounded-full">
-              <div className="h-full bg-brand-blue w-full -translate-x-full animate-[progress_1.5s_infinite_linear]" />
-            </div>
-          </div>
+        <div className="flex flex-col items-center gap-4">
+          <PharmaLogo className="h-16 w-16 animate-pulse" />
+          <p className="text-brand-blue font-black uppercase tracking-widest text-xs animate-pulse">Synchronizing Secure Registry...</p>
         </div>
       </div>
     );
   }
 
-  // If connected but profile is taking too long to load (and we have a user)
-  if (bootTimeout && userProfile === null && user !== null) {
+  if (bootTimeout && isInitializing) {
     return <InitializationDelay onRetry={() => window.location.reload()} />;
   }
+
+  if (!isAuthReady) return null;
 
   if (!user) {
     return <AuthScreen />;
@@ -134,15 +122,14 @@ export default function App() {
   return (
     <div className="min-h-screen bg-brand-light-grey font-sans text-brand-grey">
       <AppHeader 
-        onLogoClick={() => isMasterAdmin && setIsSuperAdminOpen(true)}
-        activeSchedule={activeSchedule}
+        activeSchedule={activeSchedule} 
         onScheduleChange={setActiveSchedule}
+        onLogoClick={() => isMasterAdmin && setIsSuperAdminOpen(true)}
       />
 
       <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12">
         <Tabs 
           value={isUserManagementOpen ? "users" : currentTab} 
-          orientation="vertical"
           onValueChange={(val) => {
             if (val === "users") {
               setIsUserManagementOpen(true);
@@ -165,16 +152,16 @@ export default function App() {
             isUserManagementOpen={isUserManagementOpen}
             lowStockCount={lowStockItems.length}
             onTabChange={setCurrentTab}
-            onDispense={() => setIsDispenseOpen(true)}
-            onAdd={() => setIsAddMedOpen(true)}
-            onAdjust={() => setIsAdjustStockOpen(true)}
-            onEditProfile={() => setIsEditProfileOpen(true)}
-            onLogout={() => setIsLogoutConfirmOpen(true)}
+            onDispense={() => { setLogType("OUT"); setIsLogOpen(true); }}
+            onAdd={() => { setLogType("IN"); setIsLogOpen(true); }}
+            onAdjust={() => { setLogType("ADJUST"); setIsLogOpen(true); }}
+            onEditProfile={() => setIsAddMedOpen(true)} // Or dedicated profile edit
+            onLogout={logout}
             masterAdminEmail={MASTER_ADMIN_EMAIL}
             appVersion={APP_VERSION}
           />
 
-          <div className="w-full relative min-w-0 flex-1 z-10 space-y-6">
+          <div className="w-full relative min-w-0 flex-1 z-10">
             <TabsContent value="inventory" className="m-0">
               <InventoryView 
                 inventory={inventory} 
@@ -182,10 +169,6 @@ export default function App() {
                 isInitializing={inventoryLoading}
                 onSubstanceClick={setSelectedSubstanceDetail}
                 onNDCClick={(ndc) => window.open(`https://ndclist.com/?s=${ndc}`, '_blank')}
-                onDispense={() => setIsDispenseOpen(true)}
-                onAddStock={() => setIsAddStockOpen(true)}
-                onAdjustStock={() => setIsAdjustStockOpen(true)}
-                onEnroll={() => setIsAddMedOpen(true)}
               />
             </TabsContent>
 
@@ -211,55 +194,25 @@ export default function App() {
       </main>
 
       {/* Dialogs */}
-      <DispenseDialog 
-        isOpen={isDispenseOpen}
-        onOpenChange={setIsDispenseOpen}
+      <LogTransactionDialog 
+        isOpen={isLogOpen}
+        onOpenChange={setIsLogOpen}
+        type={logType}
         inventory={inventory}
         users={staff}
         onLog={addTransaction}
         isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
-      />
-
-      <AddStockDialog 
-        isOpen={isAddStockOpen}
-        onOpenChange={setIsAddStockOpen}
-        inventory={inventory}
-        users={staff}
-        onLog={addTransaction}
-        isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
-      />
-
-      <AdjustStockDialog 
-        isOpen={isAdjustStockOpen}
-        onOpenChange={setIsAdjustStockOpen}
-        inventory={inventory}
-        users={staff}
-        onLog={addTransaction}
-        isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
-        nextAdjustCount={transactions.filter(t => t.type === "ADJUST").length + 1}
       />
 
       <AddSubstanceDialog 
         isOpen={isAddMedOpen}
         onOpenChange={setIsAddMedOpen}
-        inventory={inventory}
         onAdd={addSubstance}
-        onLog={addTransaction}
-        users={staff}
-        isPhotoRequirementEnabled={userProfile?.isPhotoRequirementEnabled || false}
-      />
-
-      <EditProfileDialog 
-        isOpen={isEditProfileOpen}
-        onOpenChange={setIsEditProfileOpen}
-        userProfile={userProfile}
-        userEmail={user.email || ""}
       />
 
       <TransactionDetailDialog 
         transaction={viewingTransaction}
         inventory={inventory}
-        staff={staff}
         onOpenChange={(open) => !open && setViewingTransaction(null)}
       />
 
@@ -282,26 +235,15 @@ export default function App() {
         }}
         onResetNode={() => toast.info("Reset logic pending specialized auth")}
         isActionPending={isActionPending}
-        appVersion={APP_VERSION}
       />
 
       <UserManagementDialog 
         isOpen={isUserManagementOpen}
-        onOpenChange={(open) => {
-          setIsUserManagementOpen(open);
-          if (!open) setCurrentTab("inventory");
-        }}
-        userEmail={user.email || ""}
-        userProfile={userProfile}
+        onOpenChange={setIsUserManagementOpen}
+        userEmail={user.email!}
         users={staff}
         isSubmitting={isActionPending}
         setIsSubmitting={setIsActionPending}
-      />
-
-      <LogoutConfirmDialog 
-        isOpen={isLogoutConfirmOpen}
-        onOpenChange={setIsLogoutConfirmOpen}
-        onConfirm={logout}
       />
 
       <Toaster 

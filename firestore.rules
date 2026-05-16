@@ -118,7 +118,8 @@ service cloud.firestore {
         allow read: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
         allow create: if (isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active')) && 
                          isValidTransaction(incoming()) &&
-                         isValidId(transactionId);
+                         isValidId(transactionId) &&
+                         incoming().performedBy == request.auth.uid; // Identity Integrity
         allow update, delete: if isMasterAdmin(); 
       }
 

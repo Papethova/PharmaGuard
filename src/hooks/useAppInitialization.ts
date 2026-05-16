@@ -13,14 +13,12 @@ export function useAppInitialization(timeoutMs = 10000) {
 
     const testConnection = async () => {
       try {
-        // safety race to prevent hang
-        const connectionTest = getDocFromServer(doc(db, 'test', 'connection'));
-        await Promise.race([
-          connectionTest,
-          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-        ]);
+        await getDocFromServer(doc(db, 'test', 'connection'));
+        // If we reach here, we are "connected" enough
       } catch (error) {
-        console.warn("Connection test non-critical failure:", error);
+        if(error instanceof Error && error.message.includes('the client is offline')) {
+           console.error("Please check your Firebase configuration.");
+        }
       } finally {
         setIsInitializing(false);
         clearTimeout(timer);

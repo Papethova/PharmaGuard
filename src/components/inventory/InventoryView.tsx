@@ -1,8 +1,7 @@
 import { useMemo } from "react";
-import { Pill, ArrowDown, Plus, RefreshCcw, PlusCircle } from "lucide-react";
+import { Pill } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Substance, Schedule } from "../../types";
 
@@ -12,10 +11,6 @@ interface InventoryViewProps {
   isInitializing: boolean;
   onSubstanceClick: (item: Substance) => void;
   onNDCClick: (ndc: string) => void;
-  onDispense: () => void;
-  onAddStock: () => void;
-  onAdjustStock: () => void;
-  onEnroll: () => void;
 }
 
 export function InventoryView({
@@ -23,22 +18,18 @@ export function InventoryView({
   activeSchedule,
   isInitializing,
   onSubstanceClick,
-  onNDCClick,
-  onDispense,
-  onAddStock,
-  onAdjustStock,
-  onEnroll
+  onNDCClick
 }: InventoryViewProps) {
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => activeSchedule === "ALL" || item.schedule === activeSchedule);
   }, [inventory, activeSchedule]);
 
-  const tableHeadClass = "text-xs font-black text-brand-blue tracking-widest text-center h-10 uppercase";
+  const tableHeadClass = "text-[10px] uppercase font-black text-brand-blue/60 tracking-widest text-center h-10";
 
   return (
-    <div className="space-y-6 relative z-10 m-0">
+    <div className="space-y-4 relative z-10 m-0">
       <div className="flex flex-col gap-4">
-        <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface rounded-2xl">
+        <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-brand-light-grey/50">
@@ -52,11 +43,11 @@ export function InventoryView({
               <TableBody>
                 {isInitializing ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50 font-bold uppercase tracking-widest text-[10px]">Loading inventory...</TableCell>
+                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50">Loading inventory...</TableCell>
                   </TableRow>
                 ) : filteredInventory.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50 font-bold uppercase tracking-widest text-[10px]">No entries found.</TableCell>
+                    <TableCell colSpan={4} className="text-center py-8 text-brand-dark-grey/50">No entries found.</TableCell>
                   </TableRow>
                 ) : filteredInventory.map((item) => (
                   <TableRow 
@@ -64,31 +55,30 @@ export function InventoryView({
                     className="hover:bg-brand-blue/5 transition-colors cursor-pointer group h-14"
                     onClick={() => onSubstanceClick(item)}
                   >
-                    <TableCell className="text-sm text-black text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="font-bold">{item.name} {item.strength}</span>
-                      </div>
+                    <TableCell className="text-sm text-brand-dark-grey text-center">
+                      <span className="font-bold">{item.name}</span>{" "}
+                      <span className="text-xs text-brand-dark-grey/80">{item.strength}</span>
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge variant="outline" className={`border-brand-blue/20 text-brand-blue bg-brand-blue/5 text-[10px] px-2 py-0.5 mx-auto`}>
                         {item.schedule}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-center">
-                      <span className="text-brand-blue font-bold">
+                    <TableCell className="font-mono text-xs text-center">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onNDCClick(item.ndc); }}
+                        className="text-brand-blue hover:underline font-bold transition-colors"
+                      >
                         {item.ndc}
-                      </span>
+                      </button>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-base font-black ${item.currentStock <= item.minThreshold ? "!text-[#FFE600]" : "text-black"}`}>
-                          {item.currentStock}
+                        <span className={`text-sm font-mono font-black ${item.currentStock <= item.minThreshold ? "text-red-500" : "text-brand-blue"}`}>
+                          {item.currentStock} {item.unit}
                         </span>
                         {item.currentStock <= item.minThreshold && (
-                          <div className="flex items-center gap-1 mt-1">
-                            <div className="h-2 w-2 rounded-full bg-[#FFE600] animate-pulse shadow-[0_0_10px_#FFE600]" />
-                            <span className="text-[9px] font-black !text-[#FFE600] tracking-tighter uppercase">Low Stock</span>
-                          </div>
+                          <span className="text-[8px] uppercase font-black text-red-400 tracking-tighter">Low Stock Alert</span>
                         )}
                       </div>
                     </TableCell>

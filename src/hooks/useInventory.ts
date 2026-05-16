@@ -41,10 +41,7 @@ export function useInventory(userEmail: string | null) {
         setInventory(snap.docs.map(d => ({ ...d.data(), id: d.id } as Substance)));
         setLoading(false);
       },
-      (err) => {
-        console.error(`Inventory substances fetch error:`, err);
-        setLoading(false);
-      }
+      (err) => handleFirestoreError(err, OperationType.LIST, `users/${emailId}/substances`)
     );
 
     const unsubTransactions = onSnapshot(
@@ -52,7 +49,7 @@ export function useInventory(userEmail: string | null) {
       (snap) => {
         setTransactions(snap.docs.map(d => ({ ...d.data(), id: d.id } as Transaction)));
       },
-      (err) => console.error(`Inventory transactions fetch error:`, err)
+      (err) => handleFirestoreError(err, OperationType.LIST, `users/${emailId}/transactions`)
     );
 
     const unsubStaff = onSnapshot(
@@ -60,7 +57,7 @@ export function useInventory(userEmail: string | null) {
       (snap) => {
         setStaff(snap.docs.map(d => ({ ...d.data(), id: d.id } as any)));
       },
-      (err) => console.error(`Inventory staff fetch error:`, err)
+      (err) => handleFirestoreError(err, OperationType.LIST, `users/${emailId}/staff`)
     );
 
     return () => {
@@ -102,12 +99,12 @@ export function useInventory(userEmail: string | null) {
     if (!userEmail) return;
     const emailId = userEmail.toLowerCase();
     try {
-      const docRef = await addDoc(collection(db, "users", emailId, "substances"), {
+      await addDoc(collection(db, "users", emailId, "substances"), {
         ...substance,
+        currentStock: 0,
         lastUpdated: serverTimestamp()
       });
       toast.success("New Catalog Entry Verified");
-      return docRef.id;
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `users/${emailId}/substances`);
     }

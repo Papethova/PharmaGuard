@@ -1,12 +1,13 @@
 import { UserProfile } from "../types";
 
 export const escapeEmail = (text: string | null | undefined) => {
-  return text || "";
+  if (!text) return "";
+  return typeof text === 'string' ? text.replace("@", "\u200B@\u200B") : text;
 };
 
 export const getIdentityString = (profile: UserProfile | null, userEmail?: string | null) => {
   const identity = profile?.organizationName || profile?.displayName || userEmail || "Identity Unverified";
-  return identity;
+  return escapeEmail(identity);
 };
 
 export const formatDateTime = (timestamp: any) => {
