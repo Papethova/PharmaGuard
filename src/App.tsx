@@ -2282,9 +2282,9 @@ export default function App() {
                             })()}
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent className="bg-brand-surface">
+                        <SelectContent className="bg-brand-surface" align="start">
                           {users.map(u => (
-                            <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-2.5">
+                            <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
                               {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
                             </SelectItem>
                           ))}
