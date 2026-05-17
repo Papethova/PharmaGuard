@@ -63,14 +63,16 @@ export function AuthScreen() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full"
       >
-        <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden">
+        <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden pt-0">
           <div className="bg-brand-blue p-6 text-center relative overflow-hidden">
             <div className="flex justify-center mb-4">
-              <PharmaLogo className="h-16 w-16" />
+              <div className="h-16 w-16 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
+                <PharmaLogo className="h-10 w-10" />
+              </div>
             </div>
             <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
-            <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.15em] mt-1">
-              secure controlled substance perpetual inventory system
+            <p className="text-brand-yellow font-black text-[9px] uppercase tracking-[0.15em] mt-1">
+              SECURE CONTROLLED SUBSTANCE REGISTRY
             </p>
           </div>
 

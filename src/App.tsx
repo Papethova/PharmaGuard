@@ -1399,8 +1399,8 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full"
         >
-          <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl">
-            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden rounded-t-xl">
+          <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl pt-0">
+            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden">
               <div className="flex justify-center mb-6">
                 <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
                   <PharmaLogo className="h-12 w-12" />
@@ -1588,61 +1588,73 @@ export default function App() {
 
   if (userProfile?.status === 'pending') {
     return (
-      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center p-4 text-center">
+      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center p-4">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-md w-full"
         >
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-blue/20 flex flex-col items-center space-y-6">
-            <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue/10">
-              <Clock className="w-12 h-12 text-brand-blue" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-brand-blue">Access Pending Approval</h2>
-              <p className="text-brand-grey text-sm">
-                Your PharmaGuard node has been registered successfully. 
-                For security reasons, access must be manually granted by a Master Authority.
-              </p>
-              <div className="bg-brand-blue/5 p-4 rounded-lg border border-brand-blue/10 mt-4">
-                <p className="text-[10px] text-brand-blue font-bold tracking-wider">Node Identification</p>
-                <p className="text-xs font-mono mt-1 text-brand-grey no-interact">{escapeEmail(userProfile.email)}</p>
+          <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-2xl pt-0">
+            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden">
+              <div className="flex justify-center mb-6">
+                <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
+                  <Clock className="h-10 w-10 text-brand-blue" />
+                </div>
               </div>
-              <p className="text-brand-dark-grey/60 text-xs mt-4">
-                Please notify your system administrator if access is not granted within 24 hours.
+              <h1 className="text-3xl font-black text-white tracking-tighter leading-none mt-2">PharmaGuard</h1>
+              <p className="text-brand-yellow font-black text-[10px] uppercase tracking-[0.2em] mt-3">
+                SECURE CONTROLLED SUBSTANCE REGISTRY
               </p>
             </div>
-            <div className="pt-4 w-full space-y-3">
-              <Button 
-                onClick={async () => {
-                  if (user && user.email) {
-                    setIsSubmitting(true);
-                    const userEmail = user.email.toLowerCase();
-                    const userDocRef = doc(db, "users", userEmail);
-                    await setDoc(userDocRef, {
-                      uid: user.uid,
-                      email: userEmail,
-                      displayName: user.displayName || "User",
-                      role: "pharmacist",
-                      status: "pending"
-                    }, { merge: true });
-                    toast.success("Registration heartbeat sent to Registry");
-                    setIsSubmitting(false);
-                  }
-                }}
-                disabled={isSubmitting}
-                className="w-full bg-brand-yellow text-brand-blue hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-brand-yellow/20 disabled:opacity-100"
-              >
-                {isSubmitting ? "Syncing..." : "Retry Registry Sync"}
-              </Button>
-              <Button 
-                onClick={handleLogout}
-                className="w-full bg-brand-blue text-white hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-brand-blue/10"
-              >
-                Sign Out
-              </Button>
-            </div>
-          </div>
+
+            <CardContent className="p-8 text-center space-y-6">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-brand-blue uppercase tracking-tight">Access Pending Approval</h2>
+                <p className="text-brand-grey font-bold text-xs leading-relaxed">
+                  Your organization's node registration has been received. 
+                  For regulatory compliance, terminal access must be manually authorized by the Master Authority.
+                </p>
+              </div>
+              
+              <div className="bg-brand-blue/5 p-5 rounded-2xl border border-brand-blue/10">
+                <p className="text-[10px] text-brand-blue font-black uppercase tracking-widest leading-none mb-2">Registered Node Identifier</p>
+                <p className="text-xs font-mono text-brand-grey font-bold truncate">{escapeEmail(userProfile.email)}</p>
+              </div>
+
+              <div className="pt-2 w-full space-y-3">
+                <Button 
+                  className="w-full h-12 bg-brand-blue text-white hover:bg-brand-blue/90 font-black tracking-widest uppercase text-xs rounded-xl"
+                  onClick={async () => {
+                    if (user && user.email) {
+                      setIsSubmitting(true);
+                      const userEmail = user.email.toLowerCase();
+                      const userDocRef = doc(db, "users", userEmail);
+                      const userDoc = await getDoc(userDocRef);
+                      
+                      if (userDoc.exists() && userDoc.data()?.status === 'active') {
+                        toast.success("Access Granted: Registry Node Active");
+                        window.location.reload();
+                      } else {
+                        toast.info("Verification in Progress", {
+                          description: "The Master Authority has not yet activated this node."
+                        });
+                      }
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : "Re-Verify Authorization Status"}
+                </Button>
+                <Button 
+                  onClick={handleLogout}
+                  className="w-full bg-brand-yellow text-brand-blue hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-brand-yellow/20"
+                >
+                  Sign Out of Registry Terminal
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     );
@@ -2109,7 +2121,7 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/30'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/40'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
@@ -2315,7 +2327,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/40' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
@@ -2659,7 +2671,7 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[85vh] max-h-[85vh]">
                 <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
@@ -2667,22 +2679,6 @@ export default function App() {
                     </div>
                     <div className="flex flex-col gap-0">
                       <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
-                        User Management
-                      </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
-                        ADD, EDIT, OR REMOVE AUTHORIZED USERS FOR THIS SYSTEM.
-                      </DialogDescription>
-                    </div>
-                  </div>
-                </DialogHeader>
-
-                <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0 rounded-t-2xl">
-                  <div className="flex items-center gap-4 relative z-10 text-left">
-                    <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-                      <Users className="h-6 w-6 text-brand-blue" />
-                    </div>
-                    <div className="flex flex-col gap-0">
-                      <DialogTitle className="text-xl font-bold tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
@@ -2785,7 +2781,7 @@ export default function App() {
                                   </Select>
                                 </div>
                               ) : (
-                                <span>{u.name} {u.title && <span className="text-brand-dark-grey font-bold">({u.title})</span>}</span>
+                                <span>{u.name} {u.title && <span className="text-brand-dark-grey font-medium">({u.title})</span>}</span>
                               )}
                             </TableCell>
                             <TableCell className="text-center py-1.5">
