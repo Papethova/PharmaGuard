@@ -1405,9 +1405,7 @@ export default function App() {
           <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl pt-0">
           <div className="bg-brand-blue p-6 py-2 text-center relative overflow-hidden">
             <div className="flex justify-center mb-4">
-              <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
-                <PharmaLogo className="h-8 w-8" />
-              </div>
+              <PharmaLogo className="h-16 w-16" />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tighter leading-none mt-1">PharmaGuard</h1>
             <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.2em] mt-2">
@@ -2124,7 +2122,7 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/30'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-muted-foreground'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
@@ -2330,7 +2328,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
@@ -2723,7 +2721,7 @@ export default function App() {
                         className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-9 flex-1 text-xs"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
@@ -2773,7 +2771,7 @@ export default function App() {
                                     value={editingUser?.title || ""} 
                                     onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                                   >
-                                    <SelectTrigger className={`w-24 h-8 bg-brand-surface border-brand-blue/30 flex items-center text-[10px] ${!editingUser?.title ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
+                                    <SelectTrigger className={`w-24 h-8 bg-brand-surface border-brand-blue/30 flex items-center text-[10px] ${!editingUser?.title ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                                       <SelectValue placeholder="Title...." />
                                     </SelectTrigger>
                                     <SelectContent className="bg-brand-surface">
@@ -2844,13 +2842,13 @@ export default function App() {
             <div className="flex flex-col gap-4">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
                 <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                  <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
+                  <Table className="relative border-separate border-spacing-0 z-10 w-full">
                     <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
                       <TableRow className="bg-brand-light-grey border-none">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[45%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[15%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3184,16 +3182,16 @@ export default function App() {
             </div>
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
               <div className="h-[calc(100vh-320px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
+                <Table className="relative border-separate border-spacing-0 z-10 w-full">
                   <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
                     <TableRow className="bg-brand-light-grey border-none">
-                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Ref #</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>User</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Ref #</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-4`}>Medication</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3206,10 +3204,10 @@ export default function App() {
                       </TableRow>
                     ) : filteredTransactions.map((t) => (
                     <TableRow key={t.id} className="h-14">
-                      <TableCell className="text-xs font-mono text-brand-dark-grey/70 whitespace-nowrap text-center">
+                      <TableCell className="text-xs font-mono text-brand-dark-grey/70 whitespace-nowrap text-center px-2">
                         {formatDateTime(t.timestamp)}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center px-2 whitespace-nowrap">
                         {t.referenceNumber ? (
                           <button 
                             onClick={() => setViewingTransaction(t)}
@@ -3221,10 +3219,10 @@ export default function App() {
                           <span className="text-brand-dark-grey/40 italic">-</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-center">
-                        <div className="text-sm font-bold text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
+                      <TableCell className="text-center px-4">
+                        <div className="text-sm font-bold text-brand-dark-grey whitespace-normal">{t.substanceName}&nbsp;{t.strength}</div>
                       </TableCell>
-                      <TableCell className="text-xs font-bold text-center">
+                      <TableCell className="text-xs font-bold text-center px-2 whitespace-nowrap">
                         <button 
                           onClick={() => handleNDCClick(t.ndc)}
                           className="text-brand-blue hover:underline font-bold transition-colors"
@@ -3232,13 +3230,13 @@ export default function App() {
                           {t.ndc}
                         </button>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-2 text-center whitespace-nowrap">
                         <TransactionBadge type={t.type} />
                       </TableCell>
-                      <TableCell className="text-center font-bold text-sm text-brand-dark-grey">
+                      <TableCell className="text-center font-bold text-sm text-brand-dark-grey px-2 whitespace-nowrap">
                         {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                       </TableCell>
-                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
+                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact px-2 whitespace-nowrap">
                         {escapeEmail(t.performedByName)}
                         {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
                           <span className="ml-1 text-brand-dark-grey">
@@ -3864,7 +3862,7 @@ export default function App() {
                       value={editingMed.schedule} 
                       onValueChange={(v: Schedule) => setEditingMed({...editingMed, schedule: v})}
                     >
-                      <SelectTrigger className={`bg-brand-surface border-brand-blue/30 focus:border-brand-blue h-11 ${!editingMed.schedule ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}><SelectValue /></SelectTrigger>
+                      <SelectTrigger className={`bg-brand-surface border-brand-blue/30 focus:border-brand-blue h-11 ${!editingMed.schedule ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {SCHEDULES.map(s => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -3937,7 +3935,7 @@ export default function App() {
               <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Source Node (Migration Point A)</Label>
               <div className="relative">
                 <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
-                  <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationSourceId ? 'text-brand-dark-grey/30' : 'text-brand-blue'}`}>
+                  <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationSourceId ? 'text-muted-foreground' : 'text-brand-blue'}`}>
                     <SelectValue placeholder="Begin Typable Search..." />
                   </SelectTrigger>
                   <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">
@@ -3976,7 +3974,7 @@ export default function App() {
             <div className="grid gap-3">
               <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Destination Node (Migration Point B)</Label>
               <Select value={migrationDestId} onValueChange={setMigrationDestId}>
-                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationDestId ? 'text-brand-dark-grey/30' : 'text-brand-blue'}`}>
+                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationDestId ? 'text-muted-foreground' : 'text-brand-blue'}`}>
                   <SelectValue placeholder="Begin Typable Search..." />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">

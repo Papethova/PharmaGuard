@@ -116,7 +116,7 @@ export function UserManagementDialog({
                   className="bg-brand-surface border-brand-blue/20 text-sm h-8"
                 />
                 <Select value={userTitle} onValueChange={setUserTitle}>
-                  <SelectTrigger className="w-32 h-8 bg-brand-surface border-brand-blue/20 text-xs">
+                  <SelectTrigger className={`w-32 h-8 bg-brand-surface border-brand-blue/20 text-xs ${!userTitle ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                     <SelectValue placeholder="Title" />
                   </SelectTrigger>
                   <SelectContent className="bg-brand-surface">
@@ -161,7 +161,7 @@ export function UserManagementDialog({
                                 value={editingUser?.title || ""} 
                                 onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                               >
-                                <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-blue/30">
+                                <SelectTrigger className={`w-28 h-8 bg-brand-surface border-brand-blue/30 ${!editingUser?.title ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                                   <SelectValue placeholder="Title" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-brand-surface">

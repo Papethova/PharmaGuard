@@ -82,7 +82,7 @@ export function AddSubstanceDialog({
             <div className="grid gap-1.5">
               <Label className="text-xs font-bold text-brand-blue">Schedule</Label>
               <Select value={schedule === "" ? undefined : schedule} onValueChange={(v) => setSchedule(v)}>
-                <SelectTrigger className="h-10 border-brand-blue/10">
+                <SelectTrigger className={`h-10 border-brand-blue/10 ${!schedule ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface">

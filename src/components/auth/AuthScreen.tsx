@@ -66,9 +66,7 @@ export function AuthScreen() {
         <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden pt-0">
           <div className="bg-brand-blue p-6 py-2 text-center relative overflow-hidden rounded-t-xl">
             <div className="flex justify-center mb-2">
-              <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-white/20">
-                <PharmaLogo className="h-8 w-8" />
-              </div>
+              <PharmaLogo className="h-14 w-14" />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tighter leading-none mt-1">PharmaGuard</h1>
             <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.15em] mt-2">

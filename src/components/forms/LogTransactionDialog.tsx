@@ -205,7 +205,7 @@ export function LogTransactionDialog({
             <div className="grid gap-1.5">
               <Label className="text-brand-dark-grey text-xs">Performing User</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>
-                <SelectTrigger className="bg-brand-surface border-brand-blue/10 h-10">
+                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-10 ${!selectedUser ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                   <SelectValue placeholder="Select User" />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface">
