@@ -1797,7 +1797,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.02] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-24 shrink-0 overflow-visible self-start">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-12 shrink-0 overflow-visible self-start">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -2020,6 +2020,23 @@ export default function App() {
                                     s.name.toLowerCase().includes(newMed.name.toLowerCase()) || 
                                     s.ndc.includes(newMed.name)
                                   )
+                                  .sort((a, b) => {
+                                    // 1. Alphabetical by name
+                                    const nameCompare = a.name.localeCompare(b.name);
+                                    if (nameCompare !== 0) return nameCompare;
+                                    
+                                    // 2. Lowest strength first
+                                    const getStrengthValue = (str: string) => {
+                                      const match = str.match(/(\d+(\.\d+)?)/);
+                                      return match ? parseFloat(match[0]) : 0;
+                                    };
+                                    const strengthA = getStrengthValue(a.strength);
+                                    const strengthB = getStrengthValue(b.strength);
+                                    if (strengthA !== strengthB) return strengthA - strengthB;
+
+                                    // 3. Least inventory count first
+                                    return a.currentStock - b.currentStock;
+                                  })
                                   .map(s => (
                                     <div
                                       key={s.id}
@@ -2124,12 +2141,12 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface text-brand-dark-grey h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
-                                <SelectValue placeholder="Select..." />
+                              <SelectTrigger className={`bg-brand-surface text-brand-dark-grey h-9 font-medium ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                                <SelectValue placeholder="Select..." className="text-brand-dark-grey" />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
                                 {SCHEDULES.map(s => (
-                                  <SelectItem key={s} value={s} className="pl-3">{s}</SelectItem>
+                                  <SelectItem key={s} value={s} className="pl-3 text-brand-dark-grey font-medium">{s}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -2211,6 +2228,23 @@ export default function App() {
                                 s.name.toLowerCase().includes(substanceSearch.toLowerCase()) || 
                                 s.ndc.includes(substanceSearch)
                               )
+                              .sort((a, b) => {
+                                // 1. Alphabetical by name
+                                const nameCompare = a.name.localeCompare(b.name);
+                                if (nameCompare !== 0) return nameCompare;
+                                
+                                // 2. Lowest strength first
+                                const getStrengthValue = (str: string) => {
+                                  const match = str.match(/(\d+(\.\d+)?)/);
+                                  return match ? parseFloat(match[0]) : 0;
+                                };
+                                const strengthA = getStrengthValue(a.strength);
+                                const strengthB = getStrengthValue(b.strength);
+                                if (strengthA !== strengthB) return strengthA - strengthB;
+
+                                // 3. Least inventory count first
+                                return a.currentStock - b.currentStock;
+                              })
                               .map(s => (
                                 <div
                                   key={s.id}
@@ -2657,154 +2691,152 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[700px] h-[750px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
-                <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0">
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-                      <Users className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+                <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
+                  <div className="flex items-center gap-4 relative z-10 text-left">
+                    <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+                      <Users className="h-6 w-6 text-brand-blue" />
                     </div>
-                    <div className="flex flex-col gap-0 text-left">
+                    <div className="flex flex-col gap-0">
                       <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
-                        SYSTEM ACCESS CONTROLS
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
+                        ADD, EDIT, OR REMOVE AUTHORIZED USERS FOR THIS SYSTEM.
                       </DialogDescription>
                     </div>
                   </div>
                 </DialogHeader>
-                
-                <div className="p-6 pb-2 shrink-0 bg-brand-blue/5 border-b border-brand-blue/10">
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
-                      <div 
-                        className="flex items-center justify-between p-4 bg-brand-surface rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
-                        onClick={togglePhotoRequirement}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue shadow-lg' : 'bg-brand-grey/20 text-brand-grey'}`}>
-                            <Camera className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <p className={`text-sm transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
-                            <p className={`text-[10px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
-                          </div>
+
+                <div className="p-6 pb-2 space-y-8 shrink-0">
+                  <div className="space-y-4">
+                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
+                    <div 
+                      className="flex items-center justify-between p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                      onClick={togglePhotoRequirement}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                          <Camera className="h-5 w-5" />
                         </div>
-                        <div className={`w-12 h-6 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
-                          <div className={`h-4 w-4 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        <div>
+                          <p className={`text-sm transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                          <p className={`text-[10px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
                         </div>
+                      </div>
+                      <div className={`w-12 h-6 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                        <div className={`h-4 w-4 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                       </div>
                     </div>
+                  </div>
 
-                    <div className="grid gap-3 p-3 border border-brand-blue/20 rounded-lg bg-brand-surface shadow-sm">
-                      <Label className="text-brand-dark-grey text-[10px] font-bold uppercase tracking-wider">Add New Staff Member</Label>
-                      <div className="flex gap-2">
-                        <Input 
-                          placeholder="Name..." 
-                          value={newUserName}
-                          onChange={(e) => setNewUserName(e.target.value)}
-                          className="bg-brand-surface border-brand-blue/10 h-10 flex-1 font-bold"
-                        />
-                        <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                          <SelectTrigger className="w-28 h-10 bg-brand-surface border-brand-blue/10">
-                            <SelectValue placeholder="Title...." />
-                          </SelectTrigger>
-                          <SelectContent className="bg-brand-surface">
-                            <SelectItem value="PIC">PIC</SelectItem>
-                            <SelectItem value="RPh">RPh</SelectItem>
-                            <SelectItem value="Tech">Tech</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Button 
-                          onClick={handleAddUser} 
-                          className="bg-brand-yellow text-brand-blue hover:brightness-110 h-10 px-4 font-black shadow-sm"
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting ? <RefreshCcw className="h-5 w-5 animate-spin" /> : <UserPlus className="h-6 w-6" />}
-                        </Button>
-                      </div>
+                  <div className="space-y-4">
+                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">Add New User</Label>
+                    <div className="flex gap-2 items-center">
+                      <Input 
+                        placeholder="Name..." 
+                        value={newUserName}
+                        onChange={(e) => setNewUserName(e.target.value)}
+                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1"
+                      />
+                      <Select value={newUserTitle} onValueChange={setNewUserTitle}>
+                        <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-grey/20 flex items-center">
+                          <SelectValue placeholder="Title...." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-brand-surface">
+                          <SelectItem value="PIC">PIC</SelectItem>
+                          <SelectItem value="RPh">RPh</SelectItem>
+                          <SelectItem value="Tech">Tech</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        onClick={handleAddUser} 
+                        className="bg-brand-yellow text-brand-blue hover:brightness-110 h-8 px-4 font-black shadow-sm"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
+                      </Button>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex-1 overflow-hidden p-6 flex flex-col gap-4">
-                  <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">Authorized Personnel</Label>
-                  <div className="flex-1 border border-brand-grey/20 rounded-xl overflow-y-auto bg-brand-surface shadow-inner relative">
-                    <Table className="relative border-separate border-spacing-0">
-                      <TableHeader className="sticky top-0 z-20">
-                        <TableRow className="bg-brand-light-grey">
-                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-20 h-12`}>Name & Title</TableHead>
-                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-20 h-12`}>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {users.map((u) => (
-                          <TableRow key={u.id} className="hover:bg-brand-blue/5 h-14">
-                            <TableCell className="font-bold text-brand-dark-grey py-3 text-center">
-                              {editingUser?.id === u.id ? (
-                                <div className="flex gap-2 items-center px-2">
-                                  <Input 
-                                    value={editingUser?.name || ""}
-                                    onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                    className="h-9 bg-brand-surface border-brand-blue/30 flex-1 font-bold"
-                                    autoFocus
-                                  />
-                                  <Select 
-                                    value={editingUser?.title || ""} 
-                                    onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
-                                  >
-                                    <SelectTrigger className="w-28 h-9 bg-brand-surface border-brand-blue/30 flex items-center shrink-0">
-                                      <SelectValue placeholder="Title...." />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-brand-surface">
-                                      <SelectItem value="PIC">PIC</SelectItem>
-                                      <SelectItem value="RPh">RPh</SelectItem>
-                                      <SelectItem value="Tech">Tech</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              ) : (
-                                <div className="flex flex-col items-center">
-                                  <span className="text-sm font-black text-brand-dark-grey">{u.name}</span>
-                                  {u.title && <span className="text-[10px] text-brand-blue font-bold bg-brand-blue/10 px-2 rounded-full uppercase mt-1">{u.title}</span>}
-                                </div>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-center py-3">
-                              <div className="flex justify-center gap-2">
-                                {editingUser?.id === u.id ? (
-                                  <Button 
-                                    size="sm" 
-                                    className="h-10 w-10 p-0 bg-brand-blue text-white hover:brightness-110 shadow-sm"
-                                    onClick={handleUpdateUser}
-                                  >
-                                    <PlusCircle className="h-5 w-5" />
-                                  </Button>
-                                ) : (
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    className="h-10 w-10 p-0 text-brand-blue border-brand-blue/20 hover:bg-brand-blue/5"
-                                    onClick={() => setEditingUser(u)}
-                                  >
-                                    <Edit className="h-5 w-5" />
-                                  </Button>
-                                )}
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  className="h-10 w-10 p-0 text-brand-blue/40 border-brand-blue/10 hover:text-red-500 hover:border-red-500/20"
-                                  onClick={() => setUserToDeleteConfirm(u)}
-                                >
-                                  <Trash2 className="h-5 w-5" />
-                                </Button>
-                              </div>
-                            </TableCell>
+                  <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
+                  <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative">
+                    <ScrollArea className="h-full">
+                      <Table className="relative border-separate border-spacing-0">
+                        <TableHeader className="sticky top-0 z-10">
+                          <TableRow className="bg-brand-light-grey">
+                            <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Name</TableHead>
+                            <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10`}>Actions</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {users.map((u) => (
+                            <TableRow key={u.id} className="hover:bg-brand-blue/5">
+                              <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
+                                {editingUser?.id === u.id ? (
+                                  <div className="flex gap-2 items-center px-1">
+                                    <Input 
+                                      value={editingUser?.name || ""}
+                                      onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
+                                      className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
+                                      autoFocus
+                                    />
+                                    <Select 
+                                      value={editingUser?.title || ""} 
+                                      onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
+                                    >
+                                      <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-blue/30 flex items-center">
+                                        <SelectValue placeholder="Title...." />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-brand-surface">
+                                        <SelectItem value="PIC">PIC</SelectItem>
+                                        <SelectItem value="RPh">RPh</SelectItem>
+                                        <SelectItem value="Tech">Tech</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                ) : (
+                                  <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-center py-3">
+                                <div className="flex justify-center gap-1">
+                                  {editingUser?.id === u.id ? (
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="h-8 w-8 p-0 text-brand-blue"
+                                      onClick={handleUpdateUser}
+                                    >
+                                      <PlusCircle className="h-4 w-4" />
+                                    </Button>
+                                  ) : (
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                      onClick={() => setEditingUser(u)}
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                    onClick={() => setUserToDeleteConfirm(u)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
                   </div>
                 </div>
 
@@ -2814,9 +2846,9 @@ export default function App() {
                       setIsUserManagementOpen(false);
                       setCurrentTab('inventory');
                     }} 
-                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
+                    className="w-full h-11 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
                   >
-                    Close User Controls
+                    Close User Management
                   </Button>
                 </DialogFooter>
               </DialogContent>
