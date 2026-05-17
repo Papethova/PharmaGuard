@@ -64,7 +64,7 @@ export function AuthScreen() {
         className="max-w-md w-full"
       >
         <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden pt-0">
-          <div className="bg-brand-blue p-6 text-center relative overflow-hidden">
+          <div className="bg-brand-blue p-6 text-center relative overflow-hidden rounded-t-xl">
             <div className="flex justify-center mb-4">
               <div className="h-16 w-16 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
                 <PharmaLogo className="h-10 w-10" />

@@ -1230,6 +1230,9 @@ export default function App() {
 
     return results
       .filter((p: UserProfile) => {
+        // EXCLUSION: Hide the Master Admin account from regulated registry lists
+        if (p.email?.toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
+        
         const term = userSearchTerm.toLowerCase();
         if (!term) return true;
         return (p.email?.toLowerCase() || "").includes(term) || 
@@ -1595,7 +1598,7 @@ export default function App() {
           className="max-w-md w-full"
         >
           <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-2xl pt-0">
-            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden">
+            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden rounded-t-2xl">
               <div className="flex justify-center mb-6">
                 <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
                   <Clock className="h-10 w-10 text-brand-blue" />
@@ -1777,10 +1780,10 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-12 shrink-0 overflow-visible self-start">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-10 sticky top-12 shrink-0 overflow-visible self-start">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
-                <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
+                <h3 className={`font-bold text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
                   (getIdentityString(userProfile, user?.email).length || 0) > 20 ? "text-lg" : 
                   (getIdentityString(userProfile, user?.email).length || 0) > 15 ? "text-xl" : "text-2xl"
                 }`}>
@@ -1825,7 +1828,7 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
@@ -1834,7 +1837,7 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="alerts" 
@@ -1845,7 +1848,7 @@ export default function App() {
                       <AlertTriangle className="h-5 w-5 text-brand-blue transition-all" strokeWidth={3} />
                     </div>
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
                   {lowStockItems.length > 0 && (
                     <div className="ml-auto relative flex items-center justify-center h-5 w-5">
                       <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
@@ -1866,14 +1869,14 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
+                  <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
                 </TabsTrigger>
                 <TabsContent value="users" className="hidden" />
               </TabsList>
               {user && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-9">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-auto">
                   <div className="flex flex-col overflow-hidden">
-                    <span className="text-xs font-black text-brand-blue/60 truncate tracking-tight">
+                    <span className="text-xs font-bold text-brand-blue/60 truncate tracking-tight">
                       {userProfile?.organizationName || userProfile?.displayName || user.displayName}
                     </span>
                     {!userProfile?.organizationName && (
@@ -2121,7 +2124,7 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/40'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/50'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
@@ -2327,7 +2330,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/40' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
@@ -2678,7 +2681,7 @@ export default function App() {
                       <Users className="h-6 w-6 text-brand-blue" />
                     </div>
                     <div className="flex flex-col gap-0">
-                      <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+                      <DialogTitle className="text-xl font-bold tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
@@ -2690,7 +2693,7 @@ export default function App() {
 
                 <div className="p-6 pb-2 space-y-6 shrink-0">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">System Configuration</Label>
+                    <Label className="text-[10px] font-bold tracking-widest text-brand-blue uppercase">System Configuration</Label>
                     <div 
                       className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                       onClick={togglePhotoRequirement}
@@ -2711,7 +2714,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">Add New User</Label>
+                    <Label className="text-[10px] font-bold tracking-widest text-brand-blue uppercase">Add New User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Name..." 
@@ -2720,7 +2723,7 @@ export default function App() {
                         className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-9 flex-1 text-xs"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-brand-dark-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
@@ -2742,22 +2745,22 @@ export default function App() {
 
                 <div className="flex-1 overflow-hidden p-6 pt-0 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">System Users</Label>
+                    <Label className="text-[10px] font-bold tracking-widest text-brand-blue uppercase">System Users</Label>
                     <span className="text-[8px] font-bold text-brand-grey/40">{users.length} Records</span>
                   </div>
-                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative min-h-[150px]">
-                  <ScrollArea className="h-full">
-                    <Table className="relative border-separate border-spacing-0">
-                      <TableHeader className="sticky top-0 z-50">
-                        <TableRow className="bg-brand-light-grey">
-                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px]`}>Name</TableHead>
-                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px]`}>Actions</TableHead>
+                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative min-h-0">
+                  <div className="h-full overflow-y-auto">
+                    <Table className="relative border-separate border-spacing-0 w-full">
+                      <TableHeader className="sticky top-0 z-50 bg-brand-blue">
+                        <TableRow className="bg-brand-blue border-none">
+                          <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-white uppercase tracking-widest`}>Name</TableHead>
+                          <TableHead className={`${tableHeadClass} text-center bg-brand-blue border-b border-white/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-white uppercase tracking-widest`}>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {users.map((u) => (
+                        {[...users].sort((a, b) => a.name.localeCompare(b.name)).map((u) => (
                           <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                            <TableCell className="font-medium text-brand-dark-grey py-1.5 text-center text-xs">
+                            <TableCell className="font-normal text-brand-dark-grey py-1.5 text-center text-xs">
                               {editingUser?.id === u.id ? (
                                 <div className="flex gap-2 items-center px-1">
                                   <Input 
@@ -2819,7 +2822,7 @@ export default function App() {
                         ))}
                       </TableBody>
                     </Table>
-                  </ScrollArea>
+                  </div>
                 </div>
               </div>
 
@@ -2842,12 +2845,12 @@ export default function App() {
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
                 <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
                   <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
-                    <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
-                      <TableRow className="bg-brand-light-grey border-none">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[45%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[15%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
+                    <TableHeader className="sticky top-0 z-[100] bg-brand-blue">
+                      <TableRow className="bg-brand-blue border-none">
+                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[45%] text-white font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[15%] text-white font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[20%] text-white font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[20%] text-white font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3182,15 +3185,15 @@ export default function App() {
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
               <div className="h-[calc(100vh-320px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
                 <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
-                  <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
-                    <TableRow className="bg-brand-light-grey border-none">
-                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Ref #</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>User</TableHead>
+                  <TableHeader className="sticky top-0 z-[100] bg-brand-blue">
+                    <TableRow className="bg-brand-blue border-none">
+                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Ref #</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Medication</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3309,7 +3312,7 @@ export default function App() {
 
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full max-h-[90vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg z-10">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
@@ -3320,7 +3323,7 @@ export default function App() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <DialogTitle className="text-xl font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
+                <DialogTitle className="text-xl font-bold tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 leading-tight truncate">
                   REAL-TIME REGISTRY MANAGEMENT AND GLOBAL SUBSCRIPTION AUTHORITY TERMINAL.
                 </DialogDescription>
@@ -3330,16 +3333,16 @@ export default function App() {
             <div className="px-3 py-2 bg-brand-yellow rounded-lg border border-brand-yellow/20 flex items-center justify-between">
               <div className="flex gap-4 items-center">
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Authenticated Master Identity</span>
-                  <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
+                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Authenticated Master Identity</span>
+                  <span className="text-xs font-bold text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
                     {getIdentityString(userProfile, user?.email)} 
                     <span className={`h-1.5 w-1.5 rounded-full ${isMasterAdmin ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} title={isMasterAdmin ? 'Authority Verified' : 'Standard User Restricted'} />
                   </span>
                 </div>
                 <div className="h-6 w-px bg-brand-blue/10" />
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Registry Synchronization Status</span>
-                  <span className="text-xs font-black text-brand-blue/80 tracking-tight">
+                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Registry Synchronization Status</span>
+                  <span className="text-xs font-bold text-brand-blue/80 tracking-tight">
                     {filteredProfiles.length} Managed Customer Nodes Registered
                   </span>
                 </div>
@@ -3915,14 +3918,14 @@ export default function App() {
         <DialogHeader className="p-6 bg-brand-blue text-white shrink-0 relative overflow-hidden">
           <div className="flex items-center gap-4 text-left relative z-10">
             <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-white/20">
-              <ArrowRight className="h-7 w-7 text-brand-blue" strokeWidth={3} />
+              <ArrowLeftRight className="h-7 w-7 text-brand-blue" strokeWidth={3} />
             </div>
             <div className="flex flex-col gap-0">
               <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
-                Data Consolidator
+                Data Migration Utility
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
-                NODE-TO-NODE REGISTRY TRANSFER UTILITY
+                TRANSFER REGISTRY DATA BETWEEN NODES
               </DialogDescription>
             </div>
           </div>
@@ -3931,7 +3934,7 @@ export default function App() {
         <div className="p-8 space-y-8 bg-brand-blue/5">
           <div className="space-y-6">
             <div className="grid gap-3">
-              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Point A: Source Records</Label>
+              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Source Node (Migration Point A)</Label>
               <div className="relative">
                 <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
                   <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationSourceId ? 'text-brand-blue/30' : 'text-brand-blue'}`}>
@@ -3954,7 +3957,7 @@ export default function App() {
                     <ScrollArea className="h-[200px]">
                       {filteredProfiles.map(p => (
                         <SelectItem key={p.docId} value={p.docId || ""} className="font-bold text-brand-blue py-3 px-4 hover:bg-brand-blue/5">
-                          {p.organizationName || p.displayName || p.email}
+                          {p.organizationName || p.displayName || p.email} ({p.docId})
                         </SelectItem>
                       ))}
                     </ScrollArea>
@@ -3971,7 +3974,7 @@ export default function App() {
             </div>
 
             <div className="grid gap-3">
-              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Point B: Destination Buffer</Label>
+              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Destination Node (Migration Point B)</Label>
               <Select value={migrationDestId} onValueChange={setMigrationDestId}>
                 <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationDestId ? 'text-brand-blue/30' : 'text-brand-blue'}`}>
                   <SelectValue placeholder="Begin Typable Search..." />
@@ -3988,7 +3991,7 @@ export default function App() {
                   <ScrollArea className="h-[200px]">
                     {filteredProfiles.map(p => (
                       <SelectItem key={p.docId} value={p.docId || ""} className="font-bold text-brand-blue py-3 px-4 hover:bg-brand-blue/5">
-                        {p.organizationName || p.displayName || p.email}
+                        {p.organizationName || p.displayName || p.email} ({p.docId})
                       </SelectItem>
                     ))}
                   </ScrollArea>
@@ -3997,13 +4000,13 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-white border border-brand-blue/10 p-5 rounded-2xl space-y-2 shadow-inner">
+          <div className="bg-brand-yellow/10 border border-brand-yellow/20 p-5 rounded-2xl space-y-2 shadow-inner">
             <div className="flex items-center gap-2 text-brand-blue">
-              <AlertTriangle className="h-4 w-4 fill-brand-yellow stroke-brand-blue" />
-              <span className="text-[10px] font-black uppercase tracking-tight">Administrative Override Warning</span>
+              <AlertTriangle className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-tight">Destructive Operation Warning</span>
             </div>
-            <p className="text-[10px] text-brand-blue/60 font-bold leading-relaxed text-center">
-              THIS RECURSIVE OPERATION WILL CLONE ALL CATALOG DATA, STAFF RECORDS, AND HISTORICAL LOGS INTO THE DESTINATION TERMINAL.
+            <p className="text-[10px] text-brand-blue/70 font-medium leading-relaxed text-center">
+              This utility will recursively copy all inventory substances, transaction history records, and staff profiles from Point A to Point B. Data in Point A will remain intact unless manually purged.
             </p>
           </div>
         </div>
