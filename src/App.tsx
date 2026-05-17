@@ -1433,8 +1433,8 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full"
         >
-          <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden border-none rounded-none">
-            <div className="bg-brand-blue p-4 py-6 text-center relative overflow-hidden">
+          <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl">
+            <div className="bg-brand-blue p-4 py-8 text-center relative overflow-hidden rounded-t-xl">
               <div className="flex justify-center mb-4">
                 <PharmaLogo className="h-16 w-16" />
               </div>
@@ -2156,7 +2156,7 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/30'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
@@ -2362,7 +2362,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className="border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9">
+                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
@@ -2723,8 +2723,24 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="p-4 space-y-4 shrink-0">
-                  <div className="space-y-2">
+                <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0 rounded-t-2xl">
+                  <div className="flex items-center gap-4 relative z-10 text-left">
+                    <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+                      <Users className="h-6 w-6 text-brand-blue" />
+                    </div>
+                    <div className="flex flex-col gap-0">
+                      <DialogTitle className="text-xl font-bold tracking-tight text-white leading-none">
+                        User Management
+                      </DialogTitle>
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
+                        ADD, EDIT, OR REMOVE AUTHORIZED USERS FOR THIS SYSTEM.
+                      </DialogDescription>
+                    </div>
+                  </div>
+                </DialogHeader>
+
+                <div className="p-6 pb-2 space-y-6 shrink-0">
+                  <div className="space-y-3">
                     <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">System Configuration</Label>
                     <div 
                       className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
@@ -2735,7 +2751,7 @@ export default function App() {
                           <Camera className="h-4 w-4" />
                         </div>
                         <div>
-                          <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                          <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-bold' : 'text-brand-blue/50'}`}>Photo Verification</p>
                           <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
                         </div>
                       </div>
@@ -2745,17 +2761,17 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">Add New User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Name..." 
                         value={newUserName}
                         onChange={(e) => setNewUserName(e.target.value)}
-                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1 text-xs"
+                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-9 flex-1 text-xs"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className="w-24 h-8 bg-brand-surface border-brand-grey/20 flex items-center text-[10px]">
+                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
@@ -2766,22 +2782,22 @@ export default function App() {
                       </Select>
                       <Button 
                         onClick={handleAddUser} 
-                        className="bg-brand-yellow text-brand-blue hover:brightness-110 h-8 px-4 font-black shadow-sm"
+                        className="bg-brand-yellow text-brand-blue hover:brightness-110 h-9 px-4 font-bold shadow-sm"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                        {isSubmitting ? <RefreshCcw className="h-3.5 w-3.5 animate-spin" /> : <UserPlus className="h-4 w-4" />}
                       </Button>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden p-4 pt-0 flex flex-col gap-2">
+                <div className="flex-1 overflow-hidden p-6 pt-0 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">System Users</Label>
                     <span className="text-[8px] font-bold text-brand-grey/40">{users.length} Records</span>
                   </div>
-                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative">
-                  <div className="h-full overflow-y-auto">
+                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative min-h-[150px]">
+                  <ScrollArea className="h-full">
                     <Table className="relative border-separate border-spacing-0">
                       <TableHeader className="sticky top-0 z-50">
                         <TableRow className="bg-brand-light-grey">
@@ -2798,14 +2814,14 @@ export default function App() {
                                   <Input 
                                     value={editingUser?.name || ""}
                                     onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                    className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
+                                    className="h-8 bg-brand-surface border-brand-blue/30 flex-1 text-xs"
                                     autoFocus
                                   />
                                   <Select 
                                     value={editingUser?.title || ""} 
                                     onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                                   >
-                                    <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-blue/30 flex items-center">
+                                    <SelectTrigger className="w-24 h-8 bg-brand-surface border-brand-blue/30 flex items-center text-[10px]">
                                       <SelectValue placeholder="Title...." />
                                     </SelectTrigger>
                                     <SelectContent className="bg-brand-surface">
@@ -2816,47 +2832,47 @@ export default function App() {
                                   </Select>
                                 </div>
                               ) : (
-                              <span className="text-xs">{u.name} {u.title && <span className="text-brand-dark-grey font-black">({u.title})</span>}</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center py-1.5">
-                          <div className="flex justify-center gap-1">
-                            {editingUser?.id === u.id ? (
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-7 w-7 p-0 text-brand-blue"
-                                onClick={handleUpdateUser}
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            ) : (
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
-                                onClick={() => setEditingUser(u)}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                            )}
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                              onClick={() => setUserToDeleteConfirm(u)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                                <span>{u.name} {u.title && <span className="text-brand-dark-grey font-bold">({u.title})</span>}</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-center py-1.5">
+                              <div className="flex justify-center gap-1">
+                                {editingUser?.id === u.id ? (
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-7 w-7 p-0 text-brand-blue"
+                                    onClick={handleUpdateUser}
+                                  >
+                                    <Check className="h-4 w-4" />
+                                  </Button>
+                                ) : (
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                    onClick={() => setEditingUser(u)}
+                                  >
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                )}
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                  onClick={() => setUserToDeleteConfirm(u)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
+                </div>
               </div>
-            </div>
-          </div>
 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
@@ -2876,16 +2892,13 @@ export default function App() {
             <div className="flex flex-col gap-4">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
                 <div className="h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] rotate-[-15deg] select-none z-0">
-                    <h1 className="text-[120px] font-black tracking-tighter text-brand-blue uppercase">PharmaGuard</h1>
-                  </div>
-                  <Table className="relative border-separate border-spacing-0 z-10">
+                  <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
                     <TableHeader className="sticky top-0 z-50">
                       <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Current Stock</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[45%]`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[15%]`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[20%]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[20%]`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3219,19 +3232,16 @@ export default function App() {
             </div>
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
               <div className="h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] rotate-[-15deg] select-none z-0">
-                  <h1 className="text-[120px] font-black tracking-tighter text-brand-blue uppercase">PharmaGuard</h1>
-                </div>
-                <Table className="relative border-separate border-spacing-0 z-10">
+                <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
                   <TableHeader className="sticky top-0 z-50">
                     <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Reference #</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>User</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Reference #</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3351,9 +3361,6 @@ export default function App() {
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
       <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl relative">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] rotate-[-15deg] select-none z-0">
-          <h1 className="text-[120px] font-black tracking-tighter text-brand-blue uppercase">PharmaGuard</h1>
-        </div>
         <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg z-10">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
@@ -3975,7 +3982,7 @@ export default function App() {
             <div className="grid gap-2">
               <Label className="text-[10px] uppercase font-black text-brand-blue/60 tracking-wider text-left">Source Node (Migration Point A)</Label>
               <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
-                <SelectTrigger className="bg-brand-blue/5 border-brand-blue/10 h-12 font-bold text-brand-blue">
+                <SelectTrigger className={`bg-brand-blue/5 border-brand-blue/10 h-12 font-bold ${!migrationSourceId ? 'text-brand-blue/40' : 'text-brand-blue'}`}>
                   <SelectValue placeholder="Select Source Organization..." />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface">
@@ -3997,7 +4004,7 @@ export default function App() {
             <div className="grid gap-2">
               <Label className="text-[10px] uppercase font-black text-brand-blue/60 tracking-wider text-left">Destination Node (Migration Point B)</Label>
               <Select value={migrationDestId} onValueChange={setMigrationDestId}>
-                <SelectTrigger className="bg-brand-blue/5 border-brand-blue/10 h-12 font-bold text-brand-blue">
+                <SelectTrigger className={`bg-brand-blue/5 border-brand-blue/10 h-12 font-bold ${!migrationDestId ? 'text-brand-blue/40' : 'text-brand-blue'}`}>
                   <SelectValue placeholder="Select Destination Organization..." />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface">
