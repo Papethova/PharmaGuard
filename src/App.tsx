@@ -16,6 +16,7 @@ import {
   RefreshCcw,
   Users,
   UserPlus,
+  ArrowLeftRight,
   Edit,
   Trash2,
   LogOut,
@@ -322,6 +323,9 @@ export default function App() {
   const [newUserName, setNewUserName] = useState("");
   const [newUserTitle, setNewUserTitle] = useState("");
   const [editingUser, setEditingUser] = useState<{id: string, name: string, title?: string} | null>(null);
+  const [isMigrateOpen, setIsMigrateOpen] = useState(false);
+  const [migrationSourceId, setMigrationSourceId] = useState("");
+  const [migrationDestId, setMigrationDestId] = useState("");
   const [userToDeleteConfirm, setUserToDeleteConfirm] = useState<{id: string, name: string} | null>(null);
   const [isSuperAdminOpen, setIsSuperAdminOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -1423,14 +1427,14 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-4">
+      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-start">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full"
         >
-          <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden border-none">
-            <div className="bg-brand-blue p-6 py-8 text-center relative overflow-hidden">
+          <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden border-none rounded-t-none">
+            <div className="bg-brand-blue p-4 py-6 text-center relative overflow-hidden">
               <div className="flex justify-center mb-4">
                 <PharmaLogo className="h-16 w-16" />
               </div>
@@ -1440,18 +1444,18 @@ export default function App() {
               </p>
             </div>
 
-            <CardContent className="p-6">
+            <CardContent className="p-4 px-6 pb-6">
               {authMode === "google" ? (
-                <div className="space-y-6">
-                  <div className="text-center space-y-2">
-                    <h2 className="text-lg font-bold text-brand-blue uppercase tracking-tight">Identity Verification Required</h2>
-                    <p className="text-brand-dark-grey/60 text-xs">
+                <div className="space-y-4">
+                  <div className="text-center space-y-1">
+                    <h2 className="text-lg font-bold text-brand-blue uppercase tracking-tight leading-none">Identity Verification Required</h2>
+                    <p className="text-brand-dark-grey/60 text-[10px]">
                       Access to the controlled substance registry is restricted to authorized personnel.
                     </p>
                   </div>
                   
-                  <form onSubmit={handleEmailLogin} className="space-y-4">
-                    <div className="space-y-3">
+                  <form onSubmit={handleEmailLogin} className="space-y-3">
+                    <div className="space-y-2">
                       <div className="space-y-1.5 text-left">
                         <Label className="text-[10px] uppercase font-black text-brand-blue/80">Authorized Email</Label>
                         <Input 
@@ -1526,8 +1530,8 @@ export default function App() {
                   <Button onClick={() => setAuthMode("google")}>Click to Restore Session</Button>
                 </div>
               ) : authMode === "signup" ? (
-                <form onSubmit={handleEmailSignUp} className="space-y-4">
-                  <div className="grid grid-cols-1 gap-3">
+                <form onSubmit={handleEmailSignUp} className="space-y-3">
+                  <div className="grid grid-cols-1 gap-2">
                   <div className="space-y-1.5 text-left">
                     <Label className="text-[10px] uppercase font-black text-brand-blue/80">Organization Name</Label>
                     <Input 
@@ -1794,7 +1798,7 @@ export default function App() {
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
           {/* Background Watermark moved here for stability */}
-          <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
+          <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.05] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
           <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-12 shrink-0 overflow-visible self-start">
@@ -1923,6 +1927,17 @@ export default function App() {
                     </Button>
                   </div>
                 </div>
+              )}
+              {isMasterAdmin && (
+                <Button
+                  onClick={() => setIsMigrateOpen(true)}
+                  className="bg-brand-blue text-brand-yellow hover:brightness-110 gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-base font-black rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] mt-2 group"
+                >
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 group-hover:scale-110 transition-transform">
+                    <ArrowLeftRight className="h-4 w-4 text-brand-blue" strokeWidth={3} />
+                  </div>
+                  Data Migration
+                </Button>
               )}
             </div>
           </aside>
@@ -2085,7 +2100,7 @@ export default function App() {
                               value={newMed.strength} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, strength: e.target.value})} 
                               placeholder="e.g. 10mg" 
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.strength ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2096,7 +2111,7 @@ export default function App() {
                               value={newMed.unit} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, unit: e.target.value})} 
                               placeholder="e.g. Tablets" 
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.unit ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2109,7 +2124,7 @@ export default function App() {
                               value={newMed.ndc} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, ndc: e.target.value})} 
                               placeholder="00000-0000-00" 
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.ndc ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2128,7 +2143,7 @@ export default function App() {
                                 }
                               }} 
                               placeholder="e.g. 100"
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.packageSize ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2141,12 +2156,12 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
-                                <SelectValue placeholder="Select..." className="text-brand-dark-grey/40" />
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-black font-black' : 'text-brand-dark-grey/40'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                                <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
                                 {SCHEDULES.map(s => (
-                                  <SelectItem key={s} value={s} className="pl-3 text-brand-dark-grey font-medium">{s}</SelectItem>
+                                  <SelectItem key={s} value={s} className="pl-3 text-black font-black">{s}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -2762,12 +2777,13 @@ export default function App() {
 
                 <div className="flex-1 overflow-hidden p-6 flex flex-col gap-4">
                   <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
-                  <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-y-auto bg-brand-surface shadow-inner relative">
+                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative">
+                  <ScrollArea className="h-full">
                     <Table className="relative border-separate border-spacing-0">
-                      <TableHeader className="sticky top-0 z-40">
+                      <TableHeader className="sticky top-0 z-50">
                         <TableRow className="bg-brand-light-grey">
-                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Name</TableHead>
-                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Actions</TableHead>
+                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Name</TableHead>
+                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -2835,8 +2851,9 @@ export default function App() {
                         ))}
                       </TableBody>
                     </Table>
-                  </div>
+                  </ScrollArea>
                 </div>
+              </div>
 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
@@ -2854,15 +2871,15 @@ export default function App() {
 
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
             <div className="flex flex-col gap-4">
-              <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px]">
-                <div className="overflow-x-auto h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+              <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
+                <div className="h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
                   <Table className="relative border-separate border-spacing-0">
-                    <TableHeader className="sticky top-0 z-30">
+                    <TableHeader className="sticky top-0 z-50">
                       <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Current Stock</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3194,18 +3211,18 @@ export default function App() {
                 Showing {filteredTransactions.length} transactions
               </div>
             </div>
-            <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px]">
-              <div className="overflow-x-auto h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+            <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
+              <div className="h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
                 <Table className="relative border-separate border-spacing-0">
-                  <TableHeader className="sticky top-0 z-30">
+                  <TableHeader className="sticky top-0 z-50">
                     <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Reference #</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>User</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Reference #</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3910,6 +3927,134 @@ export default function App() {
             disabled={isSubmitting}
           >
             {isSubmitting ? "Saving..." : "Update Details"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={isMigrateOpen} onOpenChange={setIsMigrateOpen}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col">
+        <DialogHeader className="p-6 bg-brand-blue text-white shrink-0">
+          <div className="flex items-center gap-4 text-left">
+            <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
+              <ArrowLeftRight className="h-6 w-6 text-brand-blue" />
+            </div>
+            <div className="flex flex-col gap-0">
+              <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+                Data Migration Utility
+              </DialogTitle>
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
+                TRANSFER REGISTRY DATA BETWEEN NODES
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="p-8 space-y-8">
+          <div className="space-y-4">
+            <div className="grid gap-2">
+              <Label className="text-[10px] uppercase font-black text-brand-blue/60 tracking-wider text-left">Source Node (Migration Point A)</Label>
+              <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
+                <SelectTrigger className="bg-brand-blue/5 border-brand-blue/10 h-12 font-bold text-brand-blue">
+                  <SelectValue placeholder="Select Source Organization..." />
+                </SelectTrigger>
+                <SelectContent className="bg-brand-surface">
+                  {allUserProfiles.map(p => (
+                    <SelectItem key={p.docId} value={p.docId || ""} className="font-medium text-black">
+                      {p.organizationName || p.displayName || p.email} ({p.docId})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex justify-center py-2">
+              <div className="h-10 w-10 rounded-full bg-brand-blue/5 flex items-center justify-center border border-brand-blue/10">
+                <ArrowDown className="h-5 w-5 text-brand-blue" />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label className="text-[10px] uppercase font-black text-brand-blue/60 tracking-wider text-left">Destination Node (Migration Point B)</Label>
+              <Select value={migrationDestId} onValueChange={setMigrationDestId}>
+                <SelectTrigger className="bg-brand-blue/5 border-brand-blue/10 h-12 font-bold text-brand-blue">
+                  <SelectValue placeholder="Select Destination Organization..." />
+                </SelectTrigger>
+                <SelectContent className="bg-brand-surface">
+                  {allUserProfiles.map(p => (
+                    <SelectItem key={p.docId} value={p.docId || ""} className="font-medium text-black">
+                      {p.organizationName || p.displayName || p.email} ({p.docId})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="bg-brand-yellow/10 border border-brand-yellow/20 p-4 rounded-xl space-y-2">
+            <div className="flex items-center gap-2 text-brand-blue">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-tight">Destructive Operation Warning</span>
+            </div>
+            <p className="text-[10px] text-brand-blue/70 font-medium leading-relaxed text-left">
+              This utility will recursively copy all inventory substances, transaction history records, and staff profiles from Point A to Point B. Data in Point A will remain intact unless manually purged.
+            </p>
+          </div>
+        </div>
+
+        <DialogFooter className="p-6 pt-0 flex flex-col gap-3 shrink-0">
+          <Button 
+            onClick={async () => {
+              if (!migrationSourceId || !migrationDestId) {
+                toast.error("Source and Destination nodes must be selected");
+                return;
+              }
+              if (migrationSourceId === migrationDestId) {
+                toast.error("Source and Destination cannot be the same node");
+                return;
+              }
+
+              setIsActionPending(true);
+              try {
+                const collectionsToMigrate = ["substances", "transactions", "staff"];
+                let totalCopied = 0;
+
+                for (const collName of collectionsToMigrate) {
+                  const sourceColl = collection(db, "users", migrationSourceId, collName);
+                  const destColl = collection(db, "users", migrationDestId, collName);
+                  const snapshot = await getDocs(sourceColl);
+                  
+                  const docs = snapshot.docs;
+                  for (let i = 0; i < docs.length; i += 500) {
+                    const batch = writeBatch(db);
+                    const chunk = docs.slice(i, i + 500);
+                    chunk.forEach(d => {
+                      batch.set(doc(destColl, d.id), d.data());
+                      totalCopied++;
+                    });
+                    await batch.commit();
+                  }
+                }
+
+                toast.success(`Migration Successful: ${totalCopied} records consolidated into ${migrationDestId}`);
+                setIsMigrateOpen(false);
+              } catch (e: any) {
+                toast.error(`Migration Failed: ${e.message}`);
+              } finally {
+                setIsActionPending(false);
+              }
+            }} 
+            disabled={isActionPending || !migrationSourceId || !migrationDestId}
+            className="w-full h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 shadow-lg shadow-brand-blue/20 rounded-xl"
+          >
+            {isActionPending ? <RefreshCcw className="h-5 w-5 animate-spin" /> : "Initiate Data Migration"}
+          </Button>
+          <Button 
+            variant="ghost"
+            onClick={() => setIsMigrateOpen(false)} 
+            className="w-full h-10 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-blue/40"
+          >
+            Abort Utility
           </Button>
         </DialogFooter>
       </DialogContent>
