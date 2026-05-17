@@ -13,6 +13,8 @@ import {
   X,
   Pill,
   ArrowDown,
+  ArrowRight,
+  ArrowLeft,
   RefreshCcw,
   Users,
   UserPlus,
@@ -568,52 +570,27 @@ export default function App() {
     let unsubProfile: (() => void) | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
-      // Set Auth Ready state as soon as we get even a null response
       setUser(currentUser);
       
       try {
         if (currentUser) {
-          // Identity Recovery & Profile Synchronization
           const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
           const userDocRef = doc(db, "users", emailId);
           
-          let userDoc = await getDoc(userDocRef).catch((e) => {
-             console.warn("Initial user doc fetch failed:", e);
-             return null;
-          });
+          let userDoc = await getDoc(userDocRef);
 
-          // 1. Identity Recovery: Handle UID-based legacy records migrating to Email identifier
-          if (currentUser.uid !== emailId) {
-            try {
-              const legacyDoc = await getDoc(doc(db, "users", currentUser.uid));
-              if (legacyDoc.exists()) {
-                const legacySubstances = await getDocs(collection(db, "users", currentUser.uid, "substances"));
-                const currentSubstances = await getDocs(collection(db, "users", emailId, "substances"));
-                
-                if (legacySubstances.size > 0 && currentSubstances.size === 0) {
-                  const batch = writeBatch(db);
-                  if (!userDoc?.exists()) {
-                    batch.set(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
-                  }
-                  for (const s of legacySubstances.docs) batch.set(doc(db, "users", emailId, "substances", s.id), s.data());
-                  const legacyTx = await getDocs(collection(db, "users", currentUser.uid, "transactions"));
-                  for (const t of legacyTx.docs) batch.set(doc(db, "users", emailId, "transactions", t.id), t.data());
-                  const legacyStaff = await getDocs(collection(db, "users", currentUser.uid, "staff"));
-                  for (const s of legacyStaff.docs) batch.set(doc(db, "users", emailId, "staff", s.id), s.data());
-                  await batch.commit();
-                  toast.success("Identity Unification Successful");
-                  userDoc = await getDoc(userDocRef);
-                } else if (!userDoc?.exists()) {
-                  await setDoc(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
-                  userDoc = await getDoc(userDocRef);
-                }
-              }
-            } catch (e) {
-              console.warn("Migration Assistant deferred:", e);
-            }
+          if (emailId === MASTER_ADMIN_EMAIL.toLowerCase()) {
+             const legacyRef = doc(db, "users", currentUser.uid);
+             const legacyDoc = await getDoc(legacyRef);
+             if (legacyDoc.exists() && currentUser.uid !== emailId) {
+               const batch = writeBatch(db);
+               batch.set(userDocRef, { ...legacyDoc.data(), updatedAt: serverTimestamp() }, { merge: true });
+               batch.delete(legacyRef);
+               await batch.commit();
+               userDoc = await getDoc(userDocRef);
+             }
           }
 
-          // 2. Profile Creation for New Users
           if (!userDoc || !userDoc.exists()) {
             const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
             const newProfile: UserProfile = {
@@ -629,16 +606,13 @@ export default function App() {
             };
             await setDoc(userDocRef, newProfile);
           } else if (currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && userDoc.data()?.status !== 'active') {
-            // Master Admin Authority Verification
             await updateDoc(userDocRef, { status: 'active', role: 'admin' });
           }
 
-          // 3. Real-time profile listener on the stable primary identifier
           if (unsubProfile) unsubProfile();
           unsubProfile = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
-              const data = doc.data() as UserProfile;
-              setUserProfile(data);
+              setUserProfile(doc.data() as UserProfile);
             }
           }, (error) => {
             handleFirestoreError(error, OperationType.GET, `users/${emailId}`);
@@ -650,7 +624,6 @@ export default function App() {
       } catch (error) {
         console.error("Auth state processing error:", error);
       } finally {
-        // ALWAYS mark as ready even if profile loading failed
         setIsAuthReady(true);
         setIsInitializing(false);
       }
@@ -1234,19 +1207,12 @@ export default function App() {
   }, [selectedSubstance, inventory]);
 
   // Derived Data
-  const filteredUserProfiles = useMemo(() => {
-    // Collect all raw records first for absolute transparency in debug
+  const filteredProfiles = useMemo(() => {
     const results: UserProfile[] = [];
     const seenEmails = new Set<string>();
-    
-    const activeDocId = (user?.email?.toLowerCase() || user?.uid || "").toLowerCase();
 
     allUserProfiles.forEach(p => {
-      const emailLower = (p.email || "").toLowerCase().trim();
-      
-      // EXCLUSION: COMPLETELY hide any record belonging to the Master Admin
-      // This includes the unified node and any legacy UID nodes that share the email.
-      if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return;
+      const emailLower = (p.email || "").toLowerCase();
 
       // Deduplication: If we have multiple entries for the same customer email
       if (emailLower && seenEmails.has(emailLower)) {
@@ -1434,23 +1400,25 @@ export default function App() {
           className="max-w-md w-full"
         >
           <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl">
-            <div className="bg-brand-blue p-4 py-8 text-center relative overflow-hidden rounded-t-xl">
-              <div className="flex justify-center mb-4">
-                <PharmaLogo className="h-16 w-16" />
+            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden rounded-t-xl">
+              <div className="flex justify-center mb-6">
+                <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
+                  <PharmaLogo className="h-12 w-12" />
+                </div>
               </div>
-              <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
-              <p className="text-brand-yellow font-bold text-[10px] uppercase tracking-[0.15em] mt-1">
-                SECURE CONTROLLED SUBSTANCE PERPETUAL INVENTORY SYSTEM
+              <h1 className="text-3xl font-black text-white tracking-tighter leading-none mt-2">PharmaGuard</h1>
+              <p className="text-brand-yellow font-black text-[10px] uppercase tracking-[0.2em] mt-3">
+                SECURE CONTROLLED SUBSTANCE REGISTRY
               </p>
             </div>
 
             <CardContent className="p-4 px-6 pb-6">
               {authMode === "google" ? (
-                <div className="space-y-4">
-                  <div className="text-center space-y-1">
-                    <h2 className="text-lg font-bold text-brand-blue uppercase tracking-tight leading-none">Identity Verification Required</h2>
-                    <p className="text-brand-dark-grey/60 text-[10px]">
-                      Access to the controlled substance registry is restricted to authorized personnel.
+                <div className="space-y-6">
+                  <div className="p-5 bg-brand-blue/5 border border-brand-blue/10 rounded-2xl text-center space-y-2">
+                    <h2 className="text-lg font-black text-brand-blue uppercase tracking-tight leading-none">Authorization Required</h2>
+                    <p className="text-brand-grey font-bold text-[10px] uppercase tracking-widest leading-relaxed">
+                      This terminal is restricted to credentialed staff only.
                     </p>
                   </div>
                   
@@ -1783,7 +1751,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12">
+      <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 overflow-x-hidden">
         <Tabs 
           value={currentTab} 
           orientation="vertical"
@@ -1797,10 +1765,6 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
-          {/* Background Watermark moved here for stability */}
-          <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.05] overflow-hidden z-0">
-            <PharmaLogo className="h-[800px] w-[800px]" />
-          </div>
           <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-12 shrink-0 overflow-visible self-start">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
@@ -1927,17 +1891,6 @@ export default function App() {
                     </Button>
                   </div>
                 </div>
-              )}
-              {isMasterAdmin && (
-                <Button
-                  onClick={() => setIsMigrateOpen(true)}
-                  className="bg-brand-blue text-brand-yellow hover:brightness-110 gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-base font-black rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] mt-2 group"
-                >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 group-hover:scale-110 transition-transform">
-                    <ArrowLeftRight className="h-4 w-4 text-brand-blue" strokeWidth={3} />
-                  </div>
-                  Data Migration
-                </Button>
               )}
             </div>
           </aside>
@@ -2891,14 +2844,14 @@ export default function App() {
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
             <div className="flex flex-col gap-4">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
-                <div className="h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
+                <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
                   <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
-                    <TableHeader className="sticky top-0 z-50">
-                      <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[45%]`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[15%]`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[20%]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10 w-[20%]`}>Current Stock</TableHead>
+                    <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
+                      <TableRow className="bg-brand-light-grey border-none">
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[45%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[15%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3231,17 +3184,17 @@ export default function App() {
               </div>
             </div>
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
-              <div className="h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
+              <div className="h-[calc(100vh-320px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
                 <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
-                  <TableHeader className="sticky top-0 z-50">
-                    <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Reference #</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>User</TableHead>
+                  <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
+                    <TableRow className="bg-brand-light-grey border-none">
+                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Ref #</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3360,7 +3313,7 @@ export default function App() {
 
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl relative">
+      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full max-h-[90vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg z-10">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
@@ -3391,7 +3344,7 @@ export default function App() {
                 <div className="flex flex-col">
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Registry Synchronization Status</span>
                   <span className="text-xs font-black text-brand-blue/80 tracking-tight">
-                    {filteredUserProfiles.length} Managed Customer Nodes Registered
+                    {filteredProfiles.length} Managed Customer Nodes Registered
                   </span>
                 </div>
               </div>
@@ -3462,8 +3415,8 @@ export default function App() {
             <div className="flex-1 overflow-y-auto">
               <table className="w-full table-fixed">
                 <tbody className="divide-y divide-brand-blue/5">
-                  {filteredUserProfiles.length > 0 ? (
-                    filteredUserProfiles.map((profile) => (
+                  {filteredProfiles.length > 0 ? (
+                    filteredProfiles.map((profile) => (
                       <tr key={profile.docId || profile.uid} className="hover:bg-brand-blue/5 transition-colors h-14">
                         <td className="py-2 px-4 w-[80%]">
                           <div className="flex flex-col gap-0 min-w-0">
@@ -3575,17 +3528,19 @@ export default function App() {
           </div>
             <div className="flex gap-2">
               <Button 
-                variant="outline" 
+                variant="default" 
                 onClick={() => setIsMigrateOpen(true)}
-                className="text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue hover:text-white px-4 h-9 rounded-lg transition-all flex gap-2 items-center"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-4 h-10 rounded-lg transition-all flex gap-3 items-center shadow-lg group"
               >
-                <ArrowLeftRight className="h-3.5 w-3.5" />
+                <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                  <ArrowRight className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                </div>
                 Data Migration
               </Button>
               <Button 
                 variant="default" 
                 onClick={() => setIsSuperAdminOpen(false)}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-6 h-9 rounded-lg transition-all"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-6 h-10 rounded-lg transition-all"
               >
                 Disconnect Terminal
               </Button>
@@ -3960,76 +3915,104 @@ export default function App() {
     </Dialog>
 
     <Dialog open={isMigrateOpen} onOpenChange={setIsMigrateOpen}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col">
-        <DialogHeader className="p-6 bg-brand-blue text-white shrink-0">
-          <div className="flex items-center gap-4 text-left">
-            <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
-              <ArrowLeftRight className="h-6 w-6 text-brand-blue" />
+      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+        <DialogHeader className="p-6 bg-brand-blue text-white shrink-0 relative overflow-hidden">
+          <div className="flex items-center gap-4 text-left relative z-10">
+            <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-white/20">
+              <ArrowRight className="h-7 w-7 text-brand-blue" strokeWidth={3} />
             </div>
             <div className="flex flex-col gap-0">
               <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
-                Data Migration Utility
+                Data Consolidator
               </DialogTitle>
               <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
-                TRANSFER REGISTRY DATA BETWEEN NODES
+                NODE-TO-NODE REGISTRY TRANSFER UTILITY
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="p-8 space-y-8">
-          <div className="space-y-4">
-            <div className="grid gap-2">
-              <Label className="text-[10px] uppercase font-black text-brand-blue/60 tracking-wider text-left">Source Node (Migration Point A)</Label>
-              <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
-                <SelectTrigger className={`bg-brand-blue/5 border-brand-blue/10 h-12 font-bold ${!migrationSourceId ? 'text-brand-blue/40' : 'text-brand-blue'}`}>
-                  <SelectValue placeholder="Select Source Organization..." />
-                </SelectTrigger>
-                <SelectContent className="bg-brand-surface">
-                  {allUserProfiles.map(p => (
-                    <SelectItem key={p.docId} value={p.docId || ""} className="font-medium text-black">
-                      {p.organizationName || p.displayName || p.email} ({p.docId})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-center py-2">
-              <div className="h-10 w-10 rounded-full bg-brand-blue/5 flex items-center justify-center border border-brand-blue/10">
-                <ArrowDown className="h-5 w-5 text-brand-blue" />
+        <div className="p-8 space-y-8 bg-brand-blue/5">
+          <div className="space-y-6">
+            <div className="grid gap-3">
+              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Point A: Source Records</Label>
+              <div className="relative">
+                <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
+                  <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationSourceId ? 'text-brand-blue/30' : 'text-brand-blue'}`}>
+                    <SelectValue placeholder="Begin Typable Search..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">
+                    <div className="p-2 border-b border-brand-blue/5">
+                      <Input 
+                        placeholder="Search Organizations..." 
+                        autoFocus
+                        className="h-9 text-xs border-none focus-visible:ring-0 shadow-none bg-brand-blue/5"
+                        onKeyDown={(e) => e.stopPropagation()}
+                        onChange={(e) => {
+                          const term = e.target.value.toLowerCase();
+                          setAllUserProfiles(prev => [...prev]); // Trigger re-render if using local filtering
+                          setUserSearchTerm(term);
+                        }}
+                      />
+                    </div>
+                    <ScrollArea className="h-[200px]">
+                      {filteredProfiles.map(p => (
+                        <SelectItem key={p.docId} value={p.docId || ""} className="font-bold text-brand-blue py-3 px-4 hover:bg-brand-blue/5">
+                          {p.organizationName || p.displayName || p.email}
+                        </SelectItem>
+                      ))}
+                    </ScrollArea>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label className="text-[10px] uppercase font-black text-brand-blue/60 tracking-wider text-left">Destination Node (Migration Point B)</Label>
+            <div className="flex justify-center py-0 relative h-10">
+              <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-brand-blue/10 -translate-y-1/2" />
+              <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center border-2 border-white shadow-md relative z-10">
+                <ArrowDown className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+              </div>
+            </div>
+
+            <div className="grid gap-3">
+              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Point B: Destination Buffer</Label>
               <Select value={migrationDestId} onValueChange={setMigrationDestId}>
-                <SelectTrigger className={`bg-brand-blue/5 border-brand-blue/10 h-12 font-bold ${!migrationDestId ? 'text-brand-blue/40' : 'text-brand-blue'}`}>
-                  <SelectValue placeholder="Select Destination Organization..." />
+                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationDestId ? 'text-brand-blue/30' : 'text-brand-blue'}`}>
+                  <SelectValue placeholder="Begin Typable Search..." />
                 </SelectTrigger>
-                <SelectContent className="bg-brand-surface">
-                  {allUserProfiles.map(p => (
-                    <SelectItem key={p.docId} value={p.docId || ""} className="font-medium text-black">
-                      {p.organizationName || p.displayName || p.email} ({p.docId})
-                    </SelectItem>
-                  ))}
+                <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">
+                  <div className="p-2 border-b border-brand-blue/5">
+                    <Input 
+                      placeholder="Search Organizations..." 
+                      className="h-9 text-xs border-none focus-visible:ring-0 shadow-none bg-brand-blue/5"
+                      onKeyDown={(e) => e.stopPropagation()}
+                      onChange={(e) => setUserSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <ScrollArea className="h-[200px]">
+                    {filteredProfiles.map(p => (
+                      <SelectItem key={p.docId} value={p.docId || ""} className="font-bold text-brand-blue py-3 px-4 hover:bg-brand-blue/5">
+                        {p.organizationName || p.displayName || p.email}
+                      </SelectItem>
+                    ))}
+                  </ScrollArea>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="bg-brand-yellow/10 border border-brand-yellow/20 p-4 rounded-xl space-y-2">
+          <div className="bg-white border border-brand-blue/10 p-5 rounded-2xl space-y-2 shadow-inner">
             <div className="flex items-center gap-2 text-brand-blue">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-tight">Destructive Operation Warning</span>
+              <AlertTriangle className="h-4 w-4 fill-brand-yellow stroke-brand-blue" />
+              <span className="text-[10px] font-black uppercase tracking-tight">Administrative Override Warning</span>
             </div>
-            <p className="text-[10px] text-brand-blue/70 font-medium leading-relaxed text-left">
-              This utility will recursively copy all inventory substances, transaction history records, and staff profiles from Point A to Point B. Data in Point A will remain intact unless manually purged.
+            <p className="text-[10px] text-brand-blue/60 font-bold leading-relaxed text-center">
+              THIS RECURSIVE OPERATION WILL CLONE ALL CATALOG DATA, STAFF RECORDS, AND HISTORICAL LOGS INTO THE DESTINATION TERMINAL.
             </p>
           </div>
         </div>
 
-        <DialogFooter className="p-6 pt-0 flex flex-col gap-3 shrink-0">
+        <DialogFooter className="p-6 pt-0 bg-brand-blue/5 flex flex-col gap-3 shrink-0">
           <Button 
             onClick={async () => {
               if (!migrationSourceId || !migrationDestId) {
