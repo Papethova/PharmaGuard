@@ -12,7 +12,15 @@
   --color-brand-light-grey: #f0f4f9;
   --color-brand-dark-grey: #1a202c;
   --color-brand-surface: #ffffff;
-  --color-muted-foreground: color-mix(in srgb, var(--color-brand-dark-grey), transparent 70%);
+  --color-muted-foreground: color-mix(in srgb, var(--color-brand-dark-grey), transparent 80%);
+}
+
+@layer base {
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-muted-foreground) !important;
+    opacity: 0.5 !important;
+  }
 }
 
 @layer components {

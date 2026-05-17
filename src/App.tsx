@@ -491,6 +491,24 @@ export default function App() {
     }
   }, [isLogOpen, transactionType, transactions, referenceNumber]);
 
+  // Sync newMed with selectedSubstance for "Add" window
+  useEffect(() => {
+    if (selectedSubstance) {
+      const s = inventory.find(i => i.id === selectedSubstance);
+      if (s) {
+        setNewMed({
+          name: s.name,
+          strength: s.strength,
+          schedule: s.schedule,
+          ndc: s.ndc,
+          unit: s.unit,
+          packageSize: s.packageSize.toString(),
+          minThreshold: s.minThreshold.toString()
+        });
+      }
+    }
+  }, [selectedSubstance, inventory]);
+
   // New Medication Form state
   const [newMed, setNewMed] = useState({
     name: "",
@@ -1125,7 +1143,7 @@ export default function App() {
     setNewMed({
       name: "",
       strength: "",
-      schedule: "" as any,
+      schedule: undefined as any,
       ndc: "",
       unit: "",
       packageSize: "",
@@ -1430,10 +1448,10 @@ export default function App() {
                         <Label className="text-[10px] uppercase font-black text-brand-blue/80">Authorized Email</Label>
                         <Input 
                           type="email" 
-                          placeholder="e.g. pharmacist@hospital.com"
+                          placeholder=""
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue placeholder:text-brand-dark-grey/30"
+                          className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue"
                           required
                         />
                       </div>
@@ -1453,10 +1471,10 @@ export default function App() {
                         </div>
                         <Input 
                           type="password" 
-                          placeholder="••••••••"
+                          placeholder=""
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue placeholder:text-brand-dark-grey/30"
+                          className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue"
                           required
                         />
                       </div>
@@ -1516,10 +1534,10 @@ export default function App() {
                       <Label className="text-[10px] uppercase font-black text-brand-blue/80">Email</Label>
                       <Input 
                         type="email" 
-                        placeholder="drsmith@ucla.edu"
+                        placeholder="e.g. drsmith@ucla.edu"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="h-10 border-brand-blue/10"
+                        className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30"
                         required
                       />
                     </div>
@@ -1530,7 +1548,7 @@ export default function App() {
                         placeholder="Minimum 6 characters"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="h-10 border-brand-blue/10"
+                        className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30"
                         required
                         minLength={6}
                       />
@@ -1771,7 +1789,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.02] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-24 shrink-0 overflow-visible">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-24 shrink-0 overflow-visible self-start">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -1939,7 +1957,7 @@ export default function App() {
                                   setNewMed({
                                     name: "",
                                     strength: "",
-                                    schedule: "" as any,
+                                    schedule: undefined as any,
                                     ndc: "",
                                     unit: "",
                                     packageSize: "",
@@ -2137,7 +2155,7 @@ export default function App() {
                             I confirm that the current physical count of:<br/>
                             <div className="py-1">
                               <span className="font-black text-brand-blue block text-sm">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength}</span>
-                              <span className="text-[10px] text-brand-blue font-bold opacity-60 block mt-0.5">NDC: {selectedSubstanceDetail?.ndc}</span>
+                              <span className="text-xs text-brand-blue font-black block mt-0.5">NDC: {selectedSubstanceDetail?.ndc}</span>
                             </div>
                             matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
                           </div>
@@ -2698,11 +2716,11 @@ export default function App() {
                     <div className="space-y-4">
                       <Label className="text-sm font-bold text-brand-dark-grey">System Users</Label>
                       <div className="border border-brand-grey/20 rounded-lg overflow-hidden max-h-[calc(100vh-450px)] min-h-[200px] overflow-y-auto bg-brand-surface shadow-inner">
-                        <Table>
-                          <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
-                            <TableRow>
-                              <TableHead className={tableHeadClass}>Name</TableHead>
-                              <TableHead className={`${tableHeadClass} text-center`}>Actions</TableHead>
+                        <Table className="relative border-separate border-spacing-0">
+                          <TableHeader className="sticky top-0 z-10">
+                            <TableRow className="bg-brand-light-grey">
+                              <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Name</TableHead>
+                              <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10`}>Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -2793,13 +2811,13 @@ export default function App() {
             <div className="flex flex-col gap-4">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface">
                 <div className="overflow-x-auto max-h-[calc(100vh-280px)] overflow-y-auto">
-                  <Table>
-                    <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
-                      <TableRow>
-                        <TableHead className={tableHeadClass}>Medication & Strength</TableHead>
-                        <TableHead className={tableHeadClass}>Schedule</TableHead>
-                        <TableHead className={tableHeadClass}>NDC</TableHead>
-                        <TableHead className={tableHeadClass}>Current Stock</TableHead>
+                  <Table className="relative border-separate border-spacing-0">
+                    <TableHeader className="sticky top-0 z-10">
+                      <TableRow className="bg-brand-light-grey">
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3133,16 +3151,16 @@ export default function App() {
             </div>
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface">
               <div className="overflow-x-auto max-h-[calc(100vh-320px)] overflow-y-auto">
-                <Table>
-                  <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
-                    <TableRow>
-                      <TableHead className={`${tableHeadClass} w-[140px]`}>Timestamp</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[110px]`}>Reference #</TableHead>
-                      <TableHead className={tableHeadClass}>Medication & Strength</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[120px]`}>NDC</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[90px]`}>Type</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[70px]`}>Qty</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[130px]`}>User</TableHead>
+                <Table className="relative border-separate border-spacing-0">
+                  <TableHeader className="sticky top-0 z-10">
+                    <TableRow className="bg-brand-light-grey">
+                      <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10`}>Timestamp</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10`}>Reference #</TableHead>
+                      <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Medication & Strength</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10`}>NDC</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10`}>Type</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10`}>Qty</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
