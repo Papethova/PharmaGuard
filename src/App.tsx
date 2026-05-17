@@ -510,10 +510,18 @@ export default function App() {
   }, [selectedSubstance, inventory]);
 
   // New Medication Form state
-  const [newMed, setNewMed] = useState({
+  const [newMed, setNewMed] = useState<{
+    name: string;
+    strength: string;
+    schedule: Schedule | "";
+    ndc: string;
+    unit: string;
+    packageSize: string;
+    minThreshold: string;
+  }>({
     name: "",
     strength: "",
-    schedule: "" as any as Schedule,
+    schedule: "",
     ndc: "",
     unit: "",
     packageSize: "",
@@ -1143,7 +1151,7 @@ export default function App() {
     setNewMed({
       name: "",
       strength: "",
-      schedule: undefined as any,
+      schedule: "",
       ndc: "",
       unit: "",
       packageSize: "",
@@ -1773,7 +1781,7 @@ export default function App() {
 
       <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12">
         <Tabs 
-          value={isUserManagementOpen ? "users" : currentTab} 
+          value={currentTab} 
           orientation="vertical"
           onValueChange={(val) => { 
             if (val === 'users') {
@@ -1783,7 +1791,7 @@ export default function App() {
               setIsUserManagementOpen(false); 
             }
           }} 
-          className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative"
+          className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
           {/* Background Watermark moved here for stability */}
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.02] overflow-hidden z-0">
@@ -1869,6 +1877,10 @@ export default function App() {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="users" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsUserManagementOpen(true);
+                  }}
                   className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
@@ -1876,6 +1888,7 @@ export default function App() {
                   </div>
                   <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
                 </TabsTrigger>
+                <TabsContent value="users" className="hidden" />
               </TabsList>
               {user && (
                 <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-9">
@@ -1957,7 +1970,7 @@ export default function App() {
                                   setNewMed({
                                     name: "",
                                     strength: "",
-                                    schedule: undefined as any,
+                                    schedule: "",
                                     ndc: "",
                                     unit: "",
                                     packageSize: "",
@@ -2107,7 +2120,7 @@ export default function App() {
                           <div className="grid gap-1.5">
                             <Label htmlFor="new-schedule" className="text-brand-dark-grey text-xs">Schedule</Label>
                             <Select 
-                              value={newMed.schedule === "" ? undefined : newMed.schedule} 
+                              value={newMed.schedule || ""} 
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
@@ -2644,29 +2657,29 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
-                <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
-                  <div className="flex items-center gap-4 relative z-10 text-left">
-                    <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-                      <Users className="h-6 w-6 text-brand-blue" />
+              <DialogContent showCloseButton={false} className="sm:max-w-[700px] h-[750px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+                <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0">
+                  <div className="flex items-center gap-3 relative z-10">
+                    <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+                      <Users className="h-5 w-5 text-brand-blue" strokeWidth={3} />
                     </div>
-                    <div className="flex flex-col gap-0">
+                    <div className="flex flex-col gap-0 text-left">
                       <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                        ADD, EDIT, OR REMOVE AUTHORIZED USERS FOR THIS SYSTEM.
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
+                        SYSTEM ACCESS CONTROLS
                       </DialogDescription>
                     </div>
                   </div>
                 </DialogHeader>
-
-                <ScrollArea className="flex-1 overflow-y-auto">
-                  <div className="p-6 space-y-8">
+                
+                <div className="p-6 pb-2 shrink-0 bg-brand-blue/5 border-b border-brand-blue/10">
+                  <div className="space-y-6">
                     <div className="space-y-4">
-                      <Label className="text-sm font-bold text-brand-dark-grey">System Configuration</Label>
+                      <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
                       <div 
-                        className="flex items-center justify-between p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                        className="flex items-center justify-between p-4 bg-brand-surface rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                         onClick={togglePhotoRequirement}
                       >
                         <div className="flex items-center gap-4">
@@ -2684,17 +2697,17 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <Label className="text-sm font-bold text-brand-dark-grey">Add New User</Label>
-                      <div className="flex gap-2 items-center">
+                    <div className="grid gap-3 p-3 border border-brand-blue/20 rounded-lg bg-brand-surface shadow-sm">
+                      <Label className="text-brand-dark-grey text-[10px] font-bold uppercase tracking-wider">Add New Staff Member</Label>
+                      <div className="flex gap-2">
                         <Input 
                           placeholder="Name..." 
                           value={newUserName}
                           onChange={(e) => setNewUserName(e.target.value)}
-                          className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1"
+                          className="bg-brand-surface border-brand-blue/10 h-10 flex-1 font-bold"
                         />
                         <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                          <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-grey/20 flex items-center">
+                          <SelectTrigger className="w-28 h-10 bg-brand-surface border-brand-blue/10">
                             <SelectValue placeholder="Title...." />
                           </SelectTrigger>
                           <SelectContent className="bg-brand-surface">
@@ -2705,93 +2718,95 @@ export default function App() {
                         </Select>
                         <Button 
                           onClick={handleAddUser} 
-                          className="bg-brand-yellow text-brand-blue hover:brightness-110 h-8 px-4 font-black shadow-sm"
+                          className="bg-brand-yellow text-brand-blue hover:brightness-110 h-10 px-4 font-black shadow-sm"
                           disabled={isSubmitting}
                         >
-                          {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
+                          {isSubmitting ? <RefreshCcw className="h-5 w-5 animate-spin" /> : <UserPlus className="h-6 w-6" />}
                         </Button>
                       </div>
                     </div>
-
-                    <div className="space-y-4">
-                      <Label className="text-sm font-bold text-brand-dark-grey">System Users</Label>
-                      <div className="border border-brand-grey/20 rounded-lg overflow-hidden max-h-[calc(100vh-450px)] min-h-[200px] overflow-y-auto bg-brand-surface shadow-inner">
-                        <Table className="relative border-separate border-spacing-0">
-                          <TableHeader className="sticky top-0 z-10">
-                            <TableRow className="bg-brand-light-grey">
-                              <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Name</TableHead>
-                              <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10`}>Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {users.map((u) => (
-                              <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                                <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
-                                  {editingUser?.id === u.id ? (
-                                    <div className="flex gap-2 items-center">
-                                      <Input 
-                                        value={editingUser?.name || ""}
-                                        onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                        className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
-                                        autoFocus
-                                      />
-                                      <Select 
-                                        value={editingUser?.title || ""} 
-                                        onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
-                                      >
-                                        <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-blue/30 flex items-center">
-                                          <SelectValue placeholder="Title...." />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-brand-surface">
-                                          <SelectItem value="PIC">PIC</SelectItem>
-                                          <SelectItem value="RPh">RPh</SelectItem>
-                                          <SelectItem value="Tech">Tech</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                  ) : (
-                                    <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
-                                  )}
-                                </TableCell>
-                                <TableCell className="text-center py-3">
-                                  <div className="flex justify-center gap-1">
-                                    {editingUser?.id === u.id ? (
-                                      <Button 
-                                        size="sm" 
-                                        variant="ghost" 
-                                        className="h-8 w-8 p-0 text-brand-blue"
-                                        onClick={handleUpdateUser}
-                                      >
-                                        <PlusCircle className="h-4 w-4" />
-                                      </Button>
-                                    ) : (
-                                      <Button 
-                                        size="sm" 
-                                        variant="ghost" 
-                                        className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
-                                        onClick={() => setEditingUser(u)}
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                    )}
-                                    <Button 
-                                      size="sm" 
-                                      variant="ghost" 
-                                      className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                                      onClick={() => setUserToDeleteConfirm(u)}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </div>
                   </div>
-                </ScrollArea>
+                </div>
+
+                <div className="flex-1 overflow-hidden p-6 flex flex-col gap-4">
+                  <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">Authorized Personnel</Label>
+                  <div className="flex-1 border border-brand-grey/20 rounded-xl overflow-y-auto bg-brand-surface shadow-inner relative">
+                    <Table className="relative border-separate border-spacing-0">
+                      <TableHeader className="sticky top-0 z-20">
+                        <TableRow className="bg-brand-light-grey">
+                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-20 h-12`}>Name & Title</TableHead>
+                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-20 h-12`}>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {users.map((u) => (
+                          <TableRow key={u.id} className="hover:bg-brand-blue/5 h-14">
+                            <TableCell className="font-bold text-brand-dark-grey py-3 text-center">
+                              {editingUser?.id === u.id ? (
+                                <div className="flex gap-2 items-center px-2">
+                                  <Input 
+                                    value={editingUser?.name || ""}
+                                    onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
+                                    className="h-9 bg-brand-surface border-brand-blue/30 flex-1 font-bold"
+                                    autoFocus
+                                  />
+                                  <Select 
+                                    value={editingUser?.title || ""} 
+                                    onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
+                                  >
+                                    <SelectTrigger className="w-28 h-9 bg-brand-surface border-brand-blue/30 flex items-center shrink-0">
+                                      <SelectValue placeholder="Title...." />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-brand-surface">
+                                      <SelectItem value="PIC">PIC</SelectItem>
+                                      <SelectItem value="RPh">RPh</SelectItem>
+                                      <SelectItem value="Tech">Tech</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center">
+                                  <span className="text-sm font-black text-brand-dark-grey">{u.name}</span>
+                                  {u.title && <span className="text-[10px] text-brand-blue font-bold bg-brand-blue/10 px-2 rounded-full uppercase mt-1">{u.title}</span>}
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-center py-3">
+                              <div className="flex justify-center gap-2">
+                                {editingUser?.id === u.id ? (
+                                  <Button 
+                                    size="sm" 
+                                    className="h-10 w-10 p-0 bg-brand-blue text-white hover:brightness-110 shadow-sm"
+                                    onClick={handleUpdateUser}
+                                  >
+                                    <PlusCircle className="h-5 w-5" />
+                                  </Button>
+                                ) : (
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    className="h-10 w-10 p-0 text-brand-blue border-brand-blue/20 hover:bg-brand-blue/5"
+                                    onClick={() => setEditingUser(u)}
+                                  >
+                                    <Edit className="h-5 w-5" />
+                                  </Button>
+                                )}
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-10 w-10 p-0 text-brand-blue/40 border-brand-blue/10 hover:text-red-500 hover:border-red-500/20"
+                                  onClick={() => setUserToDeleteConfirm(u)}
+                                >
+                                  <Trash2 className="h-5 w-5" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
@@ -2812,12 +2827,12 @@ export default function App() {
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface">
                 <div className="overflow-x-auto max-h-[calc(100vh-280px)] overflow-y-auto">
                   <Table className="relative border-separate border-spacing-0">
-                    <TableHeader className="sticky top-0 z-10">
+                    <TableHeader className="sticky top-0 z-30">
                       <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Current Stock</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3154,13 +3169,13 @@ export default function App() {
                 <Table className="relative border-separate border-spacing-0">
                   <TableHeader className="sticky top-0 z-10">
                     <TableRow className="bg-brand-light-grey">
-                      <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10`}>Timestamp</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10`}>Reference #</TableHead>
-                      <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10`}>Medication & Strength</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10`}>NDC</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10`}>Type</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10`}>Qty</TableHead>
-                      <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10`}>User</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Reference #</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
