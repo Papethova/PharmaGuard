@@ -1186,6 +1186,23 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    if (selectedSubstance) {
+      const s = inventory.find(i => i.id === selectedSubstance);
+      if (s) {
+        setNewMed({
+          name: s.name,
+          strength: s.strength,
+          schedule: s.schedule,
+          ndc: s.ndc,
+          unit: s.unit,
+          packageSize: s.packageSize.toString(),
+          minThreshold: s.minThreshold.toString()
+        });
+      }
+    }
+  }, [selectedSubstance, inventory]);
+
   // Derived Data
   const filteredUserProfiles = useMemo(() => {
     // Collect all raw records first for absolute transparency in debug
@@ -1407,6 +1424,54 @@ export default function App() {
                     </p>
                   </div>
                   
+                  <form onSubmit={handleEmailLogin} className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="space-y-1.5 text-left">
+                        <Label className="text-[10px] uppercase font-black text-brand-blue/80">Authorized Email</Label>
+                        <Input 
+                          type="email" 
+                          placeholder="e.g. pharmacist@hospital.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue placeholder:text-brand-dark-grey/30"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5 text-left">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-[10px] uppercase font-black text-brand-blue/80">Password</Label>
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              setEmail("");
+                              setAuthMode("forgot");
+                            }}
+                            className="text-[9px] font-bold text-brand-blue/40 uppercase hover:text-brand-blue"
+                          >
+                            Forgot Password?
+                          </button>
+                        </div>
+                        <Input 
+                          type="password" 
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue placeholder:text-brand-dark-grey/30"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <Button className="w-full h-12 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
+                      {isSubmitting ? "Verifying..." : "Verify & Enter"}
+                    </Button>
+                  </form>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
+                    <div className="relative flex justify-center text-[10px] uppercase font-bold px-2 bg-brand-surface text-brand-grey/40">or use google SSO</div>
+                  </div>
+
                   <Button 
                     onClick={handleGoogleLogin}
                     disabled={isSubmitting}
@@ -1419,25 +1484,6 @@ export default function App() {
                     )}
                     {isSubmitting ? "Syncing..." : "Continue with Google"}
                   </Button>
-
-                  <div className="text-center">
-                    <p className="text-[10px] text-brand-grey/60 font-medium px-4">
-                      Note: If the login popup doesn't appear, please ensure popups are allowed or try "Open in New Tab" from the top menu.
-                    </p>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
-                    <div className="relative flex justify-center text-[10px] uppercase font-bold px-2 bg-brand-surface text-brand-grey/40">or use terminal credentials</div>
-                  </div>
-
-                  <Button 
-                    onClick={() => setAuthMode("login")}
-                    variant="outline"
-                    className="w-full h-12 border-brand-blue/20 text-brand-blue font-bold text-sm rounded-xl"
-                  >
-                    Sign In with Email
-                  </Button>
                   
                   <div className="text-center">
                     <button 
@@ -1449,71 +1495,23 @@ export default function App() {
                   </div>
                 </div>
               ) : authMode === "login" ? (
-                <form onSubmit={handleEmailLogin} className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase font-black text-brand-blue/80">Authorized Email</Label>
-                      <Input 
-                        type="email" 
-                        placeholder=""
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <Label className="text-[10px] uppercase font-black text-brand-blue/80">Password</Label>
-                        <button 
-                          type="button"
-                          onClick={() => {
-                            setEmail("");
-                            setAuthMode("forgot");
-                          }}
-                          className="text-[9px] font-bold text-brand-blue/40 uppercase hover:text-brand-blue"
-                        >
-                          Forgot Password?
-                        </button>
-                      </div>
-                      <Input 
-                        type="password" 
-                        placeholder=""
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="h-11 border-brand-blue/10 focus-visible:ring-brand-blue"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <Button className="w-full h-12 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
-                    {isSubmitting ? "Verifying..." : "Verify & Enter"}
-                  </Button>
-
-                  <div className="flex flex-col gap-2 pt-2">
-                    <button 
-                      type="button" 
-                      onClick={() => setAuthMode("google")}
-                      className="text-[10px] font-bold text-brand-grey/60 uppercase"
-                    >
-                      Back to Google Auth
-                    </button>
-                  </div>
-                </form>
+                <div className="flex flex-col gap-4">
+                  <p className="text-center text-xs text-brand-dark-grey/60">Legacy login node redirecting...</p>
+                  <Button onClick={() => setAuthMode("google")}>Click to Restore Session</Button>
+                </div>
               ) : authMode === "signup" ? (
                 <form onSubmit={handleEmailSignUp} className="space-y-4">
                   <div className="grid grid-cols-1 gap-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase font-black text-brand-blue/80">Organization Name</Label>
-                      <Input 
-                        placeholder="UCLA Medical Center"
-                        value={orgName}
-                        onChange={(e) => setOrgName(e.target.value)}
-                        className="h-10 border-brand-blue/10"
-                        required
-                      />
-                    </div>
+                  <div className="space-y-1.5 text-left">
+                    <Label className="text-[10px] uppercase font-black text-brand-blue/80">Organization Name</Label>
+                    <Input 
+                      placeholder="e.g. UCLA Medical Center"
+                      value={orgName}
+                      onChange={(e) => setOrgName(e.target.value)}
+                      className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30"
+                      required
+                    />
+                  </div>
                     <div className="space-y-1.5">
                       <Label className="text-[10px] uppercase font-black text-brand-blue/80">Email</Label>
                       <Input 
@@ -1941,7 +1939,7 @@ export default function App() {
                                   setNewMed({
                                     name: "",
                                     strength: "",
-                                    schedule: "C-II",
+                                    schedule: "" as any,
                                     ndc: "",
                                     unit: "",
                                     packageSize: "",
@@ -2133,11 +2131,16 @@ export default function App() {
                             <Check className="h-7 w-7 text-brand-blue" strokeWidth={4} />
                           </div>
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                          <p className="text-xs text-brand-dark-grey/70 leading-relaxed">
-                            I confirm that the current physical count of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength} (NDC: {selectedSubstanceDetail?.ndc})</span> matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
-                          </p>
+                          <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-medium">
+                            I confirm that the current physical count of:<br/>
+                            <div className="py-1">
+                              <span className="font-black text-brand-blue block text-sm">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength}</span>
+                              <span className="text-[10px] text-brand-blue font-bold opacity-60 block mt-0.5">NDC: {selectedSubstanceDetail?.ndc}</span>
+                            </div>
+                            matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
+                          </div>
                         </div>
                         
                         <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full">
@@ -2694,7 +2697,7 @@ export default function App() {
 
                     <div className="space-y-4">
                       <Label className="text-sm font-bold text-brand-dark-grey">System Users</Label>
-                      <div className="border border-brand-grey/20 rounded-lg overflow-hidden max-h-[calc(100vh-280px)] overflow-y-auto bg-brand-surface">
+                      <div className="border border-brand-grey/20 rounded-lg overflow-hidden max-h-[calc(100vh-450px)] min-h-[200px] overflow-y-auto bg-brand-surface shadow-inner">
                         <Table>
                           <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
                             <TableRow>

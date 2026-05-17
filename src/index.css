@@ -12,6 +12,7 @@
   --color-brand-light-grey: #f0f4f9;
   --color-brand-dark-grey: #1a202c;
   --color-brand-surface: #ffffff;
+  --color-muted-foreground: color-mix(in srgb, var(--color-brand-dark-grey), transparent 70%);
 }
 
 @layer components {
