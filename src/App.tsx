@@ -2125,7 +2125,7 @@ export default function App() {
                         </div>
                       </div>
                     ) : transactionType === "VERIFY" ? (
-                      <div className="p-4 border-2 border-dashed border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-3">
+                      <div className="p-4 border-2 border-solid border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-3">
                         <div className="flex justify-center">
                           <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue">
                             <Check className="h-7 w-7 text-brand-blue" strokeWidth={4} />
@@ -2138,16 +2138,9 @@ export default function App() {
                           </p>
                         </div>
                         
-                        <div className="pt-3 border-t border-brand-blue/10 w-full">
-                          <div className="text-[9px] font-black text-brand-blue/40 uppercase tracking-widest mb-1">Authorization Identity</div>
-                          <div className="text-sm font-bold text-brand-dark-grey">
-                            {(() => {
-                              const u = users.find(u => u.id === selectedUser);
-                              return u ? `${u.name}${u.title ? ` (${u.title})` : ''}` : (user?.displayName || "User");
-                            })()}
-                          </div>
-                          <div className="text-[9px] text-brand-dark-grey/30 uppercase font-bold tracking-widest mt-2">
-                             {new Date().toLocaleString()}
+                        <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full">
+                          <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest">
+                            Timestamp: {new Date().toLocaleString()}
                           </div>
                         </div>
                       </div>
@@ -2699,9 +2692,9 @@ export default function App() {
 
                     <div className="space-y-4">
                       <Label className="text-sm font-bold text-brand-dark-grey">System Users</Label>
-                      <div className="border border-brand-grey/20 rounded-lg overflow-hidden">
+                      <div className="border border-brand-grey/20 rounded-lg overflow-hidden max-h-[300px] overflow-y-auto bg-brand-surface">
                         <Table>
-                          <TableHeader className="bg-brand-light-grey/50">
+                          <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
                             <TableRow>
                               <TableHead className={tableHeadClass}>Name</TableHead>
                               <TableHead className={`${tableHeadClass} text-center`}>Actions</TableHead>
@@ -2793,10 +2786,10 @@ export default function App() {
 
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
             <div className="flex flex-col gap-4">
-              <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface">
-                <div className="overflow-x-auto">
+              <Card className="border-brand-grey/10 shadow-sm bg-brand-surface">
+                <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
                   <Table>
-                    <TableHeader className="bg-brand-light-grey/50">
+                    <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
                       <TableRow>
                         <TableHead className={tableHeadClass}>Medication & Strength</TableHead>
                         <TableHead className={tableHeadClass}>Schedule</TableHead>
@@ -3133,10 +3126,10 @@ export default function App() {
                 Showing {filteredTransactions.length} transactions
               </div>
             </div>
-            <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface">
-              <div className="overflow-x-auto">
+            <Card className="border-brand-grey/10 shadow-sm bg-brand-surface">
+              <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                 <Table>
-                  <TableHeader className="bg-brand-light-grey/50">
+                  <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
                     <TableRow>
                       <TableHead className={tableHeadClass}>Timestamp</TableHead>
                       <TableHead className={tableHeadClass}>Reference #</TableHead>
@@ -3615,9 +3608,11 @@ export default function App() {
           </div>
         </DialogHeader>
         <div className="p-6 space-y-4">
-          <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-2 text-left">
+          <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3 text-left">
             <p className="text-brand-grey text-xs font-medium leading-relaxed">
-              Are you sure you want to sign out of the PharmaGuard registry? 
+              Are you sure you want to sign out of the PharmaGuard registry?
+            </p>
+            <p className="text-brand-grey text-xs font-medium leading-relaxed">
               All active database sync connections will be safely terminated.
             </p>
           </div>

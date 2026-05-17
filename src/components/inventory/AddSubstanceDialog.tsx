@@ -28,7 +28,7 @@ export function AddSubstanceDialog({
 }: AddSubstanceDialogProps) {
   const [name, setName] = useState("");
   const [strength, setStrength] = useState("");
-  const [schedule, setSchedule] = useState<Schedule | undefined>(undefined);
+  const [schedule, setSchedule] = useState<string>("");
   const [ndc, setNdc] = useState("");
   const [unit, setUnit] = useState("");
   const [packageSize, setPackageSize] = useState("");
@@ -36,7 +36,7 @@ export function AddSubstanceDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!name || !strength || !ndc) return;
+    if (!name || !strength || !ndc || !schedule) return;
     setIsSubmitting(true);
     try {
       await onAdd({
@@ -80,7 +80,7 @@ export function AddSubstanceDialog({
             </div>
             <div className="grid gap-1.5">
               <Label className="text-xs font-bold text-brand-blue">Schedule</Label>
-              <Select value={schedule} onValueChange={(v: Schedule) => setSchedule(v)}>
+              <Select value={schedule} onValueChange={(v) => setSchedule(v)}>
                 <SelectTrigger className="h-10 border-brand-blue/10">
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
