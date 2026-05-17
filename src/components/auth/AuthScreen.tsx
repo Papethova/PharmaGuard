@@ -64,14 +64,14 @@ export function AuthScreen() {
         className="max-w-md w-full"
       >
         <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden pt-0">
-          <div className="bg-brand-blue p-6 py-5 text-center relative overflow-hidden rounded-t-xl">
-            <div className="flex justify-center mb-4">
-              <div className="h-16 w-16 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
-                <PharmaLogo className="h-10 w-10" />
+          <div className="bg-brand-blue p-6 py-2 text-center relative overflow-hidden rounded-t-xl">
+            <div className="flex justify-center mb-2">
+              <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-white/20">
+                <PharmaLogo className="h-8 w-8" />
               </div>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
-            <p className="text-brand-yellow font-black text-[9px] uppercase tracking-[0.15em] mt-1">
+            <h1 className="text-2xl font-bold text-white tracking-tighter leading-none mt-1">PharmaGuard</h1>
+            <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.15em] mt-2">
               SECURE CONTROLLED SUBSTANCE REGISTRY
             </p>
           </div>

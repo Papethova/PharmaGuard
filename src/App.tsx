@@ -18,7 +18,7 @@ import {
   RefreshCcw,
   Users,
   UserPlus,
-  ArrowLeftRight,
+  ArrowRightLeft,
   Edit,
   Trash2,
   LogOut,
@@ -1403,17 +1403,17 @@ export default function App() {
           className="max-w-md w-full"
         >
           <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl pt-0">
-            <div className="bg-brand-blue p-6 py-7 text-center relative overflow-hidden">
-              <div className="flex justify-center mb-6">
-                <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
-                  <PharmaLogo className="h-12 w-12" />
-                </div>
+          <div className="bg-brand-blue p-6 py-2 text-center relative overflow-hidden">
+            <div className="flex justify-center mb-4">
+              <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
+                <PharmaLogo className="h-8 w-8" />
               </div>
-              <h1 className="text-3xl font-black text-white tracking-tighter leading-none mt-2">PharmaGuard</h1>
-              <p className="text-brand-yellow font-black text-[10px] uppercase tracking-[0.2em] mt-3">
-                SECURE CONTROLLED SUBSTANCE REGISTRY
-              </p>
             </div>
+            <h1 className="text-2xl font-bold text-white tracking-tighter leading-none mt-1">PharmaGuard</h1>
+            <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.2em] mt-2">
+              SECURE CONTROLLED SUBSTANCE REGISTRY
+            </p>
+          </div>
 
             <CardContent className="p-4 px-6 pb-6">
               {authMode === "google" ? (
@@ -1598,13 +1598,13 @@ export default function App() {
           className="max-w-md w-full"
         >
           <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-2xl pt-0">
-            <div className="bg-brand-blue p-6 py-7 text-center relative overflow-hidden rounded-t-2xl">
-              <div className="flex justify-center mb-6">
-                <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
-                  <Clock className="h-10 w-10 text-brand-blue" />
+            <div className="bg-brand-blue p-6 py-2 text-center relative overflow-hidden rounded-t-2xl">
+              <div className="flex justify-center mb-4">
+                <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
+                  <Clock className="h-8 w-8 text-brand-blue" />
                 </div>
               </div>
-              <h1 className="text-3xl font-black text-white tracking-tighter leading-none mt-2">PharmaGuard</h1>
+              <h1 className="text-2xl font-bold text-white tracking-tighter leading-none mt-1">PharmaGuard</h1>
               <p className="text-brand-yellow font-black text-[10px] uppercase tracking-[0.2em] mt-3">
                 SECURE CONTROLLED SUBSTANCE REGISTRY
               </p>
@@ -2341,7 +2341,7 @@ export default function App() {
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface" align="start">
-                          {users.map(u => (
+                          {[...users].sort((a, b) => a.name.localeCompare(b.name)).map(u => (
                             <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
                               {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
                             </SelectItem>
@@ -2748,13 +2748,13 @@ export default function App() {
                     <Label className="text-[10px] font-bold tracking-widest text-brand-blue uppercase">System Users</Label>
                     <span className="text-[8px] font-bold text-brand-grey/40">{users.length} Records</span>
                   </div>
-                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative min-h-0">
-                  <div className="h-full overflow-y-auto">
+                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative min-h-[200px]">
+                  <div className="absolute inset-0 overflow-y-auto">
                     <Table className="relative border-separate border-spacing-0 w-full">
-                      <TableHeader className="sticky top-0 z-50 bg-brand-blue">
-                        <TableRow className="bg-brand-blue border-none">
-                          <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-white uppercase tracking-widest`}>Name</TableHead>
-                          <TableHead className={`${tableHeadClass} text-center bg-brand-blue border-b border-white/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-white uppercase tracking-widest`}>Actions</TableHead>
+                      <TableHeader className="sticky top-0 z-50 bg-brand-light-grey">
+                        <TableRow className="bg-brand-light-grey border-none">
+                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-brand-blue uppercase tracking-widest`}>Name</TableHead>
+                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-brand-blue uppercase tracking-widest`}>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -2845,12 +2845,12 @@ export default function App() {
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
                 <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
                   <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
-                    <TableHeader className="sticky top-0 z-[100] bg-brand-blue">
-                      <TableRow className="bg-brand-blue border-none">
-                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[45%] text-white font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[15%] text-white font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[20%] text-white font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 w-[20%] text-white font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
+                    <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
+                      <TableRow className="bg-brand-light-grey border-none">
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[45%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[15%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 w-[20%] text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3185,15 +3185,15 @@ export default function App() {
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
               <div className="h-[calc(100vh-320px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
                 <Table className="relative border-separate border-spacing-0 z-10 w-full table-fixed">
-                  <TableHeader className="sticky top-0 z-[100] bg-brand-blue">
-                    <TableRow className="bg-brand-blue border-none">
-                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Ref #</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Medication</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-blue border-b border-white/10 sticky top-0 z-[100] h-12 text-white font-black uppercase tracking-widest text-[9px]`}>User</TableHead>
+                  <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
+                    <TableRow className="bg-brand-light-grey border-none">
+                        <TableHead className={`${tableHeadClass} w-[14%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Ref #</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[28%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[12%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[11%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[9%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[15%] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3312,7 +3312,7 @@ export default function App() {
 
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full max-h-[90vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg z-10">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
@@ -3914,17 +3914,17 @@ export default function App() {
     </Dialog>
 
     <Dialog open={isMigrateOpen} onOpenChange={setIsMigrateOpen}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-        <DialogHeader className="p-6 bg-brand-blue text-white shrink-0 relative overflow-hidden">
-          <div className="flex items-center gap-4 text-left relative z-10">
-            <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-white/20">
-              <ArrowLeftRight className="h-7 w-7 text-brand-blue" strokeWidth={3} />
+      <DialogContent showCloseButton={false} className="sm:max-w-lg w-full overflow-hidden flex flex-col p-0 gap-0 border-brand-blue/20 bg-brand-surface rounded-2xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+        <DialogHeader className="p-6 bg-white border-b border-brand-blue/5 shrink-0 relative overflow-hidden">
+          <div className="flex items-center gap-4 text-left relative z-10 w-full justify-center">
+            <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-brand-blue/10">
+              <ArrowRightLeft className="h-7 w-7 text-brand-blue" strokeWidth={3} />
             </div>
-            <div className="flex flex-col gap-0">
-              <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+            <div className="flex flex-col gap-0 text-center">
+              <DialogTitle className="text-xl font-bold tracking-tight text-brand-blue leading-none">
                 Data Migration Utility
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
+              <DialogDescription className="text-brand-blue/60 font-bold text-[10px] tracking-widest mt-1 uppercase">
                 TRANSFER REGISTRY DATA BETWEEN NODES
               </DialogDescription>
             </div>
@@ -3969,7 +3969,7 @@ export default function App() {
             <div className="flex justify-center py-0 relative h-10">
               <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-brand-blue/10 -translate-y-1/2" />
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center border-2 border-white shadow-md relative z-10">
-                <ArrowDown className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+                <ArrowRightLeft className="h-5 w-5 text-brand-blue" strokeWidth={3} />
               </div>
             </div>
 
