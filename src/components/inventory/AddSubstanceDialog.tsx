@@ -56,6 +56,7 @@ export function AddSubstanceDialog({
       setUnit("");
       setPackageSize("");
       setMinThreshold("");
+      setSchedule("");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +81,7 @@ export function AddSubstanceDialog({
             </div>
             <div className="grid gap-1.5">
               <Label className="text-xs font-bold text-brand-blue">Schedule</Label>
-              <Select value={schedule} onValueChange={(v) => setSchedule(v)}>
+              <Select value={schedule === "" ? undefined : schedule} onValueChange={(v) => setSchedule(v)}>
                 <SelectTrigger className="h-10 border-brand-blue/10">
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>

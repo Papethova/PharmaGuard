@@ -237,7 +237,9 @@ const TransactionBadge = ({ type, size = "md" }: { type: TransactionType, size?:
 const formatDateTime = (timestamp: any) => {
   if (!timestamp) return "-";
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-  return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+  const dateStr = date.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: '2-digit' });
+  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\s/g, '');
+  return `${dateStr} ${timeStr}`;
 };
 
 const formatRefForDisplay = (ref: string | undefined) => {
@@ -2692,7 +2694,7 @@ export default function App() {
 
                     <div className="space-y-4">
                       <Label className="text-sm font-bold text-brand-dark-grey">System Users</Label>
-                      <div className="border border-brand-grey/20 rounded-lg overflow-hidden max-h-[300px] overflow-y-auto bg-brand-surface">
+                      <div className="border border-brand-grey/20 rounded-lg overflow-hidden max-h-[350px] overflow-y-auto bg-brand-surface">
                         <Table>
                           <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
                             <TableRow>
@@ -2787,7 +2789,7 @@ export default function App() {
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
             <div className="flex flex-col gap-4">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface">
-                <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
                   <Table>
                     <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
                       <TableRow>
@@ -3127,17 +3129,17 @@ export default function App() {
               </div>
             </div>
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface">
-              <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
                 <Table>
                   <TableHeader className="bg-brand-light-grey/50 sticky top-0 z-10">
                     <TableRow>
-                      <TableHead className={tableHeadClass}>Timestamp</TableHead>
-                      <TableHead className={tableHeadClass}>Reference #</TableHead>
-                      <TableHead className={tableHeadClass}>Medication & Strength</TableHead>
-                      <TableHead className={tableHeadClass}>NDC</TableHead>
-                      <TableHead className={tableHeadClass}>Type</TableHead>
-                      <TableHead className={tableHeadClass}>Qty</TableHead>
-                      <TableHead className={tableHeadClass}>Performed By</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[140px]`}>Timestamp</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[110px]`}>Reference #</TableHead>
+                      <TableHead className={`${tableHeadClass} text-left pl-4`}>Medication & Strength</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[120px]`}>NDC</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[90px]`}>Type</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[70px]`}>Qty</TableHead>
+                      <TableHead className={`${tableHeadClass} w-[130px]`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3165,7 +3167,7 @@ export default function App() {
                           <span className="text-brand-dark-grey/40 italic">-</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-left pl-4">
                         <div className="text-sm font-bold text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                       </TableCell>
                       <TableCell className="text-xs font-bold text-center">
