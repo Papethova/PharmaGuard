@@ -1403,7 +1403,7 @@ export default function App() {
           className="max-w-md w-full"
         >
           <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl pt-0">
-            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden">
+            <div className="bg-brand-blue p-6 py-7 text-center relative overflow-hidden">
               <div className="flex justify-center mb-6">
                 <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
                   <PharmaLogo className="h-12 w-12" />
@@ -1598,7 +1598,7 @@ export default function App() {
           className="max-w-md w-full"
         >
           <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-2xl pt-0">
-            <div className="bg-brand-blue p-6 py-10 text-center relative overflow-hidden rounded-t-2xl">
+            <div className="bg-brand-blue p-6 py-7 text-center relative overflow-hidden rounded-t-2xl">
               <div className="flex justify-center mb-6">
                 <div className="h-20 w-20 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
                   <Clock className="h-10 w-10 text-brand-blue" />
@@ -2124,7 +2124,7 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/50'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-brand-dark-grey/30'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
@@ -2330,7 +2330,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/50' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
@@ -2723,7 +2723,7 @@ export default function App() {
                         className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-9 flex-1 text-xs"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-brand-dark-grey/50' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
@@ -2773,7 +2773,7 @@ export default function App() {
                                     value={editingUser?.title || ""} 
                                     onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                                   >
-                                    <SelectTrigger className="w-24 h-8 bg-brand-surface border-brand-blue/30 flex items-center text-[10px]">
+                                    <SelectTrigger className={`w-24 h-8 bg-brand-surface border-brand-blue/30 flex items-center text-[10px] ${!editingUser?.title ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}>
                                       <SelectValue placeholder="Title...." />
                                     </SelectTrigger>
                                     <SelectContent className="bg-brand-surface">
@@ -3864,7 +3864,7 @@ export default function App() {
                       value={editingMed.schedule} 
                       onValueChange={(v: Schedule) => setEditingMed({...editingMed, schedule: v})}
                     >
-                      <SelectTrigger className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className={`bg-brand-surface border-brand-blue/30 focus:border-brand-blue h-11 ${!editingMed.schedule ? 'text-brand-dark-grey/30' : 'text-brand-dark-grey'}`}><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {SCHEDULES.map(s => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -3937,7 +3937,7 @@ export default function App() {
               <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Source Node (Migration Point A)</Label>
               <div className="relative">
                 <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
-                  <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationSourceId ? 'text-brand-blue/30' : 'text-brand-blue'}`}>
+                  <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationSourceId ? 'text-brand-dark-grey/30' : 'text-brand-blue'}`}>
                     <SelectValue placeholder="Begin Typable Search..." />
                   </SelectTrigger>
                   <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">
@@ -3976,7 +3976,7 @@ export default function App() {
             <div className="grid gap-3">
               <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Destination Node (Migration Point B)</Label>
               <Select value={migrationDestId} onValueChange={setMigrationDestId}>
-                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationDestId ? 'text-brand-blue/30' : 'text-brand-blue'}`}>
+                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationDestId ? 'text-brand-dark-grey/30' : 'text-brand-blue'}`}>
                   <SelectValue placeholder="Begin Typable Search..." />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">
