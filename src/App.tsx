@@ -1778,7 +1778,7 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col sticky top-2 shrink-0 overflow-visible self-start h-[calc(100vh-100px)]">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-6 sticky top-12 shrink-0 overflow-visible self-start">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-bold text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -1817,43 +1817,38 @@ export default function App() {
               </Button>
             </div>
             
-            <div className="flex-1 flex flex-col justify-center py-6">
-              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-2 w-full">
+            <div className="flex flex-col w-full mt-2">
+              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full">
                 <TabsTrigger 
                   value="inventory" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
+                  className="w-full justify-start gap-4 h-12 px-4 rounded-lg data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group transition-colors"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                  <div className="h-7 w-7 rounded-full bg-brand-yellow/10 flex items-center justify-center shrink-0 border border-brand-yellow/20">
+                    <Pill className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
+                  className="w-full justify-start gap-4 h-12 px-4 rounded-lg data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group transition-colors"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                  <div className="h-7 w-7 rounded-full bg-brand-yellow/10 flex items-center justify-center shrink-0 border border-brand-yellow/20">
+                    <History className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="alerts" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
+                  className="w-full justify-start gap-4 h-12 px-4 rounded-lg data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group transition-colors"
                 >
-                  <div className="relative">
-                    <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                      <AlertTriangle className="h-5 w-5 text-brand-blue transition-all" strokeWidth={3} />
-                    </div>
+                  <div className="h-7 w-7 rounded-full bg-brand-yellow/10 flex items-center justify-center shrink-0 border border-brand-yellow/20">
+                    <AlertTriangle className="h-4 w-4 text-brand-blue" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
                   {lowStockItems.length > 0 && (
-                    <div className="ml-auto relative flex items-center justify-center h-5 w-5">
-                      <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
-                      <Badge className="relative h-5 w-5 flex items-center justify-center text-[10px] bg-brand-yellow text-brand-blue border-none font-black rounded-full p-0 shadow-sm leading-none">
-                        {lowStockItems.length}
-                      </Badge>
-                    </div>
+                    <Badge className="ml-auto h-5 min-w-5 flex items-center justify-center text-[10px] bg-brand-yellow text-brand-blue border-none font-black rounded-full px-1 shadow-sm">
+                      {lowStockItems.length}
+                    </Badge>
                   )}
                 </TabsTrigger>
                 <TabsTrigger 
@@ -1862,10 +1857,10 @@ export default function App() {
                     e.preventDefault();
                     setIsUserManagementOpen(true);
                   }}
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
+                  className="w-full justify-start gap-4 h-12 px-4 rounded-lg data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group transition-colors"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
+                  <div className="h-7 w-7 rounded-full bg-brand-yellow/10 flex items-center justify-center shrink-0 border border-brand-yellow/20">
+                    <Users className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
                 </TabsTrigger>
@@ -1873,7 +1868,7 @@ export default function App() {
               </TabsList>
             </div>
 
-            <div className="mt-auto pb-4">
+            <div className="mt-4">
                {user && (
                 <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-0">
                   <div className="flex flex-col overflow-hidden">
@@ -2843,8 +2838,8 @@ export default function App() {
 
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
             {/* Background Shield Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
-              <PharmaLogo className="w-[500px] h-[500px]" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none select-none z-0 overflow-hidden">
+              <Shield className="w-[500px] h-[500px] text-brand-blue" />
             </div>
             <div className="flex flex-col gap-4 relative z-10">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
@@ -3076,8 +3071,8 @@ export default function App() {
 
           <TabsContent value="history" className="space-y-4 relative z-10 m-0">
             {/* Background Shield Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
-              <PharmaLogo className="w-[500px] h-[500px]" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none select-none z-0 overflow-hidden">
+              <Shield className="w-[500px] h-[500px] text-brand-blue" />
             </div>
             <div className="flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
               <div className="flex items-end gap-10">
