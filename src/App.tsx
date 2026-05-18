@@ -255,7 +255,7 @@ const formatRefForDisplay = (ref: string | undefined) => {
   return ref;
 };
 
-// Sync Heartbeat: 2026-05-18T16:25:00
+// Sync Heartbeat: 2026-05-18T16:32:00
 export default function App() {
   // Emergency catch-all to prevent white screens
   const [renderError, setRenderError] = useState<string | null>(null);
@@ -272,6 +272,8 @@ export default function App() {
       </div>
     );
   }
+
+  const [syncProbeVisible, setSyncProbeVisible] = useState(true);
 
     const sigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
@@ -1794,6 +1796,21 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
+          {/* SYNC PROBE BANNER */}
+          {syncProbeVisible && (
+            <div className="fixed top-0 left-0 right-0 z-[9999] bg-brand-yellow text-brand-blue flex items-center justify-between px-4 py-1 animate-in fade-in slide-in-from-top duration-500">
+              <div className="flex items-center gap-4">
+                <span className="text-[10px] font-black uppercase tracking-widest leading-none">Terminal Sync Linked</span>
+                <span className="text-[9px] font-mono font-bold bg-brand-blue text-brand-yellow px-1.5 py-0.5 rounded leading-none">{APP_VERSION}</span>
+              </div>
+              <button 
+                onClick={() => setSyncProbeVisible(false)}
+                className="text-brand-blue hover:scale-110 transition-transform p-1"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
           {/* Background Watermark moved here for stability */}
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
@@ -1925,6 +1942,14 @@ export default function App() {
                   </div>
                 </div>
               )}
+              <div className="mt-6 flex flex-col items-center gap-1 opacity-20 hover:opacity-40 transition-opacity no-interact select-none pb-2">
+                <span className="text-[9px] font-black font-mono text-brand-blue tracking-[0.2em] uppercase">
+                  Registry Terminal
+                </span>
+                <span className="text-[8px] font-mono font-bold text-brand-blue/70">
+                  {APP_VERSION}
+                </span>
+              </div>
             </div>
           </aside>
 
