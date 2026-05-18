@@ -13,12 +13,9 @@ import {
   X,
   Pill,
   ArrowDown,
-  ArrowRight,
-  ArrowLeft,
   RefreshCcw,
   Users,
   UserPlus,
-  ArrowRightLeft,
   Edit,
   Trash2,
   LogOut,
@@ -325,9 +322,6 @@ export default function App() {
   const [newUserName, setNewUserName] = useState("");
   const [newUserTitle, setNewUserTitle] = useState("");
   const [editingUser, setEditingUser] = useState<{id: string, name: string, title?: string} | null>(null);
-  const [isMigrateOpen, setIsMigrateOpen] = useState(false);
-  const [migrationSourceId, setMigrationSourceId] = useState("");
-  const [migrationDestId, setMigrationDestId] = useState("");
   const [userToDeleteConfirm, setUserToDeleteConfirm] = useState<{id: string, name: string} | null>(null);
   const [isSuperAdminOpen, setIsSuperAdminOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -570,27 +564,52 @@ export default function App() {
     let unsubProfile: (() => void) | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
+      // Set Auth Ready state as soon as we get even a null response
       setUser(currentUser);
       
       try {
         if (currentUser) {
+          // Identity Recovery & Profile Synchronization
           const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
           const userDocRef = doc(db, "users", emailId);
           
-          let userDoc = await getDoc(userDocRef);
+          let userDoc = await getDoc(userDocRef).catch((e) => {
+             console.warn("Initial user doc fetch failed:", e);
+             return null;
+          });
 
-          if (emailId === MASTER_ADMIN_EMAIL.toLowerCase()) {
-             const legacyRef = doc(db, "users", currentUser.uid);
-             const legacyDoc = await getDoc(legacyRef);
-             if (legacyDoc.exists() && currentUser.uid !== emailId) {
-               const batch = writeBatch(db);
-               batch.set(userDocRef, { ...legacyDoc.data(), updatedAt: serverTimestamp() }, { merge: true });
-               batch.delete(legacyRef);
-               await batch.commit();
-               userDoc = await getDoc(userDocRef);
-             }
+          // 1. Identity Recovery: Handle UID-based legacy records migrating to Email identifier
+          if (currentUser.uid !== emailId) {
+            try {
+              const legacyDoc = await getDoc(doc(db, "users", currentUser.uid));
+              if (legacyDoc.exists()) {
+                const legacySubstances = await getDocs(collection(db, "users", currentUser.uid, "substances"));
+                const currentSubstances = await getDocs(collection(db, "users", emailId, "substances"));
+                
+                if (legacySubstances.size > 0 && currentSubstances.size === 0) {
+                  const batch = writeBatch(db);
+                  if (!userDoc?.exists()) {
+                    batch.set(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
+                  }
+                  for (const s of legacySubstances.docs) batch.set(doc(db, "users", emailId, "substances", s.id), s.data());
+                  const legacyTx = await getDocs(collection(db, "users", currentUser.uid, "transactions"));
+                  for (const t of legacyTx.docs) batch.set(doc(db, "users", emailId, "transactions", t.id), t.data());
+                  const legacyStaff = await getDocs(collection(db, "users", currentUser.uid, "staff"));
+                  for (const s of legacyStaff.docs) batch.set(doc(db, "users", emailId, "staff", s.id), s.data());
+                  await batch.commit();
+                  toast.success("Identity Unification Successful");
+                  userDoc = await getDoc(userDocRef);
+                } else if (!userDoc?.exists()) {
+                  await setDoc(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
+                  userDoc = await getDoc(userDocRef);
+                }
+              }
+            } catch (e) {
+              console.warn("Migration Assistant deferred:", e);
+            }
           }
 
+          // 2. Profile Creation for New Users
           if (!userDoc || !userDoc.exists()) {
             const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
             const newProfile: UserProfile = {
@@ -606,13 +625,16 @@ export default function App() {
             };
             await setDoc(userDocRef, newProfile);
           } else if (currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && userDoc.data()?.status !== 'active') {
+            // Master Admin Authority Verification
             await updateDoc(userDocRef, { status: 'active', role: 'admin' });
           }
 
+          // 3. Real-time profile listener on the stable primary identifier
           if (unsubProfile) unsubProfile();
           unsubProfile = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
-              setUserProfile(doc.data() as UserProfile);
+              const data = doc.data() as UserProfile;
+              setUserProfile(data);
             }
           }, (error) => {
             handleFirestoreError(error, OperationType.GET, `users/${emailId}`);
@@ -624,6 +646,7 @@ export default function App() {
       } catch (error) {
         console.error("Auth state processing error:", error);
       } finally {
+        // ALWAYS mark as ready even if profile loading failed
         setIsAuthReady(true);
         setIsInitializing(false);
       }
@@ -1207,12 +1230,19 @@ export default function App() {
   }, [selectedSubstance, inventory]);
 
   // Derived Data
-  const filteredProfiles = useMemo(() => {
+  const filteredUserProfiles = useMemo(() => {
+    // Collect all raw records first for absolute transparency in debug
     const results: UserProfile[] = [];
     const seenEmails = new Set<string>();
+    
+    const activeDocId = (user?.email?.toLowerCase() || user?.uid || "").toLowerCase();
 
     allUserProfiles.forEach(p => {
-      const emailLower = (p.email || "").toLowerCase();
+      const emailLower = (p.email || "").toLowerCase().trim();
+      
+      // EXCLUSION: COMPLETELY hide any record belonging to the Master Admin
+      // This includes the unified node and any legacy UID nodes that share the email.
+      if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return;
 
       // Deduplication: If we have multiple entries for the same customer email
       if (emailLower && seenEmails.has(emailLower)) {
@@ -1230,9 +1260,6 @@ export default function App() {
 
     return results
       .filter((p: UserProfile) => {
-        // EXCLUSION: Hide the Master Admin account from regulated registry lists
-        if (p.email?.toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
-        
         const term = userSearchTerm.toLowerCase();
         if (!term) return true;
         return (p.email?.toLowerCase() || "").includes(term) || 
@@ -1396,35 +1423,35 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-4">
         <motion.div 
-          initial={{ opacity: 0, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full"
         >
-          <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-xl pt-0">
-          <div className="bg-brand-blue p-6 py-2 text-center relative overflow-hidden">
-            <div className="flex justify-center mb-4">
-              <PharmaLogo className="h-16 w-16" />
+          <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden border-none">
+            <div className="bg-brand-blue p-6 py-8 text-center relative overflow-hidden">
+              <div className="flex justify-center mb-4">
+                <PharmaLogo className="h-16 w-16" />
+              </div>
+              <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
+              <p className="text-brand-yellow font-bold text-[10px] uppercase tracking-[0.15em] mt-1">
+                SECURE CONTROLLED SUBSTANCE PERPETUAL INVENTORY SYSTEM
+              </p>
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tighter leading-none mt-1">PharmaGuard</h1>
-            <p className="text-brand-yellow font-bold text-[9px] uppercase tracking-[0.2em] mt-2">
-              SECURE CONTROLLED SUBSTANCE REGISTRY
-            </p>
-          </div>
 
-            <CardContent className="p-4 px-6 pb-6">
+            <CardContent className="p-6">
               {authMode === "google" ? (
                 <div className="space-y-6">
-                  <div className="p-5 bg-brand-blue/5 border border-brand-blue/10 rounded-2xl text-center space-y-2">
-                    <h2 className="text-lg font-black text-brand-blue uppercase tracking-tight leading-none">Authorization Required</h2>
-                    <p className="text-brand-grey font-bold text-[10px] uppercase tracking-widest leading-relaxed">
-                      This terminal is restricted to credentialed staff only.
+                  <div className="text-center space-y-2">
+                    <h2 className="text-lg font-bold text-brand-blue uppercase tracking-tight">Identity Verification Required</h2>
+                    <p className="text-brand-dark-grey/60 text-xs">
+                      Access to the controlled substance registry is restricted to authorized personnel.
                     </p>
                   </div>
                   
-                  <form onSubmit={handleEmailLogin} className="space-y-3">
-                    <div className="space-y-2">
+                  <form onSubmit={handleEmailLogin} className="space-y-4">
+                    <div className="space-y-3">
                       <div className="space-y-1.5 text-left">
                         <Label className="text-[10px] uppercase font-black text-brand-blue/80">Authorized Email</Label>
                         <Input 
@@ -1499,8 +1526,8 @@ export default function App() {
                   <Button onClick={() => setAuthMode("google")}>Click to Restore Session</Button>
                 </div>
               ) : authMode === "signup" ? (
-                <form onSubmit={handleEmailSignUp} className="space-y-3">
-                  <div className="grid grid-cols-1 gap-2">
+                <form onSubmit={handleEmailSignUp} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-3">
                   <div className="space-y-1.5 text-left">
                     <Label className="text-[10px] uppercase font-black text-brand-blue/80">Organization Name</Label>
                     <Input 
@@ -1589,73 +1616,61 @@ export default function App() {
 
   if (userProfile?.status === 'pending') {
     return (
-      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center p-4 text-center">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-md w-full"
         >
-          <Card className="shadow-2xl bg-brand-surface overflow-hidden border-none rounded-2xl pt-0">
-            <div className="bg-brand-blue p-6 py-2 text-center relative overflow-hidden rounded-t-2xl">
-              <div className="flex justify-center mb-4">
-                <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-2 border-white/20">
-                  <Clock className="h-8 w-8 text-brand-blue" />
-                </div>
+          <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-blue/20 flex flex-col items-center space-y-6">
+            <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue/10">
+              <Clock className="w-12 h-12 text-brand-blue" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-brand-blue">Access Pending Approval</h2>
+              <p className="text-brand-grey text-sm">
+                Your PharmaGuard node has been registered successfully. 
+                For security reasons, access must be manually granted by a Master Authority.
+              </p>
+              <div className="bg-brand-blue/5 p-4 rounded-lg border border-brand-blue/10 mt-4">
+                <p className="text-[10px] text-brand-blue font-bold tracking-wider">Node Identification</p>
+                <p className="text-xs font-mono mt-1 text-brand-grey no-interact">{escapeEmail(userProfile.email)}</p>
               </div>
-              <h1 className="text-2xl font-bold text-white tracking-tighter leading-none mt-1">PharmaGuard</h1>
-              <p className="text-brand-yellow font-black text-[10px] uppercase tracking-[0.2em] mt-3">
-                SECURE CONTROLLED SUBSTANCE REGISTRY
+              <p className="text-brand-dark-grey/60 text-xs mt-4">
+                Please notify your system administrator if access is not granted within 24 hours.
               </p>
             </div>
-
-            <CardContent className="p-8 text-center space-y-6">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-black text-brand-blue uppercase tracking-tight">Access Pending Approval</h2>
-                <p className="text-brand-grey font-bold text-xs leading-relaxed">
-                  Your organization's node registration has been received. 
-                  For regulatory compliance, terminal access must be manually authorized by the Master Authority.
-                </p>
-              </div>
-              
-              <div className="bg-brand-blue/5 p-5 rounded-2xl border border-brand-blue/10">
-                <p className="text-[10px] text-brand-blue font-black uppercase tracking-widest leading-none mb-2">Registered Node Identifier</p>
-                <p className="text-xs font-mono text-brand-grey font-bold truncate">{escapeEmail(userProfile.email)}</p>
-              </div>
-
-              <div className="pt-2 w-full space-y-3">
-                <Button 
-                  className="w-full h-12 bg-brand-blue text-white hover:bg-brand-blue/90 font-black tracking-widest uppercase text-xs rounded-xl"
-                  onClick={async () => {
-                    if (user && user.email) {
-                      setIsSubmitting(true);
-                      const userEmail = user.email.toLowerCase();
-                      const userDocRef = doc(db, "users", userEmail);
-                      const userDoc = await getDoc(userDocRef);
-                      
-                      if (userDoc.exists() && userDoc.data()?.status === 'active') {
-                        toast.success("Access Granted: Registry Node Active");
-                        window.location.reload();
-                      } else {
-                        toast.info("Verification in Progress", {
-                          description: "The Master Authority has not yet activated this node."
-                        });
-                      }
-                      setIsSubmitting(false);
-                    }
-                  }}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : "Re-Verify Authorization Status"}
-                </Button>
-                <Button 
-                  onClick={handleLogout}
-                  className="w-full bg-brand-yellow text-brand-blue hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-brand-yellow/20"
-                >
-                  Sign Out of Registry Terminal
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            <div className="pt-4 w-full space-y-3">
+              <Button 
+                onClick={async () => {
+                  if (user && user.email) {
+                    setIsSubmitting(true);
+                    const userEmail = user.email.toLowerCase();
+                    const userDocRef = doc(db, "users", userEmail);
+                    await setDoc(userDocRef, {
+                      uid: user.uid,
+                      email: userEmail,
+                      displayName: user.displayName || "User",
+                      role: "pharmacist",
+                      status: "pending"
+                    }, { merge: true });
+                    toast.success("Registration heartbeat sent to Registry");
+                    setIsSubmitting(false);
+                  }
+                }}
+                disabled={isSubmitting}
+                className="w-full bg-brand-yellow text-brand-blue hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-brand-yellow/20 disabled:opacity-100"
+              >
+                {isSubmitting ? "Syncing..." : "Retry Registry Sync"}
+              </Button>
+              <Button 
+                onClick={handleLogout}
+                className="w-full bg-brand-blue text-white hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-brand-blue/10"
+              >
+                Sign Out
+              </Button>
+            </div>
+          </div>
         </motion.div>
       </div>
     );
@@ -1764,7 +1779,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 overflow-x-hidden">
+      <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12">
         <Tabs 
           value={currentTab} 
           orientation="vertical"
@@ -1778,10 +1793,14 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col sticky top-6 shrink-0 overflow-visible self-start pt-14">
-            <div className="flex flex-col gap-8 w-full shrink-0">
-              <div className="px-5 p-0 mb-14 text-center flex flex-col items-center justify-center min-h-[40px]">
-                <h3 className={`font-bold text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
+          {/* Background Watermark moved here for stability */}
+          <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
+            <PharmaLogo className="h-[800px] w-[800px]" />
+          </div>
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-12 shrink-0 overflow-visible self-start">
+            <div className="flex flex-col gap-3 w-full shrink-0">
+              <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
+                <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
                   (getIdentityString(userProfile, user?.email).length || 0) > 20 ? "text-lg" : 
                   (getIdentityString(userProfile, user?.email).length || 0) > 15 ? "text-xl" : "text-2xl"
                 }`}>
@@ -1816,38 +1835,44 @@ export default function App() {
                 Adjust
               </Button>
             </div>
-            <div className="flex flex-col w-full mt-14">
-              <TabsList variant="line" className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full">
+            
+            <div className="flex flex-col w-full">
+              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-2 w-full">
                 <TabsTrigger 
                   value="inventory" 
-                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
-                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="alerts" 
-                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
-                    <AlertTriangle className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                  <div className="relative">
+                    <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                      <AlertTriangle className="h-5 w-5 text-brand-blue transition-all" strokeWidth={3} />
+                    </div>
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
                   {lowStockItems.length > 0 && (
-                    <Badge className="ml-auto h-5 min-w-5 flex items-center justify-center text-[10px] bg-brand-yellow text-brand-blue border-none font-black rounded-full px-1 shadow-sm leading-none">
-                      {lowStockItems.length}
-                    </Badge>
+                    <div className="ml-auto relative flex items-center justify-center h-5 w-5">
+                      <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
+                      <Badge className="relative h-5 w-5 flex items-center justify-center text-[10px] bg-brand-yellow text-brand-blue border-none font-black rounded-full p-0 shadow-sm leading-none">
+                        {lowStockItems.length}
+                      </Badge>
+                    </div>
                   )}
                 </TabsTrigger>
                 <TabsTrigger 
@@ -1856,22 +1881,19 @@ export default function App() {
                     e.preventDefault();
                     setIsUserManagementOpen(true);
                   }}
-                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:bg-white data-[state=active]:text-brand-blue data-[state=active]:shadow-xl data-[state=active]:shadow-brand-blue/10 text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent data-[state=active]:border-brand-blue/10 text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
+                  <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
                 </TabsTrigger>
                 <TabsContent value="users" className="hidden" />
               </TabsList>
-            </div>
-
-            <div className="mt-14">
-               {user && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-0">
+              {user && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-9">
                   <div className="flex flex-col overflow-hidden">
-                    <span className="text-xs font-bold text-brand-blue/60 truncate tracking-tight">
+                    <span className="text-xs font-black text-brand-blue/60 truncate tracking-tight">
                       {userProfile?.organizationName || userProfile?.displayName || user.displayName}
                     </span>
                     {!userProfile?.organizationName && (
@@ -2063,7 +2085,7 @@ export default function App() {
                               value={newMed.strength} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, strength: e.target.value})} 
                               placeholder="e.g. 10mg" 
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2074,7 +2096,7 @@ export default function App() {
                               value={newMed.unit} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, unit: e.target.value})} 
                               placeholder="e.g. Tablets" 
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2087,7 +2109,7 @@ export default function App() {
                               value={newMed.ndc} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, ndc: e.target.value})} 
                               placeholder="00000-0000-00" 
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2106,7 +2128,7 @@ export default function App() {
                                 }
                               }} 
                               placeholder="e.g. 100"
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2119,12 +2141,12 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-brand-dark-grey' : 'text-muted-foreground'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
-                                <SelectValue placeholder="Select..." />
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                                <SelectValue placeholder="Select..." className="text-brand-dark-grey/40" />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
                                 {SCHEDULES.map(s => (
-                                  <SelectItem key={s} value={s} className="pl-3 text-brand-dark-grey">{s}</SelectItem>
+                                  <SelectItem key={s} value={s} className="pl-3 text-brand-dark-grey font-medium">{s}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -2325,7 +2347,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 ${!selectedUser ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger id="user-select" className="border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9">
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
@@ -2336,7 +2358,7 @@ export default function App() {
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface" align="start">
-                          {[...users].sort((a, b) => a.name.localeCompare(b.name)).map(u => (
+                          {users.map(u => (
                             <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
                               {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
                             </SelectItem>
@@ -2669,14 +2691,14 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[85vh] max-h-[85vh]">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
                 <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <Users className="h-6 w-6 text-brand-blue" />
                     </div>
                     <div className="flex flex-col gap-0">
-                      <DialogTitle className="text-xl font-bold tracking-tight text-white leading-none">
+                      <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
@@ -2686,39 +2708,39 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="p-6 pb-2 space-y-6 shrink-0">
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-bold tracking-widest text-brand-blue uppercase">System Configuration</Label>
+                <div className="p-6 pb-2 space-y-8 shrink-0">
+                  <div className="space-y-4">
+                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
                     <div 
-                      className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                      className="flex items-center justify-between p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                       onClick={togglePhotoRequirement}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
-                          <Camera className="h-4 w-4" />
+                      <div className="flex items-center gap-4">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                          <Camera className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-bold' : 'text-brand-blue/50'}`}>Photo Verification</p>
-                          <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
+                          <p className={`text-sm transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                          <p className={`text-[10px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
                         </div>
                       </div>
-                      <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
-                        <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <div className={`w-12 h-6 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                        <div className={`h-4 w-4 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-bold tracking-widest text-brand-blue uppercase">Add New User</Label>
+                  <div className="space-y-4">
+                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">Add New User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Name..." 
                         value={newUserName}
                         onChange={(e) => setNewUserName(e.target.value)}
-                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-9 flex-1 text-xs"
+                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className={`w-24 h-9 bg-brand-surface border-brand-grey/20 flex items-center text-[10px] ${!newUserTitle ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-grey/20 flex items-center">
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
@@ -2729,46 +2751,42 @@ export default function App() {
                       </Select>
                       <Button 
                         onClick={handleAddUser} 
-                        className="bg-brand-yellow text-brand-blue hover:brightness-110 h-9 px-4 font-bold shadow-sm"
+                        className="bg-brand-yellow text-brand-blue hover:brightness-110 h-8 px-4 font-black shadow-sm"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? <RefreshCcw className="h-3.5 w-3.5 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                        {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
                       </Button>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden p-6 pt-0 flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-[10px] font-bold tracking-widest text-brand-blue uppercase">System Users</Label>
-                    <span className="text-[8px] font-bold text-brand-grey/40">{users.length} Records</span>
-                  </div>
-                <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative min-h-[200px]">
-                  <div className="absolute inset-0 overflow-y-auto">
-                    <Table className="relative border-separate border-spacing-0 w-full">
-                      <TableHeader className="sticky top-0 z-50 bg-brand-light-grey">
-                        <TableRow className="bg-brand-light-grey border-none">
-                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-brand-blue uppercase tracking-widest`}>Name</TableHead>
-                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px] font-bold text-brand-blue uppercase tracking-widest`}>Actions</TableHead>
+                <div className="flex-1 overflow-hidden p-6 flex flex-col gap-4">
+                  <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
+                  <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-y-auto bg-brand-surface shadow-inner relative">
+                    <Table className="relative border-separate border-spacing-0">
+                      <TableHeader className="sticky top-0 z-40">
+                        <TableRow className="bg-brand-light-grey">
+                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Name</TableHead>
+                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {[...users].sort((a, b) => a.name.localeCompare(b.name)).map((u) => (
+                        {users.map((u) => (
                           <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                            <TableCell className="font-normal text-brand-dark-grey py-1.5 text-center text-xs">
+                            <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
                               {editingUser?.id === u.id ? (
                                 <div className="flex gap-2 items-center px-1">
                                   <Input 
                                     value={editingUser?.name || ""}
                                     onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                    className="h-8 bg-brand-surface border-brand-blue/30 flex-1 text-xs"
+                                    className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
                                     autoFocus
                                   />
                                   <Select 
                                     value={editingUser?.title || ""} 
                                     onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                                   >
-                                    <SelectTrigger className={`w-24 h-8 bg-brand-surface border-brand-blue/30 flex items-center text-[10px] ${!editingUser?.title ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
+                                    <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-blue/30 flex items-center">
                                       <SelectValue placeholder="Title...." />
                                     </SelectTrigger>
                                     <SelectContent className="bg-brand-surface">
@@ -2779,37 +2797,37 @@ export default function App() {
                                   </Select>
                                 </div>
                               ) : (
-                                <span>{u.name} {u.title && <span className="text-brand-dark-grey font-medium">({u.title})</span>}</span>
+                                <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
                               )}
                             </TableCell>
-                            <TableCell className="text-center py-1.5">
+                            <TableCell className="text-center py-3">
                               <div className="flex justify-center gap-1">
                                 {editingUser?.id === u.id ? (
                                   <Button 
                                     size="sm" 
                                     variant="ghost" 
-                                    className="h-7 w-7 p-0 text-brand-blue"
+                                    className="h-8 w-8 p-0 text-brand-blue"
                                     onClick={handleUpdateUser}
                                   >
-                                    <Check className="h-4 w-4" />
+                                    <PlusCircle className="h-4 w-4" />
                                   </Button>
                                 ) : (
                                   <Button 
                                     size="sm" 
                                     variant="ghost" 
-                                    className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                    className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
                                     onClick={() => setEditingUser(u)}
                                   >
-                                    <Edit className="h-3 w-3" />
+                                    <Edit className="h-4 w-4" />
                                   </Button>
                                 )}
                                 <Button 
                                   size="sm" 
                                   variant="ghost" 
-                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                  className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
                                   onClick={() => setUserToDeleteConfirm(u)}
                                 >
-                                  <Trash2 className="h-3 w-3" />
+                                  <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
                             </TableCell>
@@ -2819,7 +2837,6 @@ export default function App() {
                     </Table>
                   </div>
                 </div>
-              </div>
 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
@@ -2836,20 +2853,16 @@ export default function App() {
             </Dialog>
 
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
-            {/* Background Shield Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none select-none z-0 overflow-hidden">
-              <Shield className="w-[500px] h-[500px] text-brand-blue" />
-            </div>
-            <div className="flex flex-col gap-4 relative z-10">
-              <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
-                <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                  <Table className="relative border-separate border-spacing-0 z-10 w-full">
-                    <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
-                      <TableRow className="bg-brand-light-grey border-none">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Schedule</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px]`}>Current Stock</TableHead>
+            <div className="flex flex-col gap-4">
+              <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px]">
+                <div className="overflow-x-auto h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+                  <Table className="relative border-separate border-spacing-0">
+                    <TableHeader className="sticky top-0 z-30">
+                      <TableRow className="bg-brand-light-grey">
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Schedule</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Current Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -3069,10 +3082,6 @@ export default function App() {
         </TabsContent>
 
           <TabsContent value="history" className="space-y-4 relative z-10 m-0">
-            {/* Background Shield Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none select-none z-0 overflow-hidden">
-              <Shield className="w-[500px] h-[500px] text-brand-blue" />
-            </div>
             <div className="flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
               <div className="flex items-end gap-10">
                 <div className="grid gap-1.5">
@@ -3185,18 +3194,18 @@ export default function App() {
                 Showing {filteredTransactions.length} transactions
               </div>
             </div>
-            <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
-              <div className="h-[calc(100vh-320px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                <Table className="relative border-separate border-spacing-0 z-10 w-full">
-                  <TableHeader className="sticky top-0 z-[100] bg-brand-light-grey">
-                    <TableRow className="bg-brand-light-grey border-none">
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Ref #</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-4`}>Medication</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-[100] h-12 text-brand-blue font-black uppercase tracking-widest text-[9px] px-2 whitespace-nowrap`}>User</TableHead>
+            <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px]">
+              <div className="overflow-x-auto h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+                <Table className="relative border-separate border-spacing-0">
+                  <TableHeader className="sticky top-0 z-30">
+                    <TableRow className="bg-brand-light-grey">
+                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Reference #</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -3209,10 +3218,10 @@ export default function App() {
                       </TableRow>
                     ) : filteredTransactions.map((t) => (
                     <TableRow key={t.id} className="h-14">
-                      <TableCell className="text-xs font-mono text-brand-dark-grey/70 whitespace-nowrap text-center px-2">
+                      <TableCell className="text-xs font-mono text-brand-dark-grey/70 whitespace-nowrap text-center">
                         {formatDateTime(t.timestamp)}
                       </TableCell>
-                      <TableCell className="text-center px-2 whitespace-nowrap">
+                      <TableCell className="text-center">
                         {t.referenceNumber ? (
                           <button 
                             onClick={() => setViewingTransaction(t)}
@@ -3224,10 +3233,10 @@ export default function App() {
                           <span className="text-brand-dark-grey/40 italic">-</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-center px-4">
-                        <div className="text-sm font-bold text-brand-dark-grey whitespace-normal">{t.substanceName}&nbsp;{t.strength}</div>
+                      <TableCell className="text-center">
+                        <div className="text-sm font-bold text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                       </TableCell>
-                      <TableCell className="text-xs font-bold text-center px-2 whitespace-nowrap">
+                      <TableCell className="text-xs font-bold text-center">
                         <button 
                           onClick={() => handleNDCClick(t.ndc)}
                           className="text-brand-blue hover:underline font-bold transition-colors"
@@ -3235,13 +3244,13 @@ export default function App() {
                           {t.ndc}
                         </button>
                       </TableCell>
-                      <TableCell className="px-2 text-center whitespace-nowrap">
+                      <TableCell>
                         <TransactionBadge type={t.type} />
                       </TableCell>
-                      <TableCell className="text-center font-bold text-sm text-brand-dark-grey px-2 whitespace-nowrap">
+                      <TableCell className="text-center font-bold text-sm text-brand-dark-grey">
                         {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                       </TableCell>
-                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact px-2 whitespace-nowrap">
+                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
                         {escapeEmail(t.performedByName)}
                         {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
                           <span className="ml-1 text-brand-dark-grey">
@@ -3315,8 +3324,8 @@ export default function App() {
 
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full max-h-[90vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-        <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg z-10">
+      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
+        <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 rounded-full bg-brand-blue border-2 border-white flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
@@ -3326,7 +3335,7 @@ export default function App() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <DialogTitle className="text-xl font-bold tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
+                <DialogTitle className="text-xl font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 leading-tight truncate">
                   REAL-TIME REGISTRY MANAGEMENT AND GLOBAL SUBSCRIPTION AUTHORITY TERMINAL.
                 </DialogDescription>
@@ -3336,17 +3345,17 @@ export default function App() {
             <div className="px-3 py-2 bg-brand-yellow rounded-lg border border-brand-yellow/20 flex items-center justify-between">
               <div className="flex gap-4 items-center">
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Authenticated Master Identity</span>
-                  <span className="text-xs font-bold text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
+                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Authenticated Master Identity</span>
+                  <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
                     {getIdentityString(userProfile, user?.email)} 
                     <span className={`h-1.5 w-1.5 rounded-full ${isMasterAdmin ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} title={isMasterAdmin ? 'Authority Verified' : 'Standard User Restricted'} />
                   </span>
                 </div>
                 <div className="h-6 w-px bg-brand-blue/10" />
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Registry Synchronization Status</span>
-                  <span className="text-xs font-bold text-brand-blue/80 tracking-tight">
-                    {filteredProfiles.length} Managed Customer Nodes Registered
+                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Registry Synchronization Status</span>
+                  <span className="text-xs font-black text-brand-blue/80 tracking-tight">
+                    {filteredUserProfiles.length} Managed Customer Nodes Registered
                   </span>
                 </div>
               </div>
@@ -3417,8 +3426,8 @@ export default function App() {
             <div className="flex-1 overflow-y-auto">
               <table className="w-full table-fixed">
                 <tbody className="divide-y divide-brand-blue/5">
-                  {filteredProfiles.length > 0 ? (
-                    filteredProfiles.map((profile) => (
+                  {filteredUserProfiles.length > 0 ? (
+                    filteredUserProfiles.map((profile) => (
                       <tr key={profile.docId || profile.uid} className="hover:bg-brand-blue/5 transition-colors h-14">
                         <td className="py-2 px-4 w-[80%]">
                           <div className="flex flex-col gap-0 min-w-0">
@@ -3528,25 +3537,15 @@ export default function App() {
               PharmaGuard Inventory Registry Terminal
             </p>
           </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="default" 
-                onClick={() => setIsMigrateOpen(true)}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-4 h-10 rounded-lg transition-all flex gap-3 items-center shadow-lg group"
-              >
-                <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                  <ArrowRight className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
-                </div>
-                Data Migration
-              </Button>
-              <Button 
-                variant="default" 
-                onClick={() => setIsSuperAdminOpen(false)}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-6 h-10 rounded-lg transition-all"
-              >
-                Disconnect Terminal
-              </Button>
-            </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="default" 
+              onClick={() => setIsSuperAdminOpen(false)}
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-6 h-9 rounded-lg transition-all"
+            >
+              Disconnect Terminal
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -3867,7 +3866,7 @@ export default function App() {
                       value={editingMed.schedule} 
                       onValueChange={(v: Schedule) => setEditingMed({...editingMed, schedule: v})}
                     >
-                      <SelectTrigger className={`bg-brand-surface border-brand-blue/30 focus:border-brand-blue h-11 ${!editingMed.schedule ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {SCHEDULES.map(s => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -3911,162 +3910,6 @@ export default function App() {
             disabled={isSubmitting}
           >
             {isSubmitting ? "Saving..." : "Update Details"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog open={isMigrateOpen} onOpenChange={setIsMigrateOpen}>
-      <DialogContent showCloseButton={false} className="sm:max-w-lg w-full overflow-hidden flex flex-col p-0 gap-0 border-brand-blue/20 bg-brand-surface rounded-2xl shadow-2xl fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-        <DialogHeader className="p-6 bg-white border-b border-brand-blue/5 shrink-0 relative overflow-hidden">
-          <div className="flex items-center gap-4 text-left relative z-10 w-full justify-center">
-            <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-brand-blue/10">
-              <ArrowRightLeft className="h-7 w-7 text-brand-blue" strokeWidth={3} />
-            </div>
-            <div className="flex flex-col gap-0 text-center">
-              <DialogTitle className="text-xl font-bold tracking-tight text-brand-blue leading-none">
-                Data Migration Utility
-              </DialogTitle>
-              <DialogDescription className="text-brand-blue/60 font-bold text-[10px] tracking-widest mt-1 uppercase">
-                TRANSFER REGISTRY DATA BETWEEN NODES
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className="p-8 space-y-8 bg-brand-blue/5">
-          <div className="space-y-6">
-            <div className="grid gap-3">
-              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Source Node (Migration Point A)</Label>
-              <div className="relative">
-                <Select value={migrationSourceId} onValueChange={setMigrationSourceId}>
-                  <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationSourceId ? 'text-muted-foreground' : 'text-brand-blue'}`}>
-                    <SelectValue placeholder="Begin Typable Search..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">
-                    <div className="p-2 border-b border-brand-blue/5">
-                      <Input 
-                        placeholder="Search Organizations..." 
-                        autoFocus
-                        className="h-9 text-xs border-none focus-visible:ring-0 shadow-none bg-brand-blue/5"
-                        onKeyDown={(e) => e.stopPropagation()}
-                        onChange={(e) => {
-                          const term = e.target.value.toLowerCase();
-                          setAllUserProfiles(prev => [...prev]); // Trigger re-render if using local filtering
-                          setUserSearchTerm(term);
-                        }}
-                      />
-                    </div>
-                    <ScrollArea className="h-[200px]">
-                      {filteredProfiles.map(p => (
-                        <SelectItem key={p.docId} value={p.docId || ""} className="font-bold text-brand-blue py-3 px-4 hover:bg-brand-blue/5">
-                          {p.organizationName || p.displayName || p.email} ({p.docId})
-                        </SelectItem>
-                      ))}
-                    </ScrollArea>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex justify-center py-0 relative h-10">
-              <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-brand-blue/10 -translate-y-1/2" />
-              <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center border-2 border-white shadow-md relative z-10">
-                <ArrowRightLeft className="h-5 w-5 text-brand-blue" strokeWidth={3} />
-              </div>
-            </div>
-
-            <div className="grid gap-3">
-              <Label className="text-[11px] uppercase font-bold text-brand-blue tracking-wider text-center">Destination Node (Migration Point B)</Label>
-              <Select value={migrationDestId} onValueChange={setMigrationDestId}>
-                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-14 font-black transition-all shadow-sm rounded-xl text-center flex justify-center items-center ${!migrationDestId ? 'text-muted-foreground' : 'text-brand-blue'}`}>
-                  <SelectValue placeholder="Begin Typable Search..." />
-                </SelectTrigger>
-                <SelectContent className="bg-brand-surface p-0 border-brand-blue/10 shadow-2xl">
-                  <div className="p-2 border-b border-brand-blue/5">
-                    <Input 
-                      placeholder="Search Organizations..." 
-                      className="h-9 text-xs border-none focus-visible:ring-0 shadow-none bg-brand-blue/5"
-                      onKeyDown={(e) => e.stopPropagation()}
-                      onChange={(e) => setUserSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  <ScrollArea className="h-[200px]">
-                    {filteredProfiles.map(p => (
-                      <SelectItem key={p.docId} value={p.docId || ""} className="font-bold text-brand-blue py-3 px-4 hover:bg-brand-blue/5">
-                        {p.organizationName || p.displayName || p.email} ({p.docId})
-                      </SelectItem>
-                    ))}
-                  </ScrollArea>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="bg-brand-yellow/10 border border-brand-yellow/20 p-5 rounded-2xl space-y-2 shadow-inner">
-            <div className="flex items-center gap-2 text-brand-blue">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-tight">Destructive Operation Warning</span>
-            </div>
-            <p className="text-[10px] text-brand-blue/70 font-medium leading-relaxed text-center">
-              This utility will recursively copy all inventory substances, transaction history records, and staff profiles from Point A to Point B. Data in Point A will remain intact unless manually purged.
-            </p>
-          </div>
-        </div>
-
-        <DialogFooter className="p-6 pt-0 bg-brand-blue/5 flex flex-col gap-3 shrink-0">
-          <Button 
-            onClick={async () => {
-              if (!migrationSourceId || !migrationDestId) {
-                toast.error("Source and Destination nodes must be selected");
-                return;
-              }
-              if (migrationSourceId === migrationDestId) {
-                toast.error("Source and Destination cannot be the same node");
-                return;
-              }
-
-              setIsActionPending(true);
-              try {
-                const collectionsToMigrate = ["substances", "transactions", "staff"];
-                let totalCopied = 0;
-
-                for (const collName of collectionsToMigrate) {
-                  const sourceColl = collection(db, "users", migrationSourceId, collName);
-                  const destColl = collection(db, "users", migrationDestId, collName);
-                  const snapshot = await getDocs(sourceColl);
-                  
-                  const docs = snapshot.docs;
-                  for (let i = 0; i < docs.length; i += 500) {
-                    const batch = writeBatch(db);
-                    const chunk = docs.slice(i, i + 500);
-                    chunk.forEach(d => {
-                      batch.set(doc(destColl, d.id), d.data());
-                      totalCopied++;
-                    });
-                    await batch.commit();
-                  }
-                }
-
-                toast.success(`Migration Successful: ${totalCopied} records consolidated into ${migrationDestId}`);
-                setIsMigrateOpen(false);
-              } catch (e: any) {
-                toast.error(`Migration Failed: ${e.message}`);
-              } finally {
-                setIsActionPending(false);
-              }
-            }} 
-            disabled={isActionPending || !migrationSourceId || !migrationDestId}
-            className="w-full h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 shadow-lg shadow-brand-blue/20 rounded-xl"
-          >
-            {isActionPending ? <RefreshCcw className="h-5 w-5 animate-spin" /> : "Initiate Data Migration"}
-          </Button>
-          <Button 
-            variant="ghost"
-            onClick={() => setIsMigrateOpen(false)} 
-            className="w-full h-10 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-blue/40"
-          >
-            Abort Utility
           </Button>
         </DialogFooter>
       </DialogContent>
