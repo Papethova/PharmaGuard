@@ -1778,7 +1778,7 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-6 sticky top-12 shrink-0 overflow-visible self-start">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col sticky top-2 shrink-0 overflow-visible self-start h-[calc(100vh-100px)]">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-bold text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -1817,7 +1817,7 @@ export default function App() {
               </Button>
             </div>
             
-            <div className="flex flex-col w-full">
+            <div className="flex-1 flex flex-col justify-center py-6">
               <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-2 w-full">
                 <TabsTrigger 
                   value="inventory" 
@@ -1873,8 +1873,9 @@ export default function App() {
               </TabsList>
             </div>
 
-              {user && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-2">
+            <div className="mt-auto pb-4">
+               {user && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-0">
                   <div className="flex flex-col overflow-hidden">
                     <span className="text-xs font-bold text-brand-blue/60 truncate tracking-tight">
                       {userProfile?.organizationName || userProfile?.displayName || user.displayName}
@@ -1907,6 +1908,7 @@ export default function App() {
                   </div>
                 </div>
               )}
+            </div>
           </aside>
 
           <div className="w-full relative min-w-0 flex-1 z-10">
@@ -2840,7 +2842,11 @@ export default function App() {
             </Dialog>
 
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
-            <div className="flex flex-col gap-4">
+            {/* Background Shield Watermark */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+              <PharmaLogo className="w-[500px] h-[500px]" />
+            </div>
+            <div className="flex flex-col gap-4 relative z-10">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
                 <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
                   <Table className="relative border-separate border-spacing-0 z-10 w-full">
@@ -3069,6 +3075,10 @@ export default function App() {
         </TabsContent>
 
           <TabsContent value="history" className="space-y-4 relative z-10 m-0">
+            {/* Background Shield Watermark */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+              <PharmaLogo className="w-[500px] h-[500px]" />
+            </div>
             <div className="flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
               <div className="flex items-end gap-10">
                 <div className="grid gap-1.5">
