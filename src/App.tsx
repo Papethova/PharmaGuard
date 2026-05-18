@@ -1778,9 +1778,9 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col sticky top-16 shrink-0 overflow-visible self-start h-[calc(100vh-140px)]">
-            <div className="flex flex-col gap-2 w-full shrink-0">
-              <div className="px-5 p-0 mb-1 text-center flex flex-col items-center justify-center min-h-[32px]">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-6 sticky top-12 shrink-0 overflow-visible self-start">
+            <div className="flex flex-col gap-3 w-full shrink-0">
+              <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-bold text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
                   (getIdentityString(userProfile, user?.email).length || 0) > 20 ? "text-lg" : 
                   (getIdentityString(userProfile, user?.email).length || 0) > 15 ? "text-xl" : "text-2xl"
@@ -1817,7 +1817,7 @@ export default function App() {
               </Button>
             </div>
             
-            <div className="flex-1 flex flex-col justify-center py-6">
+            <div className="flex flex-col w-full">
               <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-2 w-full">
                 <TabsTrigger 
                   value="inventory" 
@@ -1873,9 +1873,8 @@ export default function App() {
               </TabsList>
             </div>
 
-            <div className="mt-auto shrink-0 pb-2">
               {user && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-2">
                   <div className="flex flex-col overflow-hidden">
                     <span className="text-xs font-bold text-brand-blue/60 truncate tracking-tight">
                       {userProfile?.organizationName || userProfile?.displayName || user.displayName}
@@ -1908,8 +1907,6 @@ export default function App() {
                   </div>
                 </div>
               )}
-            </div>
-
           </aside>
 
           <div className="w-full relative min-w-0 flex-1 z-10">
