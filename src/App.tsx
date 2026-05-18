@@ -1778,9 +1778,9 @@ export default function App() {
           }} 
           className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
         >
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col sticky top-6 shrink-0 overflow-visible self-start pt-10">
-            <div className="flex flex-col gap-6 w-full shrink-0">
-              <div className="px-5 p-0 mb-10 text-center flex flex-col items-center justify-center min-h-[40px]">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col sticky top-6 shrink-0 overflow-visible self-start pt-14">
+            <div className="flex flex-col gap-8 w-full shrink-0">
+              <div className="px-5 p-0 mb-14 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-bold text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
                   (getIdentityString(userProfile, user?.email).length || 0) > 20 ? "text-lg" : 
                   (getIdentityString(userProfile, user?.email).length || 0) > 15 ? "text-xl" : "text-2xl"
@@ -1816,31 +1816,31 @@ export default function App() {
                 Adjust
               </Button>
             </div>
-            <div className="flex flex-col w-full mt-12">
-              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full">
+            <div className="flex flex-col w-full mt-14">
+              <TabsList variant="line" className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full">
                 <TabsTrigger 
                   value="inventory" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
                     <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
                     <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="alerts" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
                     <AlertTriangle className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
@@ -1856,9 +1856,9 @@ export default function App() {
                     e.preventDefault();
                     setIsUserManagementOpen(true);
                   }}
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-[state=active]:text-brand-blue text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-14 px-0 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-brand-blue text-brand-blue/50 border border-transparent text-base group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all group-hover:scale-105">
                     <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-bold text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
@@ -1867,7 +1867,7 @@ export default function App() {
               </TabsList>
             </div>
 
-            <div className="mt-12">
+            <div className="mt-14">
                {user && (
                 <div className="flex items-center justify-between p-3 rounded-lg bg-brand-blue/5 border border-brand-blue/10 group mt-0">
                   <div className="flex flex-col overflow-hidden">
