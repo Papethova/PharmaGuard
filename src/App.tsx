@@ -255,7 +255,7 @@ const formatRefForDisplay = (ref: string | undefined) => {
   return ref;
 };
 
-// Sync Heartbeat: 2026-05-18T16:20:00
+// Sync Heartbeat: 2026-05-18T16:25:00
 export default function App() {
   // Emergency catch-all to prevent white screens
   const [renderError, setRenderError] = useState<string | null>(null);
