@@ -1427,13 +1427,13 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-start">
         <motion.div 
-          initial={{ opacity: 0, y: 0 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full"
         >
-          <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden border-none rounded-none">
+          <Card className="border-brand-blue/10 shadow-2xl bg-brand-surface overflow-hidden border-none rounded-t-none">
             <div className="bg-brand-blue p-4 py-6 text-center relative overflow-hidden">
               <div className="flex justify-center mb-4">
                 <PharmaLogo className="h-16 w-16" />
@@ -2100,7 +2100,7 @@ export default function App() {
                               value={newMed.strength} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, strength: e.target.value})} 
                               placeholder="e.g. 10mg" 
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.strength ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2111,7 +2111,7 @@ export default function App() {
                               value={newMed.unit} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, unit: e.target.value})} 
                               placeholder="e.g. Tablets" 
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.unit ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2124,7 +2124,7 @@ export default function App() {
                               value={newMed.ndc} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, ndc: e.target.value})} 
                               placeholder="00000-0000-00" 
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.ndc ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2143,7 +2143,7 @@ export default function App() {
                                 }
                               }} 
                               placeholder="e.g. 100"
-                              className={`bg-brand-surface h-9 text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`bg-brand-surface h-9 ${newMed.packageSize ? 'text-black font-black' : 'text-brand-dark-grey'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -2156,12 +2156,12 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium text-brand-dark-grey ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${newMed.schedule ? 'text-black font-black' : 'text-brand-dark-grey/40'} ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
                                 {SCHEDULES.map(s => (
-                                  <SelectItem key={s} value={s} className="pl-3 text-brand-dark-grey">{s}</SelectItem>
+                                  <SelectItem key={s} value={s} className="pl-3 text-black font-black">{s}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -2723,39 +2723,39 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="p-4 space-y-4 shrink-0">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">System Configuration</Label>
+                <div className="p-6 pb-2 space-y-8 shrink-0">
+                  <div className="space-y-4">
+                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
                     <div 
-                      className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                      className="flex items-center justify-between p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                       onClick={togglePhotoRequirement}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
-                          <Camera className="h-4 w-4" />
+                      <div className="flex items-center gap-4">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                          <Camera className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
-                          <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
+                          <p className={`text-sm transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                          <p className={`text-[10px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
                         </div>
                       </div>
-                      <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
-                        <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <div className={`w-12 h-6 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                        <div className={`h-4 w-4 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">Add New User</Label>
+                  <div className="space-y-4">
+                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">Add New User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Name..." 
                         value={newUserName}
                         onChange={(e) => setNewUserName(e.target.value)}
-                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1 text-xs"
+                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className="w-24 h-8 bg-brand-surface border-brand-grey/20 flex items-center text-[10px]">
+                        <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-grey/20 flex items-center">
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
@@ -2769,30 +2769,27 @@ export default function App() {
                         className="bg-brand-yellow text-brand-blue hover:brightness-110 h-8 px-4 font-black shadow-sm"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                        {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
                       </Button>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden p-4 pt-0 flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-[10px] font-black tracking-widest text-brand-blue uppercase">System Users</Label>
-                    <span className="text-[8px] font-bold text-brand-grey/40">{users.length} Records</span>
-                  </div>
+                <div className="flex-1 overflow-hidden p-6 flex flex-col gap-4">
+                  <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
                 <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-hidden bg-brand-surface shadow-inner relative">
-                  <div className="h-full overflow-y-auto">
+                  <ScrollArea className="h-full">
                     <Table className="relative border-separate border-spacing-0">
                       <TableHeader className="sticky top-0 z-50">
                         <TableRow className="bg-brand-light-grey">
-                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px]`}>Name</TableHead>
-                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-8 text-[10px]`}>Actions</TableHead>
+                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Name</TableHead>
+                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50 h-10`}>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {users.map((u) => (
                           <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                            <TableCell className="font-medium text-brand-dark-grey py-1.5 text-center text-xs">
+                            <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
                               {editingUser?.id === u.id ? (
                                 <div className="flex gap-2 items-center px-1">
                                   <Input 
@@ -2816,47 +2813,47 @@ export default function App() {
                                   </Select>
                                 </div>
                               ) : (
-                              <span className="text-xs">{u.name} {u.title && <span className="text-brand-dark-grey font-black">({u.title})</span>}</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center py-1.5">
-                          <div className="flex justify-center gap-1">
-                            {editingUser?.id === u.id ? (
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-7 w-7 p-0 text-brand-blue"
-                                onClick={handleUpdateUser}
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            ) : (
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
-                                onClick={() => setEditingUser(u)}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                            )}
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                              onClick={() => setUserToDeleteConfirm(u)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                                <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-center py-3">
+                              <div className="flex justify-center gap-1">
+                                {editingUser?.id === u.id ? (
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-8 w-8 p-0 text-brand-blue"
+                                    onClick={handleUpdateUser}
+                                  >
+                                    <PlusCircle className="h-4 w-4" />
+                                  </Button>
+                                ) : (
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                    onClick={() => setEditingUser(u)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                  onClick={() => setUserToDeleteConfirm(u)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
+                </div>
               </div>
-            </div>
-          </div>
 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
@@ -2875,11 +2872,8 @@ export default function App() {
           <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
             <div className="flex flex-col gap-4">
               <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
-                <div className="h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] rotate-[-15deg] select-none z-0">
-                    <h1 className="text-[120px] font-black tracking-tighter text-brand-blue uppercase">PharmaGuard</h1>
-                  </div>
-                  <Table className="relative border-separate border-spacing-0 z-10">
+                <div className="h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+                  <Table className="relative border-separate border-spacing-0">
                     <TableHeader className="sticky top-0 z-50">
                       <TableRow className="bg-brand-light-grey">
                         <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Medication & Strength</TableHead>
@@ -3218,11 +3212,8 @@ export default function App() {
               </div>
             </div>
             <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] overflow-hidden">
-              <div className="h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 relative">
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] rotate-[-15deg] select-none z-0">
-                  <h1 className="text-[120px] font-black tracking-tighter text-brand-blue uppercase">PharmaGuard</h1>
-                </div>
-                <Table className="relative border-separate border-spacing-0 z-10">
+              <div className="h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+                <Table className="relative border-separate border-spacing-0">
                   <TableHeader className="sticky top-0 z-50">
                     <TableRow className="bg-brand-light-grey">
                         <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-50`}>Timestamp</TableHead>
@@ -3350,11 +3341,8 @@ export default function App() {
 
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl relative">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] rotate-[-15deg] select-none z-0">
-          <h1 className="text-[120px] font-black tracking-tighter text-brand-blue uppercase">PharmaGuard</h1>
-        </div>
-        <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg z-10">
+      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
+        <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 rounded-full bg-brand-blue border-2 border-white flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
@@ -3566,23 +3554,15 @@ export default function App() {
               PharmaGuard Inventory Registry Terminal
             </p>
           </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setIsMigrateOpen(true)}
-                className="text-[10px] font-black uppercase tracking-widest border-brand-blue/20 text-brand-blue hover:bg-brand-blue hover:text-white px-4 h-9 rounded-lg transition-all flex gap-2 items-center"
-              >
-                <ArrowLeftRight className="h-3.5 w-3.5" />
-                Data Migration
-              </Button>
-              <Button 
-                variant="default" 
-                onClick={() => setIsSuperAdminOpen(false)}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-6 h-9 rounded-lg transition-all"
-              >
-                Disconnect Terminal
-              </Button>
-            </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="default" 
+              onClick={() => setIsSuperAdminOpen(false)}
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-6 h-9 rounded-lg transition-all"
+            >
+              Disconnect Terminal
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
