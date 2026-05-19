@@ -1432,29 +1432,29 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full"
         >
-          <div className="bg-brand-surface shadow-2xl overflow-hidden rounded-2xl border-none ring-0">
-            <div className="bg-brand-blue px-6 py-4 text-center relative overflow-hidden">
-              <div className="flex justify-center mb-1.5">
-                <PharmaLogo className="h-10 w-10" />
+          <div className="bg-brand-surface shadow-2xl overflow-hidden rounded-2xl border-none">
+            <div className="bg-brand-blue px-6 py-6 text-center relative overflow-hidden rounded-t-2xl">
+              <div className="flex justify-center mb-2">
+                <PharmaLogo className="h-16 w-16" />
               </div>
-              <h1 className="text-lg font-black text-white tracking-tighter">PharmaGuard</h1>
-              <p className="text-brand-yellow font-bold text-[7px] uppercase tracking-[0.15em] mt-0.5">
+              <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
+              <p className="text-brand-yellow font-bold text-[8px] uppercase tracking-[0.15em] mt-1">
                 SECURE CONTROLLED SUBSTANCE PERPETUAL INVENTORY SYSTEM
               </p>
             </div>
 
-            <div className="p-5 pt-3">
+            <div className="p-5 pt-4">
               {authMode === "google" ? (
-                <div className="space-y-2.5">
-                  <div className="text-center space-y-0.5">
+                <div className="space-y-4">
+                  <div className="text-center space-y-1">
                     <h2 className="text-sm font-bold text-brand-blue uppercase tracking-tight">Identity Verification Required</h2>
                     <p className="text-brand-dark-grey/60 text-[10px]">
                       Access to the controlled substance registry is restricted to authorized personnel.
                     </p>
                   </div>
                   
-                  <form onSubmit={handleEmailLogin} className="space-y-2.5">
-                    <div className="space-y-2">
+                  <form onSubmit={handleEmailLogin} className="space-y-3">
+                    <div className="space-y-2.5">
                       <div className="space-y-0.5 text-left">
                         <Label className="text-[9px] uppercase font-black text-brand-blue/80">Authorized Email</Label>
                         <Input 
@@ -1462,7 +1462,7 @@ export default function App() {
                           placeholder=""
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="h-9 border-brand-blue/10 focus-visible:ring-brand-blue text-sm"
+                          className="h-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm bg-brand-surface"
                           required
                         />
                       </div>
@@ -1485,18 +1485,18 @@ export default function App() {
                           placeholder=""
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="h-9 border-brand-blue/10 focus-visible:ring-brand-blue text-sm"
+                          className="h-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm bg-brand-surface"
                           required
                         />
                       </div>
                     </div>
 
-                    <Button className="w-full h-10 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
+                    <Button className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
                       {isSubmitting ? "Verifying..." : "Verify & Enter"}
                     </Button>
                   </form>
 
-                  <div className="relative my-1">
+                  <div className="relative my-2">
                     <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-brand-grey/10"></span></div>
                     <div className="relative flex justify-center text-[8px] uppercase font-bold px-2 bg-brand-surface text-brand-grey/40">or use google SSO</div>
                   </div>
@@ -1504,108 +1504,108 @@ export default function App() {
                   <Button 
                     onClick={handleGoogleLogin}
                     disabled={isSubmitting}
-                    className="w-full h-9 bg-white border border-brand-blue/10 hover:bg-gray-50 text-brand-dark-grey font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full h-10 bg-white border border-brand-blue/10 hover:bg-gray-50 text-brand-dark-grey font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
-                      <div className="h-3.5 w-3.5 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+                      <div className="h-4 w-4 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
                     ) : (
-                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-3.5 h-3.5" alt="Google" />
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" alt="Google" />
                     )}
                     {isSubmitting ? "Syncing..." : "Continue with Google"}
                   </Button>
                   
-                  <div className="text-center pt-0.5">
+                  <div className="text-center pt-1">
                     <button 
                       onClick={() => setAuthMode("signup")}
-                      className="text-[8px] uppercase font-black text-brand-blue/60 hover:text-brand-blue tracking-widest transition-colors"
+                      className="text-[9px] uppercase font-black text-brand-blue/60 hover:text-brand-blue tracking-widest transition-colors"
                     >
                       Create New Organization Nodes
                     </button>
                   </div>
                 </div>
               ) : authMode === "login" ? (
-                <div className="flex flex-col gap-2">
-                  <p className="text-center text-[10px] text-brand-dark-grey/60">Legacy login node redirecting...</p>
-                  <Button onClick={() => setAuthMode("google")} className="h-9 text-xs">Click to Restore Session</Button>
+                <div className="flex flex-col gap-3">
+                  <p className="text-center text-[11px] text-brand-dark-grey/60">Legacy login node redirecting...</p>
+                  <Button onClick={() => setAuthMode("google")} className="h-11 text-xs">Click to Restore Session</Button>
                 </div>
               ) : authMode === "signup" ? (
-                <form onSubmit={handleEmailSignUp} className="space-y-2.5">
-                  <div className="grid grid-cols-1 gap-2">
-                  <div className="space-y-0.5 text-left">
+                <form onSubmit={handleEmailSignUp} className="space-y-3">
+                  <div className="grid grid-cols-1 gap-2.5">
+                  <div className="space-y-1 text-left">
                     <Label className="text-[9px] uppercase font-black text-brand-blue/80">Organization Name</Label>
                     <Input 
                       placeholder="e.g. UCLA Medical Center"
                       value={orgName}
                       onChange={(e) => setOrgName(e.target.value)}
-                      className="h-9 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm"
+                      className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
                       required
                     />
                   </div>
-                    <div className="space-y-0.5 text-left">
+                    <div className="space-y-1 text-left">
                       <Label className="text-[9px] uppercase font-black text-brand-blue/80">Email</Label>
                       <Input 
                         type="email" 
                         placeholder="e.g. drsmith@ucla.edu"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="h-9 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm"
+                        className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
                         required
                       />
                     </div>
-                    <div className="space-y-0.5 text-left">
+                    <div className="space-y-1 text-left">
                       <Label className="text-[9px] uppercase font-black text-brand-blue/80">Password</Label>
                       <Input 
                         type="password" 
                         placeholder="Minimum 6 characters"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="h-9 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm"
+                        className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
                         required
                         minLength={6}
                       />
                     </div>
                   </div>
 
-                  <Button className="w-full h-10 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-0.5" disabled={isSubmitting}>
+                  <Button className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-1" disabled={isSubmitting}>
                     {isSubmitting ? "Provisioning..." : "Register Organization"}
                   </Button>
 
                   <button 
                     type="button" 
                     onClick={() => setAuthMode("google")}
-                    className="w-full text-[8px] font-bold text-brand-grey/60 uppercase pt-0.5"
+                    className="w-full text-[9px] font-bold text-brand-grey/60 uppercase pt-1"
                   >
                     Already registered? Sign In
                   </button>
                 </form>
               ) : (
-                <form onSubmit={handleForgotPassword} className="space-y-2.5">
-                  <div className="space-y-0.5 text-center">
-                    <h2 className="text-base font-bold text-brand-blue uppercase leading-tight">Reset Password</h2>
-                    <p className="text-[10px] text-brand-grey">Enter your email for a recovery link.</p>
+                <form onSubmit={handleForgotPassword} className="space-y-3">
+                  <div className="space-y-1 text-center">
+                    <h2 className="text-lg font-bold text-brand-blue uppercase leading-tight">Reset Password</h2>
+                    <p className="text-[11px] text-brand-grey">Enter your email for a recovery link.</p>
                   </div>
                   <Input 
                     type="email" 
                     placeholder=""
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="h-9 border-brand-blue/10 text-sm"
+                    className="h-10 border-brand-blue/10 text-sm bg-brand-surface"
                     required
                   />
-                  <Button className="w-full h-10 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
+                  <Button className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
                     {isSubmitting ? "Sending..." : "Send Recovery Link"}
                   </Button>
                   <button 
                     type="button" 
                     onClick={() => setAuthMode("google")}
-                    className="w-full text-[8px] font-bold text-brand-grey/60 uppercase"
+                    className="w-full text-[9px] font-bold text-brand-grey/60 uppercase pt-1"
                   >
                     Back to Login Options
                   </button>
                 </form>
               )}
 
-              <div className="pt-2 border-t border-brand-grey/10 text-center mt-3">
+              <div className="pt-4 border-t border-brand-grey/10 text-center mt-5">
                 <p className="text-[8px] text-brand-dark-grey/30 uppercase font-black tracking-[0.05em]">
                   Compliant with DEA Title 21 CFR Part 1300-1321
                 </p>
