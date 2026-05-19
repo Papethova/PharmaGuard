@@ -2083,11 +2083,11 @@ export default function App() {
                                     >
                                       <div className="flex flex-col">
                                         <div className="flex items-center gap-1">
-                                          <span className="font-medium group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
+                                          <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                                           <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                          <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
+                                          <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
                                         </div>
                                       </div>
                                       <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -2207,13 +2207,13 @@ export default function App() {
                         </div>
                         <div className="space-y-1.5">
                           <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                          <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-medium">
+                          <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal">
                             I confirm that the current physical count of:<br/>
                             <div className="py-1">
-                              <span className="font-black text-brand-blue block text-sm">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength}</span>
-                              <span className="text-xs text-brand-blue font-black block mt-0.5">NDC: {selectedSubstanceDetail?.ndc}</span>
+                              <span className="font-normal text-brand-blue block text-sm">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength}</span>
+                              <span className="text-xs text-brand-blue font-normal block mt-0.5">NDC: {selectedSubstanceDetail?.ndc}</span>
                             </div>
-                            matches the system balance of <span className="font-bold text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
+                            matches the system balance of <span className="font-normal text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
                           </div>
                         </div>
                         
@@ -2282,11 +2282,11 @@ export default function App() {
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex items-center gap-1">
-                                      <span className="font-medium group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
+                                      <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                                       <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
+                                      <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
                                     </div>
                                   </div>
                                   <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -2304,14 +2304,14 @@ export default function App() {
                       {selectedSubstance && (
                         <div className="mt-1 grid grid-cols-2 gap-2">
                           <div className="p-2 bg-brand-blue/5 rounded border border-brand-blue/10">
-                            <Label className="text-[10px] text-brand-blue uppercase font-bold">Strength</Label>
-                            <div className="text-sm font-medium text-brand-dark-grey">
+                            <Label className="text-[10px] text-brand-blue uppercase font-normal">Strength</Label>
+                            <div className="text-sm font-normal text-brand-dark-grey">
                               {inventory.find(i => i.id === selectedSubstance)?.strength}
                             </div>
                           </div>
                           <div className="p-2 bg-brand-blue/5 rounded border border-brand-blue/10">
-                            <Label className="text-xs text-brand-blue uppercase font-bold">NDC</Label>
-                            <div className="text-sm font-medium text-brand-dark-grey">
+                            <Label className="text-xs text-brand-blue uppercase font-normal">NDC</Label>
+                            <div className="text-sm font-normal text-brand-dark-grey">
                               {inventory.find(i => i.id === selectedSubstance)?.ndc}
                             </div>
                           </div>
@@ -2395,12 +2395,12 @@ export default function App() {
 
                     {selectedSubstance && quantity && transactionType !== "VERIFY" && (
                       <div className="p-2 bg-brand-blue/5 rounded-lg border border-brand-blue/10 flex justify-between items-center h-9">
-                        <span className="text-[10px] font-bold text-brand-blue uppercase">Projected</span>
+                        <span className="text-[10px] font-normal text-brand-blue uppercase">Projected</span>
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] text-brand-dark-grey/60">
                             {inventory.find(i => i.id === selectedSubstance)?.currentStock} →
                           </span>
-                          <span className="text-sm font-black text-brand-blue">
+                          <span className="text-sm font-normal text-brand-blue">
                             {(inventory.find(i => i.id === selectedSubstance)?.currentStock || 0) + 
                              (transactionType === "IN" ? Number(quantity) : 
                               transactionType === "OUT" ? -Number(quantity) : 
@@ -2478,7 +2478,7 @@ export default function App() {
                                     }}
                                   >
                                     <Camera className="h-6 w-6 text-brand-blue/40 group-hover:text-brand-blue transition-colors" />
-                                    <span className="text-[10px] font-bold text-brand-grey uppercase">Activate Camera</span>
+                                    <span className="text-[10px] font-normal text-brand-grey uppercase">Activate Camera</span>
                                   </Button>
                                   {cameraPermissionError && (
                                     <motion.div 
@@ -2491,11 +2491,11 @@ export default function App() {
                                           <Lock className="h-5 w-5 text-brand-blue" strokeWidth={3} />
                                         </div>
                                         <div className="flex-1">
-                                          <p className="text-[11px] font-black text-white uppercase tracking-[0.15em] leading-none mb-1">Access Locked</p>
-                                          <p className="text-[10px] text-white/80 font-bold leading-tight">Please click the lock icon in your browser's address bar to allow camera permissions.</p>
+                                          <p className="text-[11px] font-normal text-white uppercase tracking-[0.15em] leading-none mb-1">Access Locked</p>
+                                          <p className="text-[10px] text-white/80 font-normal leading-tight">Please click the lock icon in your browser's address bar to allow camera permissions.</p>
                                           <button 
                                             type="button"
-                                            className="text-[10px] text-brand-yellow hover:text-brand-yellow/80 font-black uppercase tracking-widest underline mt-4 block transition-colors"
+                                            className="text-[10px] text-brand-yellow hover:text-brand-yellow/80 font-normal uppercase tracking-widest underline mt-4 block transition-colors"
                                             onClick={() => window.open("https://support.google.com/chrome/answer/2693767", "_blank")}
                                           >
                                             View Permission Guide
@@ -2907,23 +2907,23 @@ export default function App() {
                       onClick={() => setSelectedSubstanceDetail(item)}
                     >
                       <TableCell className="text-sm text-brand-dark-grey text-center">
-                        <span className="font-bold">{item.name}</span>{" "}
-                        <span className="text-xs text-brand-dark-grey/80">{item.strength}</span>
+                        <span className="font-normal">{item.name}</span>{" "}
+                        <span className="text-sm text-brand-dark-grey/80">{item.strength}</span>
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className={`border-brand-blue/20 text-brand-blue bg-brand-blue/5 text-[10px] px-2 py-0.5 mx-auto`}>
                           {item.schedule}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-bold text-xs text-center">
+                      <TableCell className="font-normal text-sm text-center">
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleNDCClick(item.ndc); }}
-                          className="text-brand-blue hover:underline font-bold transition-colors"
+                          className="text-brand-blue hover:underline font-normal transition-colors"
                         >
                           {item.ndc}
                         </button>
                       </TableCell>
-                      <TableCell className={`text-center font-bold text-sm ${item.currentStock <= item.minThreshold ? 'text-brand-yellow font-black' : 'text-brand-dark-grey'}`}>
+                      <TableCell className={`text-center font-normal text-sm ${item.currentStock <= item.minThreshold ? 'text-brand-yellow' : 'text-brand-dark-grey'}`}>
                         {item.currentStock} {item.unit}
                       </TableCell>
                     </TableRow>
@@ -3053,7 +3053,7 @@ export default function App() {
                                 <TableCell className="text-[10px] text-center">
                                   <button 
                                     onClick={() => handleNDCClick(t.ndc)}
-                                    className="text-brand-blue hover:underline font-bold transition-colors"
+                                    className="text-brand-blue hover:underline font-normal transition-colors"
                                   >
                                     {t.ndc}
                                   </button>
@@ -3062,7 +3062,7 @@ export default function App() {
                                   {t.referenceNumber ? (
                                     <button 
                                       onClick={() => setViewingTransaction(t)}
-                                      className="text-brand-blue hover:underline font-bold"
+                                      className="text-brand-blue hover:underline font-normal"
                                     >
                                       {formatRefForDisplay(t.referenceNumber)}
                                     </button>
@@ -3076,7 +3076,7 @@ export default function App() {
                                 <TableCell className="text-center text-brand-dark-grey text-sm">
                                   {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
                                 </TableCell>
-                                <TableCell className="text-center font-bold text-brand-dark-grey text-sm">{t.newStock}</TableCell>
+                                <TableCell className="text-center font-normal text-brand-dark-grey text-sm">{t.newStock}</TableCell>
                                 <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact">
                                   {escapeEmail(t.performedByName)}
                                   {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
@@ -3172,10 +3172,10 @@ export default function App() {
                           }}
                         >
                           <div className="flex flex-col">
-                            <span className="font-medium group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
+                            <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
-                              <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
+                              <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
                             </div>
                           </div>
                           <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -3189,13 +3189,13 @@ export default function App() {
                 <div className="flex gap-4">
                   <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[120px]">
                     <Label className="text-[9px] text-brand-blue uppercase font-bold leading-none">Strength</Label>
-                    <div className="text-xs font-medium text-brand-dark-grey truncate">
+                    <div className="text-xs font-normal text-brand-dark-grey truncate">
                       {inventory.find(i => i.id === historyMedicationFilter)?.strength}
                     </div>
                   </div>
                   <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[140px]">
                     <Label className="text-xs text-brand-blue uppercase font-bold leading-none">NDC</Label>
-                    <div className="text-sm font-bold text-brand-dark-grey truncate">
+                    <div className="text-sm font-normal text-brand-dark-grey truncate">
                       {inventory.find(i => i.id === historyMedicationFilter)?.ndc}
                     </div>
                   </div>
@@ -3251,7 +3251,7 @@ export default function App() {
                         {t.referenceNumber ? (
                           <button 
                             onClick={() => setViewingTransaction(t)}
-                            className="text-xs font-bold text-brand-blue hover:underline"
+                            className="text-xs font-normal text-brand-blue hover:underline"
                           >
                             {t.referenceNumber}
                           </button>
@@ -3260,12 +3260,12 @@ export default function App() {
                         )}
                       </TableCell>
                       <TableCell className="text-center">
-                        <div className="text-sm font-bold text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
+                        <div className="text-sm font-normal text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                       </TableCell>
-                      <TableCell className="text-xs font-bold text-center">
+                      <TableCell className="text-xs font-normal text-center">
                         <button 
                           onClick={() => handleNDCClick(t.ndc)}
-                          className="text-brand-blue hover:underline font-bold transition-colors"
+                          className="text-brand-blue hover:underline font-normal transition-colors"
                         >
                           {t.ndc}
                         </button>
@@ -3273,7 +3273,7 @@ export default function App() {
                       <TableCell>
                         <TransactionBadge type={t.type} />
                       </TableCell>
-                      <TableCell className="text-center font-bold text-sm text-brand-dark-grey">
+                      <TableCell className="text-center font-normal text-sm text-brand-dark-grey">
                         {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                       </TableCell>
                       <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
