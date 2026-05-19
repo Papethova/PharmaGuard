@@ -2167,7 +2167,7 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''} ${!newMed.schedule ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                              <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-muted-foreground/50 data-placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''} ${!newMed.schedule ? 'text-muted-foreground/50' : 'text-brand-dark-grey'}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
@@ -2373,7 +2373,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!selectedUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-muted-foreground/50 data-placeholder:font-normal ${!selectedUser ? 'text-muted-foreground/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
