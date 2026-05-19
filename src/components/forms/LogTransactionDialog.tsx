@@ -132,7 +132,7 @@ export function LogTransactionDialog({
                   }}
                   onFocus={() => setIsSearching(true)}
                   onBlur={() => setTimeout(() => setIsSearching(false), 200)}
-                  className="bg-brand-surface border-brand-blue/10"
+                  className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal placeholder:font-normal"
                 />
                 {substanceSearch && !selectedSubstance && isSearching && (
                   <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-xl max-h-60 overflow-y-auto">
@@ -187,7 +187,7 @@ export function LogTransactionDialog({
                   value={referenceNumber} 
                   onChange={(e) => setReferenceNumber(e.target.value)} 
                   placeholder="RX / Invoice #" 
-                  className="bg-brand-surface border-brand-blue/10"
+                  className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal placeholder:font-normal"
                 />
               </div>
               <div className="grid gap-1.5">
@@ -197,7 +197,7 @@ export function LogTransactionDialog({
                   value={quantity} 
                   onChange={(e) => setQuantity(e.target.value)} 
                   placeholder="0" 
-                  className="bg-brand-surface border-brand-blue/10"
+                  className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal placeholder:font-normal"
                 />
               </div>
             </div>
@@ -205,7 +205,7 @@ export function LogTransactionDialog({
             <div className="grid gap-1.5">
               <Label className="text-brand-dark-grey text-xs">Performing User</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>
-                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-10 ${!selectedUser ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
+                <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal ${!selectedUser ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
                   <SelectValue placeholder="Select User" />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface">
@@ -222,7 +222,7 @@ export function LogTransactionDialog({
                 value={reason} 
                 onChange={(e) => setReason(e.target.value)} 
                 placeholder="Required for adjustments" 
-                className="bg-brand-surface border-brand-blue/10"
+                className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal placeholder:font-normal"
               />
             </div>
 
