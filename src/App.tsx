@@ -2786,9 +2786,9 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden p-6 flex flex-col gap-4">
+                <div className="flex-1 min-h-0 overflow-hidden p-6 flex flex-col gap-4">
                   <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
-                  <div className="flex-1 border border-brand-grey/20 rounded-lg overflow-y-auto bg-brand-surface shadow-inner relative">
+                  <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg overflow-y-auto bg-brand-surface shadow-inner relative scrollbar-thin scrollbar-thumb-brand-blue/20">
                     <Table className="relative border-separate border-spacing-0">
                       <TableHeader className="sticky top-0 z-40">
                         <TableRow className="bg-brand-light-grey">
