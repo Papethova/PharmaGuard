@@ -93,8 +93,8 @@ export function LogTransactionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(val) => { onOpenChange(val); if (!val) resetForm(); }}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
-        <DialogHeader className="px-6 py-3 bg-brand-blue text-white relative shrink-0">
+      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] touch-none">
+        <DialogHeader className="px-6 py-3 bg-brand-blue text-white relative shrink-0 touch-auto">
           <div className="flex items-center gap-3 relative z-10">
             <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
               {type === "OUT" && <ArrowDown className="h-5 w-5 text-brand-blue" strokeWidth={3} />}
@@ -117,7 +117,7 @@ export function LogTransactionDialog({
           </div>
         </DialogHeader>
         
-        <ScrollArea className="flex-1 overflow-y-auto">
+        <ScrollArea className="flex-1 overflow-y-auto touch-auto">
           <div className="p-5 pt-3 space-y-4">
             <div className="grid gap-1.5">
               <Label className="text-brand-dark-grey text-xs font-normal">Medication Search</Label>
@@ -235,7 +235,7 @@ export function LogTransactionDialog({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10">
+        <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 touch-auto">
           <Button 
             onClick={handleSubmit}
             disabled={!selectedSubstance || !quantity || !selectedUser}

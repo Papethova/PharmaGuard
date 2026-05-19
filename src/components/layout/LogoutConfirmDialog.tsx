@@ -19,8 +19,8 @@ interface LogoutConfirmDialogProps {
 export function LogoutConfirmDialog({ isOpen, onOpenChange, onConfirm }: LogoutConfirmDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
-        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none shrink-0">
+      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col touch-none">
+        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none shrink-0 touch-auto">
           <div className="flex flex-col gap-1 relative z-10">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
@@ -34,7 +34,7 @@ export function LogoutConfirmDialog({ isOpen, onOpenChange, onConfirm }: LogoutC
           </div>
         </DialogHeader>
 
-        <div className="p-8">
+        <div className="p-8 touch-auto">
           <div className="p-5 rounded-2xl bg-brand-blue/5 border border-brand-blue/10">
             <p className="text-brand-grey text-sm font-medium leading-relaxed max-w-[320px] mx-auto whitespace-pre-line text-center">
               Are you sure you want to sign out of the <span className="text-brand-grey font-bold">PharmaGuard</span> registry?
@@ -44,7 +44,7 @@ export function LogoutConfirmDialog({ isOpen, onOpenChange, onConfirm }: LogoutC
           </div>
         </div>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-3">
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-3 touch-auto">
           <Button 
             onClick={() => onOpenChange(false)} 
             className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 rounded-xl transition-all shadow-lg shadow-brand-blue/20"

@@ -60,8 +60,8 @@ export function EditProfileDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[85vh]">
-        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none shrink-0">
+      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[85vh] touch-none">
+        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none shrink-0 touch-auto">
             <div className="flex flex-col gap-1 relative z-10">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
@@ -75,7 +75,7 @@ export function EditProfileDialog({
           </div>
         </DialogHeader>
 
-        <div className="p-6 space-y-8">
+        <div className="p-6 space-y-8 touch-auto">
           <div className="space-y-2">
             <Label className="text-brand-blue font-black text-xs tracking-wider uppercase">Organization Name</Label>
             <Input 
@@ -96,7 +96,7 @@ export function EditProfileDialog({
           </div>
         </div>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4">
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4 touch-auto">
           <Button 
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}

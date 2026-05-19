@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { SCHEDULES } from "../../lib/constants";
 import { Schedule } from "../../types";
 
@@ -64,12 +65,13 @@ export function AddSubstanceDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl rounded-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-black text-brand-blue">Catalog New Substance</DialogTitle>
-          <DialogDescription className="text-brand-dark-grey/60 text-[10px] uppercase tracking-widest font-bold">Registry Entry Creation</DialogDescription>
+      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl rounded-2xl p-0 overflow-hidden flex flex-col touch-none">
+        <DialogHeader className="p-6 bg-brand-blue text-white shrink-0 touch-auto">
+          <DialogTitle className="text-xl font-black text-white">Catalog New Substance</DialogTitle>
+          <DialogDescription className="text-brand-yellow/70 text-[10px] uppercase tracking-widest font-bold">Registry Entry Creation</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <ScrollArea className="flex-1 overflow-y-auto touch-auto">
+          <div className="grid gap-4 p-6">
           <div className="grid gap-1.5">
             <Label className="text-brand-dark-grey text-xs font-normal">Medication Name</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Oxycodone" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
@@ -112,7 +114,8 @@ export function AddSubstanceDialog({
             </div>
           </div>
         </div>
-        <DialogFooter>
+      </ScrollArea>
+      <DialogFooter className="p-6 pt-2 touch-auto">
           <Button 
             onClick={handleSubmit} 
             disabled={isSubmitting}

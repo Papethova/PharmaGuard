@@ -57,8 +57,8 @@ export function SuperAdminPortal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-5xl bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col h-[85vh]">
-        <DialogHeader className="p-8 bg-brand-blue text-white overflow-hidden relative border-none shrink-0">
+      <DialogContent showCloseButton={false} className="sm:max-w-5xl bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col h-[85vh] touch-none">
+        <DialogHeader className="p-8 bg-brand-blue text-white overflow-hidden relative border-none shrink-0 touch-auto">
           <div className="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none">
             <ShieldCheck className="h-[400px] w-[400px]" strokeWidth={0.5} />
           </div>
@@ -98,7 +98,7 @@ export function SuperAdminPortal({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 shrink-0 overflow-y-auto">
+        <ScrollArea className="flex-1 shrink-0 overflow-y-auto touch-auto">
           <div className="p-8">
             <Card className="border-brand-blue/10 bg-white shadow-xl rounded-2xl overflow-hidden">
               <Table>
@@ -189,7 +189,7 @@ export function SuperAdminPortal({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 bg-brand-blue/[0.03] border-t border-brand-blue/5 shrink-0">
+        <DialogFooter className="p-6 bg-brand-blue/[0.03] border-t border-brand-blue/5 shrink-0 touch-auto">
           <Button 
             onClick={() => onOpenChange(false)} 
             className="w-full h-12 text-[11px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"

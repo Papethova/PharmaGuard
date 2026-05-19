@@ -89,8 +89,8 @@ export function UserManagementDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-1 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[85vh]">
-        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-xl shrink-0">
+      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-1 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[85vh] touch-none">
+        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-xl shrink-0 touch-auto">
           <div className="flex flex-col gap-1 relative z-10">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
@@ -104,7 +104,7 @@ export function UserManagementDialog({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 overflow-y-auto">
+        <ScrollArea className="flex-1 overflow-y-auto touch-auto">
           <div className="p-6 space-y-8">
             <div className="bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/10 space-y-4">
               <Label className="text-[10px] uppercase font-black text-brand-blue/80 tracking-widest">Enroll Authorized Personnel</Label>
@@ -215,7 +215,7 @@ export function UserManagementDialog({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
           <Button 
             onClick={() => onOpenChange(false)} 
             className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"

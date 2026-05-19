@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Transaction, Substance } from "../../types";
 import { formatDateTime, escapeEmail } from "../../lib/formatters";
 import { TransactionBadge } from "../common/Icons";
@@ -30,8 +31,8 @@ export function TransactionDetailDialog({
   
   return (
     <Dialog open={!!transaction} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col">
-        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none">
+      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[95vh] touch-none">
+        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none touch-auto shrink-0">
           <div className="flex items-center gap-4 relative z-10">
             <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-white">
               <Shield className="h-6 w-6 text-brand-blue" strokeWidth={3} />
@@ -43,8 +44,9 @@ export function TransactionDetailDialog({
           </div>
         </DialogHeader>
 
-        <div className="p-6 space-y-6">
-          <div className="flex justify-between items-start border-b border-brand-blue/5 pb-4">
+        <ScrollArea className="flex-1 overflow-y-auto touch-auto">
+          <div className="p-6 space-y-6">
+            <div className="flex justify-between items-start border-b border-brand-blue/5 pb-4">
             <div className="space-y-1">
               <p className="text-[10px] font-black text-brand-blue/40 uppercase tracking-widest">Reference Node</p>
               <p className="text-sm font-black text-brand-blue no-interact">{transaction.referenceNumber || "AUTO-GEN-ID"}</p>
@@ -116,8 +118,9 @@ export function TransactionDetailDialog({
              </div>
           )}
         </div>
+        </ScrollArea>
 
-        <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
+        <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
           <Button 
             onClick={() => onOpenChange(false)} 
             className="w-full h-11 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl transition-all border-none"

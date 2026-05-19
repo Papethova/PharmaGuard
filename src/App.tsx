@@ -1731,8 +1731,8 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-brand-light-grey font-sans text-brand-grey flex flex-col">
-      <header className="shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md">
+    <div className="h-screen overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
+      <header className="shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto">
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="flex h-14 items-center gap-8">
             <div className="w-full lg:w-64 flex items-center lg:justify-start justify-center lg:-ml-4">
@@ -1782,7 +1782,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col">
+      <main className="flex-1 min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto">
         <Tabs 
           value={currentTab} 
           orientation="vertical"
@@ -1815,7 +1815,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-auto">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -2717,8 +2717,8 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[700px] max-h-[95vh]">
-                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[700px] max-h-[90vh] touch-none">
+                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <Users className="h-6 w-6 text-brand-blue" />
@@ -2734,7 +2734,7 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="p-6 py-4 space-y-6 shrink-0 border-b border-brand-blue/5">
+                <div className="p-6 py-4 space-y-6 shrink-0 border-b border-brand-blue/5 touch-auto">
                   <div className="space-y-3">
                     <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
                     <div 
@@ -2786,12 +2786,12 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-                  <div className="px-6 pt-4 pb-2">
+                <div className="flex-1 min-h-0 overflow-hidden flex flex-col touch-auto">
+                  <div className="px-6 pt-4 pb-2 shrink-0">
                     <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
                   </div>
-                  <div className="flex-1 min-h-0 px-6 pb-6">
-                    <ScrollArea className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative">
+                  <div className="flex-1 min-h-0 px-6 pb-6 overflow-hidden">
+                    <ScrollArea className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative touch-auto">
                       <Table className="relative border-separate border-spacing-0">
                         <TableHeader className="sticky top-0 z-40">
                           <TableRow className="bg-brand-light-grey">
@@ -2868,7 +2868,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
+                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
@@ -2885,7 +2885,7 @@ export default function App() {
           <TabsContent value="inventory" className="flex-1 min-h-0 mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0">
             <div className="flex-1 min-h-0 flex flex-col gap-4">
               <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
-                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                   <Table className="relative border-separate border-spacing-0">
                     <TableHeader className="sticky top-0 z-30">
                       <TableRow className="bg-brand-light-grey">
@@ -2938,8 +2938,8 @@ export default function App() {
           </Card>
 
             <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
-              <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
-                <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0">
+              <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] touch-none">
+                <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <History className="h-5 w-5 text-brand-blue" />
@@ -2955,7 +2955,7 @@ export default function App() {
                   </div>
                 </DialogHeader>
                 
-                <ScrollArea className="flex-1 overflow-y-auto">
+                <ScrollArea className="flex-1 overflow-y-auto touch-auto">
                   <div className="p-4">
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                     <Button 
@@ -3098,7 +3098,7 @@ export default function App() {
                 </div>
               </ScrollArea>
                 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
+                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
                   <Button 
                     onClick={() => setSelectedSubstanceDetail(null)} 
                     className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
@@ -3225,7 +3225,7 @@ export default function App() {
               </div>
             </div>
             <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
-              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                 <Table className="relative border-separate border-spacing-0">
                   <TableHeader className="sticky top-0 z-30">
                     <TableRow className="bg-brand-light-grey">

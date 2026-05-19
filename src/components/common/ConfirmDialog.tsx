@@ -35,8 +35,8 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[400px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
-        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none shrink-0" id="dialog-header-confirm">
+      <DialogContent showCloseButton={false} className="sm:max-w-[400px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col touch-none">
+        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none shrink-0 touch-auto" id="dialog-header-confirm">
           <div className="flex items-center gap-3 relative z-10">
             <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
               {icon || <AlertTriangle className="h-5 w-5 text-brand-blue" strokeWidth={3} />}
@@ -48,13 +48,13 @@ export function ConfirmDialog({
           </div>
         </DialogHeader>
         
-        <div className="p-6 py-8">
+        <div className="p-6 py-8 touch-auto">
           <div className="p-5 rounded-2xl bg-brand-blue/5 border border-brand-blue/10 text-brand-grey text-sm font-medium leading-relaxed whitespace-pre-line">
             {description}
           </div>
         </div>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4">
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex gap-4 touch-auto">
           <Button 
             onClick={() => onOpenChange(false)}
             className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 rounded-xl shadow-lg transition-all border-none"
