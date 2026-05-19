@@ -2767,101 +2767,103 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 overflow-hidden flex flex-col touch-auto">
+                <div className="flex-1 min-h-0 flex flex-col touch-auto">
                   <div className="px-6 pt-3 pb-1 shrink-0">
                     <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
                   </div>
-                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
-                    <ScrollArea className="flex-1 h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative touch-auto overflow-hidden">
-                      <Table className="relative border-separate border-spacing-0">
-                        <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
-                          <TableRow className="bg-brand-light-grey hover:bg-transparent">
-                            <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
-                            <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {users.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={2} className="text-center py-6 text-[10px] text-brand-grey/40 uppercase font-bold">No registered users</TableCell>
+                  <div className="flex-1 min-h-[200px] px-6 pb-6 mt-1 overflow-hidden">
+                    <div className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
+                      <ScrollArea className="flex-1 w-full">
+                        <Table className="relative border-separate border-spacing-0">
+                          <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
+                            <TableRow className="bg-brand-light-grey hover:bg-transparent">
+                              <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
+                              <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Actions</TableHead>
                             </TableRow>
-                          ) : users.map((u) => (
-                            <TableRow key={u.id} className="hover:bg-brand-blue/5 h-10">
-                              <TableCell className="font-medium text-brand-dark-grey py-2 text-center text-xs">
-                                {editingUser?.id === u.id ? (
-                                  <div className="flex gap-1 items-center px-1">
-                                    <Input 
-                                      value={editingUser?.name || ""}
-                                      onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                      className="h-6 text-xs bg-brand-surface border-brand-blue/30 flex-1"
-                                      autoFocus
-                                    />
-                                    <Select 
-                                      value={editingUser?.title || ""} 
-                                      onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
-                                    >
-                                      <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-6 flex items-center w-20 text-[10px] font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                        <SelectValue placeholder="Title" />
-                                      </SelectTrigger>
-                                      <SelectContent className="bg-brand-surface border-brand-blue/10">
-                                        <SelectItem value="PIC">PIC</SelectItem>
-                                        <SelectItem value="RPh">RPh</SelectItem>
-                                        <SelectItem value="Tech">Tech</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                ) : (
-                                  <span>{u.name} {u.title && <span className="text-[10px] text-brand-dark-grey/60">({u.title})</span>}</span>
-                                )}
-                              </TableCell>
-                              <TableCell className="text-center py-2">
-                                <div className="flex justify-center gap-1">
+                          </TableHeader>
+                          <TableBody>
+                            {users.length === 0 ? (
+                              <TableRow>
+                                <TableCell colSpan={2} className="text-center py-6 text-[10px] text-brand-grey/40 uppercase font-bold">No registered users</TableCell>
+                              </TableRow>
+                            ) : users.map((u) => (
+                              <TableRow key={u.id} className="hover:bg-brand-blue/5 h-10">
+                                <TableCell className="font-medium text-brand-dark-grey py-2 text-center text-xs">
                                   {editingUser?.id === u.id ? (
-                                    <Button 
-                                      size="sm" 
-                                      variant="ghost" 
-                                      className="h-6 w-6 p-0 text-brand-blue"
-                                      onClick={handleUpdateUser}
-                                    >
-                                      <PlusCircle className="h-3.5 w-3.5" />
-                                    </Button>
+                                    <div className="flex gap-1 items-center px-1">
+                                      <Input 
+                                        value={editingUser?.name || ""}
+                                        onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
+                                        className="h-6 text-xs bg-brand-surface border-brand-blue/30 flex-1"
+                                        autoFocus
+                                      />
+                                      <Select 
+                                        value={editingUser?.title || ""} 
+                                        onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
+                                      >
+                                        <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-6 flex items-center w-20 text-[10px] font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                          <SelectValue placeholder="Title" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-brand-surface border-brand-blue/10">
+                                          <SelectItem value="PIC">PIC</SelectItem>
+                                          <SelectItem value="RPh">RPh</SelectItem>
+                                          <SelectItem value="Tech">Tech</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
                                   ) : (
+                                    <span>{u.name} {u.title && <span className="text-[10px] text-brand-dark-grey/60">({u.title})</span>}</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-center py-2">
+                                  <div className="flex justify-center gap-1">
+                                    {editingUser?.id === u.id ? (
+                                      <Button 
+                                        size="sm" 
+                                        variant="ghost" 
+                                        className="h-6 w-6 p-0 text-brand-blue"
+                                        onClick={handleUpdateUser}
+                                      >
+                                        <PlusCircle className="h-3.5 w-3.5" />
+                                      </Button>
+                                    ) : (
+                                      <Button 
+                                        size="sm" 
+                                        variant="ghost" 
+                                        className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                        onClick={() => setEditingUser(u)}
+                                      >
+                                        <Edit className="h-3.5 w-3.5" />
+                                      </Button>
+                                    )}
                                     <Button 
                                       size="sm" 
                                       variant="ghost" 
-                                      className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
-                                      onClick={() => setEditingUser(u)}
+                                      className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                      onClick={() => setUserToDeleteConfirm(u)}
                                     >
-                                      <Edit className="h-3.5 w-3.5" />
+                                      <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
-                                  )}
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                                    onClick={() => setUserToDeleteConfirm(u)}
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </ScrollArea>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </ScrollArea>
+                    </div>
                   </div>
                 </div>
 
-                <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
+                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
                       setCurrentTab('inventory');
                     }} 
-                    className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
                   >
-                    Close Terminal Controls
+                    Close User Management
                   </Button>
                 </DialogFooter>
               </DialogContent>
