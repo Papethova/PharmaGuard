@@ -3762,20 +3762,21 @@ export default function App() {
               <div className="text-xs text-brand-dark-grey/60">NDC: {editingMed.ndc}</div>
             </div>
 
-              <div className="grid gap-2">
-                <Label className="text-brand-dark-grey font-bold text-brand-blue">Minimum Threshold</Label>
-                <Input 
-                  type="text"
-                  inputMode="numeric"
-                  value={editingMed.minThreshold} 
-                  onChange={e => {
-                    const val = e.target.value;
-                    if (val === "" || /^\d*$/.test(val)) {
-                      setEditingMed({...editingMed, minThreshold: val as any});
-                    }
-                  }}
-                  className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue"
-                />
+                <div className="grid gap-1.5">
+                  <Label className="text-brand-dark-grey text-xs">Minimum Threshold</Label>
+                  <Input 
+                    type="text"
+                    inputMode="numeric"
+                    value={editingMed.minThreshold} 
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === "" || /^\d*$/.test(val)) {
+                        setEditingMed({...editingMed, minThreshold: val as any});
+                      }
+                    }}
+                    className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
+                    placeholder="e.g. 50"
+                  />
                 <p className="text-[10px] text-brand-dark-grey/50 italic">
                   The inventory stock will turn yellow and trigger an alert when it reaches or falls below this number.
                 </p>
@@ -3823,51 +3824,51 @@ export default function App() {
           <div className="p-6">
             {editingMed && (
               <div className="grid gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="edit-name" className="text-brand-dark-grey font-bold">Medication Name</Label>
+                <div className="grid gap-1.5">
+                  <Label htmlFor="edit-name" className="text-brand-dark-grey text-xs">Medication Name</Label>
                   <Input 
                     id="edit-name" 
                     value={editingMed.name} 
                     onChange={e => setEditingMed({...editingMed, name: e.target.value})} 
-                    className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11" 
+                    className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" 
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-strength" className="text-brand-dark-grey font-bold">Strength</Label>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="edit-strength" className="text-brand-dark-grey text-xs">Strength</Label>
                     <Input 
                       id="edit-strength" 
                       value={editingMed.strength} 
                       onChange={e => setEditingMed({...editingMed, strength: e.target.value})} 
-                      className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"
+                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-unit" className="text-brand-dark-grey font-bold">Dosage Form</Label>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="edit-unit" className="text-brand-dark-grey text-xs">Dosage Form</Label>
                     <Input 
                       id="edit-unit" 
                       value={editingMed.unit} 
                       onChange={e => setEditingMed({...editingMed, unit: e.target.value})} 
                       placeholder="e.g. Tablets"
-                      className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"
+                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-ndc" className="text-brand-dark-grey font-bold">NDC</Label>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="edit-ndc" className="text-brand-dark-grey text-xs">NDC</Label>
                     <Input 
                       id="edit-ndc" 
                       value={editingMed.ndc} 
                       onChange={e => setEditingMed({...editingMed, ndc: e.target.value})} 
                       placeholder="00000-0000-00"
-                      className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"
+                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-package-size" className="text-brand-dark-grey font-bold">Package Size</Label>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="edit-package-size" className="text-brand-dark-grey text-xs">Package Size</Label>
                     <Input 
                       id="edit-package-size" 
                       type="text"
@@ -3880,19 +3881,19 @@ export default function App() {
                         }
                       }}
                       placeholder="e.g. 100"
-                      className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"
+                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-schedule" className="text-brand-dark-grey font-bold">Schedule</Label>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="edit-schedule" className="text-brand-dark-grey text-xs">Schedule</Label>
                     <Select 
                       value={editingMed.schedule} 
                       onValueChange={(v: Schedule) => setEditingMed({...editingMed, schedule: v})}
                     >
-                      <SelectTrigger className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {SCHEDULES.map(s => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -3900,8 +3901,8 @@ export default function App() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-min-threshold" className="text-brand-dark-grey font-bold">Min Threshold</Label>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="edit-min-threshold" className="text-brand-dark-grey text-xs">Min Threshold</Label>
                     <Input 
                       id="edit-min-threshold" 
                       type="text"
@@ -3914,7 +3915,7 @@ export default function App() {
                         }
                       }}
                       placeholder="e.g. 50"
-                      className="bg-brand-surface text-brand-dark-grey border-brand-blue/30 focus:border-brand-blue h-11"
+                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                 </div>

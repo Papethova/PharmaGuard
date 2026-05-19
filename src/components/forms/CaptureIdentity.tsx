@@ -71,7 +71,7 @@ export function CaptureIdentity({
   if (mode === "photo") {
     return (
       <div className="space-y-2">
-        <Label className="text-xs font-bold text-brand-dark-grey">Identity Verification Capture</Label>
+        <Label className="text-xs text-brand-dark-grey">Identity Verification Capture</Label>
         <div className="relative aspect-video rounded-xl overflow-hidden bg-brand-blue/5 border-2 border-dashed border-brand-blue/20">
           {capturedData ? (
             <div className="relative h-full">
@@ -115,7 +115,7 @@ export function CaptureIdentity({
 
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-bold text-brand-dark-grey">Registry Signature binding</Label>
+      <Label className="text-xs text-brand-dark-grey">Registry Signature binding</Label>
       <div className="border-2 border-dashed border-brand-blue/20 rounded-xl bg-white overflow-hidden relative">
         {capturedData ? (
           <div className="h-32 flex items-center justify-center p-2 relative bg-brand-blue/5">
