@@ -1986,7 +1986,7 @@ export default function App() {
                     {transactionType === "IN" ? (
                       <div className="grid gap-3 p-3 border border-brand-blue/20 rounded-lg bg-brand-blue/5">
                         <div className="grid gap-1.5 relative">
-                          <Label htmlFor="new-name" className="text-brand-dark-grey text-xs flex justify-between">
+                          <Label htmlFor="new-name" className="text-brand-dark-grey text-xs font-normal flex justify-between">
                             Medication
                             {selectedSubstance && (
                               <button 
@@ -2003,7 +2003,7 @@ export default function App() {
                                     minThreshold: ""
                                   });
                                 }}
-                                className="text-[10px] text-brand-blue hover:underline font-bold"
+                                className="text-[10px] text-brand-blue hover:underline font-normal"
                               >
                                 Clear Selection
                               </button>
@@ -2036,7 +2036,7 @@ export default function App() {
                                 }
                               }}
                               placeholder="e.g. Oxycodone" 
-                              className="bg-brand-surface text-brand-dark-grey h-9" 
+                              className="border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal" 
                               readOnly={!!selectedSubstance}
                             />
                             {newMed.name && !selectedSubstance && isNewMedSearchFocused && (
@@ -2105,42 +2105,42 @@ export default function App() {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="grid gap-1.5">
-                            <Label htmlFor="new-strength" className="text-brand-dark-grey text-xs">Strength</Label>
+                            <Label htmlFor="new-strength" className="text-brand-dark-grey text-xs font-normal">Strength</Label>
                             <Input 
                               id="new-strength" 
                               value={newMed.strength} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, strength: e.target.value})} 
                               placeholder="e.g. 10mg" 
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
                           <div className="grid gap-1.5">
-                            <Label htmlFor="new-unit" className="text-brand-dark-grey text-xs">Dosage Form</Label>
+                            <Label htmlFor="new-unit" className="text-brand-dark-grey text-xs font-normal">Dosage Form</Label>
                             <Input 
                               id="new-unit" 
                               value={newMed.unit} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, unit: e.target.value})} 
                               placeholder="e.g. Tablets" 
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="grid gap-1.5">
-                            <Label htmlFor="new-ndc" className="text-brand-dark-grey text-xs">NDC</Label>
+                            <Label htmlFor="new-ndc" className="text-brand-dark-grey text-xs font-normal">NDC</Label>
                             <Input 
                               id="new-ndc" 
                               value={newMed.ndc} 
                               onChange={e => !selectedSubstance && setNewMed({...newMed, ndc: e.target.value})} 
                               placeholder="00000-0000-00" 
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
                           <div className="grid gap-1.5">
-                            <Label htmlFor="new-package-size" className="text-brand-dark-grey text-xs">Package Size</Label>
+                            <Label htmlFor="new-package-size" className="text-brand-dark-grey text-xs font-normal">Package Size</Label>
                             <Input 
                               id="new-package-size" 
                               type="text"
@@ -2154,31 +2154,31 @@ export default function App() {
                                 }
                               }} 
                               placeholder="e.g. 100"
-                              className={`bg-brand-surface text-black font-black h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="grid gap-1.5">
-                            <Label htmlFor="new-schedule" className="text-brand-dark-grey text-xs">Schedule</Label>
+                            <Label htmlFor="new-schedule" className="text-brand-dark-grey text-xs font-normal">Schedule</Label>
                             <Select 
                               value={newMed.schedule} 
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`bg-brand-surface h-9 font-medium ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
-                                <SelectValue placeholder="Select..." className="text-brand-dark-grey/40" />
+                              <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                                <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
                                 {SCHEDULES.map(s => (
-                                  <SelectItem key={s} value={s} className="pl-3 text-brand-dark-grey font-medium">{s}</SelectItem>
+                                  <SelectItem key={s} value={s} className="pl-3 text-brand-dark-grey font-normal">{s}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
                           </div>
                           <div className="grid gap-1.5">
-                            <Label htmlFor="new-min-threshold" className="text-brand-dark-grey text-xs">Min Threshold</Label>
+                            <Label htmlFor="new-min-threshold" className="text-brand-dark-grey text-xs font-normal">Min Threshold</Label>
                             <Input 
                               id="new-min-threshold" 
                               type="text"
@@ -2192,7 +2192,7 @@ export default function App() {
                                 }
                               }} 
                               placeholder="e.g. 50" 
-                              className={`bg-brand-surface text-brand-dark-grey h-9 ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
+                              className={`border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''}`}
                               readOnly={!!selectedSubstance}
                             />
                           </div>
@@ -3830,7 +3830,7 @@ export default function App() {
                     id="edit-name" 
                     value={editingMed.name} 
                     onChange={e => setEditingMed({...editingMed, name: e.target.value})}
-                    className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" 
+                    className="border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal" 
                   />
                 </div>
                 
@@ -3841,7 +3841,7 @@ export default function App() {
                       id="edit-strength" 
                       value={editingMed.strength} 
                       onChange={e => setEditingMed({...editingMed, strength: e.target.value})}
-                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
+                      className="border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                   <div className="grid gap-1.5">
@@ -3851,7 +3851,7 @@ export default function App() {
                       value={editingMed.unit} 
                       onChange={e => setEditingMed({...editingMed, unit: e.target.value})}
                       placeholder="e.g. Tablets"
-                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
+                      className="border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                 </div>
@@ -3864,7 +3864,7 @@ export default function App() {
                       value={editingMed.ndc} 
                       onChange={e => setEditingMed({...editingMed, ndc: e.target.value})}
                       placeholder="00000-0000-00"
-                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
+                      className="border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                   <div className="grid gap-1.5">
@@ -3881,7 +3881,7 @@ export default function App() {
                         }
                       }}
                       placeholder="e.g. 100"
-                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
+                      className="border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                 </div>
@@ -3893,10 +3893,10 @@ export default function App() {
                       value={editingMed.schedule} 
                       onValueChange={(v: Schedule) => setEditingMed({...editingMed, schedule: v})}
                     >
-                      <SelectTrigger className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {SCHEDULES.map(s => (
-                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                          <SelectItem key={s} value={s} className="font-normal">{s}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -3915,7 +3915,7 @@ export default function App() {
                         }
                       }}
                       placeholder="e.g. 50"
-                      className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal"
+                      className="border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-9 font-normal placeholder:text-brand-grey/50 placeholder:font-normal"
                     />
                   </div>
                 </div>
