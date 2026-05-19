@@ -1430,7 +1430,7 @@ export default function App() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full"
+          className="max-w-sm w-full"
         >
           <div className="bg-brand-surface shadow-2xl overflow-hidden rounded-2xl border-none">
             <div className="bg-brand-blue px-6 py-6 text-center relative overflow-hidden rounded-t-2xl">
