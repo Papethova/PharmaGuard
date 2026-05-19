@@ -2704,7 +2704,7 @@ export default function App() {
               <DialogContent 
                 showCloseButton={false} 
                 onOpenAutoFocus={(e) => e.preventDefault()}
-                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-none"
+                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-auto"
               >
                 <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
@@ -2775,9 +2775,10 @@ export default function App() {
                   <div className="px-6 pt-3 pb-1 shrink-0">
                     <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
                   </div>
-                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
-                    <ScrollArea className="flex-1 h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative touch-auto overflow-hidden">
-                      <Table className="relative border-separate border-spacing-0">
+                  <div className="flex-1 min-h-[200px] px-6 pb-6 mt-1 overflow-hidden">
+                    <div className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
+                      <ScrollArea className="flex-1 w-full touch-auto">
+                        <Table className="relative border-separate border-spacing-0">
                           <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                             <TableRow className="bg-brand-light-grey hover:bg-transparent">
                               <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
@@ -2856,16 +2857,17 @@ export default function App() {
                       </ScrollArea>
                     </div>
                   </div>
+                </div>
 
-                <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
+                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
                       setCurrentTab('inventory');
                     }} 
-                    className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
                   >
-                    Close Terminal Controls
+                    Close User Management
                   </Button>
                 </DialogFooter>
               </DialogContent>
