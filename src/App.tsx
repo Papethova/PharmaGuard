@@ -2771,9 +2771,9 @@ export default function App() {
                   <div className="px-6 pt-3 pb-1 shrink-0">
                     <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
                   </div>
-                  <div className="flex-1 min-h-[200px] px-6 pb-6 mt-1 overflow-hidden">
-                    <div className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
-                      <ScrollArea className="flex-1 w-full">
+                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
+                    <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative flex flex-col overflow-hidden">
+                      <div className="flex-1 w-full overflow-y-auto overflow-x-hidden touch-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
                         <Table className="relative border-separate border-spacing-0">
                           <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                             <TableRow className="bg-brand-light-grey hover:bg-transparent">
@@ -2850,7 +2850,7 @@ export default function App() {
                             ))}
                           </TableBody>
                         </Table>
-                      </ScrollArea>
+                      </div>
                     </div>
                   </div>
                 </div>
