@@ -2717,8 +2717,8 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[650px] max-h-[90vh]">
-                <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[700px] max-h-[95vh]">
+                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <Users className="h-6 w-6 text-brand-blue" />
@@ -2734,8 +2734,8 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="p-6 pb-2 space-y-8 shrink-0">
-                  <div className="space-y-4">
+                <div className="p-6 py-4 space-y-6 shrink-0 border-b border-brand-blue/5">
+                  <div className="space-y-3">
                     <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
                     <div 
                       className="flex items-center justify-between p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
@@ -2756,7 +2756,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">Add New User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
@@ -2786,82 +2786,86 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 overflow-hidden p-6 flex flex-col gap-4">
-                  <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
-                  <ScrollArea className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative">
-                    <Table className="relative border-separate border-spacing-0">
-                      <TableHeader className="sticky top-0 z-40">
-                        <TableRow className="bg-brand-light-grey">
-                          <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Name</TableHead>
-                          <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {users.map((u) => (
-                          <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                            <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
-                              {editingUser?.id === u.id ? (
-                                <div className="flex gap-2 items-center px-1">
-                                  <Input 
-                                    value={editingUser?.name || ""}
-                                    onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                    className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
-                                    autoFocus
-                                  />
-                                  <Select 
-                                    value={editingUser?.title || ""} 
-                                    onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
-                                  >
-                                    <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-sm font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                      <SelectValue placeholder="Title...." />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-brand-surface">
-                                      <SelectItem value="PIC">PIC</SelectItem>
-                                      <SelectItem value="RPh">RPh</SelectItem>
-                                      <SelectItem value="Tech">Tech</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              ) : (
-                                <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-center py-3">
-                              <div className="flex justify-center gap-1">
-                                {editingUser?.id === u.id ? (
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="h-8 w-8 p-0 text-brand-blue"
-                                    onClick={handleUpdateUser}
-                                  >
-                                    <PlusCircle className="h-4 w-4" />
-                                  </Button>
-                                ) : (
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
-                                    onClick={() => setEditingUser(u)}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                )}
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
-                                  className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                                  onClick={() => setUserToDeleteConfirm(u)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
+                <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+                  <div className="px-6 pt-4 pb-2">
+                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
+                  </div>
+                  <div className="flex-1 min-h-0 px-6 pb-6">
+                    <ScrollArea className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative">
+                      <Table className="relative border-separate border-spacing-0">
+                        <TableHeader className="sticky top-0 z-40">
+                          <TableRow className="bg-brand-light-grey">
+                            <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Name</TableHead>
+                            <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Actions</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </ScrollArea>
+                        </TableHeader>
+                        <TableBody>
+                          {users.map((u) => (
+                            <TableRow key={u.id} className="hover:bg-brand-blue/5">
+                              <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
+                                {editingUser?.id === u.id ? (
+                                  <div className="flex gap-2 items-center px-1">
+                                    <Input 
+                                      value={editingUser?.name || ""}
+                                      onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
+                                      className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
+                                      autoFocus
+                                    />
+                                    <Select 
+                                      value={editingUser?.title || ""} 
+                                      onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
+                                    >
+                                      <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-sm font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                        <SelectValue placeholder="Title...." />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-brand-surface">
+                                        <SelectItem value="PIC">PIC</SelectItem>
+                                        <SelectItem value="RPh">RPh</SelectItem>
+                                        <SelectItem value="Tech">Tech</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                ) : (
+                                  <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-center py-3">
+                                <div className="flex justify-center gap-1">
+                                  {editingUser?.id === u.id ? (
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="h-8 w-8 p-0 text-brand-blue"
+                                      onClick={handleUpdateUser}
+                                    >
+                                      <PlusCircle className="h-4 w-4" />
+                                    </Button>
+                                  ) : (
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                      onClick={() => setEditingUser(u)}
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                    onClick={() => setUserToDeleteConfirm(u)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
+                  </div>
                 </div>
 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
