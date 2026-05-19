@@ -273,7 +273,6 @@ export default function App() {
     );
   }
 
-  const [syncProbeVisible, setSyncProbeVisible] = useState(true);
 
     const sigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
@@ -1796,21 +1795,6 @@ export default function App() {
           }} 
           className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] lg:grid-rows-1 gap-10 items-stretch w-full relative overflow-hidden"
         >
-          {/* SYNC PROBE BANNER */}
-          {syncProbeVisible && (
-            <div className="fixed top-0 left-0 right-0 z-[9999] bg-brand-yellow text-brand-blue flex items-center justify-between px-4 py-1 animate-in fade-in slide-in-from-top duration-500">
-              <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-widest leading-none">Terminal Sync Linked</span>
-                <span className="text-[9px] font-mono font-bold bg-brand-blue text-brand-yellow px-1.5 py-0.5 rounded leading-none">{APP_VERSION}</span>
-              </div>
-              <button 
-                onClick={() => setSyncProbeVisible(false)}
-                className="text-brand-blue hover:scale-110 transition-transform p-1"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          )}
           {/* Background Watermark moved here for stability */}
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
