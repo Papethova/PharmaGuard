@@ -89,34 +89,36 @@ export function UserManagementDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-1 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[85vh] touch-none">
-        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-xl shrink-0 touch-auto">
-          <div className="flex flex-col gap-1 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
-                <Users className="h-5 w-5 text-brand-blue" strokeWidth={3} />
-              </div>
-              <div>
-                <DialogTitle className="text-xl font-black tracking-tight leading-none text-white">Personnel Registry</DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] uppercase tracking-[0.12em] mt-1">Terminal Authority Management</DialogDescription>
-              </div>
+      <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-none">
+        <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
+          <div className="flex items-center gap-4 relative z-10 text-left">
+            <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+              <Users className="h-5 w-5 text-brand-blue" />
+            </div>
+            <div className="flex flex-col gap-0 text-left">
+              <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+                Personnel Registry
+              </DialogTitle>
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase">
+                Terminal Authority Management
+              </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="px-6 py-4 space-y-6 shrink-0 border-b border-brand-blue/5 touch-auto">
-          <div className="bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/10 space-y-4">
-            <Label className="text-[10px] uppercase font-black text-brand-blue/80 tracking-widest">Enroll Authorized Personnel</Label>
-            <div className="flex gap-2">
+        <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-auto">
+          <div className="space-y-2">
+            <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Enroll New Authorized User</Label>
+            <div className="flex gap-2 items-center">
               <Input 
-                placeholder="Full Name" 
-                value={userName} 
+                placeholder="Full Name..." 
+                value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                className="bg-brand-surface border-brand-blue/20 text-sm h-8"
+                className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1 text-sm"
               />
               <Select value={userTitle} onValueChange={setUserTitle}>
-                <SelectTrigger className={`w-32 h-8 bg-brand-surface border-brand-blue/20 text-xs ${!userTitle ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
-                  <SelectValue placeholder="Title" />
+                <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-xs font-normal ${!userTitle ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                  <SelectValue placeholder="Title...." />
                 </SelectTrigger>
                 <SelectContent className="bg-brand-surface border-brand-blue/10">
                   <SelectItem value="PIC">PIC</SelectItem>
@@ -126,45 +128,49 @@ export function UserManagementDialog({
               </Select>
               <Button 
                 onClick={handleAddUser} 
-                className="bg-brand-blue text-white hover:bg-brand-blue/90 h-8 px-4"
+                className="bg-brand-blue text-white hover:brightness-110 h-8 px-4 font-black shadow-sm"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
+                {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
               </Button>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-          <div className="px-6 pt-4 pb-2 shrink-0">
-            <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col touch-auto">
+          <div className="px-6 pt-3 pb-1 shrink-0">
+            <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
           </div>
-          <ScrollArea className="flex-1 min-h-0 px-6 pb-6 touch-auto">
-            <div className="border border-brand-grey/20 rounded-lg overflow-hidden shrink-0">
+          <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
+            <ScrollArea className="flex-1 h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative touch-auto overflow-hidden">
               <Table className="relative border-separate border-spacing-0">
-                <TableHeader className="sticky top-0 z-10 bg-brand-light-grey/50">
-                  <TableRow>
-                    <TableHead className={tableHeadClass}>Name</TableHead>
-                    <TableHead className={`${tableHeadClass} text-center`}>Actions</TableHead>
+                <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
+                  <TableRow className="bg-brand-light-grey hover:bg-transparent">
+                    <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
+                    <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((u) => (
-                    <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                      <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
+                  {users.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-6 text-[10px] text-brand-grey/40 uppercase font-bold">No registered users</TableCell>
+                    </TableRow>
+                  ) : users.map((u) => (
+                    <TableRow key={u.id} className="hover:bg-brand-blue/5 h-10">
+                      <TableCell className="font-medium text-brand-dark-grey py-2 text-center text-xs">
                         {editingUser?.id === u.id ? (
-                          <div className="flex gap-2 items-center">
+                          <div className="flex gap-1 items-center px-1">
                             <Input 
                               value={editingUser?.name || ""}
                               onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                              className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
+                              className="h-6 text-xs bg-brand-surface border-brand-blue/30 flex-1"
                               autoFocus
                             />
                             <Select 
                               value={editingUser?.title || ""} 
                               onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                             >
-                              <SelectTrigger className={`w-28 h-8 bg-brand-surface border-brand-blue/30 ${!editingUser?.title ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
+                              <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-6 flex items-center w-20 text-[10px] font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                 <SelectValue placeholder="Title" />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface border-brand-blue/10">
@@ -175,37 +181,37 @@ export function UserManagementDialog({
                             </Select>
                           </div>
                         ) : (
-                          <span>{u.name} {u.title && <span className="text-brand-dark-grey/60">({u.title})</span>}</span>
+                          <span>{u.name} {u.title && <span className="text-[10px] text-brand-dark-grey/60">({u.title})</span>}</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-center py-3">
+                      <TableCell className="text-center py-2">
                         <div className="flex justify-center gap-1">
                           {editingUser?.id === u.id ? (
                             <Button 
                               size="sm" 
                               variant="ghost" 
-                              className="h-8 w-8 p-0 text-brand-blue"
+                              className="h-6 w-6 p-0 text-brand-blue"
                               onClick={handleUpdateUser}
                             >
-                              <PlusCircle className="h-4 w-4" />
+                              <PlusCircle className="h-3.5 w-3.5" />
                             </Button>
                           ) : (
                             <Button 
                               size="sm" 
                               variant="ghost" 
-                              className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                              className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
                               onClick={() => setEditingUser(u)}
                             >
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-3.5 w-3.5" />
                             </Button>
                           )}
                           <Button 
                             size="sm" 
                             variant="ghost" 
-                            className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                            className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-red-500"
                             onClick={() => handleDeleteUser(u.id)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </TableCell>
@@ -213,14 +219,14 @@ export function UserManagementDialog({
                   ))}
                 </TableBody>
               </Table>
-            </div>
-          </ScrollArea>
+            </ScrollArea>
+          </div>
         </div>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
+        <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
           <Button 
             onClick={() => onOpenChange(false)} 
-            className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
+            className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
           >
             Close User Controls
           </Button>

@@ -1815,7 +1815,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-auto">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-none">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -1953,7 +1953,7 @@ export default function App() {
             </div>
           </aside>
 
-          <div className="w-full relative min-w-0 flex-1 z-10">
+          <div className="w-full relative min-w-0 flex-1 z-10 flex flex-col min-h-0 overflow-hidden">
 
             <Dialog open={isLogOpen} onOpenChange={setIsLogOpen}>
                <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
@@ -2717,59 +2717,56 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[700px] max-h-[90vh] touch-none">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-none">
                 <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
-                    <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-                      <Users className="h-6 w-6 text-brand-blue" />
+                    <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+                      <Users className="h-5 w-5 text-brand-blue" />
                     </div>
                     <div className="flex flex-col gap-0">
                       <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
-                        ADD, EDIT, OR REMOVE AUTHORIZED USERS FOR THIS SYSTEM.
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase">
+                        Terminal Access Control
                       </DialogDescription>
                     </div>
                   </div>
                 </DialogHeader>
 
-                <div className="p-6 py-4 space-y-6 shrink-0 border-b border-brand-blue/5 touch-auto">
-                  <div className="space-y-3">
-                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Configuration</Label>
-                    <div 
-                      className="flex items-center justify-between p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
-                      onClick={togglePhotoRequirement}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
-                          <Camera className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className={`text-sm transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
-                          <p className={`text-[10px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
-                        </div>
+                <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-auto">
+                  <div 
+                    className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                    onClick={togglePhotoRequirement}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                        <Camera className="h-4 w-4" />
                       </div>
-                      <div className={`w-12 h-6 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
-                        <div className={`h-4 w-4 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                      <div>
+                        <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                        <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
                       </div>
+                    </div>
+                    <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                      <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">Add New User</Label>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Enroll New Authorized User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
-                        placeholder="Name..." 
+                        placeholder="Full Name..." 
                         value={newUserName}
                         onChange={(e) => setNewUserName(e.target.value)}
-                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1"
+                        className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1 text-sm"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-sm font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!newUserTitle ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-xs font-normal ${!newUserTitle ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
-                        <SelectContent className="bg-brand-surface">
+                        <SelectContent className="bg-brand-surface border-brand-blue/10">
                           <SelectItem value="PIC">PIC</SelectItem>
                           <SelectItem value="RPh">RPh</SelectItem>
                           <SelectItem value="Tech">Tech</SelectItem>
@@ -2780,45 +2777,49 @@ export default function App() {
                         className="bg-brand-yellow text-brand-blue hover:brightness-110 h-8 px-4 font-black shadow-sm"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
+                        {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
                       </Button>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-hidden flex flex-col touch-auto">
-                  <div className="px-6 pt-4 pb-2 shrink-0">
-                    <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
+                  <div className="px-6 pt-3 pb-1 shrink-0">
+                    <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
                   </div>
-                  <div className="flex-1 min-h-0 px-6 pb-6 overflow-hidden">
-                    <ScrollArea className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative touch-auto">
+                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
+                    <ScrollArea className="flex-1 h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative touch-auto overflow-hidden">
                       <Table className="relative border-separate border-spacing-0">
-                        <TableHeader className="sticky top-0 z-40">
-                          <TableRow className="bg-brand-light-grey">
-                            <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Name</TableHead>
-                            <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-10`}>Actions</TableHead>
+                        <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
+                          <TableRow className="bg-brand-light-grey hover:bg-transparent">
+                            <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
+                            <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {users.map((u) => (
-                            <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                              <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
+                          {users.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={2} className="text-center py-6 text-[10px] text-brand-grey/40 uppercase font-bold">No registered users</TableCell>
+                            </TableRow>
+                          ) : users.map((u) => (
+                            <TableRow key={u.id} className="hover:bg-brand-blue/5 h-10">
+                              <TableCell className="font-medium text-brand-dark-grey py-2 text-center text-xs">
                                 {editingUser?.id === u.id ? (
-                                  <div className="flex gap-2 items-center px-1">
+                                  <div className="flex gap-1 items-center px-1">
                                     <Input 
                                       value={editingUser?.name || ""}
                                       onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                      className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
+                                      className="h-6 text-xs bg-brand-surface border-brand-blue/30 flex-1"
                                       autoFocus
                                     />
                                     <Select 
                                       value={editingUser?.title || ""} 
                                       onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                                     >
-                                      <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-sm font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                        <SelectValue placeholder="Title...." />
+                                      <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-6 flex items-center w-20 text-[10px] font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                        <SelectValue placeholder="Title" />
                                       </SelectTrigger>
-                                      <SelectContent className="bg-brand-surface">
+                                      <SelectContent className="bg-brand-surface border-brand-blue/10">
                                         <SelectItem value="PIC">PIC</SelectItem>
                                         <SelectItem value="RPh">RPh</SelectItem>
                                         <SelectItem value="Tech">Tech</SelectItem>
@@ -2826,37 +2827,37 @@ export default function App() {
                                     </Select>
                                   </div>
                                 ) : (
-                                  <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                                  <span>{u.name} {u.title && <span className="text-[10px] text-brand-dark-grey/60">({u.title})</span>}</span>
                                 )}
                               </TableCell>
-                              <TableCell className="text-center py-3">
+                              <TableCell className="text-center py-2">
                                 <div className="flex justify-center gap-1">
                                   {editingUser?.id === u.id ? (
                                     <Button 
                                       size="sm" 
                                       variant="ghost" 
-                                      className="h-8 w-8 p-0 text-brand-blue"
+                                      className="h-6 w-6 p-0 text-brand-blue"
                                       onClick={handleUpdateUser}
                                     >
-                                      <PlusCircle className="h-4 w-4" />
+                                      <PlusCircle className="h-3.5 w-3.5" />
                                     </Button>
                                   ) : (
                                     <Button 
                                       size="sm" 
                                       variant="ghost" 
-                                      className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                      className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
                                       onClick={() => setEditingUser(u)}
                                     >
-                                      <Edit className="h-4 w-4" />
+                                      <Edit className="h-3.5 w-3.5" />
                                     </Button>
                                   )}
                                   <Button 
                                     size="sm" 
                                     variant="ghost" 
-                                    className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                    className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-red-500"
                                     onClick={() => setUserToDeleteConfirm(u)}
                                   >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
                                 </div>
                               </TableCell>
@@ -2868,22 +2869,21 @@ export default function App() {
                   </div>
                 </div>
 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
+                <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
                       setCurrentTab('inventory');
                     }} 
-                    className="w-full h-11 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
+                    className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
                   >
-                    Close User Management
+                    Close Terminal Controls
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
 
           <TabsContent value="inventory" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
-            <div className="flex-1 min-h-0 flex flex-col gap-4">
               <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
                 <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                   <Table className="relative border-separate border-spacing-0">
@@ -3108,8 +3108,7 @@ export default function App() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="shrink-0 flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
