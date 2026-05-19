@@ -1799,7 +1799,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-auto">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-none">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -2704,7 +2704,7 @@ export default function App() {
               <DialogContent 
                 showCloseButton={false} 
                 onOpenAutoFocus={(e) => e.preventDefault()}
-                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-auto"
+                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-none"
               >
                 <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
@@ -2775,10 +2775,9 @@ export default function App() {
                   <div className="px-6 pt-3 pb-1 shrink-0">
                     <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
                   </div>
-                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 overflow-hidden">
-                    <div className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative flex flex-col overflow-hidden">
-                      <div className="flex-1 w-full overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 overscroll-contain">
-                        <Table className="relative border-separate border-spacing-0">
+                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
+                    <ScrollArea className="flex-1 h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative touch-auto overflow-hidden">
+                      <Table className="relative border-separate border-spacing-0">
                           <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                             <TableRow className="bg-brand-light-grey hover:bg-transparent">
                               <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
@@ -2854,18 +2853,17 @@ export default function App() {
                             ))}
                           </TableBody>
                         </Table>
-                      </div>
+                      </ScrollArea>
                     </div>
                   </div>
-                </div>
 
                 <DialogFooter className="p-4 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
-                      setEditingUser(null);
+                      setCurrentTab('inventory');
                     }} 
-                    className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
+                    className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
                   >
                     Close Terminal Controls
                   </Button>
