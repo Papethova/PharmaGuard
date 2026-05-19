@@ -71,16 +71,16 @@ export function AddSubstanceDialog({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-1.5">
-            <Label className="text-brand-dark-grey text-xs">Medication Name</Label>
+            <Label className="text-brand-dark-grey text-xs font-normal">Medication Name</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Oxycodone" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1.5">
-              <Label className="text-brand-dark-grey text-xs">Strength</Label>
+              <Label className="text-brand-dark-grey text-xs font-normal">Strength</Label>
               <Input value={strength} onChange={(e) => setStrength(e.target.value)} placeholder="e.g. 10mg" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
             </div>
             <div className="grid gap-1.5">
-              <Label className="text-brand-dark-grey text-xs">Schedule</Label>
+              <Label className="text-brand-dark-grey text-xs font-normal">Schedule</Label>
               <Select value={schedule === "" ? undefined : schedule} onValueChange={(v) => setSchedule(v)}>
                 <SelectTrigger className={`bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal ${!schedule ? 'text-muted-foreground/50' : 'text-brand-dark-grey'}`}>
                   <SelectValue placeholder="Select schedule..." />
@@ -93,21 +93,21 @@ export function AddSubstanceDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1.5">
-              <Label className="text-brand-dark-grey text-xs">NDC</Label>
+              <Label className="text-brand-dark-grey text-xs font-normal">NDC</Label>
               <Input value={ndc} onChange={(e) => setNdc(e.target.value)} placeholder="00000-0000-00" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
             </div>
             <div className="grid gap-1.5">
-              <Label className="text-brand-dark-grey text-xs">Dosage Form</Label>
+              <Label className="text-brand-dark-grey text-xs font-normal">Dosage Form</Label>
               <Input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="e.g. Tablets" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1.5">
-              <Label className="text-brand-dark-grey text-xs">Package Size</Label>
+              <Label className="text-brand-dark-grey text-xs font-normal">Package Size</Label>
               <Input value={packageSize} onChange={(e) => setPackageSize(e.target.value)} placeholder="100" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
             </div>
             <div className="grid gap-1.5">
-              <Label className="text-brand-dark-grey text-xs">Low Stock Alert Level</Label>
+              <Label className="text-brand-dark-grey text-xs font-normal">Low Stock Alert Level</Label>
               <Input value={minThreshold} onChange={(e) => setMinThreshold(e.target.value)} placeholder="50" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
             </div>
           </div>
