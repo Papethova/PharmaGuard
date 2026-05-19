@@ -1731,8 +1731,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-light-grey font-sans text-brand-grey">
-      <header className="sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md">
+    <div className="h-screen overflow-hidden bg-brand-light-grey font-sans text-brand-grey flex flex-col">
+      <header className="shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md">
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="flex h-14 items-center gap-8">
             <div className="w-full lg:w-64 flex items-center lg:justify-start justify-center lg:-ml-4">
@@ -1782,7 +1782,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12">
+      <main className="flex-1 min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col">
         <Tabs 
           value={currentTab} 
           orientation="vertical"
@@ -1794,7 +1794,7 @@ export default function App() {
               setIsUserManagementOpen(false); 
             }
           }} 
-          className="flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-start w-full relative min-h-[700px]"
+          className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-stretch w-full relative"
         >
           {/* SYNC PROBE BANNER */}
           {syncProbeVisible && (
@@ -1815,7 +1815,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 sticky top-12 shrink-0 overflow-visible self-start">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -2882,10 +2882,10 @@ export default function App() {
               </DialogContent>
             </Dialog>
 
-          <TabsContent value="inventory" className="space-y-4 relative z-10 m-0">
-            <div className="flex flex-col gap-4">
-              <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px]">
-                <div className="overflow-x-auto h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+          <TabsContent value="inventory" className="flex-1 min-h-0 mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0">
+            <div className="flex-1 min-h-0 flex flex-col gap-4">
+              <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
+                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
                   <Table className="relative border-separate border-spacing-0">
                     <TableHeader className="sticky top-0 z-30">
                       <TableRow className="bg-brand-light-grey">
@@ -3111,8 +3111,8 @@ export default function App() {
           </div>
         </TabsContent>
 
-          <TabsContent value="history" className="space-y-4 relative z-10 m-0">
-            <div className="flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
+          <TabsContent value="history" className="flex-1 min-h-0 mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0">
+            <div className="shrink-0 flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
               <div className="flex items-end gap-10">
                 <div className="grid gap-1.5">
                   <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
@@ -3224,8 +3224,8 @@ export default function App() {
                 Showing {filteredTransactions.length} transactions
               </div>
             </div>
-            <Card className="border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px]">
-              <div className="overflow-x-auto h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
+            <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
+              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20">
                 <Table className="relative border-separate border-spacing-0">
                   <TableHeader className="sticky top-0 z-30">
                     <TableRow className="bg-brand-light-grey">
