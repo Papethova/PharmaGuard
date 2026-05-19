@@ -2704,19 +2704,19 @@ export default function App() {
               <DialogContent 
                 showCloseButton={false} 
                 onOpenAutoFocus={(e) => e.preventDefault()}
-                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[700px] max-h-[90vh] touch-auto"
+                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-auto"
               >
                 <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
-                    <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-                      <Users className="h-6 w-6 text-brand-blue" />
+                    <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+                      <Users className="h-5 w-5 text-brand-blue" />
                     </div>
                     <div className="flex flex-col gap-0">
                       <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 uppercase">
-                        ADD, EDIT, OR REMOVE AUTHORIZED USERS FOR THIS SYSTEM.
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase">
+                        Terminal Access Control
                       </DialogDescription>
                     </div>
                   </div>
@@ -2777,10 +2777,10 @@ export default function App() {
                   </div>
                   <div className="flex-1 min-h-0 px-6 pb-6 mt-1 overflow-hidden">
                     <div className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative flex flex-col overflow-hidden">
-                      <div className="flex-1 w-full overflow-y-auto overflow-x-hidden touch-pan-y overscroll-contain scrollbar-thin scrollbar-thumb-brand-blue/20">
+                      <div className="flex-1 w-full overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-brand-blue/20 overscroll-contain">
                         <Table className="relative border-separate border-spacing-0">
-                          <TableHeader className="sticky top-0 z-40">
-                            <TableRow className="bg-brand-light-grey">
+                          <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
+                            <TableRow className="bg-brand-light-grey hover:bg-transparent">
                               <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
                               <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Actions</TableHead>
                             </TableRow>
@@ -2867,7 +2867,7 @@ export default function App() {
                     }} 
                     className="w-full h-10 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
                   >
-                    Close User Management
+                    Close Terminal Controls
                   </Button>
                 </DialogFooter>
               </DialogContent>
