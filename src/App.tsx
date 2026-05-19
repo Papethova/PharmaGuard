@@ -2167,7 +2167,7 @@ export default function App() {
                               onValueChange={(v: Schedule) => !selectedSubstance && setNewMed({...newMed, schedule: v})}
                               disabled={!!selectedSubstance}
                             >
-                              <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-muted-foreground/50 data-placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''} ${!newMed.schedule ? 'text-muted-foreground/50' : 'text-brand-dark-grey'}`}>
+                              <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${selectedSubstance ? 'opacity-70 cursor-not-allowed' : ''} ${!newMed.schedule ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                 <SelectValue placeholder="Select..." />
                               </SelectTrigger>
                               <SelectContent className="bg-brand-surface" align="start">
@@ -2373,7 +2373,7 @@ export default function App() {
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
                       <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-muted-foreground/50 data-placeholder:font-normal ${!selectedUser ? 'text-muted-foreground/50' : 'text-brand-dark-grey'}`}>
+                        <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!selectedUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
                               const u = users.find(u => u.id === selectedUser);
@@ -2717,7 +2717,7 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[650px] max-h-[90vh]">
                 <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
@@ -2766,7 +2766,7 @@ export default function App() {
                         className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1"
                       />
                       <Select value={newUserTitle} onValueChange={setNewUserTitle}>
-                        <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-grey/20 flex items-center">
+                        <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-sm font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!newUserTitle ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
                         <SelectContent className="bg-brand-surface">
@@ -2788,7 +2788,7 @@ export default function App() {
 
                 <div className="flex-1 min-h-0 overflow-hidden p-6 flex flex-col gap-4">
                   <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
-                  <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg overflow-y-auto bg-brand-surface shadow-inner relative scrollbar-thin scrollbar-thumb-brand-blue/20">
+                  <ScrollArea className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative">
                     <Table className="relative border-separate border-spacing-0">
                       <TableHeader className="sticky top-0 z-40">
                         <TableRow className="bg-brand-light-grey">
@@ -2812,7 +2812,7 @@ export default function App() {
                                     value={editingUser?.title || ""} 
                                     onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
                                   >
-                                    <SelectTrigger className="w-28 h-8 bg-brand-surface border-brand-blue/30 flex items-center">
+                                    <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-sm font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                       <SelectValue placeholder="Title...." />
                                     </SelectTrigger>
                                     <SelectContent className="bg-brand-surface">
@@ -2861,7 +2861,7 @@ export default function App() {
                         ))}
                       </TableBody>
                     </Table>
-                  </div>
+                  </ScrollArea>
                 </div>
 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
