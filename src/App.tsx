@@ -1799,7 +1799,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-none">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-auto">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
@@ -2701,7 +2701,7 @@ export default function App() {
                 if (!open) setCurrentTab('inventory');
               }}
             >
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-none">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-auto">
                 <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
