@@ -1782,7 +1782,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto">
+      <main className="flex-1 h-[calc(100vh-3.5rem)] min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto overflow-hidden">
         <Tabs 
           value={currentTab} 
           orientation="vertical"
@@ -1794,7 +1794,7 @@ export default function App() {
               setIsUserManagementOpen(false); 
             }
           }} 
-          className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] gap-10 items-stretch w-full relative"
+          className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] lg:grid-rows-1 gap-10 items-stretch w-full relative overflow-hidden"
         >
           {/* SYNC PROBE BANNER */}
           {syncProbeVisible && (
@@ -2882,7 +2882,7 @@ export default function App() {
               </DialogContent>
             </Dialog>
 
-          <TabsContent value="inventory" className="flex-1 min-h-0 mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0">
+          <TabsContent value="inventory" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="flex-1 min-h-0 flex flex-col gap-4">
               <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
                 <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
@@ -3111,7 +3111,7 @@ export default function App() {
           </div>
         </TabsContent>
 
-          <TabsContent value="history" className="flex-1 min-h-0 mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0">
+          <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="shrink-0 flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
               <div className="flex items-end gap-10">
                 <div className="grid gap-1.5">

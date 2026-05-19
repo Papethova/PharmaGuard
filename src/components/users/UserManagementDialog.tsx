@@ -104,116 +104,118 @@ export function UserManagementDialog({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 overflow-y-auto touch-auto">
-          <div className="p-6 space-y-8">
-            <div className="bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/10 space-y-4">
-              <Label className="text-[10px] uppercase font-black text-brand-blue/80 tracking-widest">Enroll Authorized Personnel</Label>
-              <div className="flex gap-2">
-                <Input 
-                  placeholder="Full Name" 
-                  value={userName} 
-                  onChange={(e) => setUserName(e.target.value)}
-                  className="bg-brand-surface border-brand-blue/20 text-sm h-8"
-                />
-                <Select value={userTitle} onValueChange={setUserTitle}>
-                  <SelectTrigger className={`w-32 h-8 bg-brand-surface border-brand-blue/20 text-xs ${!userTitle ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
-                    <SelectValue placeholder="Title" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-brand-surface">
-                    <SelectItem value="PIC">PIC</SelectItem>
-                    <SelectItem value="RPh">RPh</SelectItem>
-                    <SelectItem value="Tech">Tech</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button 
-                  onClick={handleAddUser} 
-                  className="bg-brand-blue text-white hover:bg-brand-blue/90 h-8 px-4"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
-                </Button>
-              </div>
+        <div className="px-6 py-4 space-y-6 shrink-0 border-b border-brand-blue/5 touch-auto">
+          <div className="bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/10 space-y-4">
+            <Label className="text-[10px] uppercase font-black text-brand-blue/80 tracking-widest">Enroll Authorized Personnel</Label>
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Full Name" 
+                value={userName} 
+                onChange={(e) => setUserName(e.target.value)}
+                className="bg-brand-surface border-brand-blue/20 text-sm h-8"
+              />
+              <Select value={userTitle} onValueChange={setUserTitle}>
+                <SelectTrigger className={`w-32 h-8 bg-brand-surface border-brand-blue/20 text-xs ${!userTitle ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
+                  <SelectValue placeholder="Title" />
+                </SelectTrigger>
+                <SelectContent className="bg-brand-surface border-brand-blue/10">
+                  <SelectItem value="PIC">PIC</SelectItem>
+                  <SelectItem value="RPh">RPh</SelectItem>
+                  <SelectItem value="Tech">Tech</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button 
+                onClick={handleAddUser} 
+                className="bg-brand-blue text-white hover:bg-brand-blue/90 h-8 px-4"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <UserPlus className="h-5 w-5" />}
+              </Button>
             </div>
+          </div>
+        </div>
 
-            <div className="space-y-4">
-              <Label className="text-sm font-bold text-brand-dark-grey">System Users</Label>
-              <div className="border border-brand-grey/20 rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader className="bg-brand-light-grey/50">
-                    <TableRow>
-                      <TableHead className={tableHeadClass}>Name</TableHead>
-                      <TableHead className={`${tableHeadClass} text-center`}>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((u) => (
-                      <TableRow key={u.id} className="hover:bg-brand-blue/5">
-                        <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          <div className="px-6 pt-4 pb-2 shrink-0">
+            <Label className="text-sm font-bold text-brand-dark-grey uppercase tracking-widest">System Users</Label>
+          </div>
+          <ScrollArea className="flex-1 min-h-0 px-6 pb-6 touch-auto">
+            <div className="border border-brand-grey/20 rounded-lg overflow-hidden shrink-0">
+              <Table className="relative border-separate border-spacing-0">
+                <TableHeader className="sticky top-0 z-10 bg-brand-light-grey/50">
+                  <TableRow>
+                    <TableHead className={tableHeadClass}>Name</TableHead>
+                    <TableHead className={`${tableHeadClass} text-center`}>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.map((u) => (
+                    <TableRow key={u.id} className="hover:bg-brand-blue/5">
+                      <TableCell className="font-medium text-brand-dark-grey py-3 text-center">
+                        {editingUser?.id === u.id ? (
+                          <div className="flex gap-2 items-center">
+                            <Input 
+                              value={editingUser?.name || ""}
+                              onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
+                              className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
+                              autoFocus
+                            />
+                            <Select 
+                              value={editingUser?.title || ""} 
+                              onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
+                            >
+                              <SelectTrigger className={`w-28 h-8 bg-brand-surface border-brand-blue/30 ${!editingUser?.title ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
+                                <SelectValue placeholder="Title" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-brand-surface border-brand-blue/10">
+                                <SelectItem value="PIC">PIC</SelectItem>
+                                <SelectItem value="RPh">RPh</SelectItem>
+                                <SelectItem value="Tech">Tech</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ) : (
+                          <span>{u.name} {u.title && <span className="text-brand-dark-grey/60">({u.title})</span>}</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center py-3">
+                        <div className="flex justify-center gap-1">
                           {editingUser?.id === u.id ? (
-                            <div className="flex gap-2 items-center">
-                              <Input 
-                                value={editingUser?.name || ""}
-                                onChange={(e) => setEditingUser(prev => prev ? {...prev, name: e.target.value} : null)}
-                                className="h-8 bg-brand-surface border-brand-blue/30 flex-1"
-                                autoFocus
-                              />
-                              <Select 
-                                value={editingUser?.title || ""} 
-                                onValueChange={(v) => setEditingUser(prev => prev ? {...prev, title: v} : null)}
-                              >
-                                <SelectTrigger className={`w-28 h-8 bg-brand-surface border-brand-blue/30 ${!editingUser?.title ? 'text-muted-foreground' : 'text-brand-dark-grey'}`}>
-                                  <SelectValue placeholder="Title" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-brand-surface">
-                                  <SelectItem value="PIC">PIC</SelectItem>
-                                  <SelectItem value="RPh">RPh</SelectItem>
-                                  <SelectItem value="Tech">Tech</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          ) : (
-                            <span>{u.name} {u.title && <span className="text-brand-dark-grey/60">({u.title})</span>}</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center py-3">
-                          <div className="flex justify-center gap-1">
-                            {editingUser?.id === u.id ? (
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-8 w-8 p-0 text-brand-blue"
-                                onClick={handleUpdateUser}
-                              >
-                                <PlusCircle className="h-4 w-4" />
-                              </Button>
-                            ) : (
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
-                                onClick={() => setEditingUser(u)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            )}
                             <Button 
                               size="sm" 
                               variant="ghost" 
-                              className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                              onClick={() => handleDeleteUser(u.id)}
+                              className="h-8 w-8 p-0 text-brand-blue"
+                              onClick={handleUpdateUser}
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <PlusCircle className="h-4 w-4" />
                             </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                          ) : (
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                              onClick={() => setEditingUser(u)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-8 w-8 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                            onClick={() => handleDeleteUser(u.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-          </div>
-        </ScrollArea>
+          </ScrollArea>
+        </div>
 
         <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
           <Button 
