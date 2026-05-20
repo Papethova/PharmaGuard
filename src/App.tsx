@@ -2876,7 +2876,7 @@ export default function App() {
           <TabsContent value="inventory" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
               <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
                 <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
-                  <Table className="relative border-separate border-spacing-0">
+                  <table className="w-full caption-bottom text-sm relative border-separate border-spacing-0">
                     <TableHeader className="sticky top-0 z-30">
                       <TableRow className="bg-brand-light-grey">
                         <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
@@ -2923,7 +2923,7 @@ export default function App() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </table>
             </div>
           </Card>
 
