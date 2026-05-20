@@ -934,6 +934,22 @@ export default function App() {
           return refNum.toLowerCase() === normalizedBase;
         });
 
+        const currentMed = inventory.find(s => s.id === medId);
+        if (rxMatches.length > 0 && currentMed) {
+          const mismatch = rxMatches.find(t => {
+            const tName = (t.substanceName || "").trim().toLowerCase();
+            const tStrength = (t.strength || "").trim().toLowerCase();
+            const cName = (currentMed.name || "").trim().toLowerCase();
+            const cStrength = (currentMed.strength || "").trim().toLowerCase();
+            return tName !== cName || tStrength !== cStrength;
+          });
+
+          if (mismatch) {
+            toast.error(`This RX number is already registered to a different medication (${mismatch.substanceName} ${mismatch.strength})`);
+            return;
+          }
+        }
+
         const N = rxMatches.length;
         if (N > 0) {
           finalRef = `RX-${baseNumeric}R${N}`;
