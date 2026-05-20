@@ -322,19 +322,37 @@ export default function App() {
   // Lock background scroll when user management is open
   useEffect(() => {
     if (isUserManagementOpen) {
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+      document.body.style.height = "100%";
       document.body.style.overflow = "hidden";
       document.body.style.touchAction = "none";
+      document.documentElement.style.position = "fixed";
+      document.documentElement.style.width = "100%";
+      document.documentElement.style.height = "100%";
       document.documentElement.style.overflow = "hidden";
       document.documentElement.style.touchAction = "none";
     } else {
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
+      document.documentElement.style.position = "";
+      document.documentElement.style.width = "";
+      document.documentElement.style.height = "";
       document.documentElement.style.overflow = "";
       document.documentElement.style.touchAction = "";
     }
     return () => {
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
+      document.documentElement.style.position = "";
+      document.documentElement.style.width = "";
+      document.documentElement.style.height = "";
       document.documentElement.style.overflow = "";
       document.documentElement.style.touchAction = "";
     };
@@ -2832,7 +2850,7 @@ export default function App() {
                   </div>
                   <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
-                      <ScrollArea className="flex-1 w-full overflow-y-auto touch-auto">
+                      <div className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto min-h-0">
                         <Table className="relative border-separate border-spacing-0">
                           <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                             <TableRow className="bg-brand-light-grey hover:bg-transparent">
@@ -2909,7 +2927,7 @@ export default function App() {
                             ))}
                           </TableBody>
                         </Table>
-                      </ScrollArea>
+                      </div>
                     </div>
                   </div>
                 </div>
