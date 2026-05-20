@@ -2100,7 +2100,7 @@ export default function App() {
                             />
                           </div>
                           <div className="grid gap-1.5">
-                            <Label htmlFor="new-unit" className="text-brand-dark-grey text-xs font-normal">Dosage Form</Label>
+                            <Label htmlFor="new-unit" className="text-brand-dark-grey text-xs font-normal">Units</Label>
                             <Input 
                               id="new-unit" 
                               value={newMed.unit} 

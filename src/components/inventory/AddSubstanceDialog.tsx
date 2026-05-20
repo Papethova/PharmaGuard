@@ -99,7 +99,7 @@ export function AddSubstanceDialog({
               <Input value={ndc} onChange={(e) => setNdc(e.target.value)} placeholder="00000-0000-00" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
             </div>
             <div className="grid gap-1.5">
-              <Label className="text-brand-dark-grey text-xs font-normal">Dosage Form</Label>
+              <Label className="text-brand-dark-grey text-xs font-normal">Units</Label>
               <Input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="e.g. Tablets" className="bg-brand-surface border-brand-blue/10 h-10 text-sm font-normal text-brand-dark-grey placeholder:text-brand-grey/50 placeholder:font-normal" />
             </div>
           </div>
