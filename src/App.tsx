@@ -920,8 +920,26 @@ export default function App() {
       
       if (transactionType === "OUT") {
         // Strip any existing prefix to avoid RX-RX-
-        const numeric = finalRef.replace(/^RX-/, "");
-        finalRef = `RX-${numeric}`;
+        let baseNumeric = finalRef.replace(/^RX-/, "");
+        // Also strip any pre-existing refill designator like R1, R2, etc. (suffix match matching R followed by digits)
+        baseNumeric = baseNumeric.replace(/R\d+$/, "");
+        
+        // Count existing transactions that share this exact base RX number
+        const normalizedBase = baseNumeric.toLowerCase();
+        const rxMatches = transactions.filter(t => {
+          if (t.type !== "OUT" || !t.referenceNumber) return false;
+          let ref = t.referenceNumber.trim();
+          let refNum = ref.replace(/^RX-/, "");
+          refNum = refNum.replace(/R\d+$/, "");
+          return refNum.toLowerCase() === normalizedBase;
+        });
+
+        const N = rxMatches.length;
+        if (N > 0) {
+          finalRef = `RX-${baseNumeric}R${N}`;
+        } else {
+          finalRef = `RX-${baseNumeric}`;
+        }
       } else if (transactionType === "IN") {
         const numeric = finalRef.replace(/^INV-/, "");
         finalRef = `INV-${numeric}`;
