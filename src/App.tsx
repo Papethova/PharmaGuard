@@ -318,6 +318,27 @@ export default function App() {
   const [cameraPermissionError, setCameraPermissionError] = useState(false);
   const [users, setUsers] = useState<{id: string, name: string, title?: string}[]>([]);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+
+  // Lock background scroll when user management is open
+  useEffect(() => {
+    if (isUserManagementOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+      document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.touchAction = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.touchAction = "";
+    };
+  }, [isUserManagementOpen]);
   const [isEditMinThresholdOpen, setIsEditMinThresholdOpen] = useState(false);
   const [isEditMedDetailsOpen, setIsEditMedDetailsOpen] = useState(false);
   const [editingMed, setEditingMed] = useState<Substance | null>(null);
@@ -1765,7 +1786,7 @@ export default function App() {
 
   return (
     <div className="h-screen overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
-      <header className="shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto">
+      <header className={`shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="flex h-14 items-center gap-8">
             <div className="w-full lg:w-64 flex items-center lg:justify-start justify-center lg:-ml-4">
@@ -1815,7 +1836,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 h-[calc(100vh-3.5rem)] min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto overflow-hidden">
+      <main className={`flex-1 h-[calc(100vh-3.5rem)] min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto overflow-hidden ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
         <Tabs 
           value={currentTab} 
           orientation="vertical"
@@ -2809,9 +2830,9 @@ export default function App() {
                   <div className="px-6 pt-3 pb-1 shrink-0">
                     <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
                   </div>
-                  <div className="flex-1 min-h-[200px] px-6 pb-6 mt-1 overflow-hidden">
-                    <div className="h-full border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
-                      <ScrollArea className="flex-1 w-full touch-auto">
+                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
+                    <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
+                      <ScrollArea className="flex-1 w-full overflow-y-auto touch-auto">
                         <Table className="relative border-separate border-spacing-0">
                           <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                             <TableRow className="bg-brand-light-grey hover:bg-transparent">
