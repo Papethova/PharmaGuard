@@ -874,17 +874,27 @@ export default function App() {
 
     // 3. Password Compliance Checks
     if (!password) {
-      toast.error("A secure terminal passkey is required.");
+      toast.error("Compliance restriction: A secure terminal passkey is required.");
       return;
     }
+    
+    const passwordDeficiencies: string[] = [];
     if (password.length < 6) {
-      toast.error("Compliance restriction: A secure terminal passkey must be at least 6 characters in length.");
-      return;
+      passwordDeficiencies.push(`• Must be at least 6 characters (currently ${password.length})`);
     }
     const hasLetter = /[a-zA-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
-    if (!hasLetter || !hasNumber) {
-      toast.error("Compliance rejection: For security registry compliance, your terminal passkey must contain both letters and numbers.");
+    if (!hasLetter) {
+      passwordDeficiencies.push("• Must contain at least one letter (a-z, A-Z)");
+    }
+    if (!hasNumber) {
+      passwordDeficiencies.push("• Must contain at least one number (0-9)");
+    }
+
+    if (passwordDeficiencies.length > 0) {
+      toast.error(`Compliance Deficiencies Detected:\n${passwordDeficiencies.join("\n")}`, {
+        duration: 8000
+      });
       return;
     }
 
@@ -1689,13 +1699,28 @@ export default function App() {
                       <Label className="text-[9px] uppercase font-black text-brand-blue/80">Password</Label>
                       <Input 
                         type="password" 
-                        placeholder="Minimum 6 characters"
+                        placeholder="Choose a compliant password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
                         required
                         minLength={6}
                       />
+                      <div className="mt-1.5 p-2 bg-brand-blue/5 border border-brand-blue/10 rounded-lg text-[10px] space-y-1">
+                        <p className="font-bold text-brand-blue/80 uppercase tracking-widest text-[8px] mb-1">Passkey Compliance Requirements:</p>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`inline-block w-1.5 h-1.5 rounded-full transition-colors ${password.length >= 6 ? 'bg-emerald-500' : 'bg-brand-grey/40'}`} />
+                          <span className={password.length >= 6 ? 'text-emerald-600 font-semibold text-[9px]' : 'text-brand-grey/70 text-[9px]'}>
+                            At least 6 characters {password.length > 0 && password.length < 6 && <span className="text-rose-500 font-bold font-mono">({password.length}/6)</span>}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`inline-block w-1.5 h-1.5 rounded-full transition-colors ${(/[a-zA-Z]/.test(password) && /[0-9]/.test(password)) ? 'bg-emerald-500' : 'bg-brand-grey/40'}`} />
+                          <span className={(/[a-zA-Z]/.test(password) && /[0-9]/.test(password)) ? 'text-emerald-600 font-semibold text-[9px]' : 'text-brand-grey/70 text-[9px]'}>
+                            Must contain both letters and numbers
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

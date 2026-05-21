@@ -135,18 +135,28 @@ export function useAuth() {
 
     // 3. Password Compliance Checks
     if (!pass) {
-      toast.error("A secure terminal passkey is required.");
+      toast.error("Compliance restriction: A secure terminal passkey is required.");
       throw new Error("Missing password");
     }
+    
+    const passwordDeficiencies: string[] = [];
     if (pass.length < 6) {
-      toast.error("Compliance restriction: A secure terminal passkey must be at least 6 characters in length.");
-      throw new Error("Password too short");
+      passwordDeficiencies.push(`• Must be at least 6 characters (currently ${pass.length})`);
     }
     const hasLetter = /[a-zA-Z]/.test(pass);
     const hasNumber = /[0-9]/.test(pass);
-    if (!hasLetter || !hasNumber) {
-      toast.error("Compliance rejection: For security registry compliance, your terminal passkey must contain both letters and numbers.");
-      throw new Error("Password complexity not met");
+    if (!hasLetter) {
+      passwordDeficiencies.push("• Must contain at least one letter (a-z, A-Z)");
+    }
+    if (!hasNumber) {
+      passwordDeficiencies.push("• Must contain at least one number (0-9)");
+    }
+
+    if (passwordDeficiencies.length > 0) {
+      toast.error(`Compliance Deficiencies Detected:\n${passwordDeficiencies.join("\n")}`, {
+        duration: 8000
+      });
+      throw new Error(`Password complexity not met: ${passwordDeficiencies.join(", ")}`);
     }
 
     try {
