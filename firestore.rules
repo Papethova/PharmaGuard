@@ -92,7 +92,7 @@ service cloud.firestore {
                       isOwner(userId) && 
                       isValidId(userId) &&
                       isValidUserProfile(incoming()) && 
-                      (request.auth.token.email.lower() == 'allen32@gmail.com' ? incoming().status == 'active' : incoming().status == 'pending')
+                      ((request.auth.token.email != null && request.auth.token.email.lower() == 'allen32@gmail.com') ? incoming().status == 'active' : incoming().status in ['active', 'pending'])
                     );
       
       allow update: if isMasterAdmin() || (

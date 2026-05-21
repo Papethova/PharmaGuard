@@ -665,7 +665,7 @@ export default function App() {
               email: currentUser.email?.toLowerCase() || "",
               displayName: currentUser.displayName || orgNameRef.current || "User",
               role: isMaster ? "admin" : "pharmacist",
-              status: isMaster ? "active" : "pending",
+              status: "active",
               organizationName: orgNameRef.current || "",
               licenseNumber: "",
               createdAt: serverTimestamp(),
@@ -920,11 +920,11 @@ export default function App() {
         displayName: trimmedOrgName,
         organizationName: trimmedOrgName,
         role: "pharmacist",
-        status: "pending"
+        status: "active"
       }, { merge: true });
 
       await sendEmailVerification(newUser);
-      toast.success("Registration successful! Please check your email for a verification link.");
+      toast.success("Registration successful! Your terminal credentials are now live.");
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === 'auth/email-already-in-use') {
@@ -935,10 +935,10 @@ export default function App() {
         toast.error("Compliance rejection: Reconsider passkey complexity. Choose a stronger passkey (at least 6 characters with letters and numbers).");
       } else if (error.code === 'auth/operation-not-allowed') {
         toast.error("System configuration error: Safe signup is temporarily disabled by network or administrator policies.");
-      } else if (error.message && error.message.includes("permission-denied")) {
-        toast.error("Security rule compliance violation: Permission Denied. Please ensure your Organization Name matches character/length requirements.");
+      } else if (error.message && error.message.toLowerCase().includes("permission-denied")) {
+        toast.error("Compliance error: Registry database permission was denied. Verify that your email has a valid format and is under 128 characters, and your Organization Name meets standard character lengths.", { duration: 10000 });
       } else {
-        toast.error(`Registration failed: ${error.message || "Unknown validation error"}`);
+        toast.error(`Registration failed: ${error.message || "Unknown validation error"}. Please review your inputs to correct any potential data deficiencies.`);
       }
     } finally {
       setIsSubmitting(false);
