@@ -693,6 +693,25 @@ export default function App() {
 
           // 2. Profile Creation for New Users
           if (!userDoc || !userDoc.exists()) {
+            const isPasswordUser = currentUser.providerData.some(p => p.providerId === 'password') || (currentUser.email && !currentUser.providerData.some(p => p.providerId === 'google.com'));
+            
+            if (isPasswordUser && orgNameRef.current === "" && authMode !== "signup") {
+              console.log("Purged email/password user detected. Revoking and deleting session.");
+              try {
+                await currentUser.delete();
+              } catch (delError) {
+                console.warn("Could not delete purged auth user in onAuthStateChanged:", delError);
+              }
+              await signOut(auth);
+              setUser(null);
+              setUserProfile(null);
+              toast.error("This user does not exist. Access has been revoked or node was purged.");
+              alert("This user does not exist. Your organizational node has been revoked or the user was purged from the system. If you need access, please register a new organization.");
+              setIsAuthReady(true);
+              setIsInitializing(false);
+              return;
+            }
+
             const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
             const newProfile: UserProfile = {
               uid: currentUser.uid,
@@ -1003,7 +1022,29 @@ export default function App() {
 
     try {
       setIsSubmitting(true);
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const loggedInUser = userCredential.user;
+      const emailId = loggedInUser.email?.toLowerCase() || loggedInUser.uid;
+
+      // Immediately check if the user document exists in Firestore
+      const userDocRef = doc(db, "users", emailId);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        console.log("Purged user logged in. Destroying auth account and logging out.");
+        try {
+          await loggedInUser.delete();
+        } catch (delError) {
+          console.warn("Could not delete purged auth user in login handler:", delError);
+        }
+        await signOut(auth);
+        setUser(null);
+        setUserProfile(null);
+        toast.error("This user does not exist. Access has been revoked or node was purged.");
+        alert("This user does not exist. Your organizational node has been revoked or the user was purged from the system. If you need access, please register a new organization.");
+        return;
+      }
+
       toast.success("Log in successful");
     } catch (error: any) {
       console.error("Login error:", error);
