@@ -957,7 +957,10 @@ export default function App() {
         status: isMaster ? "active" : "pending"
       }, { merge: true });
 
-      await sendEmailVerification(newUser);
+      await sendEmailVerification(newUser, {
+        url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
+        handleCodeInApp: false
+      });
       if (isMaster) {
         toast.success("Registration successful! Your terminal credentials are now live.");
       } else {
@@ -1904,7 +1907,10 @@ export default function App() {
                   setIsSubmitting(true);
                   try {
                     if (auth.currentUser) {
-                      await sendEmailVerification(auth.currentUser);
+                      await sendEmailVerification(auth.currentUser, {
+                        url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
+                        handleCodeInApp: false
+                      });
                       toast.success("New verification link dispatched successfully.");
                     }
                   } catch (error: any) {
