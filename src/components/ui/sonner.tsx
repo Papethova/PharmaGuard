@@ -40,6 +40,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "zIndex": 99999999,
           "filter": "none",
           "backdropFilter": "none",
+          "transform": "translateZ(0)",
+          "WebkitTransform": "translateZ(0)",
         } as React.CSSProperties
       }
       toastOptions={{
