@@ -1803,7 +1803,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
+    <div className="h-[100dvh] overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
       <header className={`shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="flex h-14 items-center gap-8">
@@ -1854,7 +1854,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className={`flex-1 h-[calc(100vh-3.5rem)] min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto overflow-hidden ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
+      <main className={`flex-1 h-[calc(100dvh-3.5rem)] min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto overflow-hidden ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
         <Tabs 
           value={currentTab} 
           orientation="vertical"
