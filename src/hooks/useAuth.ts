@@ -209,7 +209,6 @@ export function useAuth() {
     } catch (error: any) {
       console.error("Signup error in useAuth:", error);
       if (error.code === 'auth/email-already-in-use' || error.message?.toLowerCase().includes("already") || error.message?.toLowerCase().includes("in use")) {
-        alert("Warning: This email address is already registered. If you already have an account, please sign in.");
         toast.error("Compliance error: An active node is already registered with this email address.");
       } else if (error.code === 'auth/invalid-email') {
         toast.error("Compliance rejection: Firebase authentication rejected this email format. Please enter a valid email address.");

@@ -532,6 +532,7 @@ export default function App() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [nodeToReset, setNodeToReset] = useState<UserProfile | null>(null);
+  const [isAlreadyRegisteredOpen, setIsAlreadyRegisteredOpen] = useState(false);
 
   const checkAccountStatus = () => {
     if (userProfile?.status === 'suspended' || userProfile?.status === 'pending') {
@@ -975,7 +976,7 @@ export default function App() {
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === 'auth/email-already-in-use' || error.message?.toLowerCase().includes("already") || error.message?.toLowerCase().includes("in use")) {
-        alert("Warning: This email address is already registered. If you already have an account, please click 'Already registered? Sign In' to log in.");
+        setIsAlreadyRegisteredOpen(true);
         toast.error("Compliance error: An active node is already registered with this email address.");
       } else if (error.code === 'auth/invalid-email') {
         toast.error("Compliance rejection: Firebase authentication rejected this email format. Please enter a valid email address.");
@@ -4359,6 +4360,51 @@ export default function App() {
             className="bg-brand-yellow text-brand-blue font-black uppercase tracking-widest text-[10px] h-12 flex-1 rounded-xl shadow-lg shadow-brand-yellow/20"
           >
             {isActionPending ? 'Purging...' : 'Confirm Reset'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={isAlreadyRegisteredOpen} onOpenChange={setIsAlreadyRegisteredOpen}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
+        <DialogHeader className="p-6 bg-brand-blue text-white relative">
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+              <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
+            </div>
+            
+            <div className="flex flex-col gap-0 text-left">
+              <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
+                Node Registry Warning
+              </DialogTitle>
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+                REGISTRATION EXCLUSIVITY EXCEPTION
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+        <div className="p-6 space-y-4 text-left">
+          <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
+            <p className="text-brand-blue font-bold text-sm">
+              This email address is already registered.
+            </p>
+            <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
+              An active system node is already registered with this email address in the PharmaGuard decentralized ledger. 
+            </p>
+            <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
+              If this is your account, please click "Already registered? Sign In" below the form to enter the secure environment.
+            </p>
+          </div>
+        </div>
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+          <Button 
+            onClick={() => {
+              setIsAlreadyRegisteredOpen(false);
+              setAuthMode("google");
+            }}
+            className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
+          >
+            Acknowledge & Sign In
           </Button>
         </DialogFooter>
       </DialogContent>
