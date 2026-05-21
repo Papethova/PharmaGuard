@@ -43,7 +43,24 @@
   }
 
   [data-sonner-toaster] {
-    z-index: 99999 !important;
+    z-index: 99999999 !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-sonner-toast] {
+    z-index: 99999999 !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+    backface-visibility: hidden !important;
+    transform-style: preserve-3d !important;
   }
 }
 
