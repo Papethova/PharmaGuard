@@ -1067,12 +1067,28 @@ export default function App() {
       const errCode = error.code || "";
       const errMessage = error.message || "";
       
-      if (errCode === 'auth/user-not-found' || errMessage.includes('user-not-found')) {
-        toast.error("This email address is not registered. Please check the spelling or sign up.");
+      // Check if user exists in the Firestore database to accurately identify unregistered accounts
+      const emailId = email.trim().toLowerCase();
+      let exists = true;
+      try {
+        const userDocRef = doc(db, "users", emailId);
+        const userDoc = await getDoc(userDocRef);
+        exists = userDoc.exists();
+      } catch (dbErr) {
+        console.warn("Could not verify user existence during catch block:", dbErr);
+      }
+
+      if (!exists || errCode === 'auth/user-not-found' || errMessage.includes('user-not-found')) {
+        setIsUserDoesNotExistOpen(true);
       } else if (errCode === 'auth/wrong-password' || errMessage.includes('wrong-password')) {
         toast.error("Incorrect password. The username or password you entered is incorrect.");
       } else if (errCode === 'auth/invalid-credential' || errCode === 'auth/invalid-email' || errMessage.includes('invalid-credential')) {
-        toast.error("The email address is either not registered or the password you entered is incorrect.");
+        // If they don't exist in Firestore, show the non-existent prompt
+        if (!exists) {
+          setIsUserDoesNotExistOpen(true);
+        } else {
+          toast.error("Incorrect password. The username or password you entered is incorrect.");
+        }
       } else {
         toast.error(errMessage || "Failed to log in. Please check your credentials.");
       }
