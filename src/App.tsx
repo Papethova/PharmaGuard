@@ -518,6 +518,11 @@ export default function App() {
 
   // Email Auth State
   const [authMode, setAuthMode] = useState<"google" | "login" | "signup" | "forgot">("google");
+  const authModeRef = useRef("google");
+  useEffect(() => {
+    authModeRef.current = authMode;
+  }, [authMode]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -533,6 +538,7 @@ export default function App() {
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [nodeToReset, setNodeToReset] = useState<UserProfile | null>(null);
   const [isAlreadyRegisteredOpen, setIsAlreadyRegisteredOpen] = useState(false);
+  const [isUserDoesNotExistOpen, setIsUserDoesNotExistOpen] = useState(false);
 
   const checkAccountStatus = () => {
     if (userProfile?.status === 'suspended' || userProfile?.status === 'pending') {
@@ -695,7 +701,7 @@ export default function App() {
           if (!userDoc || !userDoc.exists()) {
             const isPasswordUser = currentUser.providerData.some(p => p.providerId === 'password') || (currentUser.email && !currentUser.providerData.some(p => p.providerId === 'google.com'));
             
-            if (isPasswordUser && orgNameRef.current === "" && authMode !== "signup") {
+            if (isPasswordUser && orgNameRef.current === "" && authModeRef.current !== "signup") {
               console.log("Purged email/password user detected. Revoking and deleting session.");
               try {
                 await currentUser.delete();
@@ -706,7 +712,7 @@ export default function App() {
               setUser(null);
               setUserProfile(null);
               toast.error("This user does not exist. Access has been revoked or node was purged.");
-              alert("This user does not exist. Your organizational node has been revoked or the user was purged from the system. If you need access, please register a new organization.");
+              setIsUserDoesNotExistOpen(true);
               setIsAuthReady(true);
               setIsInitializing(false);
               return;
@@ -1041,7 +1047,7 @@ export default function App() {
         setUser(null);
         setUserProfile(null);
         toast.error("This user does not exist. Access has been revoked or node was purged.");
-        alert("This user does not exist. Your organizational node has been revoked or the user was purged from the system. If you need access, please register a new organization.");
+        setIsUserDoesNotExistOpen(true);
         return;
       }
 
@@ -4446,6 +4452,51 @@ export default function App() {
             className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
           >
             Acknowledge & Sign In
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={isUserDoesNotExistOpen} onOpenChange={setIsUserDoesNotExistOpen}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
+        <DialogHeader className="p-6 bg-brand-blue text-white relative">
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+              <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
+            </div>
+            
+            <div className="flex flex-col gap-0 text-left">
+              <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
+                User Registry Exception
+              </DialogTitle>
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+                AUTHENTICATION OR NODE DELETION EXCEPTION
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+        <div className="p-6 space-y-4 text-left">
+          <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
+            <p className="text-brand-blue font-bold text-sm">
+              This user does not exist.
+            </p>
+            <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
+              Your organizational node has been revoked or the user was purged from the PharmaGuard decentralized ledger. 
+            </p>
+            <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
+              To proceed and acquire a secure registry terminal, please register your organizational credentials using the registration window.
+            </p>
+          </div>
+        </div>
+        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+          <Button 
+            onClick={() => {
+              setIsUserDoesNotExistOpen(false);
+              setAuthMode("signup");
+            }}
+            className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
+          >
+            Acknowledge & Register
           </Button>
         </DialogFooter>
       </DialogContent>
