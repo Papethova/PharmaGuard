@@ -2851,7 +2851,7 @@ export default function App() {
                   <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
                       <div className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto min-h-0">
-                        <Table className="relative border-separate border-spacing-0">
+                        <table className="w-full caption-bottom text-sm border-separate border-spacing-0 relative">
                           <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                             <TableRow className="bg-brand-light-grey hover:bg-transparent">
                               <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
@@ -2926,7 +2926,7 @@ export default function App() {
                               </TableRow>
                             ))}
                           </TableBody>
-                        </Table>
+                        </table>
                       </div>
                     </div>
                   </div>
