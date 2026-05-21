@@ -84,7 +84,7 @@ service cloud.firestore {
     // --- Rules ---
 
     match /users/{userId} {
-      allow get: if isMasterAdmin() || isOwner(userId);
+      allow get: if true;
       allow list: if isMasterAdmin();
       
       allow create: if isMasterAdmin() || (
