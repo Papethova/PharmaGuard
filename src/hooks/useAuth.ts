@@ -190,15 +190,7 @@ export function useAuth() {
         createdAt: serverTimestamp()
       });
 
-      try {
-        await sendEmailVerification(user, {
-          url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
-          handleCodeInApp: false
-        });
-      } catch (verificationError: any) {
-        console.warn("Verification email sending failed in useAuth:", verificationError);
-        toast.warning("Registration completed, but verification email could not be sent. Please contact an administrator.");
-      }
+
 
       if (isMaster) {
         toast.success("Registration successful! Your terminal credentials are now live.");

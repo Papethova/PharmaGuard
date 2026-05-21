@@ -993,15 +993,7 @@ export default function App() {
         status: isMaster ? "active" : "pending"
       }, { merge: true });
 
-      try {
-        await sendEmailVerification(newUser, {
-          url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
-          handleCodeInApp: false
-        });
-      } catch (verificationError: any) {
-        console.warn("Verification email sending failed:", verificationError);
-        toast.warning("Registration completed, but verification email could not be sent. Please contact an administrator.");
-      }
+
 
       if (isMaster) {
         toast.success("Registration successful! Your terminal credentials are now live.");
@@ -1935,115 +1927,7 @@ export default function App() {
     );
   }
 
-  if (user && !user.emailVerified && !isVerificationBypassed) {
-    return (
-      <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center p-4 text-center">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full"
-        >
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-blue/20 flex flex-col items-center space-y-6">
-            <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg">
-              <Mail className="w-12 h-12 text-brand-blue" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-brand-blue">Verify Your Email Address</h2>
-              <p className="text-brand-grey text-sm">
-                A verification link has been sent to your email address:
-              </p>
-              <div className="bg-brand-blue/5 p-4 rounded-lg border border-brand-blue/10 mt-4">
-                <p className="text-sm font-bold text-brand-blue no-interact">{escapeEmail(user.email || "")}</p>
-              </div>
-              <p className="text-brand-dark-grey/60 text-xs mt-4">
-                Please check your inbox (and spam folder) and click the link to confirm your account.
-              </p>
-            </div>
-            <div className="pt-4 w-full space-y-3">
-              <Button 
-                onClick={async () => {
-                  setIsSubmitting(true);
-                  try {
-                    await auth.currentUser?.reload();
-                    const updatedUser = auth.currentUser;
-                    setUser(updatedUser ? { ...updatedUser } : null);
-                    if (updatedUser?.emailVerified) {
-                      toast.success("Email successfully verified! Node initialized.");
-                    } else {
-                      toast.error("Email verification not yet completed. Please check your inbox and try again.");
-                    }
-                  } catch (error) {
-                    toast.error("Failed to refresh verification status. Please try again.");
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-                disabled={isSubmitting}
-                className="w-full bg-brand-yellow text-brand-blue hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-brand-yellow/20"
-              >
-                {isSubmitting ? "Refreshing..." : "I have verified my email"}
-              </Button>
-              <Button 
-                onClick={async () => {
-                  setIsSubmitting(true);
-                  try {
-                    if (auth.currentUser) {
-                      await sendEmailVerification(auth.currentUser, {
-                        url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
-                        handleCodeInApp: false
-                      });
-                      toast.success("New verification link dispatched successfully.");
-                    }
-                  } catch (error: any) {
-                    toast.error(error.message || "Failed to resend link. Please wait a moment and try again.");
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-                disabled={isSubmitting}
-                className="w-full bg-white border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-              >
-                Resend Verification Link
-              </Button>
-              <Button 
-                onClick={handleLogout}
-                className="w-full bg-brand-blue text-white hover:brightness-110 h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-              >
-                Sign Out
-              </Button>
 
-              <div className="pt-4 border-t border-brand-blue/10 w-full text-left space-y-3">
-                <div className="bg-brand-blue/5 border border-brand-blue/10 rounded-xl p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-brand-yellow shrink-0" />
-                    <p className="text-xs font-bold text-brand-blue uppercase tracking-wider">Trouble Verifying Address?</p>
-                  </div>
-                  <p className="text-brand-dark-grey/70 text-xs">
-                    If clicking the verification link in your inbox does not trigger any action, this indicates that Firebase Auth dynamic action handlers are unconfigured in your Firebase Cloud Console.
-                  </p>
-                  <p className="text-brand-dark-grey/70 text-xs font-semibold">
-                    To bypass this issue immediately and proceed with registering a fully functional account, click the button below to register a local node waiver.
-                  </p>
-                  <Button
-                    onClick={() => {
-                      if (user) {
-                        localStorage.setItem(`bypass_verification_${user.uid}`, "true");
-                        setIsVerificationBypassed(true);
-                        toast.success("Security waiver applied: Email verification bypassed successfully!");
-                      }
-                    }}
-                    className="w-full mt-2 h-10 text-[9px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/15 transition-all rounded-lg"
-                  >
-                    Bypass & Initialize Node
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
 
   if (userProfile?.status === 'pending') {
     return (
