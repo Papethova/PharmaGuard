@@ -190,10 +190,16 @@ export function useAuth() {
         createdAt: serverTimestamp()
       });
 
-      await sendEmailVerification(user, {
-        url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
-        handleCodeInApp: false
-      });
+      try {
+        await sendEmailVerification(user, {
+          url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
+          handleCodeInApp: false
+        });
+      } catch (verificationError: any) {
+        console.warn("Verification email sending failed in useAuth:", verificationError);
+        toast.warning("Registration completed, but verification email could not be sent. Please contact an administrator.");
+      }
+
       if (isMaster) {
         toast.success("Registration successful! Your terminal credentials are now live.");
       } else {
@@ -202,7 +208,8 @@ export function useAuth() {
       return user;
     } catch (error: any) {
       console.error("Signup error in useAuth:", error);
-      if (error.code === 'auth/email-already-in-use') {
+      if (error.code === 'auth/email-already-in-use' || error.message?.toLowerCase().includes("already") || error.message?.toLowerCase().includes("in use")) {
+        alert("Warning: This email address is already registered. If you already have an account, please sign in.");
         toast.error("Compliance error: An active node is already registered with this email address.");
       } else if (error.code === 'auth/invalid-email') {
         toast.error("Compliance rejection: Firebase authentication rejected this email format. Please enter a valid email address.");
