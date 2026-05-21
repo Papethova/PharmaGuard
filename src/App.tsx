@@ -27,7 +27,9 @@ import {
   Camera,
   Lock,
   Ghost,
-  Database
+  Database,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -485,6 +487,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState<"google" | "login" | "signup" | "forgot">("google");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [orgName, setOrgName] = useState("");
   const orgNameRef = useRef("");
   useEffect(() => {
@@ -1623,14 +1626,28 @@ export default function App() {
                             Forgot Password?
                           </button>
                         </div>
-                        <Input 
-                          type="password" 
-                          placeholder=""
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="h-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm bg-brand-surface"
-                          required
-                        />
+                        <div className="relative">
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder=""
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="h-10 pr-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm bg-brand-surface"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-blue/40 hover:text-brand-blue focus:outline-none animate-fade-in"
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -1697,15 +1714,29 @@ export default function App() {
                     </div>
                     <div className="space-y-1 text-left">
                       <Label className="text-[9px] uppercase font-black text-brand-blue/80">Password</Label>
-                      <Input 
-                        type="password" 
-                        placeholder="Choose a compliant password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
-                        required
-                        minLength={6}
-                      />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="Choose a compliant password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="h-10 pr-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
+                          required
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-blue/40 hover:text-brand-blue focus:outline-none animate-fade-in"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                       <div className="mt-1.5 p-2 bg-brand-blue/5 border border-brand-blue/10 rounded-lg text-[10px] space-y-1">
                         <p className="font-bold text-brand-blue/80 uppercase tracking-widest text-[8px] mb-1">Passkey Compliance Requirements:</p>
                         <div className="flex items-center gap-1.5">
