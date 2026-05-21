@@ -36,7 +36,7 @@ export const PendingApproval = ({ email, onRetry, onLogout, isSubmitting }: any)
       className="max-w-md w-full"
     >
       <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-blue/20 flex flex-col items-center space-y-6">
-        <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue/10">
+        <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg">
           <Clock className="w-12 h-12 text-brand-blue" />
         </div>
         <div className="space-y-2">
@@ -47,7 +47,7 @@ export const PendingApproval = ({ email, onRetry, onLogout, isSubmitting }: any)
           </p>
           <div className="bg-brand-blue/5 p-4 rounded-lg border border-brand-blue/10 mt-4">
             <p className="text-[10px] text-brand-blue font-bold tracking-wider">Node Identification</p>
-            <p className="text-xs font-mono mt-1 text-brand-grey no-interact">{escapeEmail(email)}</p>
+            <p className="text-sm font-bold text-brand-blue mt-1 no-interact">{escapeEmail(email)}</p>
           </div>
         </div>
         <div className="pt-4 w-full space-y-3">
