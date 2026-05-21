@@ -486,6 +486,10 @@ export default function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [orgName, setOrgName] = useState("");
+  const orgNameRef = useRef("");
+  useEffect(() => {
+    orgNameRef.current = orgName;
+  }, [orgName]);
 
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [nodeToDelete, setNodeToDelete] = useState<UserProfile | null>(null);
@@ -655,11 +659,11 @@ export default function App() {
             const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
             const newProfile: UserProfile = {
               uid: currentUser.uid,
-              email: currentUser.email || "",
-              displayName: currentUser.displayName || "User",
+              email: currentUser.email?.toLowerCase() || "",
+              displayName: currentUser.displayName || orgNameRef.current || "User",
               role: isMaster ? "admin" : "pharmacist",
               status: isMaster ? "active" : "pending",
-              organizationName: "",
+              organizationName: orgNameRef.current || "",
               licenseNumber: "",
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp()
@@ -850,12 +854,12 @@ export default function App() {
       const userDocRef = doc(db, "users", emailId);
       await setDoc(userDocRef, {
         uid: newUser.uid,
-        email: email,
+        email: emailId,
         displayName: orgName,
         organizationName: orgName,
         role: "pharmacist",
         status: "pending"
-      });
+      }, { merge: true });
 
       await sendEmailVerification(newUser);
       toast.success("Registration successful! Please check your email for a verification link.");
