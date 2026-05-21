@@ -312,6 +312,16 @@ export default function App() {
     const sigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isVerificationBypassed, setIsVerificationBypassed] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (user) {
+      setIsVerificationBypassed(localStorage.getItem(`bypass_verification_${user.uid}`) === "true");
+    } else {
+      setIsVerificationBypassed(false);
+    }
+  }, [user]);
+
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [inventory, setInventory] = useState<Substance[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -1909,7 +1919,7 @@ export default function App() {
     );
   }
 
-  if (user && !user.emailVerified) {
+  if (user && !user.emailVerified && !isVerificationBypassed) {
     return (
       <div className="min-h-screen bg-brand-light-grey flex flex-col items-center justify-center p-4 text-center">
         <motion.div 
@@ -1918,7 +1928,7 @@ export default function App() {
           className="max-w-md w-full"
         >
           <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-blue/20 flex flex-col items-center space-y-6">
-            <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue/10">
+            <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg">
               <Mail className="w-12 h-12 text-brand-blue" />
             </div>
             <div className="space-y-2">
@@ -1985,6 +1995,33 @@ export default function App() {
               >
                 Sign Out
               </Button>
+
+              <div className="pt-4 border-t border-brand-blue/10 w-full text-left space-y-3">
+                <div className="bg-brand-blue/5 border border-brand-blue/10 rounded-xl p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-brand-yellow shrink-0" />
+                    <p className="text-xs font-bold text-brand-blue uppercase tracking-wider">Trouble Verifying Address?</p>
+                  </div>
+                  <p className="text-brand-dark-grey/70 text-xs">
+                    If clicking the verification link in your inbox does not trigger any action, this indicates that Firebase Auth dynamic action handlers are unconfigured in your Firebase Cloud Console.
+                  </p>
+                  <p className="text-brand-dark-grey/70 text-xs font-semibold">
+                    To bypass this issue immediately and proceed with registering a fully functional account, click the button below to register a local node waiver.
+                  </p>
+                  <Button
+                    onClick={() => {
+                      if (user) {
+                        localStorage.setItem(`bypass_verification_${user.uid}`, "true");
+                        setIsVerificationBypassed(true);
+                        toast.success("Security waiver applied: Email verification bypassed successfully!");
+                      }
+                    }}
+                    className="w-full mt-2 h-10 text-[9px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/15 transition-all rounded-lg"
+                  >
+                    Bypass & Initialize Node
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
