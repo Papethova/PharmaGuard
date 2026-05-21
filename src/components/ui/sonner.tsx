@@ -41,8 +41,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "isolation": "isolate",
           "filter": "none",
           "backdropFilter": "none",
-          "transform": "translate3d(0, 0, 99999px)",
-          "WebkitTransform": "translate3d(0, 0, 99999px)",
         } as React.CSSProperties
       }
       toastOptions={{

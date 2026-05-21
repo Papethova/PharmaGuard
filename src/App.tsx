@@ -276,6 +276,38 @@ export default function App() {
   }
 
 
+  // Dynamic repositioning of Sonner toaster to ensure it stays as the absolute last element of document.body.
+  // This guarantees it paints on top of all backdrop-blur overlays, preventing any browser-level blurring on toasts.
+  useEffect(() => {
+    let observer: MutationObserver | null = null;
+    let timeoutId: any = null;
+
+    const repositionToaster = () => {
+      const toaster = document.querySelector('[data-sonner-toaster]') as HTMLElement;
+      if (toaster && toaster.parentElement === document.body) {
+        if (document.body.lastChild !== toaster) {
+          if (observer) observer.disconnect();
+          document.body.appendChild(toaster);
+          if (observer) observer.observe(document.body, { childList: true });
+        }
+      }
+    };
+
+    observer = new MutationObserver(() => {
+      repositionToaster();
+    });
+
+    observer.observe(document.body, { childList: true });
+    
+    // Periodically run check and on load
+    timeoutId = setInterval(repositionToaster, 150);
+
+    return () => {
+      if (observer) observer.disconnect();
+      if (timeoutId) clearInterval(timeoutId);
+    };
+  }, []);
+
     const sigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
