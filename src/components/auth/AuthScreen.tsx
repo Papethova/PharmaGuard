@@ -195,7 +195,7 @@ export function AuthScreen() {
                   </div>
                 </div>
 
-                <Button className="w-full h-12 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-12 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
                   {isSubmitting ? "Verifying..." : "Verify & Enter"}
                 </Button>
 
@@ -261,7 +261,7 @@ export function AuthScreen() {
                   </div>
                 </div>
 
-                <Button className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-2" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-2" disabled={isSubmitting}>
                   {isSubmitting ? "Provisioning..." : "Register Organization"}
                 </Button>
 
@@ -287,7 +287,7 @@ export function AuthScreen() {
                   className="h-11 border-brand-blue/10"
                   required
                 />
-                <Button className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
                   {isSubmitting ? "Sending..." : "Send Recovery Link"}
                 </Button>
                 <button 
