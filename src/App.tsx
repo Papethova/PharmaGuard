@@ -1018,6 +1018,9 @@ export default function App() {
       }
     } finally {
       setIsSubmitting(false);
+      setEmail("");
+      setPassword("");
+      setOrgName("");
     }
   };
 
@@ -1086,6 +1089,8 @@ export default function App() {
       }
     } finally {
       setIsSubmitting(false);
+      setEmail("");
+      setPassword("");
     }
   };
 
@@ -1106,6 +1111,7 @@ export default function App() {
       toast.error("Failed to send reset link. Please check the email address.");
     } finally {
       setIsSubmitting(false);
+      setEmail("");
     }
   };
 

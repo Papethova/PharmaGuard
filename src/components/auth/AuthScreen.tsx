@@ -34,6 +34,8 @@ export function AuthScreen() {
       await loginWithEmail(email, password);
     } finally {
       setIsSubmitting(false);
+      setEmail("");
+      setPassword("");
     }
   };
 
@@ -44,6 +46,9 @@ export function AuthScreen() {
       await signUpWithEmail(email, password, orgName);
     } finally {
       setIsSubmitting(false);
+      setEmail("");
+      setPassword("");
+      setOrgName("");
     }
   };
 
@@ -55,6 +60,7 @@ export function AuthScreen() {
       setAuthMode("login");
     } finally {
       setIsSubmitting(false);
+      setEmail("");
     }
   };
 
