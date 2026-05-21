@@ -2776,10 +2776,10 @@ export default function App() {
             >
               <DialogContent 
                 showCloseButton={false} 
-                onOpenAutoFocus={(e) => e.preventDefault()}
-                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-auto"
+                initialFocus={false}
+                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-none"
               >
-                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-auto">
+                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-none">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <Users className="h-5 w-5 text-brand-blue" />
@@ -2795,7 +2795,7 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-auto">
+                <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-none">
                   <div 
                     className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                     onClick={togglePhotoRequirement}
@@ -2844,7 +2844,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 flex flex-col touch-auto">
+                <div className="flex-1 min-h-0 flex flex-col touch-none">
                   <div className="px-6 pt-3 pb-1 shrink-0">
                     <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
                   </div>
@@ -2932,7 +2932,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto shadow-inner">
+                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-none shadow-inner">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
