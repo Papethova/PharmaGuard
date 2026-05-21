@@ -697,7 +697,7 @@ export default function App() {
               email: currentUser.email?.toLowerCase() || "",
               displayName: currentUser.displayName || orgNameRef.current || "User",
               role: isMaster ? "admin" : "pharmacist",
-              status: "active",
+              status: isMaster ? "active" : "pending",
               organizationName: orgNameRef.current || "",
               licenseNumber: "",
               createdAt: serverTimestamp(),
@@ -945,18 +945,23 @@ export default function App() {
       
       // The auth listener will pick this up and create the Firestore document
       // but we force the metadata here too if needed - ALWAYS use emailId for unification
+      const isMaster = emailId === MASTER_ADMIN_EMAIL.toLowerCase();
       const userDocRef = doc(db, "users", emailId);
       await setDoc(userDocRef, {
         uid: newUser.uid,
         email: emailId,
         displayName: trimmedOrgName,
         organizationName: trimmedOrgName,
-        role: "pharmacist",
-        status: "active"
+        role: isMaster ? "admin" : "pharmacist",
+        status: isMaster ? "active" : "pending"
       }, { merge: true });
 
       await sendEmailVerification(newUser);
-      toast.success("Registration successful! Your terminal credentials are now live.");
+      if (isMaster) {
+        toast.success("Registration successful! Your terminal credentials are now live.");
+      } else {
+        toast.success("Registration successful! Access is pending administrative approval.");
+      }
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === 'auth/email-already-in-use') {

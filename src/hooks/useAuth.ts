@@ -14,6 +14,7 @@ import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from "firebase/fires
 import { auth, db, googleProvider } from "../lib/firebase";
 import { UserProfile } from "../types";
 import { handleFirestoreError, OperationType } from "../lib/errorHandlers";
+import { MASTER_ADMIN_EMAIL } from "../lib/constants";
 import { toast } from "sonner";
 
 export function useAuth() {
@@ -167,18 +168,23 @@ export function useAuth() {
       await updateProfile(user, { displayName: trimmedOrgName });
       
       // Create profile
+      const isMaster = emailId === MASTER_ADMIN_EMAIL.toLowerCase();
       await setDoc(doc(db, "users", emailId), {
         uid: user.uid,
         email: emailId,
         displayName: trimmedOrgName,
         organizationName: trimmedOrgName,
-        role: "pharmacist",
-        status: "active",
+        role: isMaster ? "admin" : "pharmacist",
+        status: isMaster ? "active" : "pending",
         createdAt: serverTimestamp()
       });
 
       await sendEmailVerification(user);
-      toast.success("Registration successful! Your terminal credentials are now live.");
+      if (isMaster) {
+        toast.success("Registration successful! Your terminal credentials are now live.");
+      } else {
+        toast.success("Registration successful! Access is pending administrative approval.");
+      }
       return user;
     } catch (error: any) {
       console.error("Signup error in useAuth:", error);
