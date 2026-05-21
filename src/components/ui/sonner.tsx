@@ -37,11 +37,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--success-text": "var(--color-brand-yellow)",
           "--error-bg": "#ef4444",
           "--error-text": "white",
-          "zIndex": 99999999,
+          "zIndex": 2147483647,
+          "isolation": "isolate",
           "filter": "none",
           "backdropFilter": "none",
-          "transform": "translateZ(0)",
-          "WebkitTransform": "translateZ(0)",
+          "transform": "translate3d(0, 0, 99999px)",
+          "WebkitTransform": "translate3d(0, 0, 99999px)",
         } as React.CSSProperties
       }
       toastOptions={{
