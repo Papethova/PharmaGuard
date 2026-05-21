@@ -2796,26 +2796,29 @@ export default function App() {
                 </DialogHeader>
 
                 <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-none">
-                  <div 
-                    className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
-                    onClick={togglePhotoRequirement}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
-                        <Camera className="h-4 w-4" />
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black text-brand-dark-grey tracking-widest">System Configuration</Label>
+                    <div 
+                      className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                      onClick={togglePhotoRequirement}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                          <Camera className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                          <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
-                        <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
+                      <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                        <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                       </div>
-                    </div>
-                    <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
-                      <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Enroll New Authorized User</Label>
+                    <Label className="text-[10px] font-black text-brand-dark-grey tracking-widest">Add Authorized User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Full Name..." 
@@ -2846,7 +2849,7 @@ export default function App() {
 
                 <div className="flex-1 min-h-0 flex flex-col touch-none">
                   <div className="px-6 pt-3 pb-1 shrink-0">
-                    <Label className="text-[10px] font-black text-brand-dark-grey uppercase tracking-widest">Authorized Registry Personnel</Label>
+                    <Label className="text-[10px] font-black text-brand-dark-grey tracking-widest">Authorized Registry Personnel</Label>
                   </div>
                   <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
@@ -2864,8 +2867,8 @@ export default function App() {
                                 <TableCell colSpan={2} className="text-center py-6 text-[10px] text-brand-grey/40 uppercase font-bold">No registered users</TableCell>
                               </TableRow>
                             ) : users.map((u) => (
-                              <TableRow key={u.id} className="hover:bg-brand-blue/5 h-10">
-                                <TableCell className="font-medium text-brand-dark-grey py-2 text-center text-xs">
+                              <TableRow key={u.id} className="hover:bg-brand-blue/5 h-8">
+                                <TableCell className="font-medium text-brand-dark-grey py-1 text-center text-xs">
                                   {editingUser?.id === u.id ? (
                                     <div className="flex gap-1 items-center px-1">
                                       <Input 
@@ -2892,7 +2895,7 @@ export default function App() {
                                     <span>{u.name} {u.title && <span className="text-[10px] text-brand-dark-grey/60">({u.title})</span>}</span>
                                   )}
                                 </TableCell>
-                                <TableCell className="text-center py-2">
+                                <TableCell className="text-center py-1">
                                   <div className="flex justify-center gap-1">
                                     {editingUser?.id === u.id ? (
                                       <Button 
