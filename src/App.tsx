@@ -834,20 +834,69 @@ export default function App() {
 
   const handleEmailSignUp = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !orgName) {
-      toast.error("Please fill in all registration fields");
+
+    // 1. Email Compliance Checks
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      toast.error("Email address is required for registration.");
+      return;
+    }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      toast.error("Invalid email format. Please specify a compliant standard email (e.g., user@domain.com).");
+      return;
+    }
+    // Firestore rules restrict characters in the User Document ID to: ^[a-zA-Z0-9_\-\.\@]+$
+    const allowedIdRegex = /^[a-zA-Z0-9_\-.\@]+$/;
+    if (!allowedIdRegex.test(trimmedEmail.toLowerCase())) {
+      toast.error("Compliance restriction: Security rules do not permit emails containing special characters like '+' or brackets. Please use a standard email without special characters.");
+      return;
+    }
+    if (trimmedEmail.length > 128) {
+      toast.error("Compliance restriction: The email address must be less than 128 characters.");
+      return;
+    }
+
+    // 2. Organization Name Compliance Checks
+    const trimmedOrgName = orgName.trim();
+    if (!trimmedOrgName) {
+      toast.error("Organization Name is required to establish clinical node identity.");
+      return;
+    }
+    if (trimmedOrgName.length < 3) {
+      toast.error("Compliance restriction: Organization Name must be at least 3 characters long.");
+      return;
+    }
+    if (trimmedOrgName.length > 120) {
+      toast.error("Compliance restriction: Organization Name must be under 120 characters to comply with Firestore database limits.");
+      return;
+    }
+
+    // 3. Password Compliance Checks
+    if (!password) {
+      toast.error("A secure terminal passkey is required.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Compliance restriction: A secure terminal passkey must be at least 6 characters in length.");
+      return;
+    }
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    if (!hasLetter || !hasNumber) {
+      toast.error("Compliance rejection: For security registry compliance, your terminal passkey must contain both letters and numbers.");
       return;
     }
 
     try {
       setIsSubmitting(true);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, trimmedEmail, password);
       const newUser = userCredential.user;
       
-      const emailId = email.toLowerCase();
+      const emailId = trimmedEmail.toLowerCase();
       
       // Update profile with organization name as the display name
-      await updateProfile(newUser, { displayName: orgName });
+      await updateProfile(newUser, { displayName: trimmedOrgName });
       
       // The auth listener will pick this up and create the Firestore document
       // but we force the metadata here too if needed - ALWAYS use emailId for unification
@@ -855,8 +904,8 @@ export default function App() {
       await setDoc(userDocRef, {
         uid: newUser.uid,
         email: emailId,
-        displayName: orgName,
-        organizationName: orgName,
+        displayName: trimmedOrgName,
+        organizationName: trimmedOrgName,
         role: "pharmacist",
         status: "pending"
       }, { merge: true });
@@ -866,9 +915,17 @@ export default function App() {
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === 'auth/email-already-in-use') {
-        toast.error("An account already exists with this email.");
+        toast.error("Compliance error: An active node is already registered with this email address.");
+      } else if (error.code === 'auth/invalid-email') {
+        toast.error("Compliance rejection: Firebase authentication rejected this email format. Please enter a valid email address.");
+      } else if (error.code === 'auth/weak-password') {
+        toast.error("Compliance rejection: Reconsider passkey complexity. Choose a stronger passkey (at least 6 characters with letters and numbers).");
+      } else if (error.code === 'auth/operation-not-allowed') {
+        toast.error("System configuration error: Safe signup is temporarily disabled by network or administrator policies.");
+      } else if (error.message && error.message.includes("permission-denied")) {
+        toast.error("Security rule compliance violation: Permission Denied. Please ensure your Organization Name matches character/length requirements.");
       } else {
-        toast.error(`Registration failed: ${error.message}`);
+        toast.error(`Registration failed: ${error.message || "Unknown validation error"}`);
       }
     } finally {
       setIsSubmitting(false);
