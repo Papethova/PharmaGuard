@@ -996,10 +996,17 @@ export default function App() {
       toast.success("Log in successful");
     } catch (error: any) {
       console.error("Login error:", error);
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-        toast.error("Invalid email or password");
+      const errCode = error.code || "";
+      const errMessage = error.message || "";
+      
+      if (errCode === 'auth/user-not-found' || errMessage.includes('user-not-found')) {
+        toast.error("This email address is not registered. Please check the spelling or sign up.");
+      } else if (errCode === 'auth/wrong-password' || errMessage.includes('wrong-password')) {
+        toast.error("Incorrect password. The username or password you entered is incorrect.");
+      } else if (errCode === 'auth/invalid-credential' || errCode === 'auth/invalid-email' || errMessage.includes('invalid-credential')) {
+        toast.error("The email address is either not registered or the password you entered is incorrect.");
       } else {
-        toast.error("Failed to log in. Please check your credentials.");
+        toast.error(errMessage || "Failed to log in. Please check your credentials.");
       }
     } finally {
       setIsSubmitting(false);
@@ -1853,7 +1860,7 @@ export default function App() {
           className="max-w-md w-full"
         >
           <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-blue/20 flex flex-col items-center space-y-6">
-            <div className="h-24 w-24 rounded-full bg-brand-yellow/10 flex items-center justify-center shadow-lg border-4 border-brand-yellow/30 animate-pulse">
+            <div className="h-24 w-24 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue/10">
               <Mail className="w-12 h-12 text-brand-blue" />
             </div>
             <div className="space-y-2">
@@ -1862,7 +1869,7 @@ export default function App() {
                 A verification link has been sent to your email address:
               </p>
               <div className="bg-brand-blue/5 p-4 rounded-lg border border-brand-blue/10 mt-4">
-                <p className="text-xs font-mono mt-1 text-brand-grey no-interact">{escapeEmail(user.email || "")}</p>
+                <p className="text-sm font-bold text-brand-blue no-interact">{escapeEmail(user.email || "")}</p>
               </div>
               <p className="text-brand-dark-grey/60 text-xs mt-4">
                 Please check your inbox (and spam folder) and click the link to confirm your account.

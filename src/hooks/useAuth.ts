@@ -92,7 +92,18 @@ export function useAuth() {
       const result = await signInWithEmailAndPassword(auth, email, pass);
       return result.user;
     } catch (error: any) {
-      toast.error(`Login Failed: ${error.message}`);
+      const errCode = error.code || "";
+      const errMessage = error.message || "";
+      
+      if (errCode === 'auth/user-not-found' || errMessage.includes('user-not-found')) {
+        toast.error("This email address is not registered. Please check the spelling or sign up.");
+      } else if (errCode === 'auth/wrong-password' || errMessage.includes('wrong-password')) {
+        toast.error("Incorrect password. The username or password you entered is incorrect.");
+      } else if (errCode === 'auth/invalid-credential' || errCode === 'auth/invalid-email' || errMessage.includes('invalid-credential')) {
+        toast.error("The email address is either not registered or the password you entered is incorrect.");
+      } else {
+        toast.error(errMessage || "Login Failed: Check your credentials and try again.");
+      }
       throw error;
     }
   };
