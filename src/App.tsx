@@ -2797,7 +2797,7 @@ export default function App() {
 
                 <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-none">
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-brand-dark-grey tracking-widest">System Configuration</Label>
+                    <Label className="text-xs font-black text-brand-dark-grey tracking-widest">System Configuration</Label>
                     <div 
                       className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                       onClick={togglePhotoRequirement}
@@ -2818,7 +2818,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-brand-dark-grey tracking-widest">Add Authorized User</Label>
+                    <Label className="text-xs font-black text-brand-dark-grey tracking-widest">Add Authorized User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Full Name..." 
@@ -2849,7 +2849,7 @@ export default function App() {
 
                 <div className="flex-1 min-h-0 flex flex-col touch-none">
                   <div className="px-6 pt-3 pb-1 shrink-0">
-                    <Label className="text-[10px] font-black text-brand-dark-grey tracking-widest">Authorized Registry Personnel</Label>
+                    <Label className="text-xs font-black text-brand-dark-grey tracking-widest">Authorized Registry Personnel</Label>
                   </div>
                   <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">

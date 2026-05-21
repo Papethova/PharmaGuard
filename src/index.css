@@ -26,7 +26,7 @@
 
 @layer components {
   .sonner-industrial {
-    @apply !bg-[#1e68cf] !text-[#ffd700] font-sans border-2 border-white/20 shadow-2xl rounded-2xl !p-4 !min-w-[300px] backdrop-blur-md;
+    @apply !bg-[#1e68cf] !text-[#ffd700] font-sans border-2 border-white/20 shadow-2xl rounded-2xl !p-4 !min-w-[300px];
     box-shadow: 0 10px 40px -10px rgba(30, 104, 207, 0.5);
   }
   
@@ -40,6 +40,10 @@
 
   .sonner-industrial [data-description] {
     @apply !text-brand-yellow/80 font-bold text-[10px];
+  }
+
+  [data-sonner-toaster] {
+    z-index: 99999 !important;
   }
 }
 
