@@ -673,6 +673,9 @@ export default function App() {
         if (unsubProfile) unsubProfile();
         setIsAuthReady(true);
         setIsInitializing(false);
+        setEmail("");
+        setPassword("");
+        setOrgName("");
         return;
       }
       
@@ -1015,6 +1018,9 @@ export default function App() {
       } else {
         toast.success("Registration successful! Access is pending administrative approval.");
       }
+      setEmail("");
+      setPassword("");
+      setOrgName("");
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === 'auth/email-already-in-use' || error.message?.toLowerCase().includes("already") || error.message?.toLowerCase().includes("in use")) {
@@ -1033,9 +1039,6 @@ export default function App() {
       }
     } finally {
       setIsSubmitting(false);
-      setEmail("");
-      setPassword("");
-      setOrgName("");
     }
   };
 
@@ -1072,6 +1075,8 @@ export default function App() {
       }
 
       toast.success("Log in successful");
+      setEmail("");
+      setPassword("");
     } catch (error: any) {
       console.error("Login error:", error);
       const errCode = error.code || "";
@@ -1104,8 +1109,6 @@ export default function App() {
       }
     } finally {
       setIsSubmitting(false);
-      setEmail("");
-      setPassword("");
     }
   };
 
