@@ -1811,12 +1811,13 @@ export default function App() {
                         <motion.span 
                           className="absolute inset-0 rounded-xl bg-brand-yellow pointer-events-none"
                           animate={{ 
-                            scale: [1, 1.04],
-                            opacity: [0.75, 0]
+                            scale: [1, 1.04, 1.04],
+                            opacity: [0.75, 0, 0]
                           }}
                           transition={{ 
                             repeat: Infinity, 
-                            duration: 1.2, 
+                            duration: 1.0, 
+                            times: [0, 0.75, 1],
                             ease: "easeOut" 
                           }}
                           style={{ transform: 'translateZ(0)' }}
@@ -1938,12 +1939,13 @@ export default function App() {
                         <motion.span 
                           className="absolute inset-0 rounded-xl bg-brand-yellow pointer-events-none"
                           animate={{ 
-                            scale: [1, 1.04],
-                            opacity: [0.75, 0]
+                            scale: [1, 1.04, 1.04],
+                            opacity: [0.75, 0, 0]
                           }}
                           transition={{ 
                             repeat: Infinity, 
-                            duration: 1.2, 
+                            duration: 1.0, 
+                            times: [0, 0.75, 1],
                             ease: "easeOut" 
                           }}
                           style={{ transform: 'translateZ(0)' }}
