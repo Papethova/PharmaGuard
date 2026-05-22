@@ -1808,27 +1808,12 @@ export default function App() {
 
                     {isUserDoesNotExistOpen && (
                       <div className="relative">
-                        <motion.div 
-                          animate={{ 
-                            scale: [1, 1.05, 1],
-                            opacity: [0.6, 0.1, 0.6]
-                          }}
-                          transition={{ 
-                            repeat: Infinity, 
-                            duration: 1.2, 
-                            ease: "easeInOut" 
-                          }}
-                          className="absolute inset-0 bg-brand-yellow/30 border border-brand-yellow/40 rounded-xl pointer-events-none"
-                        />
-                        <motion.div 
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10"
-                        >
+                        <span className="absolute inset-0 rounded-xl bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
+                        <div className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10 shadow-sm">
                           <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
                             This user does not exist or credentials are incorrect.
                           </p>
-                        </motion.div>
+                        </div>
                       </div>
                     )}
 
@@ -1938,27 +1923,12 @@ export default function App() {
 
                     {isAlreadyRegisteredOpen && (
                       <div className="relative">
-                        <motion.div 
-                          animate={{ 
-                            scale: [1, 1.05, 1],
-                            opacity: [0.6, 0.1, 0.6]
-                          }}
-                          transition={{ 
-                            repeat: Infinity, 
-                            duration: 1.2, 
-                            ease: "easeInOut" 
-                          }}
-                          className="absolute inset-0 bg-brand-yellow/30 border border-brand-yellow/40 rounded-xl pointer-events-none"
-                        />
-                        <motion.div 
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10"
-                        >
+                        <span className="absolute inset-0 rounded-xl bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
+                        <div className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10 shadow-sm">
                           <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
                             This email address is already registered.
                           </p>
-                        </motion.div>
+                        </div>
                       </div>
                     )}
                   
