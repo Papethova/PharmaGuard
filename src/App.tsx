@@ -1808,7 +1808,19 @@ export default function App() {
 
                     {isUserDoesNotExistOpen && (
                       <div className="relative">
-                        <span className="absolute inset-0 rounded-xl bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
+                        <motion.span 
+                          className="absolute inset-0 rounded-xl bg-brand-yellow pointer-events-none"
+                          animate={{ 
+                            scale: [1, 1.04],
+                            opacity: [0.75, 0]
+                          }}
+                          transition={{ 
+                            repeat: Infinity, 
+                            duration: 1.2, 
+                            ease: "easeOut" 
+                          }}
+                          style={{ transform: 'translateZ(0)' }}
+                        />
                         <div className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10 shadow-sm">
                           <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
                             This user does not exist or credentials are incorrect.
@@ -1923,7 +1935,19 @@ export default function App() {
 
                     {isAlreadyRegisteredOpen && (
                       <div className="relative">
-                        <span className="absolute inset-0 rounded-xl bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
+                        <motion.span 
+                          className="absolute inset-0 rounded-xl bg-brand-yellow pointer-events-none"
+                          animate={{ 
+                            scale: [1, 1.04],
+                            opacity: [0.75, 0]
+                          }}
+                          transition={{ 
+                            repeat: Infinity, 
+                            duration: 1.2, 
+                            ease: "easeOut" 
+                          }}
+                          style={{ transform: 'translateZ(0)' }}
+                        />
                         <div className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10 shadow-sm">
                           <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
                             This email address is already registered.
