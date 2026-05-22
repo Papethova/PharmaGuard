@@ -1797,19 +1797,16 @@ export default function App() {
                       <motion.div 
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-amber-500/10 border border-brand-yellow/30 rounded-xl space-y-1 text-left"
+                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl space-y-1 text-left"
                       >
                         <div className="flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" strokeWidth={2.5} />
-                          <p className="text-amber-800 font-extrabold text-[10px] uppercase tracking-wider">
-                            User Registry Exception
+                          <AlertTriangle className="h-4 w-4 text-brand-blue shrink-0" strokeWidth={2.5} />
+                          <p className="text-brand-blue font-extrabold text-[10px] uppercase tracking-wider">
+                            User Registry Error
                           </p>
                         </div>
-                        <p className="text-brand-dark-grey text-[10px] leading-relaxed font-semibold">
+                        <p className="text-brand-blue text-[10px] leading-relaxed font-black">
                           This user does not exist or credentials are incorrect.
-                        </p>
-                        <p className="text-brand-dark-grey/80 text-[9px] leading-relaxed">
-                          Your organizational credentials are incorrect or the node has been purged from the PharmaGuard decentralized ledger. To proceed, please select "Create New Organization Nodes" below.
                         </p>
                       </motion.div>
                     )}
@@ -1922,19 +1919,16 @@ export default function App() {
                       <motion.div 
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-amber-500/10 border border-brand-yellow/30 rounded-xl space-y-1 text-left"
+                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl space-y-1 text-left"
                       >
                         <div className="flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" strokeWidth={2.5} />
-                          <p className="text-amber-700 font-extrabold text-[10px] uppercase tracking-wider">
-                            Node Registry Warning
+                          <AlertTriangle className="h-4 w-4 text-brand-blue shrink-0" strokeWidth={2.5} />
+                          <p className="text-brand-blue font-extrabold text-[10px] uppercase tracking-wider">
+                            User Registry Error
                           </p>
                         </div>
-                        <p className="text-brand-dark-grey text-[10px] leading-relaxed font-semibold">
+                        <p className="text-brand-blue text-[10px] leading-relaxed font-black">
                           This email address is already registered.
-                        </p>
-                        <p className="text-brand-dark-grey/80 text-[9px] leading-relaxed">
-                          An active system node is already registered with this email address in the PharmaGuard decentralized ledger. If this is your account, please click "Already registered? Sign In" below to enter.
                         </p>
                       </motion.div>
                     )}
