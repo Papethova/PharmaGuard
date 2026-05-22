@@ -3198,7 +3198,7 @@ export default function App() {
                                       </Select>
                                     </div>
                                   ) : (
-                                    <span>{u.name} {u.title && <span className="text-[10px] text-brand-dark-grey/60">({u.title})</span>}</span>
+                                    <span>{u.name} {u.title && `(${u.title})`}</span>
                                   )}
                                 </TableCell>
                                 <TableCell className="text-center py-1">
@@ -3216,7 +3216,7 @@ export default function App() {
                                       <Button 
                                         size="sm" 
                                         variant="ghost" 
-                                        className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-brand-blue"
+                                        className="h-6 w-6 p-0 text-brand-dark-grey hover:text-brand-blue"
                                         onClick={() => setEditingUser(u)}
                                       >
                                         <Edit className="h-3.5 w-3.5" />
@@ -3225,7 +3225,7 @@ export default function App() {
                                     <Button 
                                       size="sm" 
                                       variant="ghost" 
-                                      className="h-6 w-6 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                      className="h-6 w-6 p-0 text-brand-dark-grey hover:text-red-500"
                                       onClick={() => setUserToDeleteConfirm(u)}
                                     >
                                       <Trash2 className="h-3.5 w-3.5" />
