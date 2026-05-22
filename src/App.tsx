@@ -550,6 +550,11 @@ export default function App() {
   const [isAlreadyRegisteredOpen, setIsAlreadyRegisteredOpen] = useState(false);
   const [isUserDoesNotExistOpen, setIsUserDoesNotExistOpen] = useState(false);
 
+  useEffect(() => {
+    setIsAlreadyRegisteredOpen(false);
+    setIsUserDoesNotExistOpen(false);
+  }, [authMode, email, password]);
+
   const checkAccountStatus = () => {
     if (userProfile?.status === 'suspended' || userProfile?.status === 'pending') {
       const isPending = userProfile.status === 'pending';
@@ -1709,8 +1714,7 @@ export default function App() {
 
   if (!user) {
     return (
-      <>
-        <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-4">
+      <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-4">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1788,6 +1792,27 @@ export default function App() {
                         </div>
                       </div>
                     </div>
+
+                    {isUserDoesNotExistOpen && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-3 bg-amber-500/10 border border-brand-yellow/30 rounded-xl space-y-1 text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" strokeWidth={2.5} />
+                          <p className="text-amber-800 font-extrabold text-[10px] uppercase tracking-wider">
+                            User Registry Exception
+                          </p>
+                        </div>
+                        <p className="text-brand-dark-grey text-[10px] leading-relaxed font-semibold">
+                          This user does not exist or credentials are incorrect.
+                        </p>
+                        <p className="text-brand-dark-grey/80 text-[9px] leading-relaxed">
+                          Your organizational credentials are incorrect or the node has been purged from the PharmaGuard decentralized ledger. To proceed, please select "Create New Organization Nodes" below.
+                        </p>
+                      </motion.div>
+                    )}
 
                     <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
                       {isSubmitting ? "Verifying..." : "Verify & Enter"}
@@ -1893,6 +1918,27 @@ export default function App() {
                     </div>
                   </div>
 
+                    {isAlreadyRegisteredOpen && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-3 bg-amber-500/10 border border-brand-yellow/30 rounded-xl space-y-1 text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" strokeWidth={2.5} />
+                          <p className="text-amber-700 font-extrabold text-[10px] uppercase tracking-wider">
+                            Node Registry Warning
+                          </p>
+                        </div>
+                        <p className="text-brand-dark-grey text-[10px] leading-relaxed font-semibold">
+                          This email address is already registered.
+                        </p>
+                        <p className="text-brand-dark-grey/80 text-[9px] leading-relaxed">
+                          An active system node is already registered with this email address in the PharmaGuard decentralized ledger. If this is your account, please click "Already registered? Sign In" below to enter.
+                        </p>
+                      </motion.div>
+                    )}
+                  
                   <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-1" disabled={isSubmitting}>
                     {isSubmitting ? "Provisioning..." : "Register Organization"}
                   </Button>
@@ -1941,99 +1987,8 @@ export default function App() {
           </div>
         </motion.div>
       </div>
-
-      <Dialog open={isAlreadyRegisteredOpen} onOpenChange={setIsAlreadyRegisteredOpen}>
-        <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
-          <DialogHeader className="p-6 bg-brand-blue text-white relative">
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-                <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
-              </div>
-              
-              <div className="flex flex-col gap-0 text-left">
-                <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
-                  Node Registry Warning
-                </DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                  REGISTRATION EXCLUSIVITY EXCEPTION
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-          <div className="p-6 space-y-4 text-left">
-            <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
-              <p className="text-brand-blue font-bold text-sm">
-                This email address is already registered.
-              </p>
-              <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
-                An active system node is already registered with this email address in the PharmaGuard decentralized ledger. 
-              </p>
-              <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
-                If this is your account, please click "Already registered? Sign In" below the form to enter the secure environment.
-              </p>
-            </div>
-          </div>
-          <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={() => {
-                setIsAlreadyRegisteredOpen(false);
-                setAuthMode("google");
-              }}
-              className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
-            >
-              Acknowledge & Sign In
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isUserDoesNotExistOpen} onOpenChange={setIsUserDoesNotExistOpen}>
-        <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
-          <DialogHeader className="p-6 bg-brand-blue text-white relative">
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-                <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
-              </div>
-              
-              <div className="flex flex-col gap-0 text-left">
-                <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
-                  User Registry Exception
-                </DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                  AUTHENTICATION OR NODE DELETION EXCEPTION
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-          <div className="p-6 space-y-4 text-left">
-            <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
-              <p className="text-brand-blue font-bold text-sm">
-                This user does not exist or credentials are incorrect.
-              </p>
-              <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
-                Your organizational credentials are incorrect or the node has been purged from the PharmaGuard decentralized ledger. 
-              </p>
-              <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
-                To proceed and acquire a secure registry terminal, please register your organizational credentials using the registration option.
-              </p>
-            </div>
-          </div>
-          <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={() => {
-                setIsUserDoesNotExistOpen(false);
-                setAuthMode("signup");
-              }}
-              className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
-            >
-              Acknowledge & Register
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
+    );
+  }
 
 
 
@@ -4457,95 +4412,6 @@ export default function App() {
       </DialogContent>
     </Dialog>
 
-    <Dialog open={isAlreadyRegisteredOpen} onOpenChange={setIsAlreadyRegisteredOpen}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
-        <DialogHeader className="p-6 bg-brand-blue text-white relative">
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-              <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
-            </div>
-            
-            <div className="flex flex-col gap-0 text-left">
-              <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
-                Node Registry Warning
-              </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                REGISTRATION EXCLUSIVITY EXCEPTION
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-        <div className="p-6 space-y-4 text-left">
-          <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
-            <p className="text-brand-blue font-bold text-sm">
-              This email address is already registered.
-            </p>
-            <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
-              An active system node is already registered with this email address in the PharmaGuard decentralized ledger. 
-            </p>
-            <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
-              If this is your account, please click "Already registered? Sign In" below the form to enter the secure environment.
-            </p>
-          </div>
-        </div>
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
-          <Button 
-            onClick={() => {
-              setIsAlreadyRegisteredOpen(false);
-              setAuthMode("google");
-            }}
-            className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
-          >
-            Acknowledge & Sign In
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog open={isUserDoesNotExistOpen} onOpenChange={setIsUserDoesNotExistOpen}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
-        <DialogHeader className="p-6 bg-brand-blue text-white relative">
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-              <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
-            </div>
-            
-            <div className="flex flex-col gap-0 text-left">
-              <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
-                User Registry Exception
-              </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
-                AUTHENTICATION OR NODE DELETION EXCEPTION
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-        <div className="p-6 space-y-4 text-left">
-          <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
-            <p className="text-brand-blue font-bold text-sm">
-              This user does not exist.
-            </p>
-            <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
-              Your organizational node has been revoked or the user was purged from the PharmaGuard decentralized ledger. 
-            </p>
-            <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
-              To proceed and acquire a secure registry terminal, please register your organizational credentials using the registration window.
-            </p>
-          </div>
-        </div>
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
-          <Button 
-            onClick={() => {
-              setIsUserDoesNotExistOpen(false);
-              setAuthMode("signup");
-            }}
-            className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
-          >
-            Acknowledge & Register
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   </div>
   );
 }
