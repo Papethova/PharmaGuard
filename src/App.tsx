@@ -1809,9 +1809,13 @@ export default function App() {
                     {isUserDoesNotExistOpen && (
                       <div className="relative">
                         <motion.span 
-                          className="absolute inset-0 rounded-xl bg-brand-yellow pointer-events-none"
+                          className="absolute rounded-xl bg-brand-yellow pointer-events-none"
+                          initial={{ top: "0px", left: "0px", right: "0px", bottom: "0px" }}
                           animate={{ 
-                            scale: [1, 1.04, 1.04],
+                            top: ["0px", "-3px", "-3px"],
+                            left: ["0px", "-3px", "-3px"],
+                            right: ["0px", "-3px", "-3px"],
+                            bottom: ["0px", "-3px", "-3px"],
                             opacity: [0.75, 0, 0]
                           }}
                           transition={{ 
@@ -1937,9 +1941,13 @@ export default function App() {
                     {isAlreadyRegisteredOpen && (
                       <div className="relative">
                         <motion.span 
-                          className="absolute inset-0 rounded-xl bg-brand-yellow pointer-events-none"
+                          className="absolute rounded-xl bg-brand-yellow pointer-events-none"
+                          initial={{ top: "0px", left: "0px", right: "0px", bottom: "0px" }}
                           animate={{ 
-                            scale: [1, 1.04, 1.04],
+                            top: ["0px", "-3px", "-3px"],
+                            left: ["0px", "-3px", "-3px"],
+                            right: ["0px", "-3px", "-3px"],
+                            bottom: ["0px", "-3px", "-3px"],
                             opacity: [0.75, 0, 0]
                           }}
                           transition={{ 
