@@ -1962,7 +1962,7 @@ export default function App() {
                     <div className="space-y-2">
                       <h2 className="text-lg font-bold text-brand-blue uppercase leading-tight">Reset Password</h2>
                       <p className="text-[11px] text-brand-grey leading-relaxed">
-                        a link to reset your password has been sent to your email
+                        A link to reset your password has been sent to your email
                       </p>
                     </div>
                     <Button 
