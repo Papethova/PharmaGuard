@@ -1105,12 +1105,14 @@ export default function App() {
         setIsUserDoesNotExistOpen(true);
       } else if (errCode === 'auth/wrong-password' || errMessage.includes('wrong-password')) {
         toast.error("Incorrect password. The username or password you entered is incorrect.");
+        setIsUserDoesNotExistOpen(true);
       } else if (errCode === 'auth/invalid-credential' || errCode === 'auth/invalid-email' || errMessage.includes('invalid-credential')) {
         // If they don't exist in Firestore, show the non-existent prompt
         if (!exists) {
           setIsUserDoesNotExistOpen(true);
         } else {
           toast.error("Incorrect password. The username or password you entered is incorrect.");
+          setIsUserDoesNotExistOpen(true);
         }
       } else {
         toast.error(errMessage || "Failed to log in. Please check your credentials.");
