@@ -542,6 +542,14 @@ export default function App() {
     orgNameRef.current = orgName;
   }, [orgName]);
 
+  // Reset fields when transitioning between authentications screens (login, signup, forgot)
+  useEffect(() => {
+    setEmail("");
+    setPassword("");
+    setOrgName("");
+    setShowPassword(false);
+  }, [authMode]);
+
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [nodeToDelete, setNodeToDelete] = useState<UserProfile | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
