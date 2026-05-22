@@ -1807,16 +1807,29 @@ export default function App() {
                     </div>
 
                     {isUserDoesNotExistOpen && (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: [0.4, 1, 0.4], scale: [0.98, 1, 0.98] }}
-                        transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
-                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center"
-                      >
-                        <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
-                          This user does not exist or credentials are incorrect.
-                        </p>
-                      </motion.div>
+                      <div className="relative">
+                        <motion.div 
+                          animate={{ 
+                            scale: [1, 1.05, 1],
+                            opacity: [0.6, 0.1, 0.6]
+                          }}
+                          transition={{ 
+                            repeat: Infinity, 
+                            duration: 1.2, 
+                            ease: "easeInOut" 
+                          }}
+                          className="absolute inset-0 bg-brand-yellow/30 border border-brand-yellow/40 rounded-xl pointer-events-none"
+                        />
+                        <motion.div 
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10"
+                        >
+                          <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
+                            This user does not exist or credentials are incorrect.
+                          </p>
+                        </motion.div>
+                      </div>
                     )}
 
                     <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
@@ -1924,16 +1937,29 @@ export default function App() {
                   </div>
 
                     {isAlreadyRegisteredOpen && (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: [0.4, 1, 0.4], scale: [0.98, 1, 0.98] }}
-                        transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
-                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center"
-                      >
-                        <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
-                          This email address is already registered.
-                        </p>
-                      </motion.div>
+                      <div className="relative">
+                        <motion.div 
+                          animate={{ 
+                            scale: [1, 1.05, 1],
+                            opacity: [0.6, 0.1, 0.6]
+                          }}
+                          transition={{ 
+                            repeat: Infinity, 
+                            duration: 1.2, 
+                            ease: "easeInOut" 
+                          }}
+                          className="absolute inset-0 bg-brand-yellow/30 border border-brand-yellow/40 rounded-xl pointer-events-none"
+                        />
+                        <motion.div 
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10"
+                        >
+                          <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
+                            This email address is already registered.
+                          </p>
+                        </motion.div>
+                      </div>
                     )}
                   
                   <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-1" disabled={isSubmitting}>
