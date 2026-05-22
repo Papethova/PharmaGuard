@@ -1763,7 +1763,11 @@ export default function App() {
                           placeholder=""
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="h-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm bg-brand-surface"
+                          className={`h-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm transition-colors duration-200 ${
+                            isUserDoesNotExistOpen 
+                              ? "bg-brand-yellow/30 border-brand-yellow/50" 
+                              : "bg-brand-surface"
+                          }`}
                           required
                         />
                       </div>
@@ -1787,7 +1791,11 @@ export default function App() {
                             placeholder=""
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="h-10 pr-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm bg-brand-surface"
+                            className={`h-10 pr-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm transition-colors duration-200 ${
+                              isUserDoesNotExistOpen 
+                                ? "bg-brand-yellow/30 border-brand-yellow/50" 
+                                : "bg-brand-surface"
+                            }`}
                             required
                           />
                           <button
@@ -1807,30 +1815,10 @@ export default function App() {
                     </div>
 
                     {isUserDoesNotExistOpen && (
-                      <div className="relative">
-                        <motion.span 
-                          className="absolute rounded-xl bg-brand-yellow pointer-events-none"
-                          initial={{ top: "0px", left: "0px", right: "0px", bottom: "0px" }}
-                          animate={{ 
-                            top: ["0px", "-6px", "-6px"],
-                            left: ["0px", "-6px", "-6px"],
-                            right: ["0px", "-6px", "-6px"],
-                            bottom: ["0px", "-6px", "-6px"],
-                            opacity: [0.75, 0, 0]
-                          }}
-                          transition={{ 
-                            repeat: Infinity, 
-                            duration: 1.0, 
-                            times: [0, 0.75, 1],
-                            ease: "easeOut" 
-                          }}
-                          style={{ transform: 'translateZ(0)' }}
-                        />
-                        <div className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10 shadow-sm">
-                          <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
-                            This user does not exist or credentials are incorrect.
-                          </p>
-                        </div>
+                      <div className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center shadow-sm">
+                        <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
+                          This user does not exist or credentials are incorrect.
+                        </p>
                       </div>
                     )}
 
@@ -1891,7 +1879,11 @@ export default function App() {
                         placeholder="e.g. drsmith@ucla.edu"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
+                        className={`h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm transition-colors duration-200 ${
+                          isAlreadyRegisteredOpen 
+                            ? "bg-brand-yellow/30 border-brand-yellow/50" 
+                            : "bg-brand-surface"
+                        }`}
                         required
                       />
                     </div>
@@ -1903,7 +1895,11 @@ export default function App() {
                           placeholder="Choose a compliant password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="h-10 pr-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm bg-brand-surface"
+                          className={`h-10 pr-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm transition-colors duration-200 ${
+                            isAlreadyRegisteredOpen 
+                              ? "bg-brand-yellow/30 border-brand-yellow/50" 
+                              : "bg-brand-surface"
+                          }`}
                           required
                           minLength={6}
                         />
@@ -1939,30 +1935,10 @@ export default function App() {
                   </div>
 
                     {isAlreadyRegisteredOpen && (
-                      <div className="relative">
-                        <motion.span 
-                          className="absolute rounded-xl bg-brand-yellow pointer-events-none"
-                          initial={{ top: "0px", left: "0px", right: "0px", bottom: "0px" }}
-                          animate={{ 
-                            top: ["0px", "-6px", "-6px"],
-                            left: ["0px", "-6px", "-6px"],
-                            right: ["0px", "-6px", "-6px"],
-                            bottom: ["0px", "-6px", "-6px"],
-                            opacity: [0.75, 0, 0]
-                          }}
-                          transition={{ 
-                            repeat: Infinity, 
-                            duration: 1.0, 
-                            times: [0, 0.75, 1],
-                            ease: "easeOut" 
-                          }}
-                          style={{ transform: 'translateZ(0)' }}
-                        />
-                        <div className="relative p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center z-10 shadow-sm">
-                          <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
-                            This email address is already registered.
-                          </p>
-                        </div>
+                      <div className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center shadow-sm">
+                        <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
+                          This email address is already registered.
+                        </p>
                       </div>
                     )}
                   
