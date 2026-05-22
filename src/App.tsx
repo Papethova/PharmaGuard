@@ -3595,7 +3595,7 @@ export default function App() {
                 Showing {filteredTransactions.length} transactions
               </div>
             </div>
-            <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden">
+            <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                 <table className="w-full caption-bottom text-sm border-separate border-spacing-0">
                   <TableHeader className="sticky top-0 z-30">

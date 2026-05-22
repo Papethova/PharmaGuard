@@ -152,7 +152,7 @@ export function AuditLogView({
         </div>
       </div>
 
-      <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface">
+      <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface py-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-brand-light-grey/50">
