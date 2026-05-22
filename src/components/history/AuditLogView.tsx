@@ -155,15 +155,15 @@ export function AuditLogView({
       <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface py-0">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-brand-blue/10">
-              <TableRow>
-                <TableHead className={tableHeadClass}>Timestamp</TableHead>
-                <TableHead className={tableHeadClass}>Reference #</TableHead>
-                <TableHead className={tableHeadClass}>Medication & Strength</TableHead>
-                <TableHead className={tableHeadClass}>NDC</TableHead>
-                <TableHead className={tableHeadClass}>Type</TableHead>
-                <TableHead className={tableHeadClass}>Qty</TableHead>
-                <TableHead className={tableHeadClass}>Performed By</TableHead>
+            <TableHeader className="bg-brand-blue sticky top-0 z-30">
+              <TableRow className="bg-brand-blue">
+                <TableHead className="text-[10px] uppercase font-black text-white tracking-widest text-center h-10 bg-brand-blue sticky top-0 z-30">Timestamp</TableHead>
+                <TableHead className="text-[10px] uppercase font-black text-white tracking-widest text-center h-10 bg-brand-blue sticky top-0 z-30">Reference #</TableHead>
+                <TableHead className="text-[10px] uppercase font-black text-white tracking-widest text-center h-10 bg-brand-blue sticky top-0 z-30">Medication & Strength</TableHead>
+                <TableHead className="text-[10px] uppercase font-black text-white tracking-widest text-center h-10 bg-brand-blue sticky top-0 z-30">NDC</TableHead>
+                <TableHead className="text-[10px] uppercase font-black text-white tracking-widest text-center h-10 bg-brand-blue sticky top-0 z-30">Type</TableHead>
+                <TableHead className="text-[10px] uppercase font-black text-white tracking-widest text-center h-10 bg-brand-blue sticky top-0 z-30">Qty</TableHead>
+                <TableHead className="text-[10px] uppercase font-black text-white tracking-widest text-center h-10 bg-brand-blue sticky top-0 z-30">Performed By</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

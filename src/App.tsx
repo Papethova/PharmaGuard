@@ -3598,15 +3598,15 @@ export default function App() {
             <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                 <table className="w-full caption-bottom text-sm border-separate border-spacing-0">
-                  <TableHeader className="sticky top-0 z-30">
-                    <TableRow className="bg-brand-blue/10">
-                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Reference #</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>User</TableHead>
+                  <TableHeader className="sticky top-0 z-40 bg-brand-blue">
+                    <TableRow className="bg-brand-blue">
+                        <TableHead className="font-semibold text-sm tracking-wider text-white text-center w-[140px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Timestamp</TableHead>
+                        <TableHead className="font-semibold text-sm tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Reference #</TableHead>
+                        <TableHead className="font-semibold text-sm tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Medication & Strength</TableHead>
+                        <TableHead className="font-semibold text-sm tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">NDC</TableHead>
+                        <TableHead className="font-semibold text-sm tracking-wider text-white text-center w-[90px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Type</TableHead>
+                        <TableHead className="font-semibold text-sm tracking-wider text-white text-center w-[70px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Qty</TableHead>
+                        <TableHead className="font-semibold text-sm tracking-wider text-white text-center w-[130px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
