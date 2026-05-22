@@ -1809,8 +1809,8 @@ export default function App() {
                     {isUserDoesNotExistOpen && (
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: [0.9, 1, 0.9], scale: [0.98, 1, 0.98] }}
-                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        animate={{ opacity: [0.4, 1, 0.4], scale: [0.98, 1, 0.98] }}
+                        transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
                         className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center"
                       >
                         <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
@@ -1926,8 +1926,8 @@ export default function App() {
                     {isAlreadyRegisteredOpen && (
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: [0.9, 1, 0.9], scale: [0.98, 1, 0.98] }}
-                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        animate={{ opacity: [0.4, 1, 0.4], scale: [0.98, 1, 0.98] }}
+                        transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
                         className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center"
                       >
                         <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
