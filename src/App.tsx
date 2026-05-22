@@ -662,8 +662,14 @@ export default function App() {
     let unsubProfile: (() => void) | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
-      // Set Auth Ready state as soon as we get even a null response
-      setUser(currentUser);
+      if (!currentUser) {
+        setUser(null);
+        setUserProfile(null);
+        if (unsubProfile) unsubProfile();
+        setIsAuthReady(true);
+        setIsInitializing(false);
+        return;
+      }
       
       try {
         if (currentUser) {
@@ -756,9 +762,13 @@ export default function App() {
           }, (error) => {
             handleFirestoreError(error, OperationType.GET, `users/${emailId}`);
           });
+
+          // Authenticated successfully and verified. Set the user state now to transition to the app view.
+          setUser(currentUser);
         } else {
           setUserProfile(null);
           if (unsubProfile) unsubProfile();
+          setUser(null);
         }
       } catch (error) {
         console.error("Auth state processing error:", error);
@@ -1699,7 +1709,8 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-4">
+      <>
+        <div className="min-h-screen bg-brand-light-grey flex items-center justify-center p-4">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1930,8 +1941,99 @@ export default function App() {
           </div>
         </motion.div>
       </div>
-    );
-  }
+
+      <Dialog open={isAlreadyRegisteredOpen} onOpenChange={setIsAlreadyRegisteredOpen}>
+        <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
+          <DialogHeader className="p-6 bg-brand-blue text-white relative">
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+                <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
+              </div>
+              
+              <div className="flex flex-col gap-0 text-left">
+                <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
+                  Node Registry Warning
+                </DialogTitle>
+                <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+                  REGISTRATION EXCLUSIVITY EXCEPTION
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="p-6 space-y-4 text-left">
+            <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
+              <p className="text-brand-blue font-bold text-sm">
+                This email address is already registered.
+              </p>
+              <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
+                An active system node is already registered with this email address in the PharmaGuard decentralized ledger. 
+              </p>
+              <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
+                If this is your account, please click "Already registered? Sign In" below the form to enter the secure environment.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+            <Button 
+              onClick={() => {
+                setIsAlreadyRegisteredOpen(false);
+                setAuthMode("google");
+              }}
+              className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
+            >
+              Acknowledge & Sign In
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isUserDoesNotExistOpen} onOpenChange={setIsUserDoesNotExistOpen}>
+        <DialogContent showCloseButton={false} className="sm:max-w-[420px] bg-brand-surface border-brand-yellow/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
+          <DialogHeader className="p-6 bg-brand-blue text-white relative">
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+                <AlertTriangle className="h-6 w-6 text-brand-blue" strokeWidth={2.5} />
+              </div>
+              
+              <div className="flex flex-col gap-0 text-left">
+                <DialogTitle className="text-lg font-black tracking-tight text-white leading-none">
+                  User Registry Exception
+                </DialogTitle>
+                <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+                  AUTHENTICATION OR NODE DELETION EXCEPTION
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="p-6 space-y-4 text-left">
+            <div className="p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-xl space-y-3">
+              <p className="text-brand-blue font-bold text-sm">
+                This user does not exist or credentials are incorrect.
+              </p>
+              <p className="text-brand-dark-grey/70 text-xs leading-relaxed">
+                Your organizational credentials are incorrect or the node has been purged from the PharmaGuard decentralized ledger. 
+              </p>
+              <p className="text-brand-dark-grey/70 text-xs leading-relaxed font-semibold">
+                To proceed and acquire a secure registry terminal, please register your organizational credentials using the registration option.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+            <Button 
+              onClick={() => {
+                setIsUserDoesNotExistOpen(false);
+                setAuthMode("signup");
+              }}
+              className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl"
+            >
+              Acknowledge & Register
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
 
 
 
