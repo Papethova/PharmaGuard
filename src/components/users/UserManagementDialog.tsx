@@ -146,8 +146,8 @@ export function UserManagementDialog({
               <Table className="relative border-separate border-spacing-0">
                 <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                   <TableRow className="bg-brand-light-grey hover:bg-transparent">
-                    <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Name & Title</TableHead>
-                    <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-[9px]`}>Actions</TableHead>
+                    <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-xs`}>Name & Title</TableHead>
+                    <TableHead className={`${tableHeadClass} text-center bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-40 h-8 text-xs`}>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
