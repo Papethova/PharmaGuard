@@ -32,7 +32,7 @@ export function TransactionDetailDialog({
   return (
     <Dialog open={!!transaction} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="sm:max-w-md bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[95vh] touch-none">
-        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none touch-auto shrink-0 rounded-t-2xl">
+        <DialogHeader className="p-6 bg-brand-blue text-white overflow-hidden relative border-none touch-auto shrink-0">
           <div className="flex items-center gap-4 relative z-10">
             <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border-2 border-white">
               <Shield className="h-6 w-6 text-brand-blue" strokeWidth={3} />
