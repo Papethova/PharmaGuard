@@ -528,6 +528,7 @@ export default function App() {
 
   // Email Auth State
   const [authMode, setAuthMode] = useState<"google" | "login" | "signup" | "forgot">("google");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const authModeRef = useRef("google");
   useEffect(() => {
     authModeRef.current = authMode;
@@ -548,6 +549,7 @@ export default function App() {
     setPassword("");
     setOrgName("");
     setShowPassword(false);
+    setResetEmailSent(false);
   }, [authMode]);
 
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
@@ -1133,7 +1135,7 @@ export default function App() {
       setIsSubmitting(true);
       await sendPasswordResetEmail(auth, email);
       toast.success("Password reset link sent to your email.");
-      setAuthMode("login");
+      setResetEmailSent(true);
     } catch (error: any) {
       console.error("Reset error:", error);
       toast.error("Failed to send reset link. Please check the email address.");
@@ -1955,30 +1957,51 @@ export default function App() {
                   </button>
                 </form>
               ) : (
-                <form onSubmit={handleForgotPassword} className="space-y-3">
-                  <div className="space-y-1 text-center">
-                    <h2 className="text-lg font-bold text-brand-blue uppercase leading-tight">Reset Password</h2>
-                    <p className="text-[11px] text-brand-grey">Enter your email for a recovery link.</p>
+                resetEmailSent ? (
+                  <div className="space-y-4 text-center">
+                    <div className="space-y-2">
+                      <h2 className="text-lg font-bold text-brand-blue uppercase leading-tight">Reset Password</h2>
+                      <p className="text-[11px] text-brand-grey leading-relaxed">
+                        a link to reset your password has been sent to your email
+                      </p>
+                    </div>
+                    <Button 
+                      type="button" 
+                      onClick={() => {
+                        setResetEmailSent(false);
+                        setAuthMode("google");
+                      }} 
+                      className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs"
+                    >
+                      return to log in
+                    </Button>
                   </div>
-                  <Input 
-                    type="email" 
-                    placeholder=""
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-10 border-brand-blue/10 text-sm bg-brand-surface"
-                    required
-                  />
-                  <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
-                    {isSubmitting ? "Sending..." : "Send Recovery Link"}
-                  </Button>
-                  <button 
-                    type="button" 
-                    onClick={() => setAuthMode("google")}
-                    className="w-full text-[9px] font-bold text-brand-grey/60 uppercase pt-1"
-                  >
-                    Back to Login Options
-                  </button>
-                </form>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-3">
+                    <div className="space-y-1 text-center">
+                      <h2 className="text-lg font-bold text-brand-blue uppercase leading-tight">Reset Password</h2>
+                      <p className="text-[11px] text-brand-grey">Enter your email for a recovery link.</p>
+                    </div>
+                    <Input 
+                      type="email" 
+                      placeholder=""
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-10 border-brand-blue/10 text-sm bg-brand-surface"
+                      required
+                    />
+                    <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
+                      {isSubmitting ? "Sending..." : "Send Recovery Link"}
+                    </Button>
+                    <button 
+                      type="button" 
+                      onClick={() => setAuthMode("google")}
+                      className="w-full text-[9px] font-bold text-brand-grey/60 uppercase pt-1"
+                    >
+                      Back to Login Options
+                    </button>
+                  </form>
+                )
               )}
 
               <div className="pt-4 border-t border-brand-grey/10 text-center mt-5">
