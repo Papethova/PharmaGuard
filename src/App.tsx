@@ -3599,14 +3599,14 @@ export default function App() {
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                 <table className="w-full caption-bottom text-sm border-separate border-spacing-0">
                   <TableHeader className="sticky top-0 z-30">
-                    <TableRow className="bg-brand-light-grey">
-                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Timestamp</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Reference #</TableHead>
-                        <TableHead className={`${tableHeadClass} bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Type</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>Qty</TableHead>
-                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-light-grey border-b border-brand-blue/10 sticky top-0 z-30`}>User</TableHead>
+                    <TableRow className="bg-brand-blue/10">
+                        <TableHead className={`${tableHeadClass} w-[140px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Timestamp</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[110px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Reference #</TableHead>
+                        <TableHead className={`${tableHeadClass} bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Medication & Strength</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[120px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>NDC</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[90px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Type</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[70px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>Qty</TableHead>
+                        <TableHead className={`${tableHeadClass} w-[130px] bg-brand-blue/10 border-b border-brand-blue/10 sticky top-0 z-30`}>User</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

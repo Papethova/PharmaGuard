@@ -155,7 +155,7 @@ export function AuditLogView({
       <Card className="border-brand-grey/10 shadow-sm overflow-hidden bg-brand-surface py-0">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-brand-light-grey/50">
+            <TableHeader className="bg-brand-blue/10">
               <TableRow>
                 <TableHead className={tableHeadClass}>Timestamp</TableHead>
                 <TableHead className={tableHeadClass}>Reference #</TableHead>
