@@ -1800,15 +1800,15 @@ export default function App() {
                       <motion.div 
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl space-y-1 text-left"
+                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl space-y-1 text-center"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center gap-2">
                           <AlertTriangle className="h-4 w-4 text-brand-blue shrink-0" strokeWidth={2.5} />
-                          <p className="text-brand-blue font-extrabold text-[10px] uppercase tracking-wider">
+                          <p className="text-brand-blue font-extrabold text-[10px] uppercase tracking-wider text-center">
                             User Registry Error
                           </p>
                         </div>
-                        <p className="text-brand-blue text-[10px] leading-relaxed font-black">
+                        <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
                           This user does not exist or credentials are incorrect.
                         </p>
                       </motion.div>
@@ -1922,15 +1922,15 @@ export default function App() {
                       <motion.div 
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl space-y-1 text-left"
+                        className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl space-y-1 text-center"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center gap-2">
                           <AlertTriangle className="h-4 w-4 text-brand-blue shrink-0" strokeWidth={2.5} />
-                          <p className="text-brand-blue font-extrabold text-[10px] uppercase tracking-wider">
+                          <p className="text-brand-blue font-extrabold text-[10px] uppercase tracking-wider text-center">
                             User Registry Error
                           </p>
                         </div>
-                        <p className="text-brand-blue text-[10px] leading-relaxed font-black">
+                        <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
                           This email address is already registered.
                         </p>
                       </motion.div>
