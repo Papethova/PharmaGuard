@@ -2319,8 +2319,8 @@ export default function App() {
           <div className="w-full relative min-w-0 flex-1 z-10 flex flex-col min-h-0 overflow-hidden">
 
             <Dialog open={isLogOpen} onOpenChange={setIsLogOpen}>
-               <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
-                <DialogHeader className="px-6 py-3 bg-brand-blue text-white relative shrink-0">
+               <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+                <DialogHeader className="px-6 py-3 bg-brand-blue text-white relative shrink-0 rounded-t-2xl">
                   <div className="flex items-center gap-3 relative z-10">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
                       {transactionType === "OUT" && <ArrowDown className="h-5 w-5 text-brand-blue" strokeWidth={3} />}
@@ -2935,8 +2935,8 @@ export default function App() {
 
             {/* Transaction Detail Modal */}
             <Dialog open={!!viewingTransaction} onOpenChange={(open) => !open && setViewingTransaction(null)}>
-              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
-                <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
+              <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+                <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0 rounded-t-2xl">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
                       <History className="h-6 w-6 text-brand-blue" />
@@ -3310,8 +3310,8 @@ export default function App() {
           </Card>
 
             <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
-              <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] touch-none">
-                <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto">
+              <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] touch-none">
+                <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto rounded-t-2xl">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <History className="h-5 w-5 text-brand-blue" />
