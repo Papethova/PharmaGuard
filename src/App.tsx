@@ -161,12 +161,12 @@ const OneSidedArrowLeftRight = ({ className, strokeWidth = 2 }: { className?: st
     className={className}
   >
     {/* Top left-pointing arrow: shaft and top-half of the arrowhead */}
-    <path d="M21 8H3" />
-    <path d="M8 3L3 8" />
+    <path d="M21 10H3" />
+    <path d="M8 5L3 10" />
 
     {/* Bottom right-pointing arrow: shaft and bottom-half of the arrowhead */}
-    <path d="M3 16h18" />
-    <path d="M21 16L16 21" />
+    <path d="M3 14h18" />
+    <path d="M21 14L16 19" />
   </svg>
 );
 
