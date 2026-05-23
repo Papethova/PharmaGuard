@@ -2004,11 +2004,7 @@ export default function App() {
                 )
               )}
 
-              <div className="pt-4 border-t border-brand-grey/10 text-center mt-5">
-                <p className="text-[8px] text-brand-dark-grey/30 uppercase font-black tracking-[0.05em]">
-                  Compliant with DEA Title 21 CFR Part 1300-1321
-                </p>
-              </div>
+
             </div>
           </div>
         </motion.div>

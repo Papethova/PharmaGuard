@@ -306,11 +306,7 @@ export function AuthScreen() {
               </form>
             )}
 
-            <div className="pt-6 border-t border-brand-grey/10 text-center mt-6">
-              <p className="text-[9px] text-brand-dark-grey/30 uppercase font-black tracking-widest">
-                Compliant with DEA Title 21 CFR Part 1300-1321
-              </p>
-            </div>
+
           </CardContent>
         </Card>
       </motion.div>
