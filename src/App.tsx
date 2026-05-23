@@ -1517,6 +1517,7 @@ export default function App() {
       await batch.commit();
       toast.success("Reconciliation Statement secured inside registry ledger!");
       setIsReconOpen(false);
+      setCurrentTab("inventory");
     } catch (error: any) {
       toast.error(`System Error: ${error.message}`);
     } finally {
@@ -2598,7 +2599,7 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
@@ -2607,7 +2608,7 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
  
                 <div className="pl-6 w-full -mt-1.5 mb-1 shrink-0">
@@ -2642,7 +2643,7 @@ export default function App() {
                       <AlertTriangle className="h-5 w-5 text-brand-blue transition-all" strokeWidth={3} />
                     </div>
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
                   {lowStockItems.length > 0 && (
                     <div className="ml-auto relative flex items-center justify-center h-5 w-5">
                       <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
@@ -2663,7 +2664,7 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${isUserManagementOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
+                  <span className={`whitespace-nowrap leading-none ${(isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
                 </TabsTrigger>
                 <TabsContent value="users" className="hidden" />
               </TabsList>
@@ -4120,7 +4121,7 @@ export default function App() {
     />
 
     {/* Reconciliation Report Dialog */}
-    <Dialog open={isReconOpen} onOpenChange={setIsReconOpen}>
+    <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }}>
       <DialogContent showCloseButton={false} className="sm:max-w-[720px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
         <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center justify-between relative z-10 w-full">
@@ -4139,7 +4140,10 @@ export default function App() {
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => setIsReconOpen(false)}
+              onClick={() => {
+                setIsReconOpen(false);
+                setCurrentTab("inventory");
+              }}
               className="text-white hover:bg-white/10 h-8 w-8 rounded-full shrink-0"
             >
               <X className="h-4 w-4" />
@@ -4371,7 +4375,10 @@ export default function App() {
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setIsReconOpen(false)}
+                  onClick={() => {
+                    setIsReconOpen(false);
+                    setCurrentTab("inventory");
+                  }}
                   className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl block h-11"
                 >
                   Terminate Draft
