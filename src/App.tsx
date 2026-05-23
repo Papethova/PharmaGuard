@@ -31,7 +31,7 @@ import {
   Eye,
   EyeOff,
   Mail,
-  ArrowLeftRight
+  ArrowRightLeft
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -411,6 +411,10 @@ export default function App() {
   const [editingUser, setEditingUser] = useState<{id: string, name: string, title?: string} | null>(null);
   const [userToDeleteConfirm, setUserToDeleteConfirm] = useState<{id: string, name: string} | null>(null);
   const [isSuperAdminOpen, setIsSuperAdminOpen] = useState(false);
+  const [isNodeMigrationOpen, setIsNodeMigrationOpen] = useState(false);
+  const [migrationSourceNode, setMigrationSourceNode] = useState("");
+  const [migrationDestNode, setMigrationDestNode] = useState("");
+  const [isMigrating, setIsMigrating] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -1509,6 +1513,106 @@ export default function App() {
       toast.error(`Migration Failed: ${err.message}`, { id: toastId });
     } finally {
       setIsActionPending(false);
+    }
+  };
+
+  const handleNodeDataMigration = async () => {
+    if (!isMasterAdmin) {
+      toast.error("Compliance Rejection: Master admin authority required for data migration.");
+      return;
+    }
+    if (!migrationSourceNode || !migrationDestNode) {
+      toast.error("Compliance Error: Both source and destination nodes must be selected.");
+      return;
+    }
+    if (migrationSourceNode === migrationDestNode) {
+      toast.error("Compliance Error: Source and destination nodes cannot be identical.");
+      return;
+    }
+
+    setIsMigrating(true);
+    const toastId = toast.loading(`Moving all registry data from [${migrationSourceNode}] to [${migrationDestNode}]...`);
+
+    try {
+      const srcEmail = migrationSourceNode.toLowerCase().trim();
+      const destEmail = migrationDestNode.toLowerCase().trim();
+
+      const srcSubstancesRef = collection(db, "users", srcEmail, "substances");
+      const srcSubstancesSnap = await getDocs(srcSubstancesRef);
+
+      const srcTransactionsRef = collection(db, "users", srcEmail, "transactions");
+      const srcTransactionsSnap = await getDocs(srcTransactionsRef);
+
+      const srcStaffRef = collection(db, "users", srcEmail, "staff");
+      const srcStaffSnap = await getDocs(srcStaffRef);
+
+      let batch = writeBatch(db);
+      let count = 0;
+
+      for (const d of srcSubstancesSnap.docs) {
+        if (count >= 400) {
+          await batch.commit();
+          batch = writeBatch(db);
+          count = 0;
+        }
+        const destDocRef = doc(db, "users", destEmail, "substances", d.id);
+        const srcDocRef = doc(db, "users", srcEmail, "substances", d.id);
+        batch.set(destDocRef, d.data());
+        batch.delete(srcDocRef);
+        count += 2;
+      }
+
+      for (const d of srcTransactionsSnap.docs) {
+        if (count >= 400) {
+          await batch.commit();
+          batch = writeBatch(db);
+          count = 0;
+        }
+        const destDocRef = doc(db, "users", destEmail, "transactions", d.id);
+        const srcDocRef = doc(db, "users", srcEmail, "transactions", d.id);
+        batch.set(destDocRef, d.data());
+        batch.delete(srcDocRef);
+        count += 2;
+      }
+
+      for (const d of srcStaffSnap.docs) {
+        if (count >= 400) {
+          await batch.commit();
+          batch = writeBatch(db);
+          count = 0;
+        }
+        const destDocRef = doc(db, "users", destEmail, "staff", d.id);
+        const srcDocRef = doc(db, "users", srcEmail, "staff", d.id);
+        batch.set(destDocRef, d.data());
+        batch.delete(srcDocRef);
+        count += 2;
+      }
+
+      if (count > 0) {
+        await batch.commit();
+      }
+
+      toast.success(
+        `Migration Successful: Moved ${srcSubstancesSnap.size} substances, ${srcTransactionsSnap.size} transactions, and ${srcStaffSnap.size} staff records from ${srcEmail} to ${destEmail}.`,
+        { id: toastId, duration: 8000 }
+      );
+
+      setMigrationSourceNode("");
+      setMigrationDestNode("");
+      setIsNodeMigrationOpen(false);
+
+      const activeUserEmail = (user?.email || "").toLowerCase().trim();
+      if (activeUserEmail === srcEmail || activeUserEmail === destEmail) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+
+    } catch (err: any) {
+      console.error("Migration task failure:", err);
+      toast.error(`Migration Failed: ${err.message}`, { id: toastId });
+    } finally {
+      setIsMigrating(false);
     }
   };
 
@@ -3811,6 +3915,117 @@ export default function App() {
       }}
     />
 
+    {/* Node Migration Dialog */}
+    <Dialog open={isNodeMigrationOpen} onOpenChange={setIsNodeMigrationOpen}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[480px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
+        <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
+          <div className="flex items-center gap-4 relative z-10 text-left">
+            <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+              <ArrowRightLeft className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+            </div>
+            <div>
+              <DialogTitle className="text-base font-black uppercase tracking-wider text-white">Node Registry Migration</DialogTitle>
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
+                RELOCATE ALL SUBSTANCE INVENTORY AND AUDIT LEDGERS BETWEEN NODES.
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="p-6 space-y-5 flex-1">
+          {/* Form */}
+          <div className="space-y-4">
+            <div className="space-y-1.5 text-left">
+              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Source Node (Relocating From)</label>
+              <select
+                value={migrationSourceNode}
+                onChange={(e) => setMigrationSourceNode(e.target.value)}
+                className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all cursor-pointer"
+              >
+                <option value="">-- SELECT SOURCE NODE --</option>
+                {allUserProfiles.map((p) => {
+                  const nodeName = p.organizationName || p.displayName || p.email;
+                  return (
+                    <option key={`src-${p.uid}`} value={p.email || p.uid}>
+                      {nodeName} ({p.email})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div className="flex items-center justify-center py-1">
+              <div className="h-9 w-9 bg-brand-blue/5 border border-brand-blue/10 rounded-full flex items-center justify-center shadow-inner">
+                <ArrowRightLeft className="h-4 w-4 text-brand-blue/60" strokeWidth={3} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5 text-left">
+              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Destination Node (Migrating To)</label>
+              <select
+                value={migrationDestNode}
+                onChange={(e) => setMigrationDestNode(e.target.value)}
+                className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all cursor-pointer"
+              >
+                <option value="">-- SELECT DESTINATION NODE --</option>
+                {allUserProfiles.map((p) => {
+                  const nodeName = p.organizationName || p.displayName || p.email;
+                  return (
+                    <option key={`dest-${p.uid}`} value={p.email || p.uid}>
+                      {nodeName} ({p.email})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+
+          {/* Warning Banner */}
+          <div className="p-3.5 bg-brand-yellow/10 border border-brand-yellow/30 rounded-xl flex gap-3 text-left">
+            <AlertTriangle className="h-5 w-5 text-brand-yellow shrink-0 mt-0.5" strokeWidth={3} />
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase text-brand-blue tracking-wide">Ledger Relocation Safe Notice</p>
+              <p className="text-[9px] text-brand-dark-grey/80 leading-relaxed">
+                All materials, audit records, and staff authorizations will be <span className="font-bold text-red-600">permanently purged</span> from the source node and <span className="font-bold text-green-600">reloaded</span> into the destination node. This action is authoritative and irreversible.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 px-6 bg-brand-blue/5 flex justify-end gap-2 border-t border-brand-blue/10 rounded-b-2xl">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsNodeMigrationOpen(false);
+              setMigrationSourceNode("");
+              setMigrationDestNode("");
+            }}
+            disabled={isMigrating}
+            className="text-[10px] font-black uppercase tracking-widest border-brand-blue/10 bg-white text-brand-blue hover:bg-brand-blue/5 px-4 h-9 rounded-lg"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleNodeDataMigration}
+            disabled={isMigrating || !migrationSourceNode || !migrationDestNode}
+            className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 px-5 h-9 rounded-lg flex gap-2 items-center shadow-sm disabled:opacity-50"
+          >
+            {isMigrating ? (
+              <>
+                <RefreshCcw className="h-3.5 w-3.5 animate-spin" strokeWidth={3} />
+                Relocating...
+              </>
+            ) : (
+              <>
+                <ArrowRightLeft className="h-3.5 w-3.5 text-brand-yellow" strokeWidth={3} />
+                Execute Migration
+              </>
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
       <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
@@ -4028,13 +4243,12 @@ export default function App() {
           </div>
           <div className="flex gap-2">
             <Button 
-              variant="outline" 
+              variant="default" 
               title="migration"
-              onClick={handleGlobalRegistryMigration}
-              disabled={isActionPending}
-              className="text-[10px] font-black tracking-widest border-brand-blue/20 bg-white text-brand-blue hover:bg-brand-blue hover:text-white px-4 h-9 rounded-lg transition-all flex gap-2 items-center"
+              onClick={() => setIsNodeMigrationOpen(true)}
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-115 px-4 h-9 rounded-lg transition-all flex gap-2 items-center shadow-md shadow-brand-blue/20"
             >
-              <ArrowLeftRight className={`h-3.5 w-3.5 ${isActionPending ? 'animate-pulse' : ''}`} />
+              <ArrowRightLeft className="h-3.5 w-3.5 text-brand-yellow" strokeWidth={3} />
               migration
             </Button>
             <Button 
