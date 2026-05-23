@@ -31,7 +31,7 @@ import {
   Eye,
   EyeOff,
   Mail,
-  ArrowRightLeft
+  ArrowLeftRight
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -3921,7 +3921,7 @@ export default function App() {
         <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center gap-4 relative z-10 text-left">
             <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-              <ArrowRightLeft className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+              <ArrowLeftRight className="h-5 w-5 text-brand-blue" strokeWidth={3} />
             </div>
             <div>
               <DialogTitle className="text-base font-black uppercase tracking-wider text-white">Node Registry Migration</DialogTitle>
@@ -3956,7 +3956,7 @@ export default function App() {
 
             <div className="flex items-center justify-center py-1">
               <div className="h-9 w-9 bg-brand-blue/5 border border-brand-blue/10 rounded-full flex items-center justify-center shadow-inner">
-                <ArrowRightLeft className="h-4 w-4 text-brand-blue/60" strokeWidth={3} />
+                <ArrowLeftRight className="h-4 w-4 text-brand-blue/60" strokeWidth={3} />
               </div>
             </div>
 
@@ -4017,7 +4017,7 @@ export default function App() {
               </>
             ) : (
               <>
-                <ArrowRightLeft className="h-3.5 w-3.5 text-brand-yellow" strokeWidth={3} />
+                <ArrowLeftRight className="h-3.5 w-3.5 text-brand-yellow" strokeWidth={3} />
                 Execute Migration
               </>
             )}
@@ -4028,7 +4028,7 @@ export default function App() {
 
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-1 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
+      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-0 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
         <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
@@ -4248,13 +4248,15 @@ export default function App() {
               onClick={() => setIsNodeMigrationOpen(true)}
               className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-115 px-4 h-9 rounded-lg transition-all flex gap-2 items-center shadow-md shadow-brand-blue/20"
             >
-              <ArrowRightLeft className="h-3.5 w-3.5 text-brand-yellow" strokeWidth={3} />
-              migration
+              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 border border-brand-yellow/20 shadow-sm">
+                <ArrowLeftRight className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+              </div>
+              data migration
             </Button>
             <Button 
               variant="default" 
               onClick={() => setIsSuperAdminOpen(false)}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:bg-brand-blue/90 px-6 h-9 rounded-lg transition-all"
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 px-6 h-9 rounded-lg transition-all shadow-md shadow-brand-yellow/10"
             >
               Disconnect Terminal
             </Button>
