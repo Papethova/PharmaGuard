@@ -4258,7 +4258,7 @@ export default function App() {
 
     {/* Reconciliation Report Dialog */}
     <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[720px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+      <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
         <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center justify-between relative z-10 w-full">
             <div className="flex items-center gap-4 text-left">
@@ -4395,17 +4395,17 @@ export default function App() {
                               {/* Activity details */}
                               <div className="text-right">
                                 <span className="text-[9px] font-black uppercase text-brand-grey block">Purchases</span>
-                                <span className="text-xs font-mono font-black text-emerald-600">+{metrics.purchases}</span>
+                                <span className="text-xs font-mono font-black text-brand-blue/90">+{metrics.purchases}</span>
                               </div>
 
                               <div className="text-right">
                                 <span className="text-[9px] font-black uppercase text-brand-grey block">Dispensed</span>
-                                <span className="text-xs font-mono font-black text-rose-600">-{metrics.dispensed}</span>
+                                <span className="text-xs font-mono font-black text-brand-grey">-{metrics.dispensed}</span>
                               </div>
 
                               <div className="text-right">
                                 <span className="text-[9px] font-black uppercase text-brand-grey block">Adjust</span>
-                                <span className={`text-xs font-mono font-black ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                <span className={`text-xs font-mono font-black ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-brand-blue/90' : 'text-brand-grey'}`}>
                                   {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                 </span>
                               </div>
@@ -4436,15 +4436,15 @@ export default function App() {
                                 {counted === undefined ? (
                                   <span className="text-[10px] text-brand-grey/50 font-medium whitespace-nowrap">Pending count...</span>
                                 ) : varianceAmount === 0 ? (
-                                  <Badge className="bg-green-100 hover:bg-green-100/90 text-green-700 hover:text-green-700/90 border-none font-bold text-[10px] h-6 px-2.5">
+                                  <Badge className="bg-brand-blue/10 hover:bg-brand-blue/15 text-brand-blue hover:text-brand-blue border border-brand-blue/20 font-bold text-[10px] h-6 px-2.5">
                                     <Check className="h-3 w-3 mr-1" strokeWidth={3} /> Match
                                   </Badge>
                                 ) : varianceAmount < 0 ? (
-                                  <Badge className="bg-red-50 hover:bg-red-50/90 text-red-700 hover:text-red-700/90 border border-red-200/50 font-black text-[10px] h-6 px-2.5">
+                                  <Badge className="bg-brand-light-grey hover:bg-brand-light-grey text-brand-blue hover:text-brand-blue/90 border border-brand-blue/10 font-black text-[10px] h-6 px-2.5">
                                     Deficit: {varianceAmount}
                                   </Badge>
                                 ) : (
-                                  <Badge className="bg-amber-50 hover:bg-amber-50/90 text-amber-700 hover:text-amber-700/90 border border-amber-200/50 font-black text-[10px] h-6 px-2.5">
+                                  <Badge className="bg-brand-yellow/10 hover:bg-brand-yellow/20 text-brand-blue hover:text-brand-blue border border-brand-yellow/30 font-black text-[10px] h-6 px-2.5">
                                     Surplus: +{varianceAmount}
                                   </Badge>
                                 )}
@@ -4454,8 +4454,8 @@ export default function App() {
 
                           {/* Reason field (shown block if there is variance) */}
                           {hasVariance && (
-                            <div className="w-full bg-red-50/20 border border-red-100/50 rounded-lg p-2.5 mt-1">
-                              <Label className="text-[9px] uppercase font-black text-red-600 block mb-1">State explanation for discrepancy *</Label>
+                            <div className="w-full bg-brand-blue/5 border border-brand-blue/10 rounded-lg p-2.5 mt-1">
+                              <Label className="text-[9px] uppercase font-black text-brand-blue block mb-1">State explanation for discrepancy *</Label>
                               <Input
                                 placeholder="State reason for variance..."
                                 value={reconReasons[sub.id] || ""}
@@ -4463,7 +4463,7 @@ export default function App() {
                                   const val = e.target.value;
                                   setReconReasons(prev => ({ ...prev, [sub.id]: val }));
                                 }}
-                                className="h-8 text-xs border-red-200 focus:border-red-500 rounded-lg placeholder:text-brand-grey/50 bg-brand-surface"
+                                className="h-8 text-xs border-brand-blue/10 focus:border-brand-blue rounded-lg placeholder:text-brand-grey/50 bg-brand-surface"
                               />
                             </div>
                           )}
@@ -4595,11 +4595,10 @@ export default function App() {
                     <table className="w-full text-xs font-mono">
                       <thead>
                         <tr className="border-b-2 border-gray-200 text-left">
-                          <th className="py-2 text-left font-bold">PREVIOUS DATE</th>
-                          <th className="py-2 text-right font-bold">FINAL COUNT</th>
+                          <th className="py-2 text-left font-bold">LAST REPORT COUNT</th>
                           <th className="py-2 text-right font-bold">PURCHASES</th>
                           <th className="py-2 text-right font-bold">DISPENSED</th>
-                          <th className="py-2 text-right font-bold">ADJUSTMENTS</th>
+                          <th className="py-2 text-right font-bold">ADJUSTED</th>
                           <th className="py-2 text-right font-bold">EXPECTED COUNT</th>
                           <th className="py-2 text-left font-bold pl-4">MEDICATION / NDC</th>
                           <th className="py-2 text-right font-bold">PHYSICAL COUNT</th>
@@ -4616,26 +4615,28 @@ export default function App() {
                           return (
                             <Fragment key={sub.id}>
                               <tr className="h-12 text-left">
-                                <td className="py-2 text-left text-gray-500 font-medium">{metrics.prevReportDate}</td>
-                                <td className="py-2 text-right text-gray-500 font-medium">{metrics.lastClosingCount}</td>
-                                <td className="py-2 text-right text-emerald-600 font-medium">+{metrics.purchases}</td>
-                                <td className="py-2 text-right text-rose-600 font-medium">-{metrics.dispensed}</td>
-                                <td className={`py-2 text-right font-medium ${metrics.adjustments === 0 ? 'text-gray-500' : metrics.adjustments > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                <td className="py-2 text-left text-gray-700 font-medium">
+                                  <span className="font-bold">{metrics.lastClosingCount}</span>
+                                  <span className="block text-[9px] text-gray-400 font-normal">Last: {metrics.prevReportDate}</span>
+                                </td>
+                                <td className="py-2 text-right text-gray-900 font-bold">+{metrics.purchases}</td>
+                                <td className="py-2 text-right text-gray-500">-{metrics.dispensed}</td>
+                                <td className={`py-2 text-right font-medium ${metrics.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
                                   {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                 </td>
                                 <td className="py-2 text-right text-brand-blue font-bold">{metrics.expected}</td>
                                 <td className="py-2 text-left pl-4">
-                                  <span className="font-bold">{sub.name}</span>
+                                  <span className="font-bold text-gray-900">{sub.name}</span>
                                   <span className="block text-[9px] text-gray-500">{sub.ndc} • {sub.strength} • {sub.schedule}</span>
                                 </td>
-                                <td className="py-2 text-right">{counted} {sub.unit || "Units"}</td>
-                                <td className={`py-2 text-right font-bold ${variance === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                <td className="py-2 text-right text-gray-900 font-bold">{counted} {sub.unit || "Units"}</td>
+                                <td className={`py-2 text-right font-black ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
                                   {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
                                 </td>
                               </tr>
                               {variance !== 0 && (
                                 <tr className="bg-gray-50/50">
-                                  <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-red-400 text-[10px] text-gray-600 italic">
+                                  <td colSpan={8} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
                                     Discrepancy Reason: {reason || "State reason omitted"}
                                   </td>
                                 </tr>
