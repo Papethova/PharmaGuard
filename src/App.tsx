@@ -2611,29 +2611,27 @@ export default function App() {
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
  
-                <div className="pl-6 w-full -mt-1.5 mb-1 shrink-0">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      // Generate a standard reference number
-                      const randomId = Math.floor(100000 + Math.random() * 900000);
-                      setReconRef(`RECON-${randomId}`);
-                      // Reset reconciliation forms
-                      setReconCounts({});
-                      setReconReasons({});
-                      setReconUser("");
-                      setReconWitness("");
-                      setReconShowPreview(false);
-                      setIsReconOpen(true);
-                    }}
-                    className="w-full justify-start gap-3 h-10 px-3 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all active:scale-[0.98]"
-                  >
-                    <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                      <Search className="h-3.5 w-3.5 text-brand-blue transition-all" strokeWidth={3} />
-                    </div>
-                    <span className={`whitespace-nowrap leading-none text-xs ${isReconOpen ? 'font-black text-brand-blue' : 'font-semibold text-brand-blue/50'}`}>Reconciliations</span>
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    // Generate a standard reference number
+                    const randomId = Math.floor(100000 + Math.random() * 900000);
+                    setReconRef(`RECON-${randomId}`);
+                    // Reset reconciliation forms
+                    setReconCounts({});
+                    setReconReasons({});
+                    setReconUser("");
+                    setReconWitness("");
+                    setReconShowPreview(false);
+                    setIsReconOpen(true);
+                  }}
+                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-base text-brand-blue font-normal"
+                >
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                    <Search className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                  </div>
+                  <span className={`whitespace-nowrap leading-none ${isReconOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Reconciliations</span>
+                </Button>
                 <TabsTrigger 
                   value="alerts" 
                   className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
