@@ -1819,7 +1819,7 @@ export default function App() {
                     {isUserDoesNotExistOpen && (
                       <div className="p-3 bg-brand-yellow border border-brand-yellow/30 rounded-xl text-center shadow-sm">
                         <p className="text-brand-blue text-[10px] leading-relaxed font-black text-center">
-                          This user does not exist or credentials are incorrect.
+                          Either the email or password you entered is incorrect, or an account does not exist for this email address
                         </p>
                       </div>
                     )}
