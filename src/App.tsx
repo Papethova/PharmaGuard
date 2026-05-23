@@ -30,7 +30,8 @@ import {
   Database,
   Eye,
   EyeOff,
-  Mail
+  Mail,
+  ArrowLeftRight
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -1435,6 +1436,77 @@ export default function App() {
       setNodeToReset(null);
     } catch (error: any) {
       toast.error(`Purge Failure: ${error.message}`);
+    } finally {
+      setIsActionPending(false);
+    }
+  };
+
+  const handleGlobalRegistryMigration = async () => {
+    if (!isMasterAdmin) {
+      toast.error("Compliance Rejection: Master admin authority required for global registry migration.");
+      return;
+    }
+    
+    setIsActionPending(true);
+    const toastId = toast.loading("Executing global registry data standardizations...");
+    
+    try {
+      const usersRef = collection(db, "users");
+      const snapshot = await getDocs(usersRef);
+      const batch = writeBatch(db);
+      let migrationCount = 0;
+      
+      snapshot.docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        const docId = docSnap.id;
+        const updates: any = {};
+        
+        // Ensure default status is standard
+        if (!data.status) {
+          updates.status = "pending";
+        }
+        
+        // Normalize role if missing
+        if (!data.role) {
+          updates.role = "pharmacist";
+        }
+        
+        // Normalize display name or org name
+        if (!data.displayName && docId.includes("@")) {
+          updates.displayName = docId.split("@")[0];
+        }
+
+        // Set baseline timestamps for synchronization if missing
+        if (!data.createdAt) {
+          updates.createdAt = serverTimestamp();
+        }
+        if (!data.updatedAt) {
+          updates.updatedAt = serverTimestamp();
+        }
+
+        if (Object.keys(updates).length > 0) {
+          batch.update(docSnap.ref, updates);
+          migrationCount++;
+        }
+      });
+      
+      if (migrationCount > 0) {
+        await batch.commit();
+        // Refresh local users list
+        const refreshedSnapshot = await getDocs(usersRef);
+        const refreshedItems = refreshedSnapshot.docs.map(doc => ({
+          ...doc.data(),
+          docId: doc.id,
+          uid: doc.data().uid || doc.id
+        } as UserProfile));
+        setAllUserProfiles(refreshedItems);
+        toast.success(`Global Migration Complete: Standardized metadata on ${migrationCount} nodes.`, { id: toastId });
+      } else {
+        toast.success("Global Migration Checked: All organizational registries are fully compliant & up-to-date.", { id: toastId });
+      }
+    } catch (err: any) {
+      console.error("Migration task failure:", err);
+      toast.error(`Migration Failed: ${err.message}`, { id: toastId });
     } finally {
       setIsActionPending(false);
     }
@@ -3955,6 +4027,15 @@ export default function App() {
             </p>
           </div>
           <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleGlobalRegistryMigration}
+              disabled={isActionPending}
+              className="text-[10px] font-black uppercase tracking-widest border-brand-blue/20 bg-white text-brand-blue hover:bg-brand-blue hover:text-white px-4 h-9 rounded-lg transition-all flex gap-2 items-center"
+            >
+              <ArrowLeftRight className={`h-3.5 w-3.5 ${isActionPending ? 'animate-pulse' : ''}`} />
+              Migration
+            </Button>
             <Button 
               variant="default" 
               onClick={() => setIsSuperAdminOpen(false)}
