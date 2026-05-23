@@ -2637,10 +2637,10 @@ export default function App() {
             </div>
             
             <div className="flex flex-col w-full">
-              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-2 w-full">
+              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full">
                 <TabsTrigger 
                   value="inventory" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
@@ -2649,7 +2649,7 @@ export default function App() {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
@@ -2674,7 +2674,7 @@ export default function App() {
                     setReconShowPreview(false);
                     setIsReconOpen(true);
                   }}
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-base text-brand-blue font-normal"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-base text-brand-blue font-normal"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Search className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
@@ -2683,7 +2683,7 @@ export default function App() {
                 </Button>
                 <TabsTrigger 
                   value="alerts" 
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="relative">
                     <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
@@ -2706,7 +2706,7 @@ export default function App() {
                     e.preventDefault();
                     setIsUserManagementOpen(true);
                   }}
-                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
