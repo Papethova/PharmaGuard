@@ -4040,12 +4040,10 @@ export default function App() {
             </div>
 
             <div className="flex items-center justify-center py-1">
-              <div className="h-10 w-10 bg-brand-yellow border border-brand-yellow/20 rounded-full flex items-center justify-center shadow-md relative overflow-hidden">
-                <svg className="h-6 w-6 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
-                  {/* Single downward bold/blocky arrow: wide square stem with large triangle head */}
-                  <path d="M8,3 H16 V11 H21 L12,21 L3,11 H8 Z" />
-                </svg>
-              </div>
+              <svg className="h-10 w-10 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
+                {/* Single downward bold/blocky arrow: wide square stem with large triangle head */}
+                <path d="M8,3 H16 V11 H21 L12,21 L3,11 H8 Z" />
+              </svg>
             </div>
 
             <div className="space-y-1.5 text-left relative">
