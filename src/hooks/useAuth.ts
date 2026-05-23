@@ -96,13 +96,13 @@ export function useAuth() {
       const errMessage = error.message || "";
       
       if (errCode === 'auth/user-not-found' || errMessage.includes('user-not-found')) {
-        toast.error("This email address is not registered. Please check the spelling or sign up.");
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
       } else if (errCode === 'auth/wrong-password' || errMessage.includes('wrong-password')) {
-        toast.error("Incorrect password. The username or password you entered is incorrect.");
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
       } else if (errCode === 'auth/invalid-credential' || errCode === 'auth/invalid-email' || errMessage.includes('invalid-credential')) {
-        toast.error("The email address is either not registered or the password you entered is incorrect.");
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
       } else {
-        toast.error(errMessage || "Login Failed: Check your credentials and try again.");
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
       }
       throw error;
     }

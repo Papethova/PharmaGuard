@@ -1104,20 +1104,17 @@ export default function App() {
       }
 
       if (!exists || errCode === 'auth/user-not-found' || errMessage.includes('user-not-found')) {
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
         setIsUserDoesNotExistOpen(true);
       } else if (errCode === 'auth/wrong-password' || errMessage.includes('wrong-password')) {
-        toast.error("Incorrect password. The username or password you entered is incorrect.");
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
         setIsUserDoesNotExistOpen(true);
       } else if (errCode === 'auth/invalid-credential' || errCode === 'auth/invalid-email' || errMessage.includes('invalid-credential')) {
-        // If they don't exist in Firestore, show the non-existent prompt
-        if (!exists) {
-          setIsUserDoesNotExistOpen(true);
-        } else {
-          toast.error("Incorrect password. The username or password you entered is incorrect.");
-          setIsUserDoesNotExistOpen(true);
-        }
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
+        setIsUserDoesNotExistOpen(true);
       } else {
-        toast.error(errMessage || "Failed to log in. Please check your credentials.");
+        toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
+        setIsUserDoesNotExistOpen(true);
       }
     } finally {
       setIsSubmitting(false);
