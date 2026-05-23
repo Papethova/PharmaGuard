@@ -415,6 +415,20 @@ export default function App() {
   const [migrationSourceNode, setMigrationSourceNode] = useState("");
   const [migrationDestNode, setMigrationDestNode] = useState("");
   const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationSourceSearch, setMigrationSourceSearch] = useState("");
+  const [isSourceSearchFocused, setIsSourceSearchFocused] = useState(false);
+  const [migrationDestSearch, setMigrationDestSearch] = useState("");
+  const [isDestSearchFocused, setIsDestSearchFocused] = useState(false);
+
+  useEffect(() => {
+    if (!isNodeMigrationOpen) {
+      setMigrationSourceNode("");
+      setMigrationDestNode("");
+      setMigrationSourceSearch("");
+      setMigrationDestSearch("");
+    }
+  }, [isNodeMigrationOpen]);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -3932,51 +3946,156 @@ export default function App() {
           </div>
         </DialogHeader>
 
-        <div className="p-6 space-y-5 flex-1">
+        <div className="p-6 space-y-5 flex-1 overflow-visible">
           {/* Form */}
           <div className="space-y-4">
-            <div className="space-y-1.5 text-left">
+            <div className="space-y-1.5 text-left relative">
               <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Source Node (Relocating From)</label>
-              <select
-                value={migrationSourceNode}
-                onChange={(e) => setMigrationSourceNode(e.target.value)}
-                className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all cursor-pointer"
-              >
-                <option value="">-- SELECT SOURCE NODE --</option>
-                {allUserProfiles.map((p) => {
-                  const nodeName = p.organizationName || p.displayName || p.email;
-                  return (
-                    <option key={`src-${p.uid}`} value={p.email || p.uid}>
-                      {nodeName} ({p.email})
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-
-            <div className="flex items-center justify-center py-1">
-              <div className="h-9 w-9 bg-brand-blue/5 border border-brand-blue/10 rounded-full flex items-center justify-center shadow-inner">
-                <ArrowLeftRight className="h-4 w-4 text-brand-blue/60" strokeWidth={3} />
+              <div className="relative">
+                <Input
+                  placeholder="Type to search source node..."
+                  value={migrationSourceSearch}
+                  onChange={(e) => {
+                    setMigrationSourceSearch(e.target.value);
+                    setMigrationSourceNode("");
+                    setIsSourceSearchFocused(true);
+                  }}
+                  onFocus={() => setIsSourceSearchFocused(true)}
+                  onBlur={() => {
+                    setTimeout(() => setIsSourceSearchFocused(false), 200);
+                  }}
+                  className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus-visible:ring-brand-blue placeholder:text-brand-grey/50"
+                />
+                {isSourceSearchFocused && (
+                  <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-blue/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto left-0 top-full">
+                    {allUserProfiles
+                      .filter((p) => {
+                        const emailLower = (p.email || "").toLowerCase().trim();
+                        if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
+                        const matchStr = migrationSourceSearch.toLowerCase().trim();
+                        const orgName = (p.organizationName || "").toLowerCase();
+                        const dispName = (p.displayName || "").toLowerCase();
+                        return (
+                          !matchStr ||
+                          orgName.includes(matchStr) ||
+                          dispName.includes(matchStr) ||
+                          emailLower.includes(matchStr)
+                        );
+                      })
+                      .map((p) => {
+                        const nodeName = p.organizationName || p.displayName || p.email;
+                        return (
+                          <div
+                            key={`src-opt-${p.uid}`}
+                            onMouseDown={() => {
+                              setMigrationSourceNode(p.email || p.uid);
+                              setMigrationSourceSearch(`${nodeName} (${p.email})`);
+                              setIsSourceSearchFocused(false);
+                            }}
+                            className="px-4 py-2 hover:bg-brand-blue/5 cursor-pointer text-xs flex flex-col border-b border-brand-blue/5 last:border-0"
+                          >
+                            <span className="font-bold text-brand-blue">{nodeName}</span>
+                            <span className="text-[10px] text-brand-dark-grey/60 font-medium">{p.email}</span>
+                          </div>
+                        );
+                      })}
+                    {allUserProfiles.filter((p) => {
+                      const emailLower = (p.email || "").toLowerCase().trim();
+                      if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
+                      const matchStr = migrationSourceSearch.toLowerCase().trim();
+                      const orgName = (p.organizationName || "").toLowerCase();
+                      const dispName = (p.displayName || "").toLowerCase();
+                      return (
+                        !matchStr ||
+                        orgName.includes(matchStr) ||
+                        dispName.includes(matchStr) ||
+                        emailLower.includes(matchStr)
+                      );
+                    }).length === 0 && (
+                      <div className="px-4 py-3 text-xs text-brand-dark-grey/50 italic">No matches found</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="space-y-1.5 text-left">
+            <div className="flex items-center justify-center py-1">
+              <div className="h-10 w-10 bg-brand-yellow border border-brand-yellow/20 rounded-full flex items-center justify-center shadow-md relative overflow-hidden">
+                <svg className="h-5 w-5 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
+                  {/* Single downward blocky arrow: square stem with triangle head */}
+                  <path d="M10,4 H14 V12 H18 L12,19 L6,12 H10 Z" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="space-y-1.5 text-left relative">
               <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Destination Node (Migrating To)</label>
-              <select
-                value={migrationDestNode}
-                onChange={(e) => setMigrationDestNode(e.target.value)}
-                className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all cursor-pointer"
-              >
-                <option value="">-- SELECT DESTINATION NODE --</option>
-                {allUserProfiles.map((p) => {
-                  const nodeName = p.organizationName || p.displayName || p.email;
-                  return (
-                    <option key={`dest-${p.uid}`} value={p.email || p.uid}>
-                      {nodeName} ({p.email})
-                    </option>
-                  );
-                })}
-              </select>
+              <div className="relative">
+                <Input
+                  placeholder="Type to search destination node..."
+                  value={migrationDestSearch}
+                  onChange={(e) => {
+                    setMigrationDestSearch(e.target.value);
+                    setMigrationDestNode("");
+                    setIsDestSearchFocused(true);
+                  }}
+                  onFocus={() => setIsDestSearchFocused(true)}
+                  onBlur={() => {
+                    setTimeout(() => setIsDestSearchFocused(false), 200);
+                  }}
+                  className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus-visible:ring-brand-blue placeholder:text-brand-grey/50"
+                />
+                {isDestSearchFocused && (
+                  <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-blue/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto left-0 top-full">
+                    {allUserProfiles
+                      .filter((p) => {
+                        const emailLower = (p.email || "").toLowerCase().trim();
+                        if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
+                        const matchStr = migrationDestSearch.toLowerCase().trim();
+                        const orgName = (p.organizationName || "").toLowerCase();
+                        const dispName = (p.displayName || "").toLowerCase();
+                        return (
+                          !matchStr ||
+                          orgName.includes(matchStr) ||
+                          dispName.includes(matchStr) ||
+                          emailLower.includes(matchStr)
+                        );
+                      })
+                      .map((p) => {
+                        const nodeName = p.organizationName || p.displayName || p.email;
+                        return (
+                          <div
+                            key={`dest-opt-${p.uid}`}
+                            onMouseDown={() => {
+                              setMigrationDestNode(p.email || p.uid);
+                              setMigrationDestSearch(`${nodeName} (${p.email})`);
+                              setIsDestSearchFocused(false);
+                            }}
+                            className="px-4 py-2 hover:bg-brand-blue/5 cursor-pointer text-xs flex flex-col border-b border-brand-blue/5 last:border-0"
+                          >
+                            <span className="font-bold text-brand-blue">{nodeName}</span>
+                            <span className="text-[10px] text-brand-dark-grey/60 font-medium">{p.email}</span>
+                          </div>
+                        );
+                      })}
+                    {allUserProfiles.filter((p) => {
+                      const emailLower = (p.email || "").toLowerCase().trim();
+                      if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
+                      const matchStr = migrationDestSearch.toLowerCase().trim();
+                      const orgName = (p.organizationName || "").toLowerCase();
+                      const dispName = (p.displayName || "").toLowerCase();
+                      return (
+                        !matchStr ||
+                        orgName.includes(matchStr) ||
+                        dispName.includes(matchStr) ||
+                        emailLower.includes(matchStr)
+                      );
+                    }).length === 0 && (
+                      <div className="px-4 py-3 text-xs text-brand-dark-grey/50 italic">No matches found</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -3992,35 +4111,22 @@ export default function App() {
           </div>
         </div>
 
-        <div className="p-4 px-6 bg-brand-blue/5 flex justify-end gap-2 border-t border-brand-blue/10 rounded-b-2xl">
+        <div className="p-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl flex-col sm:flex-row">
           <Button
-            variant="outline"
             onClick={() => {
               setIsNodeMigrationOpen(false);
-              setMigrationSourceNode("");
-              setMigrationDestNode("");
             }}
             disabled={isMigrating}
-            className="text-[10px] font-black uppercase tracking-widest border-brand-blue/10 bg-white text-brand-blue hover:bg-brand-blue/5 px-4 h-9 rounded-lg"
+            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
           >
             Cancel
           </Button>
           <Button
             onClick={handleNodeDataMigration}
             disabled={isMigrating || !migrationSourceNode || !migrationDestNode}
-            className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 px-5 h-9 rounded-lg flex gap-2 items-center shadow-sm disabled:opacity-50"
+            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl disabled:opacity-50 transition-all"
           >
-            {isMigrating ? (
-              <>
-                <RefreshCcw className="h-3.5 w-3.5 animate-spin" strokeWidth={3} />
-                Relocating...
-              </>
-            ) : (
-              <>
-                <ArrowLeftRight className="h-3.5 w-3.5 text-brand-yellow" strokeWidth={3} />
-                Execute Migration
-              </>
-            )}
+            Execute Migration
           </Button>
         </div>
       </DialogContent>
