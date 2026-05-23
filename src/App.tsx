@@ -4029,12 +4029,13 @@ export default function App() {
           <div className="flex gap-2">
             <Button 
               variant="outline" 
+              title="migration"
               onClick={handleGlobalRegistryMigration}
               disabled={isActionPending}
-              className="text-[10px] font-black uppercase tracking-widest border-brand-blue/20 bg-white text-brand-blue hover:bg-brand-blue hover:text-white px-4 h-9 rounded-lg transition-all flex gap-2 items-center"
+              className="text-[10px] font-black tracking-widest border-brand-blue/20 bg-white text-brand-blue hover:bg-brand-blue hover:text-white px-4 h-9 rounded-lg transition-all flex gap-2 items-center"
             >
               <ArrowLeftRight className={`h-3.5 w-3.5 ${isActionPending ? 'animate-pulse' : ''}`} />
-              Migration
+              migration
             </Button>
             <Button 
               variant="default" 
