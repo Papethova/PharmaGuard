@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useRef, useMemo, FormEvent } from "react";
+import { useState, useEffect, useRef, useMemo, FormEvent, Fragment } from "react";
 import { 
   History,
   Clock,
@@ -30,7 +30,9 @@ import {
   Database,
   Eye,
   EyeOff,
-  Mail
+  Mail,
+  ClipboardCheck,
+  Printer
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -448,6 +450,17 @@ export default function App() {
       setMigrationDestSearch("");
     }
   }, [isNodeMigrationOpen]);
+
+  // Reconciliation states
+  const [isReconOpen, setIsReconOpen] = useState(false);
+  const [reconCounts, setReconCounts] = useState<Record<string, string>>({});
+  const [reconReasons, setReconReasons] = useState<Record<string, string>>({});
+  const [reconUser, setReconUser] = useState("");
+  const [reconWitness, setReconWitness] = useState("");
+  const [reconRef, setReconRef] = useState("");
+  const [isReconSubmitting, setIsReconSubmitting] = useState(false);
+  const [reconShowPreview, setReconShowPreview] = useState(false);
+  const reconCanvasRef = useRef<any>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1375,6 +1388,139 @@ export default function App() {
       toast.error(`System Error: ${error.message}`);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleReconciliationSubmit = async () => {
+    if (!user) return;
+    const emailId = user.email?.toLowerCase() || user.uid;
+    
+    if (!reconUser) {
+      toast.error("Please identify the Reconciling Pharmacist");
+      return;
+    }
+
+    const substancesToReconcile = inventory;
+    if (substancesToReconcile.length === 0) {
+      toast.error("No active substance list found to reconcile.");
+      return;
+    }
+
+    const missingCounts = substancesToReconcile.filter(
+      s => reconCounts[s.id] === undefined || reconCounts[s.id].trim() === ""
+    );
+    if (missingCounts.length > 0) {
+      toast.error(`Please provide physical counts for: ${missingCounts[0].name}`);
+      return;
+    }
+
+    const missingReasons: string[] = [];
+    substancesToReconcile.forEach(s => {
+      const counted = Number(reconCounts[s.id]);
+      const current = s.currentStock;
+      const variance = counted - current;
+      if (variance !== 0) {
+        const reasonStr = reconReasons[s.id];
+        if (!reasonStr || reasonStr.trim() === "") {
+          missingReasons.push(s.name);
+        }
+      }
+    });
+
+    if (missingReasons.length > 0) {
+      toast.error(`Reason of variance required for: ${missingReasons.join(", ")}`);
+      return;
+    }
+
+    let signature = "";
+    if (reconCanvasRef.current) {
+      const trimmedCanvas = trimSignatureCanvas(reconCanvasRef.current);
+      if (trimmedCanvas) {
+        signature = trimmedCanvas.toDataURL("image/png");
+      }
+    }
+
+    if (!signature) {
+      toast.error("Authorizing pharmacist signature is required to secure the reconciliation statement");
+      return;
+    }
+
+    try {
+      setIsReconSubmitting(true);
+      const batch = writeBatch(db);
+      const transactionsRef = collection(db, "users", emailId, "transactions");
+      
+      const reconPerfBy = users.find(u => u.id === reconUser);
+      const performedByName = reconPerfBy?.name || user.displayName || user.email || "AUTHORIZED PHARMACIST";
+      const performedByTitle = reconPerfBy?.title || "Pharmacist";
+      
+      const witnessUser = users.find(u => u.id === reconWitness);
+      const witnessName = witnessUser?.name || "";
+
+      substancesToReconcile.forEach(s => {
+        const physical = Number(reconCounts[s.id]);
+        const previous = s.currentStock;
+        const variance = physical - previous;
+        const targetMedId = s.id;
+
+        const newTxDoc = doc(transactionsRef);
+        if (variance !== 0) {
+          batch.set(newTxDoc, {
+            substanceId: targetMedId,
+            substanceName: s.name,
+            strength: s.strength,
+            ndc: s.ndc,
+            type: "ADJUST",
+            quantity: variance,
+            previousStock: previous,
+            newStock: physical,
+            performedBy: user.uid,
+            performedByName: performedByName,
+            performedByTitle: performedByTitle,
+            timestamp: serverTimestamp(),
+            reason: `Reconciliation Discrepancy: ${reconReasons[s.id] || "Unexplained discrepancies"}`,
+            referenceNumber: reconRef,
+            signature,
+            witnessId: reconWitness && reconWitness !== "none" ? reconWitness : ""
+          });
+
+          batch.update(doc(db, "users", emailId, "substances", targetMedId), {
+            currentStock: physical,
+            lastUpdated: serverTimestamp()
+          });
+        } else {
+          batch.set(newTxDoc, {
+            substanceId: targetMedId,
+            substanceName: s.name,
+            strength: s.strength,
+            ndc: s.ndc,
+            type: "VERIFY",
+            quantity: previous,
+            previousStock: previous,
+            newStock: previous,
+            performedBy: user.uid,
+            performedByName: performedByName,
+            performedByTitle: performedByTitle,
+            timestamp: serverTimestamp(),
+            reason: "Reconciliation Audit: perfect match verified",
+            referenceNumber: reconRef,
+            signature,
+            witnessId: reconWitness && reconWitness !== "none" ? reconWitness : ""
+          });
+
+          batch.update(doc(db, "users", emailId, "substances", targetMedId), {
+            lastUpdated: serverTimestamp()
+          });
+        }
+      });
+
+      await batch.commit();
+      toast.success("Reconciliation Statement secured inside registry ledger!");
+      setIsReconOpen(false);
+    } catch (error: any) {
+      toast.error(`System Error: ${error.message}`);
+    } finally {
+      setIsReconSubmitting(false);
     }
   };
 
@@ -2463,6 +2609,29 @@ export default function App() {
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
+
+                {currentTab === 'history' && !isUserManagementOpen && (
+                  <div className="pl-6 pr-2 -my-1 flex flex-col gap-1 w-full animate-fade-in shrink-0">
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        // Generate a standard reference number
+                        const randomId = Math.floor(100000 + Math.random() * 900000);
+                        setReconRef(`RECON-${randomId}`);
+                        // Reset reconciliation forms
+                        setReconCounts({});
+                        setReconReasons({});
+                        setReconUser("");
+                        setReconWitness("");
+                        setIsReconOpen(true);
+                      }}
+                      className="w-full justify-start gap-2.5 h-10 px-3 py-2 bg-brand-blue/10 hover:bg-brand-blue/20 border border-brand-blue/15 text-brand-blue text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 text-left shrink-0"
+                    >
+                      <ClipboardCheck className="h-4 w-4 text-brand-blue shrink-0" strokeWidth={3} />
+                      RECONCILIATION REPORT
+                    </Button>
+                  </div>
+                )}
                 <TabsTrigger 
                   value="alerts" 
                   className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
@@ -3948,6 +4117,448 @@ export default function App() {
         className: "sonner-industrial",
       }}
     />
+
+    {/* Reconciliation Report Dialog */}
+    <Dialog open={isReconOpen} onOpenChange={setIsReconOpen}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[720px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+        <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
+          <div className="flex items-center justify-between relative z-10 w-full">
+            <div className="flex items-center gap-4 text-left">
+              <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
+                <ClipboardCheck className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-black uppercase tracking-wider text-white">Controlled Substances Reconciliation</DialogTitle>
+                <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
+                  Verify physical holdings against digital ledger logs to maintain active compliance keys.
+                </DialogDescription>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsReconOpen(false)}
+              className="text-white hover:bg-white/10 h-8 w-8 rounded-full shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </DialogHeader>
+
+        {!reconShowPreview ? (
+          // Form Editing View
+          <>
+            <ScrollArea className="flex-1 overflow-y-auto">
+              <div className="p-6 space-y-5">
+                
+                {/* Meta details */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
+                  <div className="space-y-1.5 text-left">
+                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Reconciling Pharmacist *</Label>
+                    <Select value={reconUser} onValueChange={setReconUser}>
+                      <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-9 text-xs font-semibold">
+                        <SelectValue placeholder="Select..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-brand-surface">
+                        {users.map(u => (
+                          <SelectItem key={u.id} value={u.id} className="text-xs text-brand-dark-grey">
+                            {u.name} {u.title && `(${u.title})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5 text-left">
+                    <Label htmlFor="recon-witness" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Witness Staff (Optional)</Label>
+                    <Select value={reconWitness} onValueChange={setReconWitness}>
+                      <SelectTrigger id="recon-witness" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-9 text-xs font-semibold">
+                        <SelectValue placeholder="No Witness" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-brand-surface">
+                        <SelectItem value="none" className="text-xs text-brand-dark-grey">None / Direct Audit</SelectItem>
+                        {users.filter(u => u.id !== reconUser).map(u => (
+                          <SelectItem key={u.id} value={u.id} className="text-xs text-brand-dark-grey">
+                            {u.name} {u.title && `(${u.title})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5 text-left">
+                    <Label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Report Reference #</Label>
+                    <div className="h-9 px-3 border border-brand-blue/10 rounded-xl bg-brand-blue/5 flex items-center text-xs font-mono font-black text-brand-blue select-all">
+                      {reconRef}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Batch Helper Button */}
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black uppercase text-brand-blue/60 tracking-wider">Inventory Substances</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Pre-fill all fields with their current Stock
+                      const newCounts: Record<string, string> = {};
+                      inventory.forEach(s => {
+                        newCounts[s.id] = String(s.currentStock);
+                      });
+                      setReconCounts(newCounts);
+                      toast.success("Accounts matched to expected ledgers");
+                    }}
+                    className="h-8 text-[10px] font-black uppercase tracking-wider border-brand-blue/10 text-brand-blue hover:bg-brand-blue/5 hover:border-brand-blue/20"
+                  >
+                    Match All Expected Stock
+                  </Button>
+                </div>
+
+                {/* Substance Table List */}
+                <div className="border border-brand-blue/10 rounded-xl overflow-hidden divide-y divide-brand-blue/10 bg-brand-surface">
+                  {inventory.length === 0 ? (
+                    <div className="p-8 text-center text-brand-dark-grey/50 text-xs">
+                      No medications are matching the current node registry list.
+                    </div>
+                  ) : (
+                    inventory.map((sub) => {
+                      const expected = sub.currentStock;
+                      const enteredVal = reconCounts[sub.id] || "";
+                      const counted = enteredVal === "" ? undefined : Number(enteredVal);
+                      const hasVariance = counted !== undefined && counted !== expected;
+                      const varianceAmount = counted !== undefined ? counted - expected : 0;
+                      
+                      return (
+                        <div key={sub.id} className="p-4 flex flex-col gap-3 justify-between text-left">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <span className="text-xs font-black uppercase text-brand-blue tracking-wide truncate block">{sub.name}</span>
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                                <span className="text-[9px] font-black bg-brand-yellow/30 text-brand-blue px-1.5 py-0.5 rounded uppercase leading-none">{sub.schedule}</span>
+                                <span className="text-[10px] font-mono text-brand-dark-grey/60 font-semibold leading-none">{sub.ndc}</span>
+                                <span className="text-[10px] text-brand-dark-grey/60 font-semibold leading-none">{sub.strength}</span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-4 shrink-0">
+                              {/* Expected Stock Info */}
+                              <div className="text-right">
+                                <span className="text-[9px] font-black uppercase text-brand-grey block">Expected Ledger</span>
+                                <span className="text-xs font-black text-brand-dark-grey">{expected} {sub.unit || "Units"}</span>
+                              </div>
+
+                              {/* Count Input */}
+                              <div className="w-24">
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="Count..."
+                                  value={enteredVal}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setReconCounts(prev => ({ ...prev, [sub.id]: val }));
+                                  }}
+                                  className="h-9 text-xs text-center font-bold border-brand-blue/10 focus:border-brand-blue"
+                                />
+                              </div>
+
+                              {/* Dynamic Variance Column */}
+                              <div className="w-28 text-center flex justify-end">
+                                {counted === undefined ? (
+                                  <span className="text-xs text-brand-grey/50 font-medium">Pending count...</span>
+                                ) : varianceAmount === 0 ? (
+                                  <Badge className="bg-green-100 hover:bg-green-100/90 text-green-700 hover:text-green-700/90 border-none font-bold text-[10px] h-6 px-2.5">
+                                    <Check className="h-3 w-3 mr-1" strokeWidth={3} /> Match
+                                  </Badge>
+                                ) : varianceAmount < 0 ? (
+                                  <Badge className="bg-red-50 hover:bg-red-50/90 text-red-700 hover:text-red-700/90 border border-red-200/50 font-black text-[10px] h-6 px-2.5">
+                                    Deficit: {varianceAmount}
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-amber-50 hover:bg-amber-50/90 text-amber-700 hover:text-amber-700/90 border border-amber-200/50 font-black text-[10px] h-6 px-2.5">
+                                    Surplus: +{varianceAmount}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Reason field (shown block if there is variance) */}
+                          {hasVariance && (
+                            <div className="w-full bg-red-50/20 border border-red-100/50 rounded-lg p-2.5 mt-1">
+                              <Label className="text-[9px] uppercase font-black text-red-600 block mb-1">State explanation for discrepancy *</Label>
+                              <Input
+                                placeholder="State reason for variance..."
+                                value={reconReasons[sub.id] || ""}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setReconReasons(prev => ({ ...prev, [sub.id]: val }));
+                                }}
+                                className="h-8 text-xs border-red-200 focus:border-red-500 rounded-lg placeholder:text-brand-grey/50 bg-brand-surface"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Signature canvas */}
+                <div className="mt-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-surface space-y-4">
+                  <div className="space-y-2">
+                    <Label className="flex justify-between items-center text-brand-dark-grey text-xs font-semibold">
+                      Authorizing Sign-Off *
+                      <Button 
+                        type="button"
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          reconCanvasRef.current?.clear();
+                        }}
+                      >
+                        Clear Canvas
+                      </Button>
+                    </Label>
+                    <div className="border border-brand-blue/10 rounded-xl bg-brand-blue/5 overflow-hidden">
+                      <SignatureCanvas 
+                        ref={reconCanvasRef}
+                        penColor="#0d3151"
+                        canvasProps={{
+                          id: "reconciliation-signature-canvas",
+                          className: "w-full h-20 cursor-crosshair"
+                        }}
+                      />
+                    </div>
+                    <p className="text-[9px] text-brand-grey font-medium leading-normal text-left">
+                      By executing this report, you certify under penalty of active compliance tracking that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </ScrollArea>
+
+            <DialogFooter className="p-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl sm:flex-row items-center justify-between shrink-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  const enteredCountKeys = Object.keys(reconCounts).filter(k => reconCounts[k].trim() !== "");
+                  if (enteredCountKeys.length < inventory.length) {
+                    toast.error("Please enter physical counts for all items to preview report.");
+                    return;
+                  }
+                  if (!reconUser) {
+                    toast.error("Please select reconciling pharmacist.");
+                    return;
+                  }
+                  setReconShowPreview(true);
+                }}
+                className="text-xs font-black uppercase text-brand-blue border-brand-blue/10 hover:bg-brand-blue/5 rounded-xl shrink-0 gap-2 h-11"
+              >
+                <Printer className="h-4 w-4" />
+                Preview Form
+              </Button>
+
+              <div className="flex gap-3 justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsReconOpen(false)}
+                  className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl block h-11"
+                >
+                  Terminate Draft
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleReconciliationSubmit}
+                  disabled={isReconSubmitting}
+                  className="text-xs font-black uppercase bg-brand-blue hover:brightness-110 text-white rounded-xl h-11 shadow-md shadow-brand-blue/20"
+                >
+                  {isReconSubmitting ? "Securing Records..." : "Secure Reconciliation Registry"}
+                </Button>
+              </div>
+            </DialogFooter>
+          </>
+        ) : (
+          // Print Report Review Page (Gorgeously Styled)
+          <>
+            <ScrollArea className="flex-1 overflow-y-auto">
+              {/* Added print root anchor */}
+              <div id="reconciliation-printable-root">
+                <div id="reconciliation-printable-invoice" className="p-8 space-y-6 text-left selection:bg-brand-yellow/30 bg-white text-black">
+                  
+                  {/* Visual Official Letterhead */}
+                  <div className="flex justify-between items-start border-b-2 border-black pb-4">
+                    <div>
+                      <h1 className="text-xl font-bold tracking-tight uppercase">PHARMACEUTICAL INVENTORY COMPLIANCE OFFICE</h1>
+                      <p className="text-xs text-gray-500 font-mono mt-1">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+                      <p className="text-xs text-gray-500 font-mono">DATE EXECUTED: {new Date().toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold font-mono">REPORT #: {reconRef}</p>
+                      <p className="text-xs text-gray-400 font-mono uppercase">CONDUIT VERIFIED</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-100 p-4 rounded-lg flex flex-col sm:flex-row justify-between gap-4">
+                    <div>
+                      <span className="text-[10px] text-gray-500 font-mono uppercase block">RECONCILING PHARMACIST</span>
+                      <span className="text-sm font-bold">{users.find(u => u.id === reconUser)?.name || "AUTHORIZED STAFF"} {users.find(u => u.id === reconUser)?.title && `(${users.find(u => u.id === reconUser)?.title})`}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-500 font-mono uppercase block">WITNESS STAFF</span>
+                      <span className="text-sm font-bold">
+                        {reconWitness && reconWitness !== "none" ? (users.find(u => u.id === reconWitness)?.name || "PRESENT WITNESS") : "NONE / DIRECT SYSTEM AUDIT"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Audit Grid/Table */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold tracking-wider uppercase font-mono border-b border-gray-300 pb-1">RECONCILED CONTROLLED INVENTORY STATEMENT</h3>
+                    <table className="w-full text-xs font-mono">
+                      <thead>
+                        <tr className="border-b-2 border-gray-200 text-left">
+                          <th className="py-2 font-bold">MEDICATION / NDC</th>
+                          <th className="py-2 text-center font-bold">SCHEDULE</th>
+                          <th className="py-2 text-right font-bold">LEDGER STOCK</th>
+                          <th className="py-2 text-right font-bold">PHYSICAL COUNT</th>
+                          <th className="py-2 text-right font-bold">VARIANCE</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {inventory.map(sub => {
+                          const expected = sub.currentStock;
+                          const counted = Number(reconCounts[sub.id]) || 0;
+                          const variance = counted - expected;
+                          const reason = reconReasons[sub.id] || "";
+                          
+                          return (
+                            <Fragment key={sub.id}>
+                              <tr className="h-12">
+                                <td className="py-2 text-left">
+                                  <span className="font-bold">{sub.name}</span>
+                                  <span className="block text-[9px] text-gray-500">{sub.ndc} • {sub.strength}</span>
+                                </td>
+                                <td className="py-2 text-center">{sub.schedule}</td>
+                                <td className="py-2 text-right">{expected} {sub.unit || "Units"}</td>
+                                <td className="py-2 text-right">{counted} {sub.unit || "Units"}</td>
+                                <td className={`py-2 text-right font-bold ${variance === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
+                                </td>
+                              </tr>
+                              {variance !== 0 && (
+                                <tr className="bg-gray-50/50">
+                                  <td colSpan={5} className="py-2 pl-4 text-left border-l-2 border-red-400 text-[10px] text-gray-600 italic">
+                                    Discrepancy Reason: {reason || "State reason omitted"}
+                                  </td>
+                                </tr>
+                              )}
+                            </Fragment>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Signature box info */}
+                  <div className="grid grid-cols-2 gap-8 pt-8">
+                    <div className="border-t border-black pt-3">
+                      <span className="text-[10px] text-gray-500 font-mono block">PHARMACIST COGNIZANT ATTRIBUTE SIGNATURE</span>
+                      {reconCanvasRef.current && (
+                        <div className="mt-2 h-14 w-full flex items-center justify-center bg-gray-50 rounded">
+                          {(() => {
+                            const trimmed = trimSignatureCanvas(reconCanvasRef.current);
+                            return trimmed ? (
+                              <img src={trimmed.toDataURL("image/png")} className="max-h-12 object-contain" alt="Pharmacist signature" />
+                            ) : (
+                              <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
+                            );
+                          })()}
+                        </div>
+                      )}
+                      <span className="text-xs font-bold block mt-2">{users.find(u => u.id === reconUser)?.name}</span>
+                      <span className="text-[9px] text-gray-400 font-mono block">Title Code: {users.find(u => u.id === reconUser)?.title || "RPh"}</span>
+                    </div>
+                    <div className="border-t border-black pt-3">
+                      <span className="text-[10px] text-gray-500 font-mono block">CO-SIGNING WITNESS OR SYSTEM AUDIT KEY</span>
+                      <div className="mt-2 h-14 border border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs italic bg-gray-50 rounded">
+                        {reconWitness && reconWitness !== "none" ? (
+                          <div className="flex flex-col items-center">
+                            <span className="font-bold text-gray-700 not-italic">{users.find(u => u.id === reconWitness)?.name}</span>
+                            <span className="text-[9px] text-gray-400">{users.find(u => u.id === reconWitness)?.title || "RPh/Staff"}</span>
+                          </div>
+                        ) : "Direct Electronic Logging Audit Only"}
+                      </div>
+                      <span className="text-[9px] text-gray-400 font-mono block mt-2 font-semibold">Filing Record Reference Match Verified</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </ScrollArea>
+
+            <DialogFooter className="p-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl justify-between items-center shrink-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setReconShowPreview(false)}
+                className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 border-brand-blue/10 rounded-xl h-11"
+              >
+                Return to Editing
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  window.print();
+                }}
+                className="text-xs font-black uppercase bg-brand-blue hover:brightness-110 text-white rounded-xl h-11 shadow-md shadow-brand-blue/20 flex gap-2 items-center"
+              >
+                <Printer className="h-4 w-4" />
+                EXECUTE SYSTEM PRINT
+              </Button>
+            </DialogFooter>
+
+            {/* Print utilities to style print view on Ctrl+P or button click */}
+            <style>{`
+              @media print {
+                body {
+                  background: white !important;
+                  color: black !important;
+                }
+                body > *:not(#reconciliation-printable-root) {
+                  display: none !important;
+                }
+                #reconciliation-printable-root {
+                  display: block !important;
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  width: 100% !important;
+                  height: auto !important;
+                  overflow: visible !important;
+                  padding: 0 !important;
+                  margin: 0 !important;
+                }
+                .dialog-overlay, .dialog-content-wrapper {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                }
+              }
+            `}</style>
+          </>
+        )}
+
+      </DialogContent>
+    </Dialog>
 
     {/* Node Migration Dialog */}
     <Dialog open={isNodeMigrationOpen} onOpenChange={setIsNodeMigrationOpen}>
