@@ -30,8 +30,7 @@ import {
   Database,
   Eye,
   EyeOff,
-  Mail,
-  ArrowLeftRight
+  Mail
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -148,6 +147,27 @@ const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
       />
     </div>
   </div>
+);
+
+const OneSidedArrowLeftRight = ({ className, strokeWidth = 2 }: { className?: string; strokeWidth?: number }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth={strokeWidth} 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    {/* Top left-pointing arrow: shaft and top-half of the arrowhead */}
+    <path d="M21 8H3" />
+    <path d="M8 3L3 8" />
+
+    {/* Bottom right-pointing arrow: shaft and bottom-half of the arrowhead */}
+    <path d="M3 16h18" />
+    <path d="M21 16L16 21" />
+  </svg>
 );
 
 enum OperationType {
@@ -3935,7 +3955,7 @@ export default function App() {
         <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center gap-4 relative z-10 text-left">
             <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-              <ArrowLeftRight className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+              <OneSidedArrowLeftRight className="h-5 w-5 text-brand-blue" strokeWidth={3} />
             </div>
             <div>
               <DialogTitle className="text-base font-black uppercase tracking-wider text-white">Node Registry Migration</DialogTitle>
@@ -4355,7 +4375,7 @@ export default function App() {
               className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-115 px-4 h-9 rounded-lg transition-all flex gap-2 items-center shadow-md shadow-brand-blue/20"
             >
               <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 border border-brand-yellow/20 shadow-sm">
-                <ArrowLeftRight className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                <OneSidedArrowLeftRight className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
               </div>
               data migration
             </Button>
