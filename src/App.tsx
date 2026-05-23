@@ -462,6 +462,51 @@ export default function App() {
   const [reconShowPreview, setReconShowPreview] = useState(false);
   const reconCanvasRef = useRef<any>(null);
 
+  const lastReport = useMemo(() => {
+    const reconTxs = transactions.filter(t => 
+      t.referenceNumber && 
+      (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-")) &&
+      t.referenceNumber !== reconRef
+    );
+    
+    if (reconTxs.length === 0) {
+      return { date: "N/A", counts: {} as Record<string, number>, ref: "N/A" };
+    }
+    
+    const sortedReconTxs = [...reconTxs].sort((a, b) => {
+      const aTime = a.timestamp?.seconds !== undefined ? a.timestamp.seconds : a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+      const bTime = b.timestamp?.seconds !== undefined ? b.timestamp.seconds : b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+      return bTime - aTime;
+    });
+
+    const latestRef = sortedReconTxs[0].referenceNumber || "";
+    
+    let lastDate = "N/A";
+    const firstTxWithLatestRef = sortedReconTxs.find(t => t.referenceNumber === latestRef);
+    if (firstTxWithLatestRef?.timestamp) {
+      const ts = firstTxWithLatestRef.timestamp;
+      let d: Date;
+      if (typeof ts.toDate === "function") {
+        d = ts.toDate();
+      } else if (ts instanceof Date) {
+        d = ts;
+      } else {
+        d = new Date(ts);
+      }
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const yy = String(d.getFullYear()).slice(-2);
+      lastDate = `${mm}/${dd}/${yy}`;
+    }
+    
+    const counts: Record<string, number> = {};
+    sortedReconTxs.filter(t => t.referenceNumber === latestRef).forEach(t => {
+      counts[t.substanceId] = t.newStock;
+    });
+    
+    return { date: lastDate, counts, ref: latestRef };
+  }, [transactions, reconRef]);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -1417,8 +1462,8 @@ export default function App() {
     const missingReasons: string[] = [];
     substancesToReconcile.forEach(s => {
       const counted = Number(reconCounts[s.id]);
-      const current = s.currentStock;
-      const variance = counted - current;
+      const startingCount = lastReport.counts[s.id] !== undefined ? lastReport.counts[s.id] : s.currentStock;
+      const variance = counted - startingCount;
       if (variance !== 0) {
         const reasonStr = reconReasons[s.id];
         if (!reasonStr || reasonStr.trim() === "") {
@@ -1459,8 +1504,8 @@ export default function App() {
 
       substancesToReconcile.forEach(s => {
         const physical = Number(reconCounts[s.id]);
-        const previous = s.currentStock;
-        const variance = physical - previous;
+        const startingCount = lastReport.counts[s.id] !== undefined ? lastReport.counts[s.id] : s.currentStock;
+        const variance = physical - startingCount;
         const targetMedId = s.id;
 
         const newTxDoc = doc(transactionsRef);
@@ -1472,7 +1517,7 @@ export default function App() {
             ndc: s.ndc,
             type: "ADJUST",
             quantity: variance,
-            previousStock: previous,
+            previousStock: startingCount,
             newStock: physical,
             performedBy: user.uid,
             performedByName: performedByName,
@@ -1495,9 +1540,9 @@ export default function App() {
             strength: s.strength,
             ndc: s.ndc,
             type: "VERIFY",
-            quantity: previous,
-            previousStock: previous,
-            newStock: previous,
+            quantity: startingCount,
+            previousStock: startingCount,
+            newStock: startingCount,
             performedBy: user.uid,
             performedByName: performedByName,
             performedByTitle: performedByTitle,
@@ -1509,6 +1554,7 @@ export default function App() {
           });
 
           batch.update(doc(db, "users", emailId, "substances", targetMedId), {
+            currentStock: physical,
             lastUpdated: serverTimestamp()
           });
         }
@@ -2614,9 +2660,12 @@ export default function App() {
                 <Button
                   type="button"
                   onClick={() => {
-                    // Generate a standard reference number
-                    const randomId = Math.floor(100000 + Math.random() * 900000);
-                    setReconRef(`RECON-${randomId}`);
+                    // Generate a standard reference number in REC-MM/DD/YY format
+                    const today = new Date();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    const yy = String(today.getFullYear()).slice(-2);
+                    setReconRef(`REC-${mm}/${dd}/${yy}`);
                     // Reset reconciliation forms
                     setReconCounts({});
                     setReconReasons({});
@@ -4209,10 +4258,11 @@ export default function App() {
                       // Pre-fill all fields with their current Stock
                       const newCounts: Record<string, string> = {};
                       inventory.forEach(s => {
-                        newCounts[s.id] = String(s.currentStock);
+                        const startingCount = lastReport.counts[s.id] !== undefined ? lastReport.counts[s.id] : s.currentStock;
+                        newCounts[s.id] = String(startingCount);
                       });
                       setReconCounts(newCounts);
-                      toast.success("Accounts matched to expected ledgers");
+                      toast.success("Accounts matched to starting counts");
                     }}
                     className="h-8 text-[10px] font-black uppercase tracking-wider border-brand-blue/10 text-brand-blue hover:bg-brand-blue/5 hover:border-brand-blue/20"
                   >
@@ -4228,11 +4278,11 @@ export default function App() {
                     </div>
                   ) : (
                     inventory.map((sub) => {
-                      const expected = sub.currentStock;
+                      const startingCount = lastReport.counts[sub.id] !== undefined ? lastReport.counts[sub.id] : sub.currentStock;
                       const enteredVal = reconCounts[sub.id] || "";
                       const counted = enteredVal === "" ? undefined : Number(enteredVal);
-                      const hasVariance = counted !== undefined && counted !== expected;
-                      const varianceAmount = counted !== undefined ? counted - expected : 0;
+                      const hasVariance = counted !== undefined && counted !== startingCount;
+                      const varianceAmount = counted !== undefined ? counted - startingCount : 0;
                       
                       return (
                         <div key={sub.id} className="p-4 flex flex-col gap-3 justify-between text-left">
@@ -4247,10 +4297,16 @@ export default function App() {
                             </div>
 
                             <div className="flex items-center gap-4 shrink-0">
-                              {/* Expected Stock Info */}
+                              {/* Last Report Date Info */}
                               <div className="text-right">
-                                <span className="text-[9px] font-black uppercase text-brand-grey block">Expected Ledger</span>
-                                <span className="text-xs font-black text-brand-dark-grey">{expected} {sub.unit || "Units"}</span>
+                                <span className="text-[9px] font-black uppercase text-brand-grey block">Last Report</span>
+                                <span className="text-xs font-mono font-black text-brand-blue">{lastReport.date}</span>
+                              </div>
+
+                              {/* Starting Count Info */}
+                              <div className="text-right">
+                                <span className="text-[9px] font-black uppercase text-brand-grey block">Starting Count</span>
+                                <span className="text-xs font-black text-brand-dark-grey">{startingCount} {sub.unit || "Units"}</span>
                               </div>
 
                               {/* Count Input */}
@@ -4432,29 +4488,31 @@ export default function App() {
                     <table className="w-full text-xs font-mono">
                       <thead>
                         <tr className="border-b-2 border-gray-200 text-left">
-                          <th className="py-2 font-bold">MEDICATION / NDC</th>
+                          <th className="py-2 text-left font-bold">PREVIOUS DATE</th>
+                          <th className="py-2 text-right font-bold">FINAL COUNT</th>
+                          <th className="py-2 text-left font-bold pl-4">MEDICATION / NDC</th>
                           <th className="py-2 text-center font-bold">SCHEDULE</th>
-                          <th className="py-2 text-right font-bold">LEDGER STOCK</th>
                           <th className="py-2 text-right font-bold">PHYSICAL COUNT</th>
                           <th className="py-2 text-right font-bold">VARIANCE</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
                         {inventory.map(sub => {
-                          const expected = sub.currentStock;
+                          const startingCount = lastReport.counts[sub.id] !== undefined ? lastReport.counts[sub.id] : sub.currentStock;
                           const counted = Number(reconCounts[sub.id]) || 0;
-                          const variance = counted - expected;
+                          const variance = counted - startingCount;
                           const reason = reconReasons[sub.id] || "";
                           
                           return (
                             <Fragment key={sub.id}>
-                              <tr className="h-12">
-                                <td className="py-2 text-left">
+                              <tr className="h-12 text-left">
+                                <td className="py-2 text-left text-gray-500 font-medium">{lastReport.date}</td>
+                                <td className="py-2 text-right text-gray-500 font-medium">{startingCount} {sub.unit || "Units"}</td>
+                                <td className="py-2 text-left pl-4">
                                   <span className="font-bold">{sub.name}</span>
                                   <span className="block text-[9px] text-gray-500">{sub.ndc} • {sub.strength}</span>
                                 </td>
                                 <td className="py-2 text-center">{sub.schedule}</td>
-                                <td className="py-2 text-right">{expected} {sub.unit || "Units"}</td>
                                 <td className="py-2 text-right">{counted} {sub.unit || "Units"}</td>
                                 <td className={`py-2 text-right font-bold ${variance === 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
@@ -4462,7 +4520,7 @@ export default function App() {
                               </tr>
                               {variance !== 0 && (
                                 <tr className="bg-gray-50/50">
-                                  <td colSpan={5} className="py-2 pl-4 text-left border-l-2 border-red-400 text-[10px] text-gray-600 italic">
+                                  <td colSpan={6} className="py-2 pl-4 text-left border-l-2 border-red-400 text-[10px] text-gray-600 italic">
                                     Discrepancy Reason: {reason || "State reason omitted"}
                                   </td>
                                 </tr>
