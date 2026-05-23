@@ -2683,8 +2683,8 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-5 shrink-0 overflow-visible self-start touch-none">
-            <div className="flex flex-col gap-1.5 w-full shrink-0">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-none">
+            <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
                   (getIdentityString(userProfile, user?.email).length || 0) > 20 ? "text-lg" : 
@@ -2723,22 +2723,22 @@ export default function App() {
             </div>
             
             <div className="flex flex-col w-full">
-              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-0.5 w-full">
+              <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-1 w-full">
                 <TabsTrigger 
                   value="inventory" 
-                  className="w-full justify-start gap-3 h-8 px-3 rounded-lg data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-sm transition-all group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
-                  <div className="h-6.5 w-6.5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <Pill className="h-3.5 w-3.5 text-brand-blue transition-all" strokeWidth={3} />
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                    <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
-                  className="w-full justify-start gap-3 h-8 px-3 rounded-lg data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-sm transition-all group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
-                  <div className="h-6.5 w-6.5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <History className="h-3.5 w-3.5 text-brand-blue transition-all" strokeWidth={3} />
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                    <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
@@ -2760,30 +2760,27 @@ export default function App() {
                     setReconShowPreview(false);
                     setIsReconOpen(true);
                   }}
-                  className="w-full justify-start gap-3 h-8 px-3 rounded-lg bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-sm text-brand-blue font-normal"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-base text-brand-blue font-normal"
                 >
-                  <div className="h-6.5 w-6.5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <div className="relative flex items-center justify-center h-3.5 w-3.5">
-                      <Clipboard className="h-3.5 w-3.5 text-brand-blue absolute" strokeWidth={2.5} />
-                      <Search className="h-1.5 w-1.5 text-brand-blue absolute translate-y-[0.75px] translate-x-[0.25px]" strokeWidth={3.5} />
-                    </div>
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                    <Search className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${isReconOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Reconciliations</span>
                 </Button>
                 <TabsTrigger 
                   value="alerts" 
-                  className="w-full justify-start gap-3 h-8 px-3 rounded-lg data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-sm transition-all group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="relative">
-                    <div className="h-6.5 w-6.5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                      <AlertTriangle className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                    <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                      <AlertTriangle className="h-5 w-5 text-brand-blue transition-all" strokeWidth={3} />
                     </div>
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
                   {lowStockItems.length > 0 && (
-                    <div className="ml-auto relative flex items-center justify-center h-4 w-4">
+                    <div className="ml-auto relative flex items-center justify-center h-5 w-5">
                       <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
-                      <Badge className="relative h-4 w-4 flex items-center justify-center text-[9px] bg-brand-yellow text-brand-blue border-none font-black rounded-full p-0 shadow-sm leading-none">
+                      <Badge className="relative h-5 w-5 flex items-center justify-center text-[10px] bg-brand-yellow text-brand-blue border-none font-black rounded-full p-0 shadow-sm leading-none">
                         {lowStockItems.length}
                       </Badge>
                     </div>
@@ -2795,10 +2792,10 @@ export default function App() {
                     e.preventDefault();
                     setIsUserManagementOpen(true);
                   }}
-                  className="w-full justify-start gap-3 h-8 px-3 rounded-lg data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-sm transition-all group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
-                  <div className="h-6.5 w-6.5 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <Users className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                    <Users className="h-4 w-4 text-brand-blue" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>User Management</span>
                 </TabsTrigger>
@@ -4263,7 +4260,7 @@ export default function App() {
           <div className="flex items-center justify-between relative z-10 w-full">
             <div className="flex items-center gap-4 text-left">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
-                <ClipboardCheck className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+                <Search className="h-5 w-5 text-brand-blue" strokeWidth={3} />
               </div>
               <div>
                 <DialogTitle className="text-base font-black uppercase tracking-wider text-white">Controlled Substances Reconciliation</DialogTitle>
