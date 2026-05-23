@@ -3970,7 +3970,7 @@ export default function App() {
           {/* Form */}
           <div className="space-y-4">
             <div className="space-y-1.5 text-left relative">
-              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Source Node (Relocating From)</label>
+              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Source Node</label>
               <div className="relative">
                 <Input
                   placeholder="Type to search source node..."
@@ -3986,7 +3986,7 @@ export default function App() {
                   }}
                   className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus-visible:ring-brand-blue placeholder:text-brand-grey/50"
                 />
-                {isSourceSearchFocused && (
+                {isSourceSearchFocused && migrationSourceSearch.trim() !== "" && (
                   <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-blue/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto left-0 top-full">
                     {allUserProfiles
                       .filter((p) => {
@@ -4041,15 +4041,15 @@ export default function App() {
 
             <div className="flex items-center justify-center py-1">
               <div className="h-10 w-10 bg-brand-yellow border border-brand-yellow/20 rounded-full flex items-center justify-center shadow-md relative overflow-hidden">
-                <svg className="h-5 w-5 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
-                  {/* Single downward blocky arrow: square stem with triangle head */}
-                  <path d="M10,4 H14 V12 H18 L12,19 L6,12 H10 Z" />
+                <svg className="h-6 w-6 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
+                  {/* Single downward bold/blocky arrow: wide square stem with large triangle head */}
+                  <path d="M8,3 H16 V11 H21 L12,21 L3,11 H8 Z" />
                 </svg>
               </div>
             </div>
 
             <div className="space-y-1.5 text-left relative">
-              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Destination Node (Migrating To)</label>
+              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Destination Node</label>
               <div className="relative">
                 <Input
                   placeholder="Type to search destination node..."
@@ -4065,7 +4065,7 @@ export default function App() {
                   }}
                   className="w-full h-11 px-3 border border-brand-blue/10 rounded-xl bg-brand-surface text-brand-dark-grey text-sm font-semibold focus-visible:ring-brand-blue placeholder:text-brand-grey/50"
                 />
-                {isDestSearchFocused && (
+                {isDestSearchFocused && migrationDestSearch.trim() !== "" && (
                   <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-blue/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto left-0 top-full">
                     {allUserProfiles
                       .filter((p) => {
@@ -4116,17 +4116,6 @@ export default function App() {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Warning Banner */}
-          <div className="p-3.5 bg-brand-yellow/10 border border-brand-yellow/30 rounded-xl flex gap-3 text-left">
-            <AlertTriangle className="h-5 w-5 text-brand-yellow shrink-0 mt-0.5" strokeWidth={3} />
-            <div className="space-y-1">
-              <p className="text-[10px] font-black uppercase text-brand-blue tracking-wide">Ledger Relocation Safe Notice</p>
-              <p className="text-[9px] text-brand-dark-grey/80 leading-relaxed">
-                All materials, audit records, and staff authorizations will be <span className="font-bold text-red-600">permanently purged</span> from the source node and <span className="font-bold text-green-600">reloaded</span> into the destination node. This action is authoritative and irreversible.
-              </p>
             </div>
           </div>
         </div>
