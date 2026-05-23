@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useRef, useMemo, FormEvent, Fragment } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, FormEvent, Fragment } from "react";
 import { 
   History,
   Clock,
@@ -470,7 +470,7 @@ export default function App() {
     );
     
     if (reconTxs.length === 0) {
-      return { date: "N/A", counts: {} as Record<string, number>, ref: "N/A" };
+      return { date: "N/A", counts: {} as Record<string, number>, ref: "N/A", timestampMs: 0 };
     }
     
     const sortedReconTxs = [...reconTxs].sort((a, b) => {
@@ -482,6 +482,7 @@ export default function App() {
     const latestRef = sortedReconTxs[0].referenceNumber || "";
     
     let lastDate = "N/A";
+    let lastReportTimestampMs = 0;
     const firstTxWithLatestRef = sortedReconTxs.find(t => t.referenceNumber === latestRef);
     if (firstTxWithLatestRef?.timestamp) {
       const ts = firstTxWithLatestRef.timestamp;
@@ -497,6 +498,7 @@ export default function App() {
       const dd = String(d.getDate()).padStart(2, '0');
       const yy = String(d.getFullYear()).slice(-2);
       lastDate = `${mm}/${dd}/${yy}`;
+      lastReportTimestampMs = d.getTime();
     }
     
     const counts: Record<string, number> = {};
@@ -504,8 +506,91 @@ export default function App() {
       counts[t.substanceId] = t.newStock;
     });
     
-    return { date: lastDate, counts, ref: latestRef };
+    return { date: lastDate, counts, ref: latestRef, timestampMs: lastReportTimestampMs };
   }, [transactions, reconRef]);
+
+  const getTimestampMs = useCallback((ts: any): number => {
+    if (!ts) return 0;
+    if (typeof ts.toDate === "function") {
+      return ts.toDate().getTime();
+    }
+    if (ts.seconds !== undefined) {
+      return ts.seconds * 1000 + (ts.nanoseconds || 0) / 1000000;
+    }
+    if (ts instanceof Date) {
+      return ts.getTime();
+    }
+    return new Date(ts).getTime();
+  }, []);
+
+  const getSubstanceHistoryMetrics = useCallback((subId: string) => {
+    const subTxs = transactions.filter(t => t.substanceId === subId);
+    
+    let lastClosingCount = 0;
+    let prevReportDate = "N/A";
+    
+    if (lastReport.ref !== "N/A" && lastReport.counts[subId] !== undefined) {
+      lastClosingCount = lastReport.counts[subId];
+      prevReportDate = lastReport.date;
+    } else {
+      if (subTxs.length > 0) {
+        const sortedSubTxs = [...subTxs].sort((a, b) => {
+          return getTimestampMs(a.timestamp) - getTimestampMs(b.timestamp);
+        });
+        lastClosingCount = sortedSubTxs[0].previousStock;
+        const oldestTs = sortedSubTxs[0].timestamp;
+        if (oldestTs) {
+          if (typeof oldestTs.toDate === "function") {
+            const d = oldestTs.toDate();
+            prevReportDate = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+          } else if (oldestTs instanceof Date) {
+            prevReportDate = `${String(oldestTs.getMonth() + 1).padStart(2, '0')}/${String(oldestTs.getDate()).padStart(2, '0')}/${String(oldestTs.getFullYear()).slice(-2)}`;
+          } else {
+            const d = new Date(oldestTs);
+            prevReportDate = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+          }
+        }
+      } else {
+        const currentSub = inventory.find(s => s.id === subId);
+        lastClosingCount = currentSub ? currentSub.currentStock : 0;
+      }
+    }
+    
+    const lastTime = lastReport.timestampMs;
+    const periodTxs = subTxs.filter(t => {
+      if (t.referenceNumber === reconRef) return false;
+      if (lastReport.ref !== "N/A" && t.referenceNumber === lastReport.ref) return false;
+      if (lastReport.ref !== "N/A") {
+        return getTimestampMs(t.timestamp) > lastTime;
+      }
+      return true;
+    });
+    
+    let purchases = 0;
+    let dispensed = 0;
+    let adjustments = 0;
+    
+    periodTxs.forEach(t => {
+      if (t.type === "IN") {
+        purchases += t.quantity;
+      } else if (t.type === "OUT") {
+        dispensed += t.quantity;
+      } else if (t.type === "ADJUST") {
+        adjustments += t.quantity;
+      }
+    });
+    
+    const expected = lastClosingCount + purchases - dispensed + adjustments;
+    
+    return {
+      lastClosingCount,
+      prevReportDate,
+      purchases,
+      dispensed,
+      adjustments,
+      expected
+    };
+  }, [transactions, lastReport, reconRef, inventory, getTimestampMs]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1462,8 +1547,8 @@ export default function App() {
     const missingReasons: string[] = [];
     substancesToReconcile.forEach(s => {
       const counted = Number(reconCounts[s.id]);
-      const startingCount = lastReport.counts[s.id] !== undefined ? lastReport.counts[s.id] : s.currentStock;
-      const variance = counted - startingCount;
+      const metrics = getSubstanceHistoryMetrics(s.id);
+      const variance = counted - metrics.expected;
       if (variance !== 0) {
         const reasonStr = reconReasons[s.id];
         if (!reasonStr || reasonStr.trim() === "") {
@@ -1504,8 +1589,8 @@ export default function App() {
 
       substancesToReconcile.forEach(s => {
         const physical = Number(reconCounts[s.id]);
-        const startingCount = lastReport.counts[s.id] !== undefined ? lastReport.counts[s.id] : s.currentStock;
-        const variance = physical - startingCount;
+        const metrics = getSubstanceHistoryMetrics(s.id);
+        const variance = physical - metrics.expected;
         const targetMedId = s.id;
 
         const newTxDoc = doc(transactionsRef);
@@ -1517,7 +1602,7 @@ export default function App() {
             ndc: s.ndc,
             type: "ADJUST",
             quantity: variance,
-            previousStock: startingCount,
+            previousStock: metrics.expected,
             newStock: physical,
             performedBy: user.uid,
             performedByName: performedByName,
@@ -1540,9 +1625,9 @@ export default function App() {
             strength: s.strength,
             ndc: s.ndc,
             type: "VERIFY",
-            quantity: startingCount,
-            previousStock: startingCount,
-            newStock: startingCount,
+            quantity: metrics.expected,
+            previousStock: metrics.expected,
+            newStock: metrics.expected,
             performedBy: user.uid,
             performedByName: performedByName,
             performedByTitle: performedByTitle,
@@ -4255,14 +4340,14 @@ export default function App() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      // Pre-fill all fields with their current Stock
+                      // Pre-fill all fields with their Calculated Expected Stock
                       const newCounts: Record<string, string> = {};
                       inventory.forEach(s => {
-                        const startingCount = lastReport.counts[s.id] !== undefined ? lastReport.counts[s.id] : s.currentStock;
-                        newCounts[s.id] = String(startingCount);
+                        const metrics = getSubstanceHistoryMetrics(s.id);
+                        newCounts[s.id] = String(metrics.expected);
                       });
                       setReconCounts(newCounts);
-                      toast.success("Accounts matched to starting counts");
+                      toast.success("Accounts matched to calculated expected stock");
                     }}
                     className="h-8 text-[10px] font-black uppercase tracking-wider border-brand-blue/10 text-brand-blue hover:bg-brand-blue/5 hover:border-brand-blue/20"
                   >
@@ -4278,11 +4363,11 @@ export default function App() {
                     </div>
                   ) : (
                     inventory.map((sub) => {
-                      const startingCount = lastReport.counts[sub.id] !== undefined ? lastReport.counts[sub.id] : sub.currentStock;
+                      const metrics = getSubstanceHistoryMetrics(sub.id);
                       const enteredVal = reconCounts[sub.id] || "";
                       const counted = enteredVal === "" ? undefined : Number(enteredVal);
-                      const hasVariance = counted !== undefined && counted !== startingCount;
-                      const varianceAmount = counted !== undefined ? counted - startingCount : 0;
+                      const hasVariance = counted !== undefined && counted !== metrics.expected;
+                      const varianceAmount = counted !== undefined ? counted - metrics.expected : 0;
                       
                       return (
                         <div key={sub.id} className="p-4 flex flex-col gap-3 justify-between text-left">
@@ -4297,20 +4382,38 @@ export default function App() {
                             </div>
 
                             <div className="flex items-center gap-4 shrink-0">
-                              {/* Last Report Date Info */}
-                              <div className="text-right">
-                                <span className="text-[9px] font-black uppercase text-brand-grey block">Last Report</span>
-                                <span className="text-xs font-mono font-black text-brand-blue">{lastReport.date}</span>
-                              </div>
-
                               {/* Starting Count Info */}
                               <div className="text-right">
-                                <span className="text-[9px] font-black uppercase text-brand-grey block">Starting Count</span>
-                                <span className="text-xs font-black text-brand-dark-grey">{startingCount} {sub.unit || "Units"}</span>
+                                <span className="text-[9px] font-black uppercase text-brand-grey block">Starting ({metrics.prevReportDate})</span>
+                                <span className="text-xs font-black text-brand-dark-grey/70">{metrics.lastClosingCount}</span>
+                              </div>
+
+                              {/* Activity details */}
+                              <div className="text-right">
+                                <span className="text-[9px] font-black uppercase text-brand-grey block">Purchases</span>
+                                <span className="text-xs font-mono font-black text-emerald-600">+{metrics.purchases}</span>
+                              </div>
+
+                              <div className="text-right">
+                                <span className="text-[9px] font-black uppercase text-brand-grey block">Dispensed</span>
+                                <span className="text-xs font-mono font-black text-rose-600">-{metrics.dispensed}</span>
+                              </div>
+
+                              <div className="text-right">
+                                <span className="text-[9px] font-black uppercase text-brand-grey block">Adjust</span>
+                                <span className={`text-xs font-mono font-black ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                  {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
+                                </span>
+                              </div>
+
+                              {/* Expected Info */}
+                              <div className="text-right bg-brand-blue/5 px-2 py-1 rounded-lg border border-brand-blue/10">
+                                <span className="text-[9px] font-black uppercase text-brand-blue block">Expected</span>
+                                <span className="text-xs font-mono font-black text-brand-blue">{metrics.expected}</span>
                               </div>
 
                               {/* Count Input */}
-                              <div className="w-24">
+                              <div className="w-20">
                                 <Input
                                   type="number"
                                   min="0"
@@ -4325,9 +4428,9 @@ export default function App() {
                               </div>
 
                               {/* Dynamic Variance Column */}
-                              <div className="w-28 text-center flex justify-end">
+                              <div className="w-24 text-center flex justify-end">
                                 {counted === undefined ? (
-                                  <span className="text-xs text-brand-grey/50 font-medium">Pending count...</span>
+                                  <span className="text-[10px] text-brand-grey/50 font-medium whitespace-nowrap">Pending count...</span>
                                 ) : varianceAmount === 0 ? (
                                   <Badge className="bg-green-100 hover:bg-green-100/90 text-green-700 hover:text-green-700/90 border-none font-bold text-[10px] h-6 px-2.5">
                                     <Check className="h-3 w-3 mr-1" strokeWidth={3} /> Match
@@ -4490,29 +4593,37 @@ export default function App() {
                         <tr className="border-b-2 border-gray-200 text-left">
                           <th className="py-2 text-left font-bold">PREVIOUS DATE</th>
                           <th className="py-2 text-right font-bold">FINAL COUNT</th>
+                          <th className="py-2 text-right font-bold">PURCHASES</th>
+                          <th className="py-2 text-right font-bold">DISPENSED</th>
+                          <th className="py-2 text-right font-bold">ADJUSTMENTS</th>
+                          <th className="py-2 text-right font-bold">EXPECTED COUNT</th>
                           <th className="py-2 text-left font-bold pl-4">MEDICATION / NDC</th>
-                          <th className="py-2 text-center font-bold">SCHEDULE</th>
                           <th className="py-2 text-right font-bold">PHYSICAL COUNT</th>
                           <th className="py-2 text-right font-bold">VARIANCE</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
                         {inventory.map(sub => {
-                          const startingCount = lastReport.counts[sub.id] !== undefined ? lastReport.counts[sub.id] : sub.currentStock;
+                          const metrics = getSubstanceHistoryMetrics(sub.id);
                           const counted = Number(reconCounts[sub.id]) || 0;
-                          const variance = counted - startingCount;
+                          const variance = counted - metrics.expected;
                           const reason = reconReasons[sub.id] || "";
                           
                           return (
                             <Fragment key={sub.id}>
                               <tr className="h-12 text-left">
-                                <td className="py-2 text-left text-gray-500 font-medium">{lastReport.date}</td>
-                                <td className="py-2 text-right text-gray-500 font-medium">{startingCount} {sub.unit || "Units"}</td>
+                                <td className="py-2 text-left text-gray-500 font-medium">{metrics.prevReportDate}</td>
+                                <td className="py-2 text-right text-gray-500 font-medium">{metrics.lastClosingCount}</td>
+                                <td className="py-2 text-right text-emerald-600 font-medium">+{metrics.purchases}</td>
+                                <td className="py-2 text-right text-rose-600 font-medium">-{metrics.dispensed}</td>
+                                <td className={`py-2 text-right font-medium ${metrics.adjustments === 0 ? 'text-gray-500' : metrics.adjustments > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                  {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
+                                </td>
+                                <td className="py-2 text-right text-brand-blue font-bold">{metrics.expected}</td>
                                 <td className="py-2 text-left pl-4">
                                   <span className="font-bold">{sub.name}</span>
-                                  <span className="block text-[9px] text-gray-500">{sub.ndc} • {sub.strength}</span>
+                                  <span className="block text-[9px] text-gray-500">{sub.ndc} • {sub.strength} • {sub.schedule}</span>
                                 </td>
-                                <td className="py-2 text-center">{sub.schedule}</td>
                                 <td className="py-2 text-right">{counted} {sub.unit || "Units"}</td>
                                 <td className={`py-2 text-right font-bold ${variance === 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
@@ -4520,7 +4631,7 @@ export default function App() {
                               </tr>
                               {variance !== 0 && (
                                 <tr className="bg-gray-50/50">
-                                  <td colSpan={6} className="py-2 pl-4 text-left border-l-2 border-red-400 text-[10px] text-gray-600 italic">
+                                  <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-red-400 text-[10px] text-gray-600 italic">
                                     Discrepancy Reason: {reason || "State reason omitted"}
                                   </td>
                                 </tr>
