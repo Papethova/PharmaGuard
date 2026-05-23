@@ -2610,26 +2610,27 @@ export default function App() {
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
 
-                <div className="pl-6 pr-2 -my-1 flex flex-col gap-1 w-full shrink-0">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      // Generate a standard reference number
-                      const randomId = Math.floor(100000 + Math.random() * 900000);
-                      setReconRef(`RECON-${randomId}`);
-                      // Reset reconciliation forms
-                      setReconCounts({});
-                      setReconReasons({});
-                      setReconUser("");
-                      setReconWitness("");
-                      setIsReconOpen(true);
-                    }}
-                    className="w-full justify-start gap-2.5 h-10 px-3 py-2 bg-brand-blue/10 hover:bg-brand-blue/20 border border-brand-blue/15 text-brand-blue text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 text-left shrink-0"
-                  >
-                    <ClipboardCheck className="h-4 w-4 text-brand-blue shrink-0" strokeWidth={3} />
-                    RECONCILIATION REPORT
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    // Generate a standard reference number
+                    const randomId = Math.floor(100000 + Math.random() * 900000);
+                    setReconRef(`RECON-${randomId}`);
+                    // Reset reconciliation forms
+                    setReconCounts({});
+                    setReconReasons({});
+                    setReconUser("");
+                    setReconWitness("");
+                    setReconShowPreview(false);
+                    setIsReconOpen(true);
+                  }}
+                  className="w-full justify-start gap-4 h-14 px-5 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent text-base group shadow-none transition-all"
+                >
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                    <ClipboardCheck className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                  </div>
+                  <span className={`whitespace-nowrap leading-none ${isReconOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Recon Report</span>
+                </Button>
                 <TabsTrigger 
                   value="alerts" 
                   className="w-full justify-start gap-4 h-14 px-5 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
