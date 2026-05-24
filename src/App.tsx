@@ -4304,7 +4304,7 @@ export default function App() {
               <div className="p-6 space-y-5">
                 
                 {/* Meta details */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
                   <div className="space-y-1.5 text-left">
                     <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Performed By *</Label>
                     <Select value={reconUser} onValueChange={setReconUser}>
@@ -4313,23 +4313,6 @@ export default function App() {
                       </SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {users.map(u => (
-                          <SelectItem key={u.id} value={u.id} className="text-xs text-brand-dark-grey">
-                            {u.name} {u.title && `(${u.title})`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-1.5 text-left">
-                    <Label htmlFor="recon-witness" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Witness Staff (Optional)</Label>
-                    <Select value={reconWitness} onValueChange={setReconWitness}>
-                      <SelectTrigger id="recon-witness" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-9 text-xs font-semibold">
-                        <SelectValue placeholder="No Witness" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-brand-surface">
-                        <SelectItem value="none" className="text-xs text-brand-dark-grey">None / Direct Audit</SelectItem>
-                        {users.filter(u => u.id !== reconUser).map(u => (
                           <SelectItem key={u.id} value={u.id} className="text-xs text-brand-dark-grey">
                             {u.name} {u.title && `(${u.title})`}
                           </SelectItem>
@@ -4427,7 +4410,7 @@ export default function App() {
                                           Deficit: {varianceAmount}
                                         </Badge>
                                       ) : (
-                                        <Badge className="bg-brand-light-grey hover:bg-brand-light-grey text-brand-blue hover:text-brand-blue/90 border border-brand-blue/10 font-black text-[10px] h-6 px-2.5">
+                                        <Badge className="bg-brand-blue hover:bg-brand-blue/90 text-brand-yellow hover:text-brand-yellow border border-brand-blue/20 font-black text-[10px] h-6 px-2.5 shadow-sm">
                                           Surplus: +{varianceAmount}
                                         </Badge>
                                       )}
