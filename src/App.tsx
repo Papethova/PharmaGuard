@@ -4368,7 +4368,7 @@ export default function App() {
                                   <td className="text-left font-semibold pl-4 border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <div className="flex flex-row items-center gap-2 flex-wrap">
                                       <span className="font-bold text-black text-xs">{sub.name} {sub.strength}</span>
-                                      <span className="text-[9px] text-brand-blue font-mono font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
+                                      <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
                                     </div>
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80" style={{ verticalAlign: 'middle' }}>
