@@ -530,9 +530,14 @@ export default function App() {
     let lastClosingCount = 0;
     let prevReportDate = "N/A";
     
-    if (lastReport.ref !== "N/A" && lastReport.counts[subId] !== undefined) {
-      lastClosingCount = lastReport.counts[subId];
-      prevReportDate = lastReport.date;
+    if (lastReport.ref !== "N/A") {
+      if (lastReport.counts[subId] !== undefined) {
+        lastClosingCount = lastReport.counts[subId];
+        prevReportDate = lastReport.date;
+      } else {
+        lastClosingCount = 0;
+        prevReportDate = lastReport.date;
+      }
     } else {
       if (subTxs.length > 0) {
         const sortedSubTxs = [...subTxs].sort((a, b) => {
@@ -4354,26 +4359,26 @@ export default function App() {
                 {/* Substance Table List */}
                 <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col h-[400px] min-h-0">
                   <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
-                    <Table className="w-full border-separate border-spacing-0 text-xs text-left">
-                      <TableHeader className="sticky top-0 z-40 bg-brand-blue">
-                        <TableRow className="bg-brand-blue hover:bg-brand-blue">
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-left pl-4 bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Medication</TableHead>
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Last Report</TableHead>
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Purchases</TableHead>
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Dispensed</TableHead>
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Adjusted</TableHead>
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Expected</TableHead>
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30">Physical Count</TableHead>
-                          <TableHead className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 pr-4">Variance</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
+                    <table className="w-full border-separate border-spacing-0 text-xs text-left">
+                      <thead className="sticky top-0 z-40 bg-brand-blue">
+                        <tr className="bg-brand-blue hover:bg-brand-blue border-none">
+                          <th className="font-semibold text-xs tracking-wider text-white text-left pl-4 bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 pl-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Last Report ({lastReport.date})</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchases</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Dispensed</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Adjusted</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Expected</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Physical Count</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 pr-4 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
                         {inventory.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={8} className="text-center py-12 text-brand-dark-grey/50">
+                          <tr className="border-b border-brand-blue/10">
+                            <td colSpan={8} className="text-center py-12 text-brand-dark-grey/50 align-middle">
                               No medications are matching the current node registry list.
-                            </TableCell>
-                          </TableRow>
+                            </td>
+                          </tr>
                         ) : (
                           inventory.map((sub) => {
                             const metrics = getSubstanceHistoryMetrics(sub.id);
@@ -4384,29 +4389,28 @@ export default function App() {
                             
                             return (
                               <Fragment key={sub.id}>
-                                <TableRow className="h-14 hover:bg-brand-blue/5 border-b border-brand-blue/10">
-                                  <TableCell className="text-left font-semibold pl-4">
-                                    <span className="font-bold text-brand-blue">{sub.name} <span className="text-brand-dark-grey/50 font-normal ml-1">({sub.strength})</span></span>
-                                    <span className="block text-[10px] text-brand-dark-grey/60 font-mono mt-0.5">{sub.ndc}</span>
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <div className="text-[10px] text-brand-grey/50 font-mono">{metrics.prevReportDate}</div>
-                                    <div className="text-xs font-black text-brand-dark-grey/70 mt-0.5">{metrics.lastClosingCount}</div>
-                                  </TableCell>
-                                  <TableCell className="text-center font-mono font-black text-brand-blue/90 text-xs">
+                                <tr className="h-14 hover:bg-brand-blue/5 border-b border-brand-blue/10">
+                                  <td className="text-left font-semibold pl-4 border-b border-brand-blue/10 h-14 py-0" style={{ verticalAlign: 'middle' }}>
+                                    <span className="font-bold text-black text-xs block leading-tight">{sub.name} {sub.strength}</span>
+                                    <span className="block text-[10px] text-brand-blue font-sans mt-0.5 leading-none">{sub.ndc}</span>
+                                  </td>
+                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-dark-grey/80" style={{ verticalAlign: 'middle' }}>
+                                    {metrics.lastClosingCount}
+                                  </td>
+                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
                                     +{metrics.purchases}
-                                  </TableCell>
-                                  <TableCell className="text-center font-mono font-black text-brand-grey text-xs">
+                                  </td>
+                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-grey" style={{ verticalAlign: 'middle' }}>
                                     -{metrics.dispensed}
-                                  </TableCell>
-                                  <TableCell className={`text-center font-mono font-black text-xs ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-brand-blue/90' : 'text-brand-grey'}`}>
+                                  </td>
+                                  <td className={`text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-brand-blue/90' : 'text-brand-grey'}`} style={{ verticalAlign: 'middle' }}>
                                     {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
-                                  </TableCell>
-                                  <TableCell className="text-center font-mono font-black text-brand-blue text-xs">
+                                  </td>
+                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
                                     {metrics.expected}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <div className="flex justify-center">
+                                  </td>
+                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0" style={{ verticalAlign: 'middle' }}>
+                                    <div className="flex justify-center items-center">
                                       <Input
                                         type="number"
                                         min="0"
@@ -4419,9 +4423,9 @@ export default function App() {
                                         className="h-9 w-20 text-xs text-center font-bold border-brand-blue/10 focus:border-brand-blue bg-brand-surface"
                                       />
                                     </div>
-                                  </TableCell>
-                                  <TableCell className="text-center pr-4">
-                                    <div className="flex justify-center">
+                                  </td>
+                                  <td className="text-center pr-4 border-b border-brand-blue/10 h-14 py-0" style={{ verticalAlign: 'middle' }}>
+                                    <div className="flex justify-center items-center">
                                       {counted === undefined ? (
                                         <span className="text-[10px] text-brand-grey/50 font-medium whitespace-nowrap">Pending...</span>
                                       ) : varianceAmount === 0 ? (
@@ -4429,20 +4433,20 @@ export default function App() {
                                           <Check className="h-3 w-3 mr-1" strokeWidth={3} /> Match
                                         </Badge>
                                       ) : varianceAmount < 0 ? (
-                                        <Badge className="bg-brand-light-grey hover:bg-brand-light-grey text-brand-blue hover:text-brand-blue/90 border border-brand-blue/10 font-black text-[10px] h-6 px-2.5">
+                                        <Badge className="bg-brand-yellow hover:bg-brand-yellow text-brand-blue hover:text-brand-blue border border-brand-yellow/40 font-black text-[10px] h-6 px-2.5 shadow-sm">
                                           Deficit: {varianceAmount}
                                         </Badge>
                                       ) : (
-                                        <Badge className="bg-brand-yellow/10 hover:bg-brand-yellow/20 text-brand-blue hover:text-brand-blue border border-brand-yellow/30 font-black text-[10px] h-6 px-2.5">
+                                        <Badge className="bg-brand-light-grey hover:bg-brand-light-grey text-brand-blue hover:text-brand-blue/90 border border-brand-blue/10 font-black text-[10px] h-6 px-2.5">
                                           Surplus: +{varianceAmount}
                                         </Badge>
                                       )}
                                     </div>
-                                  </TableCell>
-                                </TableRow>
+                                  </td>
+                                </tr>
                                 {hasVariance && (
-                                  <TableRow className="bg-brand-blue/[0.02] hover:bg-brand-blue/[0.02]">
-                                    <TableCell colSpan={8} className="p-3 pl-4 pr-4 border-b border-brand-blue/10">
+                                  <tr className="bg-brand-blue/[0.02] hover:bg-brand-blue/[0.02]">
+                                    <td colSpan={8} className="p-3 pl-4 pr-4 border-b border-brand-blue/10">
                                       <div className="w-full bg-brand-blue/5 border border-brand-blue/10 rounded-lg p-2.5">
                                         <Label className="text-[9px] uppercase font-black text-brand-blue block mb-1">State explanation for discrepancy *</Label>
                                         <Input
@@ -4455,15 +4459,15 @@ export default function App() {
                                           className="h-8 text-xs border-brand-blue/10 focus:border-brand-blue rounded-lg placeholder:text-brand-grey/50 bg-brand-surface"
                                         />
                                       </div>
-                                    </TableCell>
-                                  </TableRow>
+                                    </td>
+                                  </tr>
                                 )}
                               </Fragment>
                             );
                           })
                         )}
-                      </TableBody>
-                    </Table>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
