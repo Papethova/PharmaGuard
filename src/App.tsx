@@ -499,6 +499,7 @@ export default function App() {
   const [isReconSubmitting, setIsReconSubmitting] = useState(false);
   const [reconShowPreview, setReconShowPreview] = useState(false);
   const reconCanvasRef = useRef<any>(null);
+  const [reconSigData, setReconSigData] = useState<string | null>(null);
 
   const lastReport = useMemo(() => {
     const reconTxs = transactions.filter(t => 
@@ -1601,8 +1602,8 @@ export default function App() {
       return;
     }
 
-    let signature = "";
-    if (reconCanvasRef.current) {
+    let signature = reconSigData || "";
+    if (!signature && reconCanvasRef.current) {
       const trimmedCanvas = trimSignatureCanvas(reconCanvasRef.current);
       if (trimmedCanvas) {
         signature = trimmedCanvas.toDataURL("image/png");
@@ -2782,6 +2783,7 @@ export default function App() {
                     setReconReasons({});
                     setReconUser("");
                     setReconWitness("");
+                    setReconSigData(null);
                     setReconShowPreview(false);
                     setIsReconOpen(true);
                   }}
@@ -4446,38 +4448,104 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Signature canvas */}
+                {/* Two interactive signature fields */}
                 <div className="mt-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-surface space-y-4">
-                  <div className="space-y-2">
-                    <Label className="flex justify-between items-center text-brand-dark-grey text-xs font-semibold">
-                      Authorizing Sign-Off *
-                      <Button 
-                        type="button"
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          reconCanvasRef.current?.clear();
-                        }}
-                      >
-                        Clear Canvas
-                      </Button>
-                    </Label>
-                    <div className="border border-brand-blue/10 rounded-xl bg-brand-blue/5 overflow-hidden">
-                      <SignatureCanvas 
-                        ref={reconCanvasRef}
-                        penColor="#0d3151"
-                        canvasProps={{
-                          id: "reconciliation-signature-canvas",
-                          className: "w-full h-20 cursor-crosshair"
-                        }}
-                      />
-                    </div>
-                    <p className="text-[9px] text-brand-grey font-medium leading-normal text-left">
-                      By executing this report, you certify under penalty of active compliance tracking that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
-                    </p>
+                  <div className="flex justify-between items-center pb-2 border-b border-brand-blue/10">
+                    <span className="text-xs font-black uppercase tracking-wider text-brand-blue/80">Authorizing Signatures</span>
+                    <Button 
+                      type="button"
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 text-[10px] text-brand-blue hover:text-brand-blue/80 px-2 font-bold bg-brand-blue/5 hover:bg-brand-blue/10 rounded-lg shrink-0 gap-1"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        reconCanvasRef.current?.clear();
+                        setReconSigData(null);
+                      }}
+                    >
+                      Clear Signature
+                    </Button>
                   </div>
+
+                  {(() => {
+                    const reconUserObj = users.find(u => u.id === reconUser);
+                    const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
+                    
+                    return (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Left Sign-off: Performed By */}
+                        <div className="border border-brand-blue/15 p-4 rounded-xl relative h-36 flex flex-col justify-between bg-brand-blue/[0.02]">
+                          <div className="flex justify-between items-start gap-2">
+                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">Performed By</span>
+                            <span className="text-[10px] text-brand-blue/70 font-bold font-sans text-right truncate max-w-[150px]">
+                              {reconUserObj?.name || ""}
+                            </span>
+                          </div>
+                          <div className="flex-1 flex items-center justify-center my-1 relative overflow-hidden rounded-lg bg-white/50 border border-brand-blue/5">
+                            {reconSigData ? (
+                              <img src={reconSigData} className="max-h-16 object-contain" alt="Captured signature" referrerPolicy="no-referrer" />
+                            ) : (
+                              <div className="absolute inset-0 flex flex-col">
+                                <SignatureCanvas 
+                                  ref={reconCanvasRef}
+                                  penColor="#0d3151"
+                                  onEnd={() => {
+                                    if (reconCanvasRef.current) {
+                                      const canvas = reconCanvasRef.current.getCanvas ? reconCanvasRef.current.getCanvas() : reconCanvasRef.current;
+                                      if (canvas) {
+                                        const trimmed = trimSignatureCanvas(canvas);
+                                        if (trimmed) {
+                                          setReconSigData(trimmed.toDataURL("image/png"));
+                                        }
+                                      }
+                                    }
+                                  }}
+                                  canvasProps={{
+                                    id: "reconciliation-signature-canvas",
+                                    className: "w-full h-full cursor-crosshair bg-transparent"
+                                  }}
+                                />
+                                <div className="absolute inset-x-0 bottom-1 flex justify-center pointer-events-none select-none">
+                                  <span className="text-[8px] uppercase tracking-widest text-brand-blue/30 font-bold bg-white/80 px-1.5 py-0.5 rounded shadow-sm border border-brand-blue/5">Sign here</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex justify-between items-end border-t border-brand-blue/10 pt-1.5 leading-none">
+                            <span className="text-[9px] text-brand-blue/50 font-mono">Title: {reconUserObj?.title || "RPh"}</span>
+                            <span className="text-[10px] font-black text-brand-blue">{reconUserObj?.name || ""}</span>
+                          </div>
+                        </div>
+
+                        {/* Right Sign-off: PIC */}
+                        <div className="border border-brand-blue/15 p-4 rounded-xl relative h-36 flex flex-col justify-between bg-brand-blue/[0.02]">
+                          <div className="flex justify-between items-start gap-2">
+                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">PIC</span>
+                            <span className="text-[10px] text-brand-blue/70 font-bold font-sans text-right truncate max-w-[150px]">
+                              {picUserObj?.name || ""}
+                            </span>
+                          </div>
+                          <div className="flex-1 flex items-center justify-center my-1 rounded-lg bg-white/50 border border-brand-blue/5">
+                            {reconSigData ? (
+                              <img src={reconSigData} className="max-h-16 object-contain" alt="PIC captured signature" referrerPolicy="no-referrer" />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center text-center p-3 select-none">
+                                <span className="text-[8px] uppercase tracking-wider text-brand-blue/30 font-bold">Awaiting signature</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex justify-between items-end border-t border-brand-blue/10 pt-1.5 leading-none">
+                            <span className="text-[9px] text-brand-blue/50 font-mono">Title: PIC</span>
+                            <span className="text-[10px] font-black text-brand-blue">{picUserObj?.name || "PIC NOT ASSIGNED"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <p className="text-[9px] text-brand-grey font-medium leading-normal text-left">
+                    By executing this report, you certify under penalty of active compliance tracking that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+                  </p>
                 </div>
 
               </div>
@@ -4635,8 +4703,7 @@ export default function App() {
 
                   {/* Signature box info */}
                   {(() => {
-                    const trimmed = trimSignatureCanvas(reconCanvasRef.current);
-                    const sigImgUrl = trimmed ? trimmed.toDataURL("image/png") : null;
+                    const sigImgUrl = reconSigData;
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
                     
