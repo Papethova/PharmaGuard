@@ -4590,16 +4590,26 @@ export default function App() {
                   <div className="space-y-4">
                     <h3 className="text-xs font-bold tracking-wider uppercase font-mono border-b border-gray-300 pb-1">RECONCILED CONTROLLED INVENTORY STATEMENT</h3>
                     <table className="w-full text-xs font-mono">
+                      <colgroup>
+                        <col className="w-[30%]" />
+                        <col className="w-[12%]" />
+                        <col className="w-[9%]" />
+                        <col className="w-[9%]" />
+                        <col className="w-[9%]" />
+                        <col className="w-[11%]" />
+                        <col className="w-[11%]" />
+                        <col className="w-[9%]" />
+                      </colgroup>
                       <thead>
-                        <tr className="border-b-2 border-gray-200 text-left">
-                          <th className="py-2 text-left font-bold">LAST REPORT COUNT</th>
-                          <th className="py-2 text-right font-bold">PURCHASES</th>
-                          <th className="py-2 text-right font-bold">DISPENSED</th>
-                          <th className="py-2 text-right font-bold">ADJUSTED</th>
-                          <th className="py-2 text-right font-bold">EXPECTED COUNT</th>
-                          <th className="py-2 text-left font-bold pl-4">MEDICATION / NDC</th>
-                          <th className="py-2 text-right font-bold">PHYSICAL COUNT</th>
-                          <th className="py-2 text-right font-bold">VARIANCE</th>
+                        <tr className="border-b-2 border-gray-200">
+                          <th className="py-2 text-left font-bold">MEDICATION / NDC</th>
+                          <th className="py-2 text-center font-bold">LAST REPORT</th>
+                          <th className="py-2 text-center font-bold">PURCHASES</th>
+                          <th className="py-2 text-center font-bold">DISPENSED</th>
+                          <th className="py-2 text-center font-bold">ADJUSTED</th>
+                          <th className="py-2 text-center font-bold">EXPECTED COUNT</th>
+                          <th className="py-2 text-center font-bold">PHYSICAL COUNT</th>
+                          <th className="py-2 text-center font-bold">VARIANCE</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -4611,23 +4621,23 @@ export default function App() {
                           
                           return (
                             <Fragment key={sub.id}>
-                              <tr className="h-12 text-left">
-                                <td className="py-2 text-left text-gray-700 font-medium">
-                                  <span className="font-bold">{metrics.lastClosingCount}</span>
-                                  <span className="block text-[9px] text-gray-400 font-normal">Last: {metrics.prevReportDate}</span>
+                              <tr className="h-12">
+                                <td className="py-2 text-left">
+                                  <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
+                                  <span className="block text-[9px] text-gray-400 mt-0.5">{sub.ndc}</span>
                                 </td>
-                                <td className="py-2 text-right text-gray-900 font-bold">+{metrics.purchases}</td>
-                                <td className="py-2 text-right text-gray-500">-{metrics.dispensed}</td>
-                                <td className={`py-2 text-right font-medium ${metrics.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
+                                <td className="py-2 text-center text-gray-700">
+                                  <div className="text-[10px] text-gray-400 font-normal">{metrics.prevReportDate}</div>
+                                  <div className="font-bold text-gray-900 mt-0.5">{metrics.lastClosingCount}</div>
+                                </td>
+                                <td className="py-2 text-center text-gray-900 font-bold">+{metrics.purchases}</td>
+                                <td className="py-2 text-center text-gray-500">-{metrics.dispensed}</td>
+                                <td className={`py-2 text-center font-medium ${metrics.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
                                   {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                 </td>
-                                <td className="py-2 text-right text-brand-blue font-bold">{metrics.expected}</td>
-                                <td className="py-2 text-left pl-4">
-                                  <span className="font-bold text-gray-900">{sub.name}</span>
-                                  <span className="block text-[9px] text-gray-500">{sub.ndc} • {sub.strength} • {sub.schedule}</span>
-                                </td>
-                                <td className="py-2 text-right text-gray-900 font-bold">{counted} {sub.unit || "Units"}</td>
-                                <td className={`py-2 text-right font-black ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
+                                <td className="py-2 text-center text-brand-blue font-bold">{metrics.expected}</td>
+                                <td className="py-2 text-center text-gray-900 font-bold">{counted} {sub.unit || "Units"}</td>
+                                <td className={`py-2 text-center font-black ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
                                   {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
                                 </td>
                               </tr>
