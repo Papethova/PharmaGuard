@@ -4467,8 +4467,8 @@ export default function App() {
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Left Sign-off: Performed By */}
-                        <div className="border border-brand-blue/15 p-4 rounded-xl relative h-36 flex flex-col justify-between bg-brand-blue/[0.02]">
-                          <div className="flex justify-between items-center gap-2">
+                        <div className="flex flex-col h-40">
+                          <div className="flex justify-between items-center gap-2 mb-1.5 px-1">
                             <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1 min-w-0">
                               <span>Performed By:</span>
                               <span className="text-brand-blue/70 font-bold normal-case font-sans truncate">
@@ -4489,9 +4489,9 @@ export default function App() {
                               Clear
                             </Button>
                           </div>
-                          <div className="flex-1 flex items-center justify-center my-1 relative overflow-hidden rounded-lg bg-white/50 border border-brand-blue/5">
+                          <div className="flex-1 relative overflow-hidden rounded-xl border border-brand-blue/15 bg-brand-blue/[0.02] flex items-center justify-center">
                             {reconSigData ? (
-                              <img src={reconSigData} className="max-h-16 object-contain" alt="Captured signature" referrerPolicy="no-referrer" />
+                              <img src={reconSigData} className="max-h-24 p-2 object-contain" alt="Captured signature" referrerPolicy="no-referrer" />
                             ) : (
                               <div className="absolute inset-0 flex flex-col">
                                 <SignatureCanvas 
@@ -4519,8 +4519,8 @@ export default function App() {
                         </div>
 
                         {/* Right Sign-off: PIC */}
-                        <div className="border border-brand-blue/15 p-4 rounded-xl relative h-36 flex flex-col justify-between bg-brand-blue/[0.02]">
-                          <div className="flex justify-between items-center gap-2">
+                        <div className="flex flex-col h-40">
+                          <div className="flex justify-between items-center gap-2 mb-1.5 px-1">
                             <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1 min-w-0">
                               <span>PIC:</span>
                               <span className="text-brand-blue/70 font-bold normal-case font-sans truncate">
@@ -4541,9 +4541,9 @@ export default function App() {
                               Clear
                             </Button>
                           </div>
-                          <div className="flex-1 flex items-center justify-center my-1 relative overflow-hidden rounded-lg bg-white/50 border border-brand-blue/5">
+                          <div className="flex-1 relative overflow-hidden rounded-xl border border-brand-blue/15 bg-brand-blue/[0.02] flex items-center justify-center">
                             {picSigData ? (
-                              <img src={picSigData} className="max-h-16 object-contain" alt="PIC captured signature" referrerPolicy="no-referrer" />
+                              <img src={picSigData} className="max-h-24 p-2 object-contain" alt="PIC captured signature" referrerPolicy="no-referrer" />
                             ) : (
                               <div className="absolute inset-0 flex flex-col">
                                 <SignatureCanvas 
