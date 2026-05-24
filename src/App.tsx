@@ -4337,7 +4337,7 @@ export default function App() {
                         <tr className="bg-brand-blue hover:bg-brand-blue border-none">
                           <th className="font-semibold text-xs tracking-wider text-white text-left pl-4 bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 pl-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Last Report ({lastReport.date})</th>
-                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchases</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchased</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Dispensed</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Adjusted</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Expected</th>
@@ -4578,7 +4578,7 @@ export default function App() {
                         <tr className="border-b-2 border-gray-200">
                           <th className="py-2 text-left font-bold">MEDICATION / NDC</th>
                           <th className="py-2 text-center font-bold">LAST REPORT</th>
-                          <th className="py-2 text-center font-bold">PURCHASES</th>
+                          <th className="py-2 text-center font-bold">PURCHASED</th>
                           <th className="py-2 text-center font-bold">DISPENSED</th>
                           <th className="py-2 text-center font-bold">ADJUSTED</th>
                           <th className="py-2 text-center font-bold">EXPECTED COUNT</th>
@@ -4630,37 +4630,58 @@ export default function App() {
                   </div>
 
                   {/* Signature box info */}
-                  <div className="grid grid-cols-2 gap-8 pt-8">
-                    <div className="border-t border-black pt-3">
-                      <span className="text-[10px] text-gray-500 font-mono block">PHARMACIST COGNIZANT ATTRIBUTE SIGNATURE</span>
-                      {reconCanvasRef.current && (
-                        <div className="mt-2 h-14 w-full flex items-center justify-center bg-gray-50 rounded">
-                          {(() => {
-                            const trimmed = trimSignatureCanvas(reconCanvasRef.current);
-                            return trimmed ? (
-                              <img src={trimmed.toDataURL("image/png")} className="max-h-12 object-contain" alt="Pharmacist signature" />
+                  {(() => {
+                    const trimmed = trimSignatureCanvas(reconCanvasRef.current);
+                    const sigImgUrl = trimmed ? trimmed.toDataURL("image/png") : null;
+                    const reconUserObj = users.find(u => u.id === reconUser);
+                    const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
+                    
+                    return (
+                      <div className="grid grid-cols-2 gap-8 pt-8">
+                        {/* Left signature field */}
+                        <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
+                          <div className="flex justify-between items-start">
+                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PERFORMED BY</span>
+                            <span className="text-[10px] text-gray-500 font-mono font-bold text-right truncate max-w-[180px]">
+                              {reconUserObj?.name || ""}
+                            </span>
+                          </div>
+                          <div className="flex-1 flex items-center justify-center my-1">
+                            {sigImgUrl ? (
+                              <img src={sigImgUrl} className="max-h-16 object-contain" alt="Performed by signature" />
                             ) : (
                               <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
-                            );
-                          })()}
-                        </div>
-                      )}
-                      <span className="text-xs font-bold block mt-2">{users.find(u => u.id === reconUser)?.name}</span>
-                      <span className="text-[9px] text-gray-400 font-mono block">Title Code: {users.find(u => u.id === reconUser)?.title || "RPh"}</span>
-                    </div>
-                    <div className="border-t border-black pt-3">
-                      <span className="text-[10px] text-gray-500 font-mono block">CO-SIGNING WITNESS OR SYSTEM AUDIT KEY</span>
-                      <div className="mt-2 h-14 border border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs italic bg-gray-50 rounded">
-                        {reconWitness && reconWitness !== "none" ? (
-                          <div className="flex flex-col items-center">
-                            <span className="font-bold text-gray-700 not-italic">{users.find(u => u.id === reconWitness)?.name}</span>
-                            <span className="text-[9px] text-gray-400">{users.find(u => u.id === reconWitness)?.title || "RPh/Staff"}</span>
+                            )}
                           </div>
-                        ) : "Direct Electronic Logging Audit Only"}
+                          <div className="flex justify-between items-end border-t border-black/10 pt-1.5 mt-1">
+                            <span className="text-[9px] text-gray-400 font-mono">Title: {reconUserObj?.title || "RPh"}</span>
+                            <span className="text-xs font-black text-gray-900">{reconUserObj?.name || ""}</span>
+                          </div>
+                        </div>
+
+                        {/* Right signature field */}
+                        <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
+                          <div className="flex justify-between items-start">
+                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PIC</span>
+                            <span className="text-[10px] text-gray-500 font-mono font-bold text-right truncate max-w-[180px]">
+                              {picUserObj?.name || ""}
+                            </span>
+                          </div>
+                          <div className="flex-1 flex items-center justify-center my-1">
+                            {sigImgUrl ? (
+                              <img src={sigImgUrl} className="max-h-16 object-contain" alt="PIC signature" />
+                            ) : (
+                              <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
+                            )}
+                          </div>
+                          <div className="flex justify-between items-end border-t border-black/10 pt-1.5 mt-1">
+                            <span className="text-[9px] text-gray-400 font-mono">Title: PIC</span>
+                            <span className="text-xs font-black text-gray-900">{picUserObj?.name || "PIC NOT ASSIGNED"}</span>
+                          </div>
+                        </div>
                       </div>
-                      <span className="text-[9px] text-gray-400 font-mono block mt-2 font-semibold">Filing Record Reference Match Verified</span>
-                    </div>
-                  </div>
+                    );
+                  })()}
 
                 </div>
               </div>
