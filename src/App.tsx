@@ -500,6 +500,8 @@ export default function App() {
   const [reconShowPreview, setReconShowPreview] = useState(false);
   const reconCanvasRef = useRef<any>(null);
   const [reconSigData, setReconSigData] = useState<string | null>(null);
+  const picCanvasRef = useRef<any>(null);
+  const [picSigData, setPicSigData] = useState<string | null>(null);
 
   const lastReport = useMemo(() => {
     const reconTxs = transactions.filter(t => 
@@ -2784,6 +2786,7 @@ export default function App() {
                     setReconUser("");
                     setReconWitness("");
                     setReconSigData(null);
+                    setPicSigData(null);
                     setReconShowPreview(false);
                     setIsReconOpen(true);
                   }}
@@ -4450,23 +4453,6 @@ export default function App() {
 
                 {/* Two interactive signature fields */}
                 <div className="mt-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-surface space-y-4">
-                  <div className="flex justify-between items-center pb-2 border-b border-brand-blue/10">
-                    <span className="text-xs font-black uppercase tracking-wider text-brand-blue/80">Authorizing Signatures</span>
-                    <Button 
-                      type="button"
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-6 text-[10px] text-brand-blue hover:text-brand-blue/80 px-2 font-bold bg-brand-blue/5 hover:bg-brand-blue/10 rounded-lg shrink-0 gap-1"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        reconCanvasRef.current?.clear();
-                        setReconSigData(null);
-                      }}
-                    >
-                      Clear Signature
-                    </Button>
-                  </div>
-
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
@@ -4475,11 +4461,26 @@ export default function App() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Left Sign-off: Performed By */}
                         <div className="border border-brand-blue/15 p-4 rounded-xl relative h-36 flex flex-col justify-between bg-brand-blue/[0.02]">
-                          <div className="flex justify-between items-start gap-2">
-                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">Performed By</span>
-                            <span className="text-[10px] text-brand-blue/70 font-bold font-sans text-right truncate max-w-[150px]">
-                              {reconUserObj?.name || ""}
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1 min-w-0">
+                              <span>Performed By:</span>
+                              <span className="text-brand-blue/70 font-bold normal-case font-sans truncate">
+                                {reconUserObj?.name || "Unassigned"}
+                              </span>
                             </span>
+                            <Button 
+                              type="button"
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                reconCanvasRef.current?.clear();
+                                setReconSigData(null);
+                              }}
+                            >
+                              Clear
+                            </Button>
                           </div>
                           <div className="flex-1 flex items-center justify-center my-1 relative overflow-hidden rounded-lg bg-white/50 border border-brand-blue/5">
                             {reconSigData ? (
@@ -4511,32 +4512,60 @@ export default function App() {
                               </div>
                             )}
                           </div>
-                          <div className="flex justify-between items-end border-t border-brand-blue/10 pt-1.5 leading-none">
-                            <span className="text-[9px] text-brand-blue/50 font-mono">Title: {reconUserObj?.title || "RPh"}</span>
-                            <span className="text-[10px] font-black text-brand-blue">{reconUserObj?.name || ""}</span>
-                          </div>
                         </div>
 
                         {/* Right Sign-off: PIC */}
                         <div className="border border-brand-blue/15 p-4 rounded-xl relative h-36 flex flex-col justify-between bg-brand-blue/[0.02]">
-                          <div className="flex justify-between items-start gap-2">
-                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">PIC</span>
-                            <span className="text-[10px] text-brand-blue/70 font-bold font-sans text-right truncate max-w-[150px]">
-                              {picUserObj?.name || ""}
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1 min-w-0">
+                              <span>PIC:</span>
+                              <span className="text-brand-blue/70 font-bold normal-case font-sans truncate">
+                                {picUserObj?.name || "PIC NOT ASSIGNED"}
+                              </span>
                             </span>
+                            <Button 
+                              type="button"
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                picCanvasRef.current?.clear();
+                                setPicSigData(null);
+                              }}
+                            >
+                              Clear
+                            </Button>
                           </div>
-                          <div className="flex-1 flex items-center justify-center my-1 rounded-lg bg-white/50 border border-brand-blue/5">
-                            {reconSigData ? (
-                              <img src={reconSigData} className="max-h-16 object-contain" alt="PIC captured signature" referrerPolicy="no-referrer" />
+                          <div className="flex-1 flex items-center justify-center my-1 relative overflow-hidden rounded-lg bg-white/50 border border-brand-blue/5">
+                            {picSigData ? (
+                              <img src={picSigData} className="max-h-16 object-contain" alt="PIC captured signature" referrerPolicy="no-referrer" />
                             ) : (
-                              <div className="flex flex-col items-center justify-center text-center p-3 select-none">
-                                <span className="text-[8px] uppercase tracking-wider text-brand-blue/30 font-bold">Awaiting signature</span>
+                              <div className="absolute inset-0 flex flex-col">
+                                <SignatureCanvas 
+                                  ref={picCanvasRef}
+                                  penColor="#0d3151"
+                                  onEnd={() => {
+                                    if (picCanvasRef.current) {
+                                      const canvas = picCanvasRef.current.getCanvas ? picCanvasRef.current.getCanvas() : picCanvasRef.current;
+                                      if (canvas) {
+                                        const trimmed = trimSignatureCanvas(canvas);
+                                        if (trimmed) {
+                                          setPicSigData(trimmed.toDataURL("image/png"));
+                                        }
+                                      }
+                                    }
+                                  }}
+                                  canvasProps={{
+                                    id: "reconciliation-pic-signature-canvas",
+                                    className: "w-full h-full cursor-crosshair bg-transparent"
+                                  }}
+                                />
+                                <div className="absolute inset-x-0 bottom-1 flex justify-center pointer-events-none select-none">
+                                  <span className="text-[8px] uppercase tracking-widest text-brand-blue/30 font-bold bg-white/80 px-1.5 py-0.5 rounded shadow-sm border border-brand-blue/5">Sign here</span>
+                                </div>
                               </div>
                             )}
-                          </div>
-                          <div className="flex justify-between items-end border-t border-brand-blue/10 pt-1.5 leading-none">
-                            <span className="text-[9px] text-brand-blue/50 font-mono">Title: PIC</span>
-                            <span className="text-[10px] font-black text-brand-blue">{picUserObj?.name || "PIC NOT ASSIGNED"}</span>
                           </div>
                         </div>
                       </div>
@@ -4544,7 +4573,7 @@ export default function App() {
                   })()}
 
                   <p className="text-[9px] text-brand-grey font-medium leading-normal text-left">
-                    By executing this report, you certify under penalty of active compliance tracking that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+                    By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
                   </p>
                 </div>
 
@@ -4703,7 +4732,6 @@ export default function App() {
 
                   {/* Signature box info */}
                   {(() => {
-                    const sigImgUrl = reconSigData;
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
                     
@@ -4711,43 +4739,35 @@ export default function App() {
                       <div className="grid grid-cols-2 gap-8 pt-8">
                         {/* Left signature field */}
                         <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
-                          <div className="flex justify-between items-start">
-                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PERFORMED BY</span>
-                            <span className="text-[10px] text-gray-500 font-mono font-bold text-right truncate max-w-[180px]">
-                              {reconUserObj?.name || ""}
+                          <div className="flex items-center gap-1.5 pb-2">
+                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PERFORMED BY:</span>
+                            <span className="text-[10px] text-gray-700 font-sans font-bold truncate">
+                              {reconUserObj?.name || "Unassigned"}
                             </span>
                           </div>
                           <div className="flex-1 flex items-center justify-center my-1">
-                            {sigImgUrl ? (
-                              <img src={sigImgUrl} className="max-h-16 object-contain" alt="Performed by signature" />
+                            {reconSigData ? (
+                              <img src={reconSigData} className="max-h-20 object-contain" alt="Performed by signature" />
                             ) : (
                               <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
                             )}
-                          </div>
-                          <div className="flex justify-between items-end border-t border-black/10 pt-1.5 mt-1">
-                            <span className="text-[9px] text-gray-400 font-mono">Title: {reconUserObj?.title || "RPh"}</span>
-                            <span className="text-xs font-black text-gray-900">{reconUserObj?.name || ""}</span>
                           </div>
                         </div>
 
                         {/* Right signature field */}
                         <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
-                          <div className="flex justify-between items-start">
-                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PIC</span>
-                            <span className="text-[10px] text-gray-500 font-mono font-bold text-right truncate max-w-[180px]">
-                              {picUserObj?.name || ""}
+                          <div className="flex items-center gap-1.5 pb-2">
+                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PIC:</span>
+                            <span className="text-[10px] text-gray-700 font-sans font-bold truncate">
+                              {picUserObj?.name || "PIC NOT ASSIGNED"}
                             </span>
                           </div>
                           <div className="flex-1 flex items-center justify-center my-1">
-                            {sigImgUrl ? (
-                              <img src={sigImgUrl} className="max-h-16 object-contain" alt="PIC signature" />
+                            {picSigData ? (
+                              <img src={picSigData} className="max-h-20 object-contain" alt="PIC signature" />
                             ) : (
                               <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
                             )}
-                          </div>
-                          <div className="flex justify-between items-end border-t border-black/10 pt-1.5 mt-1">
-                            <span className="text-[9px] text-gray-400 font-mono">Title: PIC</span>
-                            <span className="text-xs font-black text-gray-900">{picUserObj?.name || "PIC NOT ASSIGNED"}</span>
                           </div>
                         </div>
                       </div>
