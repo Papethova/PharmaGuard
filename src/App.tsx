@@ -296,6 +296,29 @@ const getTimestampMs = (ts: any): number => {
   return new Date(ts).getTime();
 };
 
+const parseNumericStrength = (str: string): number => {
+  if (!str) return 0;
+  const match = str.match(/(\d+(?:\.\d+)?)/);
+  return match ? parseFloat(match[1]) : 0;
+};
+
+const compareSubstances = (a: Substance, b: Substance): number => {
+  const nameCompare = (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base", numeric: true });
+  if (nameCompare !== 0) return nameCompare;
+
+  const aStr = parseNumericStrength(a.strength || "");
+  const bStr = parseNumericStrength(b.strength || "");
+  if (aStr !== bStr) return aStr - bStr;
+
+  const aPkg = a.packageSize || 0;
+  const bPkg = b.packageSize || 0;
+  if (aPkg !== bPkg) return aPkg - bPkg;
+
+  const aStock = a.currentStock || 0;
+  const bStock = b.currentStock || 0;
+  return aStock - bStock;
+};
+
 // Sync Heartbeat: 2026-05-18T16:45:00
 export default function App() {
   // Emergency catch-all to prevent white screens
@@ -537,13 +560,17 @@ export default function App() {
     
     let lastClosingCount = 0;
     let prevReportDate = "N/A";
+    let lastReportTxTime = 0;
     
     if (lastReport.ref !== "N/A") {
-      if (lastReport.counts[subId] !== undefined) {
-        lastClosingCount = lastReport.counts[subId];
+      const prevReconTx = subTxs.find(t => t.referenceNumber === lastReport.ref);
+      if (prevReconTx) {
+        lastClosingCount = prevReconTx.newStock;
+        lastReportTxTime = getTimestampMs(prevReconTx.timestamp);
         prevReportDate = lastReport.date;
       } else {
         lastClosingCount = 0;
+        lastReportTxTime = 0;
         prevReportDate = lastReport.date;
       }
     } else {
@@ -570,14 +597,12 @@ export default function App() {
       }
     }
     
-    const lastTime = lastReport.timestampMs;
     const periodTxs = subTxs.filter(t => {
       if (t.referenceNumber === reconRef) return false;
       if (lastReport.ref !== "N/A" && t.referenceNumber === lastReport.ref) return false;
-      if (lastReport.ref !== "N/A") {
-        return getTimestampMs(t.timestamp) > lastTime;
-      }
-      return true;
+      
+      const txTime = getTimestampMs(t.timestamp);
+      return txTime > lastReportTxTime;
     });
     
     let purchases = 0;
@@ -2095,15 +2120,7 @@ export default function App() {
   const filteredInventory = useMemo(() => 
     inventory
       .filter(s => activeSchedule === "ALL" || s.schedule === activeSchedule)
-      .sort((a, b) => {
-        const nameCompare = a.name.localeCompare(b.name);
-        if (nameCompare !== 0) return nameCompare;
-        const getStrengthValue = (s: string) => {
-          const match = s.match(/(\d+(\.\d+)?)/);
-          return match ? parseFloat(match[1]) : 0;
-        };
-        return getStrengthValue(a.strength) - getStrengthValue(b.strength);
-      }),
+      .sort(compareSubstances),
   [inventory, activeSchedule]);
 
   const filteredTransactions = useMemo(() => 
@@ -4271,9 +4288,9 @@ export default function App() {
                 <Search className="h-5 w-5 text-brand-blue" strokeWidth={3} />
               </div>
               <div>
-                <DialogTitle className="text-base font-black uppercase tracking-wider text-white">Controlled Substances Reconciliation</DialogTitle>
+                <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">Controlled Substance Reconciliation</DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
-                  Verify physical holdings against digital ledger logs to maintain active compliance keys.
+                  VERIFY PHYSICAL HOLDINGS AGAINST DIGITAL LEDGER LOGS TO MAINTAIN ACTIVE COMPLIANCE
                 </DialogDescription>
               </div>
             </div>
@@ -4353,7 +4370,7 @@ export default function App() {
                             </td>
                           </tr>
                         ) : (
-                          inventory.map((sub) => {
+                          [...inventory].sort(compareSubstances).map((sub) => {
                             const metrics = getSubstanceHistoryMetrics(sub.id);
                             const enteredVal = reconCounts[sub.id] || "";
                             const counted = enteredVal === "" ? undefined : Number(enteredVal);
@@ -4587,7 +4604,7 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {inventory.map(sub => {
+                        {[...inventory].sort(compareSubstances).map(sub => {
                           const metrics = getSubstanceHistoryMetrics(sub.id);
                           const counted = Number(reconCounts[sub.id]) || 0;
                           const variance = counted - metrics.expected;
