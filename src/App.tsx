@@ -282,6 +282,20 @@ const formatRefForDisplay = (ref: string | undefined) => {
   return ref;
 };
 
+const getTimestampMs = (ts: any): number => {
+  if (!ts) return Date.now();
+  if (typeof ts.toDate === "function") {
+    return ts.toDate().getTime();
+  }
+  if (ts.seconds !== undefined) {
+    return ts.seconds * 1000 + (ts.nanoseconds || 0) / 1000000;
+  }
+  if (ts instanceof Date) {
+    return ts.getTime();
+  }
+  return new Date(ts).getTime();
+};
+
 // Sync Heartbeat: 2026-05-18T16:45:00
 export default function App() {
   // Emergency catch-all to prevent white screens
@@ -475,8 +489,8 @@ export default function App() {
     }
     
     const sortedReconTxs = [...reconTxs].sort((a, b) => {
-      const aTime = a.timestamp?.seconds !== undefined ? a.timestamp.seconds : a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
-      const bTime = b.timestamp?.seconds !== undefined ? b.timestamp.seconds : b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+      const aTime = getTimestampMs(a.timestamp);
+      const bTime = getTimestampMs(b.timestamp);
       return bTime - aTime;
     });
 
@@ -484,6 +498,15 @@ export default function App() {
     
     let lastDate = "N/A";
     let lastReportTimestampMs = 0;
+    
+    const latestRefTxs = reconTxs.filter(t => t.referenceNumber === latestRef);
+    latestRefTxs.forEach(t => {
+      const ms = getTimestampMs(t.timestamp);
+      if (ms > lastReportTimestampMs) {
+        lastReportTimestampMs = ms;
+      }
+    });
+
     const firstTxWithLatestRef = sortedReconTxs.find(t => t.referenceNumber === latestRef);
     if (firstTxWithLatestRef?.timestamp) {
       const ts = firstTxWithLatestRef.timestamp;
@@ -499,7 +522,6 @@ export default function App() {
       const dd = String(d.getDate()).padStart(2, '0');
       const yy = String(d.getFullYear()).slice(-2);
       lastDate = `${mm}/${dd}/${yy}`;
-      lastReportTimestampMs = d.getTime();
     }
     
     const counts: Record<string, number> = {};
@@ -509,20 +531,6 @@ export default function App() {
     
     return { date: lastDate, counts, ref: latestRef, timestampMs: lastReportTimestampMs };
   }, [transactions, reconRef]);
-
-  const getTimestampMs = useCallback((ts: any): number => {
-    if (!ts) return 0;
-    if (typeof ts.toDate === "function") {
-      return ts.toDate().getTime();
-    }
-    if (ts.seconds !== undefined) {
-      return ts.seconds * 1000 + (ts.nanoseconds || 0) / 1000000;
-    }
-    if (ts instanceof Date) {
-      return ts.getTime();
-    }
-    return new Date(ts).getTime();
-  }, []);
 
   const getSubstanceHistoryMetrics = useCallback((subId: string) => {
     const subTxs = transactions.filter(t => t.substanceId === subId);
@@ -596,7 +604,7 @@ export default function App() {
       adjustments,
       expected
     };
-  }, [transactions, lastReport, reconRef, inventory, getTimestampMs]);
+  }, [transactions, lastReport, reconRef, inventory]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1532,7 +1540,7 @@ export default function App() {
     const emailId = user.email?.toLowerCase() || user.uid;
     
     if (!reconUser) {
-      toast.error("Please identify the Reconciling Pharmacist");
+      toast.error("Please identify the Performed By user");
       return;
     }
 
@@ -4269,18 +4277,6 @@ export default function App() {
                 </DialogDescription>
               </div>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                setIsReconOpen(false);
-                setCurrentTab("inventory");
-              }}
-              className="text-white hover:bg-white/10 h-8 w-8 rounded-full shrink-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
         </DialogHeader>
 
@@ -4293,7 +4289,7 @@ export default function App() {
                 {/* Meta details */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
                   <div className="space-y-1.5 text-left">
-                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Reconciling Pharmacist *</Label>
+                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Performed By *</Label>
                     <Select value={reconUser} onValueChange={setReconUser}>
                       <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-9 text-xs font-semibold">
                         <SelectValue placeholder="Select..." />
@@ -4331,29 +4327,6 @@ export default function App() {
                       {reconRef}
                     </div>
                   </div>
-                </div>
-
-                {/* Batch Helper Button */}
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-black uppercase text-brand-blue/60 tracking-wider">Inventory Substances</span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      // Pre-fill all fields with their Calculated Expected Stock
-                      const newCounts: Record<string, string> = {};
-                      inventory.forEach(s => {
-                        const metrics = getSubstanceHistoryMetrics(s.id);
-                        newCounts[s.id] = String(metrics.expected);
-                      });
-                      setReconCounts(newCounts);
-                      toast.success("Accounts matched to calculated expected stock");
-                    }}
-                    className="h-8 text-[10px] font-black uppercase tracking-wider border-brand-blue/10 text-brand-blue hover:bg-brand-blue/5 hover:border-brand-blue/20"
-                  >
-                    Match All Expected Stock
-                  </Button>
                 </div>
 
                 {/* Substance Table List */}
@@ -4519,7 +4492,7 @@ export default function App() {
                     return;
                   }
                   if (!reconUser) {
-                    toast.error("Please select reconciling pharmacist.");
+                    toast.error("Please select Performed By user.");
                     return;
                   }
                   setReconShowPreview(true);
@@ -4576,7 +4549,7 @@ export default function App() {
 
                   <div className="bg-gray-100 p-4 rounded-lg flex flex-col sm:flex-row justify-between gap-4">
                     <div>
-                      <span className="text-[10px] text-gray-500 font-mono uppercase block">RECONCILING PHARMACIST</span>
+                      <span className="text-[10px] text-gray-500 font-mono uppercase block">PERFORMED BY</span>
                       <span className="text-sm font-bold">{users.find(u => u.id === reconUser)?.name || "AUTHORIZED STAFF"} {users.find(u => u.id === reconUser)?.title && `(${users.find(u => u.id === reconUser)?.title})`}</span>
                     </div>
                     <div>
