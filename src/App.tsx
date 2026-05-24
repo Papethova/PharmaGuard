@@ -4304,11 +4304,11 @@ export default function App() {
               <div className="p-6 space-y-5">
                 
                 {/* Meta details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
-                  <div className="space-y-1.5 text-left">
-                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Performed By *</Label>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
+                  <div className="flex items-center gap-2.5 text-left w-full sm:w-auto">
+                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0">Performed By *</Label>
                     <Select value={reconUser} onValueChange={setReconUser}>
-                      <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-9 text-xs font-semibold">
+                      <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-8 text-xs font-semibold w-48 shrink-0">
                         <SelectValue placeholder="Select..." />
                       </SelectTrigger>
                       <SelectContent className="bg-brand-surface">
@@ -4321,9 +4321,9 @@ export default function App() {
                     </Select>
                   </div>
 
-                  <div className="space-y-1.5 text-left">
-                    <Label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Report Reference #</Label>
-                    <div className="h-9 px-3 border border-brand-blue/10 rounded-xl bg-brand-blue/5 flex items-center text-xs font-mono font-black text-brand-blue select-all">
+                  <div className="flex items-center gap-2.5 text-left w-full sm:w-auto sm:justify-end">
+                    <Label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0">Report Reference #</Label>
+                    <div className="h-8 px-3 border border-brand-blue/10 rounded-xl bg-brand-blue/5 flex items-center text-xs font-mono font-black text-brand-blue select-all shrink-0">
                       {reconRef}
                     </div>
                   </div>
@@ -4362,27 +4362,29 @@ export default function App() {
                             
                             return (
                               <Fragment key={sub.id}>
-                                <tr className="h-14 hover:bg-brand-blue/5 border-b border-brand-blue/10">
-                                  <td className="text-left font-semibold pl-4 border-b border-brand-blue/10 h-14 py-0" style={{ verticalAlign: 'middle' }}>
-                                    <span className="font-bold text-black text-xs block leading-tight">{sub.name} {sub.strength}</span>
-                                    <span className="block text-[10px] text-brand-blue font-sans mt-0.5 leading-none">{sub.ndc}</span>
+                                <tr className="hover:bg-brand-blue/5 border-b border-brand-blue/10">
+                                  <td className="text-left font-semibold pl-4 border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
+                                    <div className="flex flex-row items-center gap-2 flex-wrap">
+                                      <span className="font-bold text-black text-xs">{sub.name} {sub.strength}</span>
+                                      <span className="text-[9px] text-brand-blue font-mono font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
+                                    </div>
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-dark-grey/80" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80" style={{ verticalAlign: 'middle' }}>
                                     {metrics.lastClosingCount}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
                                     +{metrics.purchases}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-grey" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey" style={{ verticalAlign: 'middle' }}>
                                     -{metrics.dispensed}
                                   </td>
-                                  <td className={`text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-brand-blue/90' : 'text-brand-grey'}`} style={{ verticalAlign: 'middle' }}>
+                                  <td className={`text-center border-b border-brand-blue/10 py-1.5 text-xs font-black ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-brand-blue/90' : 'text-brand-grey'}`} style={{ verticalAlign: 'middle' }}>
                                     {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
                                     {metrics.expected}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 h-14 py-0" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <div className="flex justify-center items-center">
                                       <Input
                                         type="number"
@@ -4393,24 +4395,24 @@ export default function App() {
                                           const val = e.target.value;
                                           setReconCounts(prev => ({ ...prev, [sub.id]: val }));
                                         }}
-                                        className="h-9 w-20 text-xs text-center font-bold border-brand-blue/10 focus:border-brand-blue bg-brand-surface"
+                                        className="h-8 w-20 text-xs text-center font-bold border-brand-blue/10 focus:border-brand-blue bg-brand-surface"
                                       />
                                     </div>
                                   </td>
-                                  <td className="text-center pr-4 border-b border-brand-blue/10 h-14 py-0" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center pr-4 border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <div className="flex justify-center items-center">
                                       {counted === undefined ? (
                                         <span className="text-[10px] text-brand-grey/50 font-medium whitespace-nowrap">Pending...</span>
                                       ) : varianceAmount === 0 ? (
-                                        <Badge className="bg-brand-blue/10 hover:bg-brand-blue/15 text-brand-blue hover:text-brand-blue border border-brand-blue/20 font-bold text-[10px] h-6 px-2.5">
-                                          <Check className="h-3 w-3 mr-1" strokeWidth={3} /> Match
+                                        <Badge className="bg-brand-blue/10 hover:bg-brand-blue/15 text-brand-blue hover:text-brand-blue border border-brand-blue/20 font-bold text-[11px] h-7 px-3">
+                                          <Check className="h-3.5 w-3.5 mr-1" strokeWidth={3} /> Match
                                         </Badge>
                                       ) : varianceAmount < 0 ? (
-                                        <Badge className="bg-brand-yellow hover:bg-brand-yellow text-brand-blue hover:text-brand-blue border border-brand-yellow/40 font-black text-[10px] h-6 px-2.5 shadow-sm">
+                                        <Badge className="bg-brand-yellow hover:bg-brand-yellow text-brand-blue hover:text-brand-blue border border-brand-yellow/40 font-black text-[11px] h-7 px-3 shadow-sm">
                                           Deficit: {varianceAmount}
                                         </Badge>
                                       ) : (
-                                        <Badge className="bg-brand-blue hover:bg-brand-blue/90 text-brand-yellow hover:text-brand-yellow border border-brand-blue/20 font-black text-[10px] h-6 px-2.5 shadow-sm">
+                                        <Badge className="bg-brand-blue hover:bg-brand-blue/90 text-brand-yellow hover:text-brand-yellow border border-brand-blue/20 font-black text-[11px] h-7 px-3 shadow-sm">
                                           Surplus: +{varianceAmount}
                                         </Badge>
                                       )}
@@ -4595,10 +4597,12 @@ export default function App() {
                           
                           return (
                             <Fragment key={sub.id}>
-                              <tr className="h-12">
-                                <td className="py-2 text-left">
-                                  <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
-                                  <span className="block text-[9px] text-gray-400 mt-0.5">{sub.ndc}</span>
+                              <tr className="h-10">
+                                <td className="py-1 text-left">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
+                                    <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{sub.ndc}</span>
+                                  </div>
                                 </td>
                                 <td className="py-2 text-center text-gray-700">
                                   <div className="text-[10px] text-gray-400 font-normal">{metrics.prevReportDate}</div>
