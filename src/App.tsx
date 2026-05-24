@@ -1844,7 +1844,7 @@ export default function App() {
     }
 
     setIsMigrating(true);
-    const toastId = toast.loading(`Moving all registry data from [${migrationSourceNode}] to [${migrationDestNode}]...`);
+    const toastId = toast.loading(`Copying all registry data from [${migrationSourceNode}] to [${migrationDestNode}]...`);
 
     try {
       const srcEmail = migrationSourceNode.toLowerCase().trim();
@@ -1869,10 +1869,8 @@ export default function App() {
           count = 0;
         }
         const destDocRef = doc(db, "users", destEmail, "substances", d.id);
-        const srcDocRef = doc(db, "users", srcEmail, "substances", d.id);
         batch.set(destDocRef, d.data());
-        batch.delete(srcDocRef);
-        count += 2;
+        count += 1;
       }
 
       for (const d of srcTransactionsSnap.docs) {
@@ -1882,10 +1880,8 @@ export default function App() {
           count = 0;
         }
         const destDocRef = doc(db, "users", destEmail, "transactions", d.id);
-        const srcDocRef = doc(db, "users", srcEmail, "transactions", d.id);
         batch.set(destDocRef, d.data());
-        batch.delete(srcDocRef);
-        count += 2;
+        count += 1;
       }
 
       for (const d of srcStaffSnap.docs) {
@@ -1895,10 +1891,8 @@ export default function App() {
           count = 0;
         }
         const destDocRef = doc(db, "users", destEmail, "staff", d.id);
-        const srcDocRef = doc(db, "users", srcEmail, "staff", d.id);
         batch.set(destDocRef, d.data());
-        batch.delete(srcDocRef);
-        count += 2;
+        count += 1;
       }
 
       if (count > 0) {
@@ -1906,13 +1900,14 @@ export default function App() {
       }
 
       toast.success(
-        `Migration Successful: Moved ${srcSubstancesSnap.size} substances, ${srcTransactionsSnap.size} transactions, and ${srcStaffSnap.size} staff records from ${srcEmail} to ${destEmail}.`,
+        `Migration Successful: Copied ${srcSubstancesSnap.size} substances, ${srcTransactionsSnap.size} transactions, and ${srcStaffSnap.size} staff records to ${destEmail} (source data protected & preserved).`,
         { id: toastId, duration: 8000 }
       );
 
       setMigrationSourceNode("");
       setMigrationDestNode("");
       setIsNodeMigrationOpen(false);
+      setIsSuperAdminOpen(false);
 
       const activeUserEmail = (user?.email || "").toLowerCase().trim();
       if (activeUserEmail === srcEmail || activeUserEmail === destEmail) {
