@@ -1186,13 +1186,21 @@ export default function App() {
 
   const handleGoogleLogin = async () => {
     setIsSubmitting(true);
+    
+    // Check if the application is running inside an iframe
+    const isIframe = window.self !== window.top;
+    if (isIframe) {
+      toast.warning("Google Login Popup: If the login window hangs or fails, please open the app in a new tab using the 'Open in new tab' button at the top-right of the preview.", { duration: 8000 });
+    }
+
     try {
       await signInWithPopup(auth, googleProvider);
       toast.success("Signed in successfully");
     } catch (error: any) {
       console.error("Google login error:", error);
       if (error.code === 'auth/unauthorized-domain') {
-        toast.error("Auth Error: Domain not authorized. Please add this domain to Firebase Authorized Domains.");
+        const hostname = window.location.hostname;
+        toast.error(`Auth Error: Domain "${hostname}" is not authorized. Please add "${hostname}" to your Firebase project Authorized Domains list under Authentication > Settings > Authorized domains in the Firebase Console.`, { duration: 15000 });
       } else if (error.code === 'auth/popup-blocked') {
         toast.error("Login popup blocked. Please enable popups or open the app in a new tab.");
       } else {
