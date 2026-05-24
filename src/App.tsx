@@ -4400,15 +4400,15 @@ export default function App() {
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
                       <thead className="sticky top-0 z-40 bg-brand-blue">
                         <tr className="bg-brand-blue hover:bg-brand-blue border-none">
-                          <th className="font-semibold text-xs tracking-wider text-white text-left pl-4 bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 pl-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication</th>
-                          <th className="font-semibold text-xs tracking-wider text-white text-left bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Last Report ({lastReport.date})</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchased</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Dispensed</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Adjusted</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Expected</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Physical Count</th>
-                          <th className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 pr-4 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -4428,10 +4428,10 @@ export default function App() {
                             return (
                               <Fragment key={sub.id}>
                                 <tr className="hover:bg-brand-blue/5 border-b border-brand-blue/10">
-                                  <td className="text-left font-semibold pl-4 border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center font-semibold border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <span className="font-bold text-black text-xs">{sub.name} {sub.strength}</span>
                                   </td>
-                                  <td className="text-left border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80" style={{ verticalAlign: 'middle' }}>
@@ -4477,7 +4477,7 @@ export default function App() {
                                       )}
                                     </div>
                                   </td>
-                                  <td className="text-center pr-4 border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <div className="flex justify-center items-center">
                                       {counted === undefined ? (
                                         <span className="text-[10px] text-brand-grey/50 font-medium whitespace-nowrap">Pending...</span>
@@ -4734,8 +4734,8 @@ export default function App() {
                       </colgroup>
                       <thead>
                         <tr className="border-b-2 border-gray-200">
-                          <th className="py-2 text-left font-bold">MEDICATION</th>
-                          <th className="py-2 text-left font-bold">NDC</th>
+                          <th className="py-2 text-center font-bold">MEDICATION</th>
+                          <th className="py-2 text-center font-bold">NDC</th>
                           <th className="py-2 text-center font-bold">LAST REPORT</th>
                           <th className="py-2 text-center font-bold">PURCHASED</th>
                           <th className="py-2 text-center font-bold">DISPENSED</th>
@@ -4755,10 +4755,10 @@ export default function App() {
                           return (
                             <Fragment key={sub.id}>
                               <tr className="h-10">
-                                <td className="py-1 text-left">
+                                <td className="py-1 text-center">
                                   <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
                                 </td>
-                                <td className="py-1 text-left">
+                                <td className="py-1 text-center">
                                   <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{sub.ndc}</span>
                                 </td>
                                 <td className="py-2 text-center text-gray-700">
