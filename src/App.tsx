@@ -503,6 +503,15 @@ export default function App() {
   const picCanvasRef = useRef<any>(null);
   const [picSigData, setPicSigData] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (isReconOpen) {
+      setTimeout(() => {
+        reconCanvasRef.current?.clear();
+        picCanvasRef.current?.clear();
+      }, 50);
+    }
+  }, [isReconOpen]);
+
   const lastReport = useMemo(() => {
     const reconTxs = transactions.filter(t => 
       t.referenceNumber && 
@@ -1605,10 +1614,13 @@ export default function App() {
     }
 
     let signature = reconSigData || "";
-    if (!signature && reconCanvasRef.current) {
-      const trimmedCanvas = trimSignatureCanvas(reconCanvasRef.current);
-      if (trimmedCanvas) {
-        signature = trimmedCanvas.toDataURL("image/png");
+    if (reconCanvasRef.current) {
+      const canvas = reconCanvasRef.current.getCanvas ? reconCanvasRef.current.getCanvas() : reconCanvasRef.current;
+      if (canvas && !reconCanvasRef.current.isEmpty()) {
+        const trimmedCanvas = trimSignatureCanvas(canvas);
+        if (trimmedCanvas) {
+          signature = trimmedCanvas.toDataURL("image/png");
+        }
       }
     }
 
@@ -4302,10 +4314,9 @@ export default function App() {
           </div>
         </DialogHeader>
 
-        {!reconShowPreview ? (
-          // Form Editing View
-          <>
-            <ScrollArea className="flex-1 overflow-y-auto">
+        <div className={`flex flex-col flex-1 min-h-0 ${reconShowPreview ? 'hidden' : ''}`}>
+          {/* Form Editing View */}
+          <ScrollArea className="flex-1 overflow-y-auto">
               <div className="p-6 space-y-5">
                 
                 {/* Meta details */}
@@ -4348,6 +4359,7 @@ export default function App() {
                       <thead className="sticky top-0 z-40 bg-brand-blue">
                         <tr className="bg-brand-blue hover:bg-brand-blue border-none">
                           <th className="font-semibold text-xs tracking-wider text-white text-left pl-4 bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 pl-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-left bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Last Report ({lastReport.date})</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchased</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Dispensed</th>
@@ -4360,7 +4372,7 @@ export default function App() {
                       <tbody>
                         {inventory.length === 0 ? (
                           <tr className="border-b border-brand-blue/10">
-                            <td colSpan={8} className="text-center py-12 text-brand-dark-grey/50 align-middle">
+                            <td colSpan={9} className="text-center py-12 text-brand-dark-grey/50 align-middle">
                               No medications are matching the current node registry list.
                             </td>
                           </tr>
@@ -4376,10 +4388,10 @@ export default function App() {
                               <Fragment key={sub.id}>
                                 <tr className="hover:bg-brand-blue/5 border-b border-brand-blue/10">
                                   <td className="text-left font-semibold pl-4 border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
-                                    <div className="flex flex-row items-center gap-2 flex-wrap">
-                                      <span className="font-bold text-black text-xs">{sub.name} {sub.strength}</span>
-                                      <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
-                                    </div>
+                                    <span className="font-bold text-black text-xs">{sub.name} {sub.strength}</span>
+                                  </td>
+                                  <td className="text-left border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
+                                    <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80" style={{ verticalAlign: 'middle' }}>
                                     {metrics.lastClosingCount}
@@ -4433,7 +4445,7 @@ export default function App() {
                                 </tr>
                                 {hasVariance && (
                                   <tr className="bg-brand-blue/[0.02] hover:bg-brand-blue/[0.02]">
-                                    <td colSpan={8} className="p-3 pl-4 pr-4 border-b border-brand-blue/10">
+                                    <td colSpan={9} className="p-3 pl-4 pr-4 border-b border-brand-blue/10">
                                       <div className="w-full bg-brand-blue/5 border border-brand-blue/10 rounded-lg p-2.5">
                                         <Label className="text-[9px] font-black text-brand-blue block mb-1">Explanation For Discrepancy</Label>
                                         <Input
@@ -4489,32 +4501,15 @@ export default function App() {
                               Clear
                             </Button>
                           </div>
-                          <div className="flex-1 relative overflow-hidden rounded-xl border border-brand-blue/15 bg-brand-blue/[0.02] flex items-center justify-center">
-                            {reconSigData ? (
-                              <img src={reconSigData} className="max-h-24 p-2 object-contain" alt="Captured signature" referrerPolicy="no-referrer" />
-                            ) : (
-                              <div className="absolute inset-0 flex flex-col">
-                                <SignatureCanvas 
-                                  ref={reconCanvasRef}
-                                  penColor="#0d3151"
-                                  onEnd={() => {
-                                    if (reconCanvasRef.current) {
-                                      const canvas = reconCanvasRef.current.getCanvas ? reconCanvasRef.current.getCanvas() : reconCanvasRef.current;
-                                      if (canvas) {
-                                        const trimmed = trimSignatureCanvas(canvas);
-                                        if (trimmed) {
-                                          setReconSigData(trimmed.toDataURL("image/png"));
-                                        }
-                                      }
-                                    }
-                                  }}
-                                  canvasProps={{
-                                    id: "reconciliation-signature-canvas",
-                                    className: "w-full h-full cursor-crosshair bg-transparent"
-                                  }}
-                                />
-                              </div>
-                            )}
+                          <div className="flex-1 relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                            <SignatureCanvas 
+                              ref={reconCanvasRef}
+                              penColor="#0d3151"
+                              canvasProps={{
+                                id: "reconciliation-signature-canvas",
+                                className: "w-full h-[120px] cursor-crosshair bg-transparent"
+                              }}
+                            />
                           </div>
                         </div>
 
@@ -4541,32 +4536,15 @@ export default function App() {
                               Clear
                             </Button>
                           </div>
-                          <div className="flex-1 relative overflow-hidden rounded-xl border border-brand-blue/15 bg-brand-blue/[0.02] flex items-center justify-center">
-                            {picSigData ? (
-                              <img src={picSigData} className="max-h-24 p-2 object-contain" alt="PIC captured signature" referrerPolicy="no-referrer" />
-                            ) : (
-                              <div className="absolute inset-0 flex flex-col">
-                                <SignatureCanvas 
-                                  ref={picCanvasRef}
-                                  penColor="#0d3151"
-                                  onEnd={() => {
-                                    if (picCanvasRef.current) {
-                                      const canvas = picCanvasRef.current.getCanvas ? picCanvasRef.current.getCanvas() : picCanvasRef.current;
-                                      if (canvas) {
-                                        const trimmed = trimSignatureCanvas(canvas);
-                                        if (trimmed) {
-                                          setPicSigData(trimmed.toDataURL("image/png"));
-                                        }
-                                      }
-                                    }
-                                  }}
-                                  canvasProps={{
-                                    id: "reconciliation-pic-signature-canvas",
-                                    className: "w-full h-full cursor-crosshair bg-transparent"
-                                  }}
-                                />
-                              </div>
-                            )}
+                          <div className="flex-1 relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                            <SignatureCanvas 
+                              ref={picCanvasRef}
+                              penColor="#0d3151"
+                              canvasProps={{
+                                id: "reconciliation-pic-signature-canvas",
+                                className: "w-full h-[120px] cursor-crosshair bg-transparent"
+                              }}
+                            />
                           </div>
                         </div>
                       </div>
@@ -4595,6 +4573,31 @@ export default function App() {
                     toast.error("Please select Performed By user.");
                     return;
                   }
+
+                  // Capture and trim signatures from canvases for preview display
+                  if (reconCanvasRef.current) {
+                    const canvas = reconCanvasRef.current.getCanvas ? reconCanvasRef.current.getCanvas() : reconCanvasRef.current;
+                    if (canvas && !reconCanvasRef.current.isEmpty()) {
+                      const trimmed = trimSignatureCanvas(canvas);
+                      if (trimmed) {
+                        setReconSigData(trimmed.toDataURL("image/png"));
+                      }
+                    } else if (reconCanvasRef.current.isEmpty()) {
+                      setReconSigData(null);
+                    }
+                  }
+                  if (picCanvasRef.current) {
+                    const canvas = picCanvasRef.current.getCanvas ? picCanvasRef.current.getCanvas() : picCanvasRef.current;
+                    if (canvas && !picCanvasRef.current.isEmpty()) {
+                      const trimmed = trimSignatureCanvas(canvas);
+                      if (trimmed) {
+                        setPicSigData(trimmed.toDataURL("image/png"));
+                      }
+                    } else if (picCanvasRef.current.isEmpty()) {
+                      setPicSigData(null);
+                    }
+                  }
+
                   setReconShowPreview(true);
                 }}
                 className="text-xs font-black uppercase text-brand-blue border-brand-blue/10 hover:bg-brand-blue/5 rounded-xl shrink-0 gap-2 h-11"
@@ -4625,11 +4628,11 @@ export default function App() {
                 </Button>
               </div>
             </DialogFooter>
-          </>
-        ) : (
-          // Print Report Review Page (Gorgeously Styled)
-          <>
-            <ScrollArea className="flex-1 overflow-y-auto">
+        </div>
+
+        <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''}`}>
+          {/* Print Report Review Page (Gorgeously Styled) */}
+          <ScrollArea className="flex-1 overflow-y-auto">
               {/* Added print root anchor */}
               <div id="reconciliation-printable-root">
                 <div id="reconciliation-printable-invoice" className="p-8 space-y-6 text-left selection:bg-brand-yellow/30 bg-white text-black">
@@ -4665,18 +4668,20 @@ export default function App() {
                     <h3 className="text-xs font-bold tracking-wider uppercase font-mono border-b border-gray-300 pb-1">RECONCILED CONTROLLED INVENTORY STATEMENT</h3>
                     <table className="w-full text-xs font-mono">
                       <colgroup>
-                        <col className="w-[30%]" />
-                        <col className="w-[12%]" />
-                        <col className="w-[9%]" />
-                        <col className="w-[9%]" />
-                        <col className="w-[9%]" />
+                        <col className="w-[22%]" />
                         <col className="w-[11%]" />
                         <col className="w-[11%]" />
-                        <col className="w-[9%]" />
+                        <col className="w-[8%]" />
+                        <col className="w-[8%]" />
+                        <col className="w-[8%]" />
+                        <col className="w-[11%]" />
+                        <col className="w-[11%]" />
+                        <col className="w-[10%]" />
                       </colgroup>
                       <thead>
                         <tr className="border-b-2 border-gray-200">
-                          <th className="py-2 text-left font-bold">MEDICATION / NDC</th>
+                          <th className="py-2 text-left font-bold">MEDICATION</th>
+                          <th className="py-2 text-left font-bold">NDC</th>
                           <th className="py-2 text-center font-bold">LAST REPORT</th>
                           <th className="py-2 text-center font-bold">PURCHASED</th>
                           <th className="py-2 text-center font-bold">DISPENSED</th>
@@ -4697,10 +4702,10 @@ export default function App() {
                             <Fragment key={sub.id}>
                               <tr className="h-10">
                                 <td className="py-1 text-left">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
-                                    <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{sub.ndc}</span>
-                                  </div>
+                                  <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
+                                </td>
+                                <td className="py-1 text-left">
+                                  <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{sub.ndc}</span>
                                 </td>
                                 <td className="py-2 text-center text-gray-700">
                                   <div className="text-[10px] text-gray-400 font-normal">{metrics.prevReportDate}</div>
@@ -4719,7 +4724,7 @@ export default function App() {
                               </tr>
                               {variance !== 0 && (
                                 <tr className="bg-gray-50/50">
-                                  <td colSpan={8} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
+                                  <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
                                     Discrepancy Reason: {reason || "State reason omitted"}
                                   </td>
                                 </tr>
@@ -4828,8 +4833,7 @@ export default function App() {
                 }
               }
             `}</style>
-          </>
-        )}
+        </div>
 
       </DialogContent>
     </Dialog>
