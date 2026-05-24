@@ -643,6 +643,44 @@ export default function App() {
     };
   }, [transactions, lastReport, reconRef, inventory]);
 
+  const getLatestVerifiedCount = useCallback((subId: string) => {
+    const subTxs = transactions.filter(t => t.substanceId === subId && t.type === "VERIFY");
+    if (subTxs.length === 0) return null;
+    
+    const sorted = [...subTxs].sort((a, b) => {
+      const aTime = getTimestampMs(a.timestamp);
+      const bTime = getTimestampMs(b.timestamp);
+      return bTime - aTime;
+    });
+    
+    const latestTx = sorted[0];
+    
+    // Find the timestamp of the last report
+    let lastReportTxTime = 0;
+    if (lastReport.ref !== "N/A") {
+      const prevReconTx = transactions.find(t => t.referenceNumber === lastReport.ref);
+      if (prevReconTx) {
+        lastReportTxTime = getTimestampMs(prevReconTx.timestamp);
+      }
+    }
+    
+    if (getTimestampMs(latestTx.timestamp) > lastReportTxTime) {
+      return latestTx.quantity;
+    }
+    return null;
+  }, [transactions, lastReport]);
+
+  const getReconPhysicalCount = useCallback((subId: string) => {
+    if (reconCounts[subId] !== undefined && reconCounts[subId] !== "") {
+      return Number(reconCounts[subId]);
+    }
+    const verifiedNum = getLatestVerifiedCount(subId);
+    if (verifiedNum !== null) {
+      return verifiedNum;
+    }
+    return undefined;
+  }, [reconCounts, getLatestVerifiedCount]);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -1562,6 +1600,10 @@ export default function App() {
 
       await batch.commit();
 
+      if (transactionType === "VERIFY") {
+        setReconCounts(prev => ({ ...prev, [targetMedId]: previousStock.toString() }));
+      }
+
       toast.success("Registry Record Secured");
       setIsLogOpen(false);
       resetForm();
@@ -1588,7 +1630,7 @@ export default function App() {
     }
 
     const missingCounts = substancesToReconcile.filter(
-      s => reconCounts[s.id] === undefined || reconCounts[s.id].trim() === ""
+      s => getReconPhysicalCount(s.id) === undefined
     );
     if (missingCounts.length > 0) {
       toast.error(`Please provide physical counts for: ${missingCounts[0].name}`);
@@ -1597,7 +1639,7 @@ export default function App() {
 
     const missingReasons: string[] = [];
     substancesToReconcile.forEach(s => {
-      const counted = Number(reconCounts[s.id]);
+      const counted = getReconPhysicalCount(s.id) ?? 0;
       const metrics = getSubstanceHistoryMetrics(s.id);
       const variance = counted - metrics.expected;
       if (variance !== 0) {
@@ -1642,7 +1684,7 @@ export default function App() {
       const witnessName = witnessUser?.name || "";
 
       substancesToReconcile.forEach(s => {
-        const physical = Number(reconCounts[s.id]);
+        const physical = getReconPhysicalCount(s.id) ?? 0;
         const metrics = getSubstanceHistoryMetrics(s.id);
         const variance = physical - metrics.expected;
         const targetMedId = s.id;
@@ -4379,8 +4421,7 @@ export default function App() {
                         ) : (
                           [...inventory].sort(compareSubstances).map((sub) => {
                             const metrics = getSubstanceHistoryMetrics(sub.id);
-                            const enteredVal = reconCounts[sub.id] || "";
-                            const counted = enteredVal === "" ? undefined : Number(enteredVal);
+                            const counted = getReconPhysicalCount(sub.id);
                             const hasVariance = counted !== undefined && counted !== metrics.expected;
                             const varianceAmount = counted !== undefined ? counted - metrics.expected : 0;
                             
@@ -4410,17 +4451,30 @@ export default function App() {
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <div className="flex justify-center items-center">
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        placeholder="Count..."
-                                        value={enteredVal}
-                                        onChange={(e) => {
-                                          const val = e.target.value;
-                                          setReconCounts(prev => ({ ...prev, [sub.id]: val }));
-                                        }}
-                                        className="h-8 w-20 text-xs text-center font-bold border-brand-blue/10 focus:border-brand-blue bg-brand-surface"
-                                      />
+                                      {counted !== undefined ? (
+                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-brand-blue/5 border border-brand-blue/10 rounded-lg text-brand-blue font-black text-xs h-8">
+                                          <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
+                                          {counted}
+                                        </div>
+                                      ) : (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="h-8 text-[10px] font-black uppercase tracking-wider text-brand-blue border-brand-blue/15 hover:bg-brand-blue/5 rounded-xl shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1 bg-brand-surface font-sans px-2.5"
+                                          onClick={() => {
+                                            resetForm();
+                                            setSelectedSubstance(sub.id);
+                                            setSubstanceSearch(sub.name);
+                                            setTransactionType("VERIFY");
+                                            setReferenceNumber("");
+                                            setReason("");
+                                            setIsLogOpen(true);
+                                          }}
+                                        >
+                                          <Check className="h-3 w-3 text-brand-blue shrink-0" strokeWidth={3} />
+                                          Verify Count
+                                        </Button>
+                                      )}
                                     </div>
                                   </td>
                                   <td className="text-center pr-4 border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
@@ -4481,10 +4535,10 @@ export default function App() {
                         {/* Left Sign-off: Performed By */}
                         <div className="flex flex-col h-40">
                           <div className="flex justify-between items-center gap-2 mb-1.5 px-1">
-                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1 min-w-0">
+                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1.5 min-w-0">
                               <span>Performed By:</span>
                               <span className="text-brand-blue/70 font-bold normal-case font-sans truncate">
-                                {reconUserObj?.name || "Unassigned"}
+                                {reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned"}
                               </span>
                             </span>
                             <Button 
@@ -4564,9 +4618,9 @@ export default function App() {
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  const enteredCountKeys = Object.keys(reconCounts).filter(k => reconCounts[k].trim() !== "");
-                  if (enteredCountKeys.length < inventory.length) {
-                    toast.error("Please enter physical counts for all items to preview report.");
+                  const allVerified = inventory.every(sub => getReconPhysicalCount(sub.id) !== undefined);
+                  if (!allVerified) {
+                    toast.error("Please verify counts for all items to preview report.");
                     return;
                   }
                   if (!reconUser) {
@@ -4694,7 +4748,7 @@ export default function App() {
                       <tbody className="divide-y divide-gray-100">
                         {[...inventory].sort(compareSubstances).map(sub => {
                           const metrics = getSubstanceHistoryMetrics(sub.id);
-                          const counted = Number(reconCounts[sub.id]) || 0;
+                          const counted = getReconPhysicalCount(sub.id) ?? 0;
                           const variance = counted - metrics.expected;
                           const reason = reconReasons[sub.id] || "";
                           
@@ -4748,7 +4802,7 @@ export default function App() {
                           <div className="flex items-center gap-1.5 pb-2">
                             <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PERFORMED BY:</span>
                             <span className="text-[10px] text-gray-700 font-sans font-bold truncate">
-                              {reconUserObj?.name || "Unassigned"}
+                              {reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned"}
                             </span>
                           </div>
                           <div className="flex-1 flex items-center justify-center my-1">
