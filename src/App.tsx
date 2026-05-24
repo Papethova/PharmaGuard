@@ -4311,10 +4311,17 @@ export default function App() {
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
                   <div className="flex items-center gap-2.5 text-left w-full sm:w-auto">
-                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0">Performed By *</Label>
+                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0">Performed By</Label>
                     <Select value={reconUser} onValueChange={setReconUser}>
                       <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-8 text-xs font-semibold w-48 shrink-0">
-                        <SelectValue placeholder="Select..." />
+                        <SelectValue placeholder="Select...">
+                          {(() => {
+                            const u = users.find(usr => usr.id === reconUser);
+                            return u ? (
+                              <span>{u.name} {u.title && <span>({u.title})</span>}</span>
+                            ) : null;
+                          })()}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent className="bg-brand-surface">
                         {users.map(u => (
@@ -4428,9 +4435,9 @@ export default function App() {
                                   <tr className="bg-brand-blue/[0.02] hover:bg-brand-blue/[0.02]">
                                     <td colSpan={8} className="p-3 pl-4 pr-4 border-b border-brand-blue/10">
                                       <div className="w-full bg-brand-blue/5 border border-brand-blue/10 rounded-lg p-2.5">
-                                        <Label className="text-[9px] uppercase font-black text-brand-blue block mb-1">State explanation for discrepancy *</Label>
+                                        <Label className="text-[9px] font-black text-brand-blue block mb-1">Explanation For Discrepancy</Label>
                                         <Input
-                                          placeholder="State reason for variance..."
+                                          placeholder="Reason For Variance..."
                                           value={reconReasons[sub.id] || ""}
                                           onChange={(e) => {
                                             const val = e.target.value;
@@ -4506,9 +4513,6 @@ export default function App() {
                                     className: "w-full h-full cursor-crosshair bg-transparent"
                                   }}
                                 />
-                                <div className="absolute inset-x-0 bottom-1 flex justify-center pointer-events-none select-none">
-                                  <span className="text-[8px] uppercase tracking-widest text-brand-blue/30 font-bold bg-white/80 px-1.5 py-0.5 rounded shadow-sm border border-brand-blue/5">Sign here</span>
-                                </div>
                               </div>
                             )}
                           </div>
@@ -4561,9 +4565,6 @@ export default function App() {
                                     className: "w-full h-full cursor-crosshair bg-transparent"
                                   }}
                                 />
-                                <div className="absolute inset-x-0 bottom-1 flex justify-center pointer-events-none select-none">
-                                  <span className="text-[8px] uppercase tracking-widest text-brand-blue/30 font-bold bg-white/80 px-1.5 py-0.5 rounded shadow-sm border border-brand-blue/5">Sign here</span>
-                                </div>
                               </div>
                             )}
                           </div>
