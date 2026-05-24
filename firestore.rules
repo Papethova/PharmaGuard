@@ -116,10 +116,11 @@ service cloud.firestore {
 
       match /transactions/{transactionId} {
         allow read: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
-        allow create: if (isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active')) && 
-                         isValidTransaction(incoming()) &&
-                         isValidId(transactionId) &&
-                         incoming().performedBy == request.auth.uid; // Identity Integrity
+        allow create: if (isMasterAdmin() && isValidTransaction(incoming()) && isValidId(transactionId)) ||
+                         ((isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active') && 
+                          isValidTransaction(incoming()) &&
+                          isValidId(transactionId) &&
+                          incoming().performedBy == request.auth.uid); // Identity Integrity
         allow update, delete: if isMasterAdmin(); 
       }
 
