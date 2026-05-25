@@ -127,10 +127,16 @@ service cloud.firestore {
       match /staff/{staffId} {
         allow read: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
         allow create: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active' && 
-                         isValidStaff(incoming()) &&
-                         isValidId(staffId));
+                          isValidStaff(incoming()) &&
+                          isValidId(staffId));
         allow update: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active' && 
-                         isValidStaff(incoming()));
+                          isValidStaff(incoming()));
+        allow delete: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
+      }
+
+      match /reconciliation_reports/{reportId} {
+        allow read: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
+        allow create, update: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active' && isValidId(reportId));
         allow delete: if isMasterAdmin() || (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.status == 'active');
       }
     }

@@ -504,6 +504,11 @@ export default function App() {
   const picCanvasRef = useRef<any>(null);
   const [picSigData, setPicSigData] = useState<string | null>(null);
 
+  // Added history/selection states
+  const [reconViewMode, setReconViewMode] = useState<"form" | "history">("form");
+  const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
+  const [historicalReports, setHistoricalReports] = useState<any[]>([]);
+
   useEffect(() => {
     if (isReconOpen) {
       setTimeout(() => {
@@ -1153,10 +1158,19 @@ export default function App() {
       }
     });
 
+    const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
+    const unsubReports = onSnapshot(reportsRef, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setHistoricalReports(items);
+    }, (error) => {
+      console.warn("Reports listener failed:", error);
+    });
+
     return () => {
       unsubSubstances();
       unsubTransactions();
       unsubStaff();
+      unsubReports();
     };
   }, [user]);
 
@@ -1679,6 +1693,17 @@ export default function App() {
       return;
     }
 
+    let picSignature = picSigData || "";
+    if (picCanvasRef.current) {
+      const canvas = picCanvasRef.current.getCanvas ? picCanvasRef.current.getCanvas() : picCanvasRef.current;
+      if (canvas && !picCanvasRef.current.isEmpty()) {
+        const trimmedCanvas = trimSignatureCanvas(canvas);
+        if (trimmedCanvas) {
+          picSignature = trimmedCanvas.toDataURL("image/png");
+        }
+      }
+    }
+
     try {
       setIsReconSubmitting(true);
       const batch = writeBatch(db);
@@ -1690,6 +1715,30 @@ export default function App() {
       
       const witnessUser = users.find(u => u.id === reconWitness);
       const witnessName = witnessUser?.name || "";
+
+      const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
+
+      // Build items array to freeze state for the historical report
+      const reportedItems = substancesToReconcile.map(s => {
+        const physical = getReconPhysicalCount(s.id) ?? 0;
+        const metrics = getSubstanceHistoryMetrics(s.id);
+        const variance = physical - metrics.expected;
+        return {
+          substanceId: s.id,
+          substanceName: s.name,
+          strength: s.strength,
+          ndc: s.ndc,
+          lastClosingCount: metrics.lastClosingCount,
+          prevReportDate: metrics.prevReportDate,
+          purchases: metrics.purchases,
+          dispensed: metrics.dispensed,
+          adjustments: metrics.adjustments,
+          expected: metrics.expected,
+          physical: physical,
+          variance: variance,
+          reason: reconReasons[s.id] || ""
+        };
+      });
 
       substancesToReconcile.forEach(s => {
         const physical = getReconPhysicalCount(s.id) ?? 0;
@@ -1749,10 +1798,32 @@ export default function App() {
         }
       });
 
+      // Assemble report details payload
+      const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
+      const reportDocRef = doc(reportsRef);
+      const reportPayload = {
+        reportNumber: reconRef,
+        timestamp: new Date().toISOString(),
+        performedByUid: user.uid,
+        performedByName: performedByName,
+        performedByTitle: performedByTitle,
+        witnessId: reconWitness && reconWitness !== "none" ? reconWitness : "",
+        witnessName: witnessName,
+        scheduleFilter: reconScheduleFilter,
+        items: reportedItems,
+        reconSigData: signature,
+        picSigData: picSignature,
+        picName: picUserObj?.name || "None"
+      };
+
+      batch.set(reportDocRef, reportPayload);
+
       await batch.commit();
-      toast.success("Reconciliation Statement secured inside registry ledger!");
-      setIsReconOpen(false);
-      setCurrentTab("inventory");
+      toast.success("Reconciliation Report finalized and saved to registry logs!");
+      
+      // Update local states to view newly created report
+      setSelectedHistoricalReport({ id: reportDocRef.id, ...reportPayload });
+      setReconShowPreview(true);
     } catch (error: any) {
       toast.error(`System Error: ${error.message}`);
     } finally {
@@ -2862,6 +2933,8 @@ export default function App() {
                     setReconSigData(null);
                     setPicSigData(null);
                     setReconShowPreview(false);
+                    setReconViewMode("form");
+                    setSelectedHistoricalReport(null);
                     setIsReconOpen(true);
                   }}
                   className="w-full justify-start gap-4 h-11 px-4 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-base text-brand-blue font-normal"
@@ -4373,10 +4446,28 @@ export default function App() {
                 </DialogDescription>
               </div>
             </div>
+
+            {/* History button in the top header on the far right */}
+            <div className="flex items-center gap-2">
+              <Button
+                id="recon-history-button"
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setReconViewMode(reconViewMode === "history" ? "form" : "history");
+                  setSelectedHistoricalReport(null);
+                  setReconShowPreview(false);
+                }}
+                className="h-10 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-brand-yellow border border-brand-yellow/30 hover:bg-white/10 flex items-center gap-2 transition-all"
+              >
+                <History className="h-4 w-4 text-brand-yellow" strokeWidth={3} />
+                {reconViewMode === "history" ? "Show Form" : "Report History"}
+              </Button>
+            </div>
           </div>
         </DialogHeader>
 
-        <div className={`flex flex-col flex-1 min-h-0 ${reconShowPreview ? 'hidden' : ''}`}>
+        <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
           <ScrollArea className="flex-1 overflow-y-auto">
               <div className="p-6 space-y-5">
@@ -4700,6 +4791,7 @@ export default function App() {
                     }
                   }
 
+                  setSelectedHistoricalReport(null);
                   setReconShowPreview(true);
                 }}
                 className="text-xs font-black uppercase text-brand-blue border-brand-blue/10 hover:bg-brand-blue/5 rounded-xl shrink-0 gap-2 h-11"
@@ -4708,8 +4800,9 @@ export default function App() {
                 Preview Form
               </Button>
 
-              <div className="flex gap-3 justify-end">
+              <div className="flex gap-3 justify-end items-center">
                 <Button
+                  id="recon-close-button"
                   type="button"
                   variant="ghost"
                   onClick={() => {
@@ -4718,15 +4811,16 @@ export default function App() {
                   }}
                   className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl block h-11"
                 >
-                  Terminate Draft
+                  Close
                 </Button>
                 <Button
+                  id="recon-generate-report-button"
                   type="button"
                   onClick={handleReconciliationSubmit}
                   disabled={isReconSubmitting}
-                  className="text-xs font-black uppercase bg-brand-blue hover:brightness-110 text-white rounded-xl h-11 shadow-md shadow-brand-blue/20"
+                  className="text-xs font-black uppercase bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-11 shadow-md shadow-brand-yellow/20 px-6 border-none"
                 >
-                  {isReconSubmitting ? "Securing Records..." : "Secure Reconciliation Registry"}
+                  {isReconSubmitting ? "Generating..." : "Generate Report"}
                 </Button>
               </div>
             </DialogFooter>
@@ -4744,10 +4838,14 @@ export default function App() {
                     <div>
                       <h1 className="text-xl font-bold tracking-tight uppercase">PHARMACEUTICAL INVENTORY COMPLIANCE OFFICE</h1>
                       <p className="text-xs text-gray-500 font-mono mt-1">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
-                      <p className="text-xs text-gray-500 font-mono">DATE EXECUTED: {new Date().toLocaleDateString()}</p>
+                      <p className="text-xs text-gray-500 font-mono">DATE EXECUTED: {
+                        selectedHistoricalReport 
+                          ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                          : new Date().toLocaleDateString()
+                      }</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold font-mono">REPORT #: {reconRef}</p>
+                      <p className="text-sm font-bold font-mono">REPORT #: {selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef}</p>
                       <p className="text-xs text-gray-400 font-mono uppercase">CONDUIT VERIFIED</p>
                     </div>
                   </div>
@@ -4755,12 +4853,20 @@ export default function App() {
                   <div className="bg-gray-100 p-4 rounded-lg flex flex-col sm:flex-row justify-between gap-4">
                     <div>
                       <span className="text-[10px] text-gray-500 font-mono uppercase block">PERFORMED BY</span>
-                      <span className="text-sm font-bold">{users.find(u => u.id === reconUser)?.name || "AUTHORIZED STAFF"} {users.find(u => u.id === reconUser)?.title && `(${users.find(u => u.id === reconUser)?.title})`}</span>
+                      <span className="text-sm font-bold">
+                        {selectedHistoricalReport
+                          ? `${selectedHistoricalReport.performedByName} (${selectedHistoricalReport.performedByTitle})`
+                          : `${users.find(u => u.id === reconUser)?.name || "AUTHORIZED STAFF"} ${users.find(u => u.id === reconUser)?.title ? `(${users.find(u => u.id === reconUser)?.title})` : ""}`
+                        }
+                      </span>
                     </div>
                     <div>
                       <span className="text-[10px] text-gray-500 font-mono uppercase block">WITNESS STAFF</span>
                       <span className="text-sm font-bold">
-                        {reconWitness && reconWitness !== "none" ? (users.find(u => u.id === reconWitness)?.name || "PRESENT WITNESS") : "NONE / DIRECT SYSTEM AUDIT"}
+                        {selectedHistoricalReport
+                          ? (selectedHistoricalReport.witnessName || "NONE / DIRECT SYSTEM AUDIT")
+                          : (reconWitness && reconWitness !== "none" ? (users.find(u => u.id === reconWitness)?.name || "PRESENT WITNESS") : "NONE / DIRECT SYSTEM AUDIT")
+                        }
                       </span>
                     </div>
                   </div>
@@ -4794,46 +4900,85 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {[...substancesToReconcile].sort(compareSubstances).map(sub => {
-                          const metrics = getSubstanceHistoryMetrics(sub.id);
-                          const counted = getReconPhysicalCount(sub.id) ?? 0;
-                          const variance = counted - metrics.expected;
-                          const reason = reconReasons[sub.id] || "";
-                          
-                          return (
-                            <Fragment key={sub.id}>
-                              <tr className="h-10">
-                                <td className="py-1 text-center">
-                                  <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
-                                </td>
-                                <td className="py-1 text-center">
-                                  <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{sub.ndc}</span>
-                                </td>
-                                <td className="py-2 text-center text-gray-700">
-                                  <div className="text-[10px] text-gray-400 font-normal">{metrics.prevReportDate}</div>
-                                  <div className="font-bold text-gray-900 mt-0.5">{metrics.lastClosingCount}</div>
-                                </td>
-                                <td className="py-2 text-center text-gray-900 font-bold">+{metrics.purchases}</td>
-                                <td className="py-2 text-center text-gray-500">-{metrics.dispensed}</td>
-                                <td className={`py-2 text-center font-medium ${metrics.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
-                                  {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
-                                </td>
-                                <td className="py-2 text-center text-brand-blue font-bold">{metrics.expected}</td>
-                                <td className="py-2 text-center text-gray-900 font-bold">{counted} {sub.unit || "Units"}</td>
-                                <td className={`py-2 text-center font-black ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
-                                  {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
-                                </td>
-                              </tr>
-                              {variance !== 0 && (
-                                <tr className="bg-gray-50/50">
-                                  <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
-                                    Discrepancy Reason: {reason || "State reason omitted"}
+                        {selectedHistoricalReport ? (
+                          [...selectedHistoricalReport.items].map(item => {
+                            const variance = item.variance;
+                            return (
+                              <Fragment key={item.substanceId}>
+                                <tr className="h-10 text-center">
+                                  <td className="py-1 text-center font-mono">
+                                    <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-500 font-normal ml-1">({item.strength})</span></span>
+                                  </td>
+                                  <td className="py-1 text-center font-mono">
+                                    <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{item.ndc}</span>
+                                  </td>
+                                  <td className="py-2 text-center text-gray-700 font-mono">
+                                    <div className="text-[10px] text-gray-400 font-normal">{item.prevReportDate || "N/A"}</div>
+                                    <div className="font-bold text-gray-900 mt-0.5">{item.lastClosingCount || 0}</div>
+                                  </td>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">+{item.purchases || 0}</td>
+                                  <td className="py-2 text-center text-gray-500 font-mono">-{item.dispensed || 0}</td>
+                                  <td className={`py-2 text-center font-medium font-mono ${item.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
+                                    {item.adjustments >= 0 ? `+${item.adjustments}` : item.adjustments}
+                                  </td>
+                                  <td className="py-2 text-center text-brand-blue font-bold font-mono">{item.expected || 0}</td>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">{item.physical || 0}</td>
+                                  <td className={`py-2 text-center font-black font-mono ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
+                                    {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
                                   </td>
                                 </tr>
-                              )}
-                            </Fragment>
-                          );
-                        })}
+                                {variance !== 0 && (
+                                  <tr className="bg-gray-50/50">
+                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
+                                      Discrepancy Reason: {item.reason || "State reason omitted"}
+                                    </td>
+                                  </tr>
+                                )}
+                              </Fragment>
+                            );
+                          })
+                        ) : (
+                          [...substancesToReconcile].sort(compareSubstances).map(sub => {
+                            const metrics = getSubstanceHistoryMetrics(sub.id);
+                            const counted = getReconPhysicalCount(sub.id) ?? 0;
+                            const variance = counted - metrics.expected;
+                            const reason = reconReasons[sub.id] || "";
+                            
+                            return (
+                              <Fragment key={sub.id}>
+                                <tr className="h-10">
+                                  <td className="py-1 text-center">
+                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
+                                  </td>
+                                  <td className="py-1 text-center">
+                                    <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{sub.ndc}</span>
+                                  </td>
+                                  <td className="py-2 text-center text-gray-700 font-mono">
+                                    <div className="text-[10px] text-gray-400 font-normal">{metrics.prevReportDate}</div>
+                                    <div className="font-bold text-gray-900 mt-0.5">{metrics.lastClosingCount}</div>
+                                  </td>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">+{metrics.purchases}</td>
+                                  <td className="py-2 text-center text-gray-500 font-mono">-{metrics.dispensed}</td>
+                                  <td className={`py-2 text-center font-medium font-mono ${metrics.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
+                                    {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
+                                  </td>
+                                  <td className="py-2 text-center text-brand-blue font-bold font-mono">{metrics.expected}</td>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">{counted} {sub.unit || "Units"}</td>
+                                  <td className={`py-2 text-center font-black font-mono ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
+                                    {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
+                                  </td>
+                                </tr>
+                                {variance !== 0 && (
+                                  <tr className="bg-gray-50/50">
+                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
+                                      Discrepancy Reason: {reason || "State reason omitted"}
+                                    </td>
+                                  </tr>
+                                )}
+                              </Fragment>
+                            );
+                          })
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -4843,6 +4988,11 @@ export default function App() {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
                     
+                    const perfName = selectedHistoricalReport ? selectedHistoricalReport.performedByName : (reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned");
+                    const picName = selectedHistoricalReport ? selectedHistoricalReport.picName : (picUserObj?.name || "PIC NOT ASSIGNED");
+                    const userSig = selectedHistoricalReport ? selectedHistoricalReport.reconSigData : reconSigData;
+                    const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
+
                     return (
                       <div className="grid grid-cols-2 gap-8 pt-8">
                         {/* Left signature field */}
@@ -4850,12 +5000,12 @@ export default function App() {
                           <div className="flex items-center gap-1.5 pb-2">
                             <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PERFORMED BY:</span>
                             <span className="text-[10px] text-gray-700 font-sans font-bold truncate">
-                              {reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned"}
+                              {perfName}
                             </span>
                           </div>
                           <div className="flex-1 flex items-center justify-center my-1">
-                            {reconSigData ? (
-                              <img src={reconSigData} className="max-h-20 object-contain" alt="Performed by signature" />
+                            {userSig ? (
+                              <img src={userSig} className="max-h-20 object-contain" alt="Performed by signature" />
                             ) : (
                               <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
                             )}
@@ -4867,12 +5017,12 @@ export default function App() {
                           <div className="flex items-center gap-1.5 pb-2">
                             <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PIC:</span>
                             <span className="text-[10px] text-gray-700 font-sans font-bold truncate">
-                              {picUserObj?.name || "PIC NOT ASSIGNED"}
+                              {picName}
                             </span>
                           </div>
                           <div className="flex-1 flex items-center justify-center my-1">
-                            {picSigData ? (
-                              <img src={picSigData} className="max-h-20 object-contain" alt="PIC signature" />
+                            {picSig ? (
+                              <img src={picSig} className="max-h-20 object-contain" alt="PIC signature" />
                             ) : (
                               <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
                             )}
@@ -4890,10 +5040,13 @@ export default function App() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setReconShowPreview(false)}
+                onClick={() => {
+                  setReconShowPreview(false);
+                  setSelectedHistoricalReport(null);
+                }}
                 className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 border-brand-blue/10 rounded-xl h-11"
               >
-                Return to Editing
+                {selectedHistoricalReport ? "Return to Registry" : "Return to Editing"}
               </Button>
               <Button
                 type="button"
@@ -4935,6 +5088,99 @@ export default function App() {
                 }
               }
             `}</style>
+        </div>
+
+        {/* Report History View */}
+        <div className={`flex flex-col flex-1 min-h-0 ${(reconViewMode !== "history" || reconShowPreview) ? 'hidden' : ''}`}>
+          <div className="p-6 pb-2 border-b border-brand-blue/10 bg-brand-blue/5">
+            <h3 className="text-sm font-black uppercase tracking-wider text-brand-blue flex items-center gap-2 text-left">
+              <History className="h-4 w-4" strokeWidth={3} />
+              ARCHIVED COMPLIANCE RECORDS ({historicalReports.length})
+            </h3>
+            <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
+              Select any report from the ledger below to retrieve and print certified historical snapshots.
+            </p>
+          </div>
+
+          <ScrollArea className="flex-1 p-6">
+            {historicalReports.length === 0 ? (
+              <div className="text-center py-12 border-2 border-dashed border-brand-blue/15 rounded-xl bg-brand-blue/[0.01]">
+                <Clipboard className="h-10 w-10 text-brand-blue/40 mx-auto stroke-[1.5]" />
+                <p className="text-sm font-bold text-brand-blue/50 mt-4 leading-none">NO REPORTS ARCHIVED YET</p>
+                <p className="text-xs text-brand-dark-grey/50 mt-1.5 font-medium">Reconciliation reports generated by this node will automatically save here.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+                {[...historicalReports].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map((report) => (
+                  <div
+                    key={report.id}
+                    className="border border-brand-blue/10 rounded-xl hover:border-brand-blue/30 bg-brand-surface p-5 text-left transition-all hover:shadow-lg flex flex-col justify-between group relative overflow-hidden"
+                  >
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <span className="text-[10px] text-brand-blue font-black uppercase tracking-widest bg-brand-blue/5 px-2 py-0.5 rounded-lg border border-brand-blue/10">
+                            {report.scheduleFilter || "ALL"}
+                          </span>
+                          <h4 className="text-lg font-black text-brand-blue mt-2 tracking-tight group-hover:text-brand-yellow transition-all">
+                            {report.reportNumber}
+                          </h4>
+                        </div>
+                        <span className="text-[10px] uppercase font-black tracking-wider text-brand-dark-grey/50 font-mono">
+                          {new Date(report.timestamp).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 text-xs text-brand-dark-grey/80">
+                        <p className="flex items-center gap-1.5">
+                          <span className="font-bold">Performed:</span>
+                          <span className="truncate">{report.performedByName}</span>
+                          <span className="text-brand-dark-grey/50">({report.performedByTitle})</span>
+                        </p>
+                        <p className="flex items-center gap-1.5">
+                          <span className="font-bold">Witness:</span>
+                          <span className="truncate">{report.witnessName || "DIRECT SYSTEM AUDIT"}</span>
+                        </p>
+                        <p className="flex items-center gap-1.5">
+                          <span className="font-bold">Medicines:</span>
+                          <span>{report.items?.length || 0} substances reconciled</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 mt-4 border-t border-brand-blue/5 flex justify-end">
+                      <Button
+                        id={`btn-retrieve-${report.id}`}
+                        type="button"
+                        onClick={() => {
+                          setSelectedHistoricalReport(report);
+                          setReconShowPreview(true);
+                        }}
+                        className="h-8 px-4 text-[10px] font-black uppercase tracking-wider bg-brand-blue hover:brightness-110 text-white rounded-lg flex items-center gap-1.5 border-none shadow-sm"
+                      >
+                        <Search className="h-3.5 w-3.5" />
+                        Retrieve Statement
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+
+          <DialogFooter className="p-4 px-6 bg-brand-blue/5 flex justify-end border-t border-brand-blue/10 rounded-b-2xl shrink-0">
+            <Button
+              id="recon-history-close"
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setReconViewMode("form");
+              }}
+              className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 border-brand-blue/10 rounded-xl h-11 px-6"
+            >
+              Back to Form
+            </Button>
+          </DialogFooter>
         </div>
 
       </DialogContent>
