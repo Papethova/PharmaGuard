@@ -4437,10 +4437,16 @@ export default function App() {
           <div className="flex items-center justify-between relative z-10 w-full">
             <div className="flex items-center gap-4 text-left">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
-                <Search className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+                {reconViewMode === "history" ? (
+                  <Clipboard className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+                ) : (
+                  <Search className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+                )}
               </div>
               <div>
-                <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">Controlled Substance Reconciliation</DialogTitle>
+                <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+                  {reconViewMode === "history" ? "Controlled Substance Reconciliation Report History" : "Controlled Substance Reconciliation"}
+                </DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
                   VERIFY PHYSICAL HOLDINGS AGAINST DIGITAL LEDGER LOGS TO MAINTAIN ACTIVE COMPLIANCE
                 </DialogDescription>
@@ -4745,7 +4751,7 @@ export default function App() {
               </div>
             </ScrollArea>
 
-            <DialogFooter className="p-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl sm:flex-row items-center justify-between shrink-0">
+            <DialogFooter className="p-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl sm:flex-row items-center justify-between shrink-0">
               <Button
                 type="button"
                 variant="outline"
@@ -4787,7 +4793,7 @@ export default function App() {
                   setSelectedHistoricalReport(null);
                   setReconShowPreview(true);
                 }}
-                className="text-xs font-black uppercase text-brand-blue border-brand-blue/10 hover:bg-brand-blue/5 rounded-xl shrink-0 gap-2 h-11"
+                className="text-[10px] font-black uppercase tracking-widest text-brand-blue border-brand-blue/10 hover:bg-brand-blue/5 rounded-xl shrink-0 gap-2 h-12 shadow-sm"
               >
                 <Printer className="h-4 w-4" />
                 Preview Form
@@ -4802,7 +4808,7 @@ export default function App() {
                     setIsReconOpen(false);
                     setCurrentTab("inventory");
                   }}
-                  className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl block h-11"
+                  className="text-[10px] font-black uppercase tracking-widest text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl block h-12"
                 >
                   Close
                 </Button>
@@ -4811,7 +4817,7 @@ export default function App() {
                   type="button"
                   onClick={handleReconciliationSubmit}
                   disabled={isReconSubmitting}
-                  className="text-xs font-black uppercase bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-11 shadow-md shadow-brand-yellow/20 px-6 border-none"
+                  className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none"
                 >
                   {isReconSubmitting ? "Generating..." : "Generate Report"}
                 </Button>
@@ -5029,7 +5035,7 @@ export default function App() {
               </div>
             </ScrollArea>
 
-            <DialogFooter className="p-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl justify-between items-center shrink-0">
+            <DialogFooter className="p-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl justify-between items-center shrink-0">
               <Button
                 type="button"
                 variant="outline"
@@ -5037,7 +5043,7 @@ export default function App() {
                   setReconShowPreview(false);
                   setSelectedHistoricalReport(null);
                 }}
-                className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 border-brand-blue/10 rounded-xl h-11"
+                className="text-[10px] font-black uppercase tracking-widest text-brand-dark-grey hover:bg-brand-blue/5 border-brand-blue/10 rounded-xl h-12"
               >
                 {selectedHistoricalReport ? "Return to Registry" : "Return to Editing"}
               </Button>
@@ -5046,7 +5052,7 @@ export default function App() {
                 onClick={() => {
                   window.print();
                 }}
-                className="text-xs font-black uppercase bg-brand-blue hover:brightness-110 text-white rounded-xl h-11 shadow-md shadow-brand-blue/20 flex gap-2 items-center"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue hover:brightness-110 text-white rounded-xl h-12 shadow-lg shadow-brand-blue/20 flex gap-2 items-center border-none"
               >
                 <Printer className="h-4 w-4" />
                 EXECUTE SYSTEM PRINT
@@ -5087,7 +5093,6 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${(reconViewMode !== "history" || reconShowPreview) ? 'hidden' : ''}`}>
           <div className="p-6 pb-2 border-b border-brand-blue/10 bg-brand-blue/5">
             <h3 className="text-sm font-black uppercase tracking-wider text-brand-blue flex items-center gap-2 text-left">
-              <Clipboard className="h-4 w-4" strokeWidth={3} />
               ARCHIVED RECONCILIATION REPORTS ({historicalReports.length})
             </h3>
             <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
@@ -5161,14 +5166,14 @@ export default function App() {
             )}
           </ScrollArea>
 
-          <DialogFooter className="p-4 px-6 bg-brand-blue/5 flex justify-end border-t border-brand-blue/10 rounded-b-2xl shrink-0">
+          <DialogFooter className="p-6 bg-brand-blue/5 flex justify-end border-t border-brand-blue/10 rounded-b-2xl shrink-0">
             <Button
               id="recon-history-close"
               type="button"
               onClick={() => {
                 setReconViewMode("form");
               }}
-              className="text-xs font-black uppercase bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-11 shadow-md shadow-brand-yellow/20 px-6 border-none"
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none"
             >
               Back to Form
             </Button>
