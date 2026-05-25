@@ -51,6 +51,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { createPortal } from "react-dom";
 import firebaseConfig from "../firebase-applet-config.json";
 import {
   Dialog,
@@ -338,37 +339,7 @@ export default function App() {
   }
 
 
-  // Dynamic repositioning of Sonner toaster to ensure it stays as the absolute last element of document.body.
-  // This guarantees it paints on top of all backdrop-blur overlays, preventing any browser-level blurring on toasts.
-  useEffect(() => {
-    let observer: MutationObserver | null = null;
-    let timeoutId: any = null;
-
-    const repositionToaster = () => {
-      const toaster = document.querySelector('[data-sonner-toaster]') as HTMLElement;
-      if (toaster) {
-        if (document.body.lastChild !== toaster) {
-          if (observer) observer.disconnect();
-          document.body.appendChild(toaster);
-          if (observer) observer.observe(document.body, { childList: true });
-        }
-      }
-    };
-
-    observer = new MutationObserver(() => {
-      repositionToaster();
-    });
-
-    observer.observe(document.body, { childList: true });
-    
-    // Periodically run check and on load
-    timeoutId = setInterval(repositionToaster, 150);
-
-    return () => {
-      if (observer) observer.disconnect();
-      if (timeoutId) clearInterval(timeoutId);
-    };
-  }, []);
+  // Rendered natively via React Portal on document.body to stay above overlays
 
     const sigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
@@ -1554,7 +1525,8 @@ export default function App() {
           return;
         }
       } else {
-        if (sigPad.current?.isEmpty()) {
+        const pad = sigPad.current;
+        if (!pad || pad.isEmpty()) {
           toast.error(transactionType === "VERIFY" ? "Signature is required to verify the physical count" : "Signature is required for compliance");
           return;
         }
@@ -4425,15 +4397,18 @@ export default function App() {
         </div>
       </Tabs>
     </main>
-    <Toaster 
-      position="bottom-right"
-      theme="light"
-      expand={true}
-      richColors={true}
-      toastOptions={{
-        className: "sonner-industrial",
-      }}
-    />
+    {createPortal(
+      <Toaster 
+        position="bottom-right"
+        theme="light"
+        expand={true}
+        richColors={true}
+        toastOptions={{
+          className: "sonner-industrial",
+        }}
+      />,
+      document.body
+    )}
 
     {/* Reconciliation Report Dialog */}
     <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }}>
@@ -4666,7 +4641,11 @@ export default function App() {
                               </span>
                               <Select value={reconUser} onValueChange={setReconUser}>
                                 <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                  <SelectValue placeholder="Select..." />
+                                  <SelectValue placeholder="Select...">
+                                    {reconUserObj ? (
+                                      <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
+                                    ) : null}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent className="bg-brand-surface" align="start">
                                   {users.map(u => (
