@@ -475,6 +475,20 @@ export default function App() {
   const picCanvasRef = useRef<any>(null);
   const [picSigData, setPicSigData] = useState<string | null>(null);
 
+  useEffect(() => {
+    const today = new Date();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const yy = String(today.getFullYear()).slice(-2);
+    let suffix = "2345";
+    if (reconScheduleFilter === "C-II") {
+      suffix = "2";
+    } else if (reconScheduleFilter === "C-III/C-IV/C-V") {
+      suffix = "345";
+    }
+    setReconRef(`${mm}${dd}${yy}C${suffix}`);
+  }, [reconScheduleFilter]);
+
   // Added history/selection states
   const [reconViewMode, setReconViewMode] = useState<"form" | "history">("form");
   const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
@@ -2911,12 +2925,6 @@ export default function App() {
                 <Button
                   type="button"
                   onClick={() => {
-                    // Generate a standard reference number in REC-MM/DD/YY format
-                    const today = new Date();
-                    const mm = String(today.getMonth() + 1).padStart(2, '0');
-                    const dd = String(today.getDate()).padStart(2, '0');
-                    const yy = String(today.getFullYear()).slice(-2);
-                    setReconRef(`REC-${mm}/${dd}/${yy}`);
                     // Reset reconciliation forms
                     setReconScheduleFilter("ALL");
                     setReconCounts({});
@@ -4864,7 +4872,6 @@ export default function App() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold font-sans">REPORT #: {selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef}</p>
-                      <p className="text-xs text-gray-900 font-sans uppercase font-bold">CONDUIT VERIFIED</p>
                       <p className="text-xs text-gray-900 font-sans font-semibold mt-1">
                         PERFORMED BY: {
                           selectedHistoricalReport
@@ -5000,40 +5007,45 @@ export default function App() {
                     const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
 
                     return (
-                      <div className="grid grid-cols-2 gap-8 pt-8">
-                        {/* Left signature field */}
-                        <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
-                          <div className="flex items-center gap-1.5 pb-2">
-                            <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PERFORMED BY:</span>
-                            <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                              {perfName}
-                            </span>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-8 pt-8">
+                          {/* Left signature field */}
+                          <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
+                            <div className="flex items-center gap-1.5 pb-2">
+                              <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PERFORMED BY:</span>
+                              <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                                {perfName}
+                              </span>
+                            </div>
+                            <div className="flex-1 flex items-center justify-center my-1">
+                              {userSig ? (
+                                <img src={userSig} className="max-h-20 object-contain" alt="Performed by signature" />
+                              ) : (
+                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex-1 flex items-center justify-center my-1">
-                            {userSig ? (
-                              <img src={userSig} className="max-h-20 object-contain" alt="Performed by signature" />
-                            ) : (
-                              <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
-                            )}
-                          </div>
-                        </div>
 
-                        {/* Right signature field */}
-                        <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
-                          <div className="flex items-center gap-1.5 pb-2">
-                            <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
-                            <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                              {picName}
-                            </span>
-                          </div>
-                          <div className="flex-1 flex items-center justify-center my-1">
-                            {picSig ? (
-                              <img src={picSig} className="max-h-20 object-contain" alt="PIC signature" />
-                            ) : (
-                              <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
-                            )}
+                          {/* Right signature field */}
+                          <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
+                            <div className="flex items-center gap-1.5 pb-2">
+                              <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
+                              <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                                {picName}
+                              </span>
+                            </div>
+                            <div className="flex-1 flex items-center justify-center my-1">
+                              {picSig ? (
+                                <img src={picSig} className="max-h-20 object-contain" alt="PIC signature" />
+                              ) : (
+                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
+                              )}
+                            </div>
                           </div>
                         </div>
+                        <p className="text-[9px] text-gray-900 font-medium leading-normal text-left pt-2 border-t border-gray-300">
+                          By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+                        </p>
                       </div>
                     );
                   })()}
