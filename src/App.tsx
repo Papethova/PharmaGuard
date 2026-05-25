@@ -4412,7 +4412,7 @@ export default function App() {
 
     {/* Reconciliation Report Dialog */}
     <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
+      <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] h-[90vh] max-h-[90vh] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
         <DialogHeader className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center justify-between relative z-10 w-full">
             <div className="flex items-center gap-4 text-left">
@@ -4459,11 +4459,10 @@ export default function App() {
 
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
-          <ScrollArea className="flex-1 overflow-y-auto">
-              <div className="p-6 pt-4 space-y-4">
+          <div className="flex-1 min-h-0 p-6 pt-4 flex flex-col gap-4 overflow-hidden">
                 
                 {/* Meta details */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5 shrink-0">
                   <div className="flex items-center gap-2 text-left w-full sm:w-auto">
                     <div className="flex items-center gap-2">
                       {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => (
@@ -4494,7 +4493,7 @@ export default function App() {
                 </div>
 
                 {/* Substance Table List */}
-                <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col h-[460px] min-h-0">
+                <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col flex-1 min-h-0">
                   <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
                       <thead className="sticky top-0 z-40 bg-brand-blue">
@@ -4671,7 +4670,7 @@ export default function App() {
                             </Button>
                           </div>
                           
-                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={reconCanvasRef}
                               penColor="#0d3151"
@@ -4705,7 +4704,7 @@ export default function App() {
                             </Button>
                           </div>
                           
-                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={picCanvasRef}
                               penColor="#0d3151"
@@ -4722,12 +4721,11 @@ export default function App() {
                 </div>
 
                 {/* Disclaimer shifted closer to the absolute bottom edge of the form container */}
-                <p className="text-[9px] text-brand-grey font-medium leading-normal text-left mt-4 pt-2 border-t border-brand-blue/5">
+                <p className="shrink-0 text-[9px] text-brand-grey font-medium leading-normal text-left pt-2 border-t border-brand-blue/5">
                   By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
                 </p>
 
-              </div>
-            </ScrollArea>
+          </div>
 
             <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl sm:flex-row items-center justify-between shrink-0">
               <Button
