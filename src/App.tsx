@@ -4475,19 +4475,18 @@ export default function App() {
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
                   <div className="flex items-center gap-2 text-left w-full sm:w-auto">
-                    <span className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0 mr-1">Filter Class:</span>
-                    <div className="flex items-center gap-1 bg-brand-blue/10 p-1 rounded-xl">
+                    <div className="flex items-center gap-2">
                       {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => (
                         <Button
                           key={filterVal}
                           type="button"
-                          variant="ghost"
+                          variant={reconScheduleFilter === filterVal ? "default" : "outline"}
                           size="sm"
                           onClick={() => setReconScheduleFilter(filterVal)}
-                          className={`h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all leading-none ${
+                          className={`rounded-full px-6 h-10 text-xs font-extrabold tracking-wider transition-all ${
                             reconScheduleFilter === filterVal
-                              ? "bg-brand-blue text-white shadow-sm hover:bg-brand-blue hover:text-white"
-                              : "text-brand-blue hover:bg-brand-blue/5"
+                              ? "bg-brand-blue text-white border-brand-blue shadow-md"
+                              : "bg-brand-surface text-brand-blue border-brand-blue/20 hover:bg-brand-blue/5"
                           }`}
                         >
                           {filterVal}
@@ -4645,10 +4644,36 @@ export default function App() {
                         {/* Left Sign-off: Performed By */}
                         <div className="flex flex-col gap-2">
                           <div className="flex flex-col gap-1.5 px-1">
-                            <div className="flex justify-between items-center min-h-[20px]">
-                              <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">
-                                Performed By Signature
+                            {/* Blue Performed By label and Dropdown sitting next to each other */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0">
+                                Performed By:
                               </span>
+                              <Select value={reconUser} onValueChange={setReconUser}>
+                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal flex-1 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                  <SelectValue placeholder="Select">
+                                    {(() => {
+                                      const u = users.find(usr => usr.id === reconUser);
+                                      return u ? (
+                                        <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                                      ) : null;
+                                    })()}
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent className="bg-brand-surface" align="start">
+                                  {users.map(u => (
+                                    <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
+                                      {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          
+                          {/* Left Signature Canvas and Clear button right above it on the right corner */}
+                          <div className="flex flex-col">
+                            <div className="flex justify-end mb-1 pr-1">
                               <Button 
                                 type="button"
                                 variant="ghost" 
@@ -4663,50 +4688,33 @@ export default function App() {
                                 Clear
                               </Button>
                             </div>
-
-                            {/* Performed By select dropdown placed above the left signature field */}
-                            <div className="flex items-center gap-2">
-                              <Select value={reconUser} onValueChange={setReconUser}>
-                                <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-8 text-xs font-semibold w-full">
-                                  <SelectValue placeholder="Select Performed By user...">
-                                    {(() => {
-                                      const u = users.find(usr => usr.id === reconUser);
-                                      return u ? (
-                                        <span>{u.name} {u.title && <span>({u.title})</span>}</span>
-                                      ) : null;
-                                    })()}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent className="bg-brand-surface">
-                                  {users.map(u => (
-                                    <SelectItem key={u.id} value={u.id} className="text-xs text-brand-dark-grey">
-                                      {u.name} {u.title && `(${u.title})`}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                            <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                              <SignatureCanvas 
+                                ref={reconCanvasRef}
+                                penColor="#0d3151"
+                                canvasProps={{
+                                  id: "reconciliation-signature-canvas",
+                                  className: "w-full h-full cursor-crosshair bg-transparent"
+                                }}
+                              />
                             </div>
-                          </div>
-                          
-                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                            <SignatureCanvas 
-                              ref={reconCanvasRef}
-                              penColor="#0d3151"
-                              canvasProps={{
-                                id: "reconciliation-signature-canvas",
-                                className: "w-full h-full cursor-crosshair bg-transparent"
-                              }}
-                            />
                           </div>
                         </div>
 
                         {/* Right Sign-off: PIC */}
                         <div className="flex flex-col gap-2">
                           <div className="flex flex-col gap-1.5 px-1">
-                            <div className="flex justify-between items-center min-h-[20px]">
-                              <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">
-                                PIC Verification Signature
+                            {/* Registered PIC text only */}
+                            <div className="flex items-center h-9 select-none">
+                              <span className="text-xs text-brand-blue font-extrabold font-sans truncate">
+                                Registered PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
                               </span>
+                            </div>
+                          </div>
+                          
+                          {/* Right Signature Canvas and Clear button right above it on the right corner */}
+                          <div className="flex flex-col">
+                            <div className="flex justify-end mb-1 pr-1">
                               <Button 
                                 type="button"
                                 variant="ghost" 
@@ -4721,23 +4729,16 @@ export default function App() {
                                 Clear
                               </Button>
                             </div>
-
-                            <div className="flex items-center h-8 px-2.5 select-none">
-                              <span className="text-xs text-brand-blue/70 font-bold font-sans truncate">
-                                Registered PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
-                              </span>
+                            <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                              <SignatureCanvas 
+                                ref={picCanvasRef}
+                                penColor="#0d3151"
+                                canvasProps={{
+                                  id: "reconciliation-pic-signature-canvas",
+                                  className: "w-full h-full cursor-crosshair bg-transparent"
+                                }}
+                              />
                             </div>
-                          </div>
-                          
-                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                            <SignatureCanvas 
-                              ref={picCanvasRef}
-                              penColor="#0d3151"
-                              canvasProps={{
-                                id: "reconciliation-pic-signature-canvas",
-                                className: "w-full h-full cursor-crosshair bg-transparent"
-                              }}
-                            />
                           </div>
                         </div>
                       </div>
