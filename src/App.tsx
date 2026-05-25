@@ -346,7 +346,7 @@ export default function App() {
 
     const repositionToaster = () => {
       const toaster = document.querySelector('[data-sonner-toaster]') as HTMLElement;
-      if (toaster && toaster.parentElement === document.body) {
+      if (toaster) {
         if (document.body.lastChild !== toaster) {
           if (observer) observer.disconnect();
           document.body.appendChild(toaster);
