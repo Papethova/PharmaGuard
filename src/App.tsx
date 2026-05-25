@@ -4448,24 +4448,26 @@ export default function App() {
             </div>
 
             {/* History button in the top header on the far right */}
-            <div className="flex items-center gap-2">
-              <Button
-                id="recon-history-button"
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setReconViewMode(reconViewMode === "history" ? "form" : "history");
-                  setSelectedHistoricalReport(null);
-                  setReconShowPreview(false);
-                }}
-                className="h-10 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-brand-yellow border border-brand-yellow/30 hover:bg-white/10 flex items-center gap-2 transition-all"
-              >
-                <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
-                  <Clipboard className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
-                </div>
-                {reconViewMode === "history" ? "Show Form" : "Report History"}
-              </Button>
-            </div>
+            {reconViewMode !== "history" && (
+              <div className="flex items-center gap-2">
+                <Button
+                  id="recon-history-button"
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setReconViewMode("history");
+                    setSelectedHistoricalReport(null);
+                    setReconShowPreview(false);
+                  }}
+                  className="h-10 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-brand-yellow border border-brand-yellow/30 hover:bg-white/10 flex items-center gap-2 transition-all"
+                >
+                  <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
+                    <Clipboard className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                  </div>
+                  Report History
+                </Button>
+              </div>
+            )}
           </div>
         </DialogHeader>
 
@@ -5086,7 +5088,7 @@ export default function App() {
           <div className="p-6 pb-2 border-b border-brand-blue/10 bg-brand-blue/5">
             <h3 className="text-sm font-black uppercase tracking-wider text-brand-blue flex items-center gap-2 text-left">
               <Clipboard className="h-4 w-4" strokeWidth={3} />
-              ARCHIVED COMPLIANCE RECORDS ({historicalReports.length})
+              ARCHIVED RECONCILIATION REPORTS ({historicalReports.length})
             </h3>
             <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
               Select any report from the ledger below to retrieve and print certified historical snapshots.
@@ -5163,11 +5165,10 @@ export default function App() {
             <Button
               id="recon-history-close"
               type="button"
-              variant="outline"
               onClick={() => {
                 setReconViewMode("form");
               }}
-              className="text-xs font-black uppercase text-brand-dark-grey hover:bg-brand-blue/5 border-brand-blue/10 rounded-xl h-11 px-6"
+              className="text-xs font-black uppercase bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-11 shadow-md shadow-brand-yellow/20 px-6 border-none"
             >
               Back to Form
             </Button>
