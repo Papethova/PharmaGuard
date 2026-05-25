@@ -4460,7 +4460,9 @@ export default function App() {
                 }}
                 className="h-10 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-brand-yellow border border-brand-yellow/30 hover:bg-white/10 flex items-center gap-2 transition-all"
               >
-                <History className="h-4 w-4 text-brand-yellow" strokeWidth={3} />
+                <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
+                  <Clipboard className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                </div>
                 {reconViewMode === "history" ? "Show Form" : "Report History"}
               </Button>
             </div>
@@ -4643,19 +4645,19 @@ export default function App() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Left Sign-off: Performed By */}
                         <div className="flex flex-col gap-2">
-                          <div className="flex flex-col gap-1.5 px-1">
-                            {/* Blue Performed By label and Dropdown sitting next to each other */}
-                            <div className="flex items-center gap-2">
+                          {/* Inner row for label, select, and clear */}
+                          <div className="flex items-center justify-between mb-1 px-1 min-h-[28px]">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
                               <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0">
                                 Performed By:
                               </span>
                               <Select value={reconUser} onValueChange={setReconUser}>
-                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal flex-1 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 text-[10px] font-semibold w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                   <SelectValue placeholder="Select">
                                     {(() => {
                                       const u = users.find(usr => usr.id === reconUser);
                                       return u ? (
-                                        <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                                        <span className="truncate">{u.name} {u.title && <span className="text-[9px] text-brand-dark-grey/70">({u.title})</span>}</span>
                                       ) : null;
                                     })()}
                                   </SelectValue>
@@ -4669,76 +4671,64 @@ export default function App() {
                                 </SelectContent>
                               </Select>
                             </div>
+                            <Button 
+                              type="button"
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                reconCanvasRef.current?.clear();
+                                setReconSigData(null);
+                              }}
+                            >
+                              Clear
+                            </Button>
                           </div>
                           
-                          {/* Left Signature Canvas and Clear button right above it on the right corner */}
-                          <div className="flex flex-col">
-                            <div className="flex justify-end mb-1 pr-1">
-                              <Button 
-                                type="button"
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  reconCanvasRef.current?.clear();
-                                  setReconSigData(null);
-                                }}
-                              >
-                                Clear
-                              </Button>
-                            </div>
-                            <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                              <SignatureCanvas 
-                                ref={reconCanvasRef}
-                                penColor="#0d3151"
-                                canvasProps={{
-                                  id: "reconciliation-signature-canvas",
-                                  className: "w-full h-full cursor-crosshair bg-transparent"
-                                }}
-                              />
-                            </div>
+                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                            <SignatureCanvas 
+                              ref={reconCanvasRef}
+                              penColor="#0d3151"
+                              canvasProps={{
+                                id: "reconciliation-signature-canvas",
+                                className: "w-full h-full cursor-crosshair bg-transparent"
+                              }}
+                            />
                           </div>
                         </div>
 
                         {/* Right Sign-off: PIC */}
                         <div className="flex flex-col gap-2">
-                          <div className="flex flex-col gap-1.5 px-1">
-                            {/* Registered PIC text only */}
-                            <div className="flex items-center h-9 select-none">
-                              <span className="text-xs text-brand-blue font-extrabold font-sans truncate">
-                                Registered PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
-                              </span>
-                            </div>
+                          {/* Inner row for PIC and clear */}
+                          <div className="flex items-center justify-between mb-1 px-1 min-h-[28px]">
+                            <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider truncate mr-2">
+                              PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
+                            </span>
+                            <Button 
+                              type="button"
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                picCanvasRef.current?.clear();
+                                setPicSigData(null);
+                              }}
+                            >
+                              Clear
+                            </Button>
                           </div>
                           
-                          {/* Right Signature Canvas and Clear button right above it on the right corner */}
-                          <div className="flex flex-col">
-                            <div className="flex justify-end mb-1 pr-1">
-                              <Button 
-                                type="button"
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  picCanvasRef.current?.clear();
-                                  setPicSigData(null);
-                                }}
-                              >
-                                Clear
-                              </Button>
-                            </div>
-                            <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                              <SignatureCanvas 
-                                ref={picCanvasRef}
-                                penColor="#0d3151"
-                                canvasProps={{
+                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                            <SignatureCanvas 
+                              ref={picCanvasRef}
+                              penColor="#0d3151"
+                              canvasProps={{
                                   id: "reconciliation-pic-signature-canvas",
                                   className: "w-full h-full cursor-crosshair bg-transparent"
-                                }}
-                              />
-                            </div>
+                              }}
+                            />
                           </div>
                         </div>
                       </div>
@@ -5095,7 +5085,7 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${(reconViewMode !== "history" || reconShowPreview) ? 'hidden' : ''}`}>
           <div className="p-6 pb-2 border-b border-brand-blue/10 bg-brand-blue/5">
             <h3 className="text-sm font-black uppercase tracking-wider text-brand-blue flex items-center gap-2 text-left">
-              <History className="h-4 w-4" strokeWidth={3} />
+              <Clipboard className="h-4 w-4" strokeWidth={3} />
               ARCHIVED COMPLIANCE RECORDS ({historicalReports.length})
             </h3>
             <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
