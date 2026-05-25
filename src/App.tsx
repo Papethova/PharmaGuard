@@ -4433,7 +4433,7 @@ export default function App() {
     {/* Reconciliation Report Dialog */}
     <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }}>
       <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
-        <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
+        <DialogHeader className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center justify-between relative z-10 w-full">
             <div className="flex items-center gap-4 text-left">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
@@ -4474,7 +4474,7 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
           <ScrollArea className="flex-1 overflow-y-auto">
-              <div className="p-6 pt-3 space-y-5">
+              <div className="p-6 pt-1 space-y-4">
                 
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
@@ -4638,7 +4638,7 @@ export default function App() {
                 </div>
 
                 {/* Two interactive signature fields */}
-                <div className="mt-4 p-4 border border-brand-blue/10 rounded-xl bg-brand-surface space-y-4">
+                <div className="mt-4 space-y-4">
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
@@ -4646,16 +4646,16 @@ export default function App() {
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Left Sign-off: Performed By */}
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-1">
                           {/* Inner row for label, select, and clear */}
-                          <div className="flex items-center justify-between mb-1 px-1 min-h-[28px]">
-                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0">
+                          <div className="flex items-end justify-between px-1 h-9">
+                            <div className="flex items-end gap-1.5 min-w-0 flex-1">
+                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0 pb-1.5">
                                 Performed By:
                               </span>
                               <Select value={reconUser} onValueChange={setReconUser}>
                                 <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                  <SelectValue placeholder="Select">
+                                  <SelectValue placeholder="Select...">
                                     {(() => {
                                       const u = users.find(usr => usr.id === reconUser);
                                       return u ? (
@@ -4677,7 +4677,7 @@ export default function App() {
                               type="button"
                               variant="ghost" 
                               size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent"
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-1.5"
                               onClick={(e) => {
                                 e.preventDefault();
                                 reconCanvasRef.current?.clear();
@@ -4701,17 +4701,17 @@ export default function App() {
                         </div>
 
                         {/* Right Sign-off: PIC */}
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-1">
                           {/* Inner row for PIC and clear */}
-                          <div className="flex items-center justify-between mb-1 px-1 min-h-[28px]">
-                            <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider truncate mr-2">
+                          <div className="flex items-end justify-between px-1 h-9">
+                            <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-1.5">
                               PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
                             </span>
                             <Button 
                               type="button"
                               variant="ghost" 
                               size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent"
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-1.5"
                               onClick={(e) => {
                                 e.preventDefault();
                                 picCanvasRef.current?.clear();
