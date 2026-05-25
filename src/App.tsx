@@ -485,9 +485,9 @@ export default function App() {
     if (filter === "C-II") {
       return "Controlled Substance Reconciliation Report For Schedule C-II";
     } else if (filter === "C-III/C-IV/C-V") {
-      return "Controlled Substance Reconciliation Report For Schedules C-III/C-IV/CV";
+      return "Controlled Substance Reconciliation Report For Schedules C-III/C-IV/C-V";
     } else {
-      return "Controlled Substance Reconciliation Report For Schedules All";
+      return "Controlled Substance Reconciliation Report For Schedules C-II/C-III/C-IV/C-V";
     }
   };
 
@@ -5143,8 +5143,8 @@ export default function App() {
                           <span className="text-brand-dark-grey/50">({report.performedByTitle})</span>
                         </p>
                         <p className="flex items-center gap-1.5">
-                          <span className="font-bold">Witness:</span>
-                          <span className="truncate">{report.witnessName || "DIRECT SYSTEM AUDIT"}</span>
+                          <span className="font-bold">PIC:</span>
+                          <span className="truncate">{report.picName || users.find(u => u.title?.toUpperCase() === "PIC")?.name || "None"}</span>
                         </p>
                         <p className="flex items-center gap-1.5">
                           <span className="font-bold">Medicines:</span>
