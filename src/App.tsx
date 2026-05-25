@@ -4480,7 +4480,7 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
           <ScrollArea className="flex-1 overflow-y-auto">
-              <div className="p-6 pt-1 space-y-4">
+              <div className="p-6 pt-4 space-y-4">
                 
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
@@ -4514,7 +4514,7 @@ export default function App() {
                 </div>
 
                 {/* Substance Table List */}
-                <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col h-[400px] min-h-0">
+                <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col h-[460px] min-h-0">
                   <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
                       <thead className="sticky top-0 z-40 bg-brand-blue">
@@ -4644,7 +4644,7 @@ export default function App() {
                 </div>
 
                 {/* Two interactive signature fields */}
-                <div className="mt-4 space-y-4">
+                <div className="mt-8 space-y-4">
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
@@ -4652,23 +4652,16 @@ export default function App() {
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Left Sign-off: Performed By */}
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-0.5">
                           {/* Inner row for label, select, and clear */}
                           <div className="flex items-end justify-between px-1 h-9">
                             <div className="flex items-end gap-1.5 min-w-0 flex-1">
-                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0 pb-1.5">
+                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
                                 Performed By:
                               </span>
                               <Select value={reconUser} onValueChange={setReconUser}>
                                 <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                  <SelectValue placeholder="Select...">
-                                    {(() => {
-                                      const u = users.find(usr => usr.id === reconUser);
-                                      return u ? (
-                                        <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
-                                      ) : null;
-                                    })()}
-                                  </SelectValue>
+                                  <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent className="bg-brand-surface" align="start">
                                   {users.map(u => (
@@ -4683,7 +4676,7 @@ export default function App() {
                               type="button"
                               variant="ghost" 
                               size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-1.5"
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
                               onClick={(e) => {
                                 e.preventDefault();
                                 reconCanvasRef.current?.clear();
@@ -4707,17 +4700,17 @@ export default function App() {
                         </div>
 
                         {/* Right Sign-off: PIC */}
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-0.5">
                           {/* Inner row for PIC and clear */}
                           <div className="flex items-end justify-between px-1 h-9">
-                            <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-1.5">
+                            <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
                               PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
                             </span>
                             <Button 
                               type="button"
                               variant="ghost" 
                               size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-1.5"
+                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
                               onClick={(e) => {
                                 e.preventDefault();
                                 picCanvasRef.current?.clear();
@@ -4742,11 +4735,12 @@ export default function App() {
                       </div>
                     );
                   })()}
-
-                  <p className="text-[9px] text-brand-grey font-medium leading-normal text-left">
-                    By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
-                  </p>
                 </div>
+
+                {/* Disclaimer shifted closer to the absolute bottom edge of the form container */}
+                <p className="text-[9px] text-brand-grey font-medium leading-normal text-left mt-8 pt-2 border-t border-brand-blue/5">
+                  By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+                </p>
 
               </div>
             </ScrollArea>
