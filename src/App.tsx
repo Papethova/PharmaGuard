@@ -491,6 +491,7 @@ export default function App() {
 
   // Reconciliation states
   const [isReconOpen, setIsReconOpen] = useState(false);
+  const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">("ALL");
   const [reconCounts, setReconCounts] = useState<Record<string, string>>({});
   const [reconReasons, setReconReasons] = useState<Record<string, string>>({});
   const [reconUser, setReconUser] = useState("");
@@ -1631,7 +1632,6 @@ export default function App() {
       return;
     }
 
-    const substancesToReconcile = inventory;
     if (substancesToReconcile.length === 0) {
       toast.error("No active substance list found to reconcile.");
       return;
@@ -2212,6 +2212,17 @@ export default function App() {
   const lowStockItems = useMemo(() => 
     inventory.filter(s => s.currentStock <= s.minThreshold && !dismissedAlerts.includes(s.id)),
   [inventory, dismissedAlerts]);
+
+  const substancesToReconcile = useMemo(() => {
+    return inventory.filter(s => {
+      if (reconScheduleFilter === "ALL") return true;
+      if (reconScheduleFilter === "C-II") return s.schedule === "C-II";
+      if (reconScheduleFilter === "C-III/C-IV/C-V") {
+        return s.schedule === "C-III" || s.schedule === "C-IV" || s.schedule === "C-V";
+      }
+      return true;
+    });
+  }, [inventory, reconScheduleFilter]);
 
   const handleDismissAlert = (id: string) => {
     setDismissedAlerts(prev => [...prev, id]);
@@ -2843,6 +2854,7 @@ export default function App() {
                     const yy = String(today.getFullYear()).slice(-2);
                     setReconRef(`REC-${mm}/${dd}/${yy}`);
                     // Reset reconciliation forms
+                    setReconScheduleFilter("ALL");
                     setReconCounts({});
                     setReconReasons({});
                     setReconUser("");
@@ -4371,27 +4383,26 @@ export default function App() {
                 
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
-                  <div className="flex items-center gap-2.5 text-left w-full sm:w-auto">
-                    <Label htmlFor="recon-pharmacist" className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0">Performed By</Label>
-                    <Select value={reconUser} onValueChange={setReconUser}>
-                      <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-8 text-xs font-semibold w-48 shrink-0">
-                        <SelectValue placeholder="Select...">
-                          {(() => {
-                            const u = users.find(usr => usr.id === reconUser);
-                            return u ? (
-                              <span>{u.name} {u.title && <span>({u.title})</span>}</span>
-                            ) : null;
-                          })()}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent className="bg-brand-surface">
-                        {users.map(u => (
-                          <SelectItem key={u.id} value={u.id} className="text-xs text-brand-dark-grey">
-                            {u.name} {u.title && `(${u.title})`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="flex items-center gap-2 text-left w-full sm:w-auto">
+                    <span className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0 mr-1">Filter Class:</span>
+                    <div className="flex items-center gap-1 bg-brand-blue/10 p-1 rounded-xl">
+                      {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => (
+                        <Button
+                          key={filterVal}
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setReconScheduleFilter(filterVal)}
+                          className={`h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all leading-none ${
+                            reconScheduleFilter === filterVal
+                              ? "bg-brand-blue text-white shadow-sm hover:bg-brand-blue hover:text-white"
+                              : "text-brand-blue hover:bg-brand-blue/5"
+                          }`}
+                        >
+                          {filterVal}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2.5 text-left w-full sm:w-auto sm:justify-end">
@@ -4420,14 +4431,14 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody>
-                        {inventory.length === 0 ? (
+                        {substancesToReconcile.length === 0 ? (
                           <tr className="border-b border-brand-blue/10">
                             <td colSpan={9} className="text-center py-12 text-brand-dark-grey/50 align-middle">
                               No medications are matching the current node registry list.
                             </td>
                           </tr>
                         ) : (
-                          [...inventory].sort(compareSubstances).map((sub) => {
+                          [...substancesToReconcile].sort(compareSubstances).map((sub) => {
                             const metrics = getSubstanceHistoryMetrics(sub.id);
                             const counted = getReconPhysicalCount(sub.id);
                             const hasVariance = counted !== undefined && counted !== metrics.expected;
@@ -4541,70 +4552,99 @@ export default function App() {
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Left Sign-off: Performed By */}
-                        <div className="flex flex-col h-40">
-                          <div className="flex justify-between items-center gap-2 mb-1.5 px-1">
-                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1.5 min-w-0">
-                              <span>Performed By:</span>
-                              <span className="text-brand-blue/70 font-bold normal-case font-sans truncate">
-                                {reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned"}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex flex-col gap-1.5 px-1">
+                            <div className="flex justify-between items-center min-h-[20px]">
+                              <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">
+                                Performed By Signature
                               </span>
-                            </span>
-                            <Button 
-                              type="button"
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                reconCanvasRef.current?.clear();
-                                setReconSigData(null);
-                              }}
-                            >
-                              Clear
-                            </Button>
+                              <Button 
+                                type="button"
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  reconCanvasRef.current?.clear();
+                                  setReconSigData(null);
+                                }}
+                              >
+                                Clear
+                              </Button>
+                            </div>
+
+                            {/* Performed By select dropdown placed above the left signature field */}
+                            <div className="flex items-center gap-2">
+                              <Select value={reconUser} onValueChange={setReconUser}>
+                                <SelectTrigger id="recon-pharmacist" className="border-brand-blue/10 focus:ring-brand-blue bg-brand-surface h-8 text-xs font-semibold w-full">
+                                  <SelectValue placeholder="Select Performed By user...">
+                                    {(() => {
+                                      const u = users.find(usr => usr.id === reconUser);
+                                      return u ? (
+                                        <span>{u.name} {u.title && <span>({u.title})</span>}</span>
+                                      ) : null;
+                                    })()}
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent className="bg-brand-surface">
+                                  {users.map(u => (
+                                    <SelectItem key={u.id} value={u.id} className="text-xs text-brand-dark-grey">
+                                      {u.name} {u.title && `(${u.title})`}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
-                          <div className="flex-1 relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          
+                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={reconCanvasRef}
                               penColor="#0d3151"
                               canvasProps={{
                                 id: "reconciliation-signature-canvas",
-                                className: "w-full h-[120px] cursor-crosshair bg-transparent"
+                                className: "w-full h-full cursor-crosshair bg-transparent"
                               }}
                             />
                           </div>
                         </div>
 
                         {/* Right Sign-off: PIC */}
-                        <div className="flex flex-col h-40">
-                          <div className="flex justify-between items-center gap-2 mb-1.5 px-1">
-                            <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider flex items-center gap-1 min-w-0">
-                              <span>PIC:</span>
-                              <span className="text-brand-blue/70 font-bold normal-case font-sans truncate">
-                                {picUserObj?.name || "PIC NOT ASSIGNED"}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex flex-col gap-1.5 px-1">
+                            <div className="flex justify-between items-center min-h-[20px]">
+                              <span className="text-[10px] text-brand-blue/80 font-black uppercase tracking-wider">
+                                PIC Verification Signature
                               </span>
-                            </span>
-                            <Button 
-                              type="button"
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                picCanvasRef.current?.clear();
-                                setPicSigData(null);
-                              }}
-                            >
-                              Clear
-                            </Button>
+                              <Button 
+                                type="button"
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1.5 font-bold shrink-0 bg-brand-blue/5 hover:bg-brand-blue/10 rounded"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  picCanvasRef.current?.clear();
+                                  setPicSigData(null);
+                                }}
+                              >
+                                Clear
+                              </Button>
+                            </div>
+
+                            <div className="flex items-center h-8 px-2.5 select-none">
+                              <span className="text-xs text-brand-blue/70 font-bold font-sans truncate">
+                                Registered PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex-1 relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          
+                          <div className="h-[120px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={picCanvasRef}
                               penColor="#0d3151"
                               canvasProps={{
                                 id: "reconciliation-pic-signature-canvas",
-                                className: "w-full h-[120px] cursor-crosshair bg-transparent"
+                                className: "w-full h-full cursor-crosshair bg-transparent"
                               }}
                             />
                           </div>
@@ -4626,9 +4666,9 @@ export default function App() {
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  const allVerified = inventory.every(sub => getReconPhysicalCount(sub.id) !== undefined);
+                  const allVerified = substancesToReconcile.every(sub => getReconPhysicalCount(sub.id) !== undefined);
                   if (!allVerified) {
-                    toast.error("Please verify counts for all items to preview report.");
+                    toast.error("Please verify counts for all filtered items to preview report.");
                     return;
                   }
                   if (!reconUser) {
@@ -4754,7 +4794,7 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {[...inventory].sort(compareSubstances).map(sub => {
+                        {[...substancesToReconcile].sort(compareSubstances).map(sub => {
                           const metrics = getSubstanceHistoryMetrics(sub.id);
                           const counted = getReconPhysicalCount(sub.id) ?? 0;
                           const variance = counted - metrics.expected;
