@@ -480,6 +480,17 @@ export default function App() {
   const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
   const [historicalReports, setHistoricalReports] = useState<any[]>([]);
 
+  const getReportTitle = () => {
+    const filter = selectedHistoricalReport ? selectedHistoricalReport.scheduleFilter : reconScheduleFilter;
+    if (filter === "C-II") {
+      return "Controlled Substance Reconciliation Report For Schedule C-II";
+    } else if (filter === "C-III/C-IV/C-V") {
+      return "Controlled Substance Reconciliation Report For Schedules C-III/C-IV/CV";
+    } else {
+      return "Controlled Substance Reconciliation Report For Schedules All";
+    }
+  };
+
   useEffect(() => {
     if (isReconOpen) {
       setTimeout(() => {
@@ -1632,7 +1643,7 @@ export default function App() {
       s => getReconPhysicalCount(s.id) === undefined
     );
     if (missingCounts.length > 0) {
-      toast.error(`Please provide physical counts for: ${missingCounts[0].name}`);
+      toast.error(`Please provide physical counts for: ${missingCounts.map(m => m.name).join(", ")}`);
       return;
     }
 
@@ -1666,7 +1677,7 @@ export default function App() {
     }
 
     if (!signature) {
-      toast.error("Authorizing pharmacist signature is required to secure the reconciliation statement");
+      toast.error("Performed By signature is required.");
       return;
     }
 
@@ -1679,6 +1690,11 @@ export default function App() {
           picSignature = trimmedCanvas.toDataURL("image/png");
         }
       }
+    }
+
+    if (!picSignature) {
+      toast.error("PIC signature is required.");
+      return;
     }
 
     try {
@@ -4742,29 +4758,56 @@ export default function App() {
                     return;
                   }
 
-                  // Capture and trim signatures from canvases for preview display
+                  // Check if any variance items are missing explanations
+                  const missingReasons: string[] = [];
+                  substancesToReconcile.forEach(s => {
+                    const counted = getReconPhysicalCount(s.id) ?? 0;
+                    const metrics = getSubstanceHistoryMetrics(s.id);
+                    const variance = counted - metrics.expected;
+                    if (variance !== 0) {
+                      const reasonStr = reconReasons[s.id];
+                      if (!reasonStr || !reasonStr.trim()) {
+                        missingReasons.push(s.name);
+                      }
+                    }
+                  });
+                  if (missingReasons.length > 0) {
+                    toast.error(`Reason of variance required for: ${missingReasons.join(", ")}`);
+                    return;
+                  }
+
+                  // Capture and check signatures from canvases
+                  let localReconSig: string | null = null;
                   if (reconCanvasRef.current) {
                     const canvas = reconCanvasRef.current.getCanvas ? reconCanvasRef.current.getCanvas() : reconCanvasRef.current;
                     if (canvas && !reconCanvasRef.current.isEmpty()) {
                       const trimmed = trimSignatureCanvas(canvas);
                       if (trimmed) {
-                        setReconSigData(trimmed.toDataURL("image/png"));
+                        localReconSig = trimmed.toDataURL("image/png");
                       }
-                    } else if (reconCanvasRef.current.isEmpty()) {
-                      setReconSigData(null);
                     }
                   }
+                  if (!localReconSig) {
+                    toast.error("Performed By signature is required.");
+                    return;
+                  }
+                  setReconSigData(localReconSig);
+
+                  let localPicSig: string | null = null;
                   if (picCanvasRef.current) {
                     const canvas = picCanvasRef.current.getCanvas ? picCanvasRef.current.getCanvas() : picCanvasRef.current;
                     if (canvas && !picCanvasRef.current.isEmpty()) {
                       const trimmed = trimSignatureCanvas(canvas);
                       if (trimmed) {
-                        setPicSigData(trimmed.toDataURL("image/png"));
+                        localPicSig = trimmed.toDataURL("image/png");
                       }
-                    } else if (picCanvasRef.current.isEmpty()) {
-                      setPicSigData(null);
                     }
                   }
+                  if (!localPicSig) {
+                    toast.error("PIC signature is required.");
+                    return;
+                  }
+                  setPicSigData(localPicSig);
 
                   setSelectedHistoricalReport(null);
                   setReconShowPreview(true);
@@ -4806,50 +4849,38 @@ export default function App() {
           <ScrollArea className="flex-1 overflow-y-auto">
               {/* Added print root anchor */}
               <div id="reconciliation-printable-root">
-                <div id="reconciliation-printable-invoice" className="p-8 space-y-6 text-left selection:bg-brand-yellow/30 bg-white text-black">
+                <div id="reconciliation-printable-invoice" className="p-8 space-y-6 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
                   
                   {/* Visual Official Letterhead */}
                   <div className="flex justify-between items-start border-b-2 border-black pb-4">
                     <div>
-                      <h1 className="text-xl font-bold tracking-tight uppercase">PHARMACEUTICAL INVENTORY COMPLIANCE OFFICE</h1>
-                      <p className="text-xs text-gray-500 font-mono mt-1">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
-                      <p className="text-xs text-gray-500 font-mono">DATE EXECUTED: {
+                      <h1 className="text-xl font-bold tracking-tight uppercase">{getReportTitle().toUpperCase()}</h1>
+                      <p className="text-xs text-gray-900 font-sans mt-1">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+                      <p className="text-xs text-gray-900 font-sans">DATE EXECUTED: {
                         selectedHistoricalReport 
                           ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                           : new Date().toLocaleDateString()
                       }</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold font-mono">REPORT #: {selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef}</p>
-                      <p className="text-xs text-gray-400 font-mono uppercase">CONDUIT VERIFIED</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-100 p-4 rounded-lg flex flex-col sm:flex-row justify-between gap-4">
-                    <div>
-                      <span className="text-[10px] text-gray-500 font-mono uppercase block">PERFORMED BY</span>
-                      <span className="text-sm font-bold">
-                        {selectedHistoricalReport
-                          ? `${selectedHistoricalReport.performedByName} (${selectedHistoricalReport.performedByTitle})`
-                          : `${users.find(u => u.id === reconUser)?.name || "AUTHORIZED STAFF"} ${users.find(u => u.id === reconUser)?.title ? `(${users.find(u => u.id === reconUser)?.title})` : ""}`
+                      <p className="text-sm font-bold font-sans">REPORT #: {selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef}</p>
+                      <p className="text-xs text-gray-900 font-sans uppercase font-bold">CONDUIT VERIFIED</p>
+                      <p className="text-xs text-gray-900 font-sans font-semibold mt-1">
+                        PERFORMED BY: {
+                          selectedHistoricalReport
+                            ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
+                            : (() => {
+                                const selectedUserObj = users.find(u => u.id === reconUser);
+                                return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
+                              })()
                         }
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-gray-500 font-mono uppercase block">WITNESS STAFF</span>
-                      <span className="text-sm font-bold">
-                        {selectedHistoricalReport
-                          ? (selectedHistoricalReport.witnessName || "NONE / DIRECT SYSTEM AUDIT")
-                          : (reconWitness && reconWitness !== "none" ? (users.find(u => u.id === reconWitness)?.name || "PRESENT WITNESS") : "NONE / DIRECT SYSTEM AUDIT")
-                        }
-                      </span>
+                      </p>
                     </div>
                   </div>
 
                   {/* Audit Grid/Table */}
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold tracking-wider uppercase font-mono border-b border-gray-300 pb-1">RECONCILED CONTROLLED INVENTORY STATEMENT</h3>
-                    <table className="w-full text-xs font-mono">
+                    <table className="w-full text-xs font-sans text-gray-900">
                       <colgroup>
                         <col className="w-[22%]" />
                         <col className="w-[11%]" />
@@ -4880,31 +4911,31 @@ export default function App() {
                             const variance = item.variance;
                             return (
                               <Fragment key={item.substanceId}>
-                                <tr className="h-10 text-center">
-                                  <td className="py-1 text-center font-mono">
-                                    <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-500 font-normal ml-1">({item.strength})</span></span>
+                                <tr className="h-10 text-center text-gray-900 font-sans">
+                                  <td className="py-1 text-center font-sans">
+                                    <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span></span>
                                   </td>
-                                  <td className="py-1 text-center font-mono">
-                                    <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{item.ndc}</span>
+                                  <td className="py-1 text-center font-sans">
+                                    <span className="text-[10px] text-gray-900 font-sans">{item.ndc}</span>
                                   </td>
-                                  <td className="py-2 text-center text-gray-700 font-mono">
-                                    <div className="text-[10px] text-gray-400 font-normal">{item.prevReportDate || "N/A"}</div>
+                                  <td className="py-2 text-center text-gray-900 font-sans">
+                                    <div className="text-[10px] text-gray-900 font-normal">{item.prevReportDate || "N/A"}</div>
                                     <div className="font-bold text-gray-900 mt-0.5">{item.lastClosingCount || 0}</div>
                                   </td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">+{item.purchases || 0}</td>
-                                  <td className="py-2 text-center text-gray-500 font-mono">-{item.dispensed || 0}</td>
-                                  <td className={`py-2 text-center font-medium font-mono ${item.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">+{item.purchases || 0}</td>
+                                  <td className="py-2 text-center text-gray-900 font-sans">-{item.dispensed || 0}</td>
+                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
                                     {item.adjustments >= 0 ? `+${item.adjustments}` : item.adjustments}
                                   </td>
-                                  <td className="py-2 text-center text-brand-blue font-bold font-mono">{item.expected || 0}</td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">{item.physical || 0}</td>
-                                  <td className={`py-2 text-center font-black font-mono ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.expected || 0}</td>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.physical || 0}</td>
+                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
                                     {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
                                   </td>
                                 </tr>
                                 {variance !== 0 && (
                                   <tr className="bg-gray-50/50">
-                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
+                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
                                       Discrepancy Reason: {item.reason || "State reason omitted"}
                                     </td>
                                   </tr>
@@ -4921,31 +4952,31 @@ export default function App() {
                             
                             return (
                               <Fragment key={sub.id}>
-                                <tr className="h-10">
-                                  <td className="py-1 text-center">
-                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-500 font-normal ml-1">({sub.strength})</span></span>
+                                <tr className="h-10 text-center text-gray-900 font-sans">
+                                  <td className="py-1 text-center font-sans">
+                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span></span>
                                   </td>
-                                  <td className="py-1 text-center">
-                                    <span className="text-[9px] text-gray-400 font-mono bg-gray-100/50 border border-gray-200/50 rounded px-1">{sub.ndc}</span>
+                                  <td className="py-1 text-center font-sans">
+                                    <span className="text-[10px] text-gray-900 font-sans">{sub.ndc}</span>
                                   </td>
-                                  <td className="py-2 text-center text-gray-700 font-mono">
-                                    <div className="text-[10px] text-gray-400 font-normal">{metrics.prevReportDate}</div>
+                                  <td className="py-2 text-center text-gray-900 font-sans">
+                                    <div className="text-[10px] text-gray-900 font-normal">{metrics.prevReportDate}</div>
                                     <div className="font-bold text-gray-900 mt-0.5">{metrics.lastClosingCount}</div>
                                   </td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">+{metrics.purchases}</td>
-                                  <td className="py-2 text-center text-gray-500 font-mono">-{metrics.dispensed}</td>
-                                  <td className={`py-2 text-center font-medium font-mono ${metrics.adjustments === 0 ? 'text-gray-400' : 'text-gray-900 font-bold'}`}>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">+{metrics.purchases}</td>
+                                  <td className="py-2 text-center text-gray-900 font-sans">-{metrics.dispensed}</td>
+                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
                                     {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                   </td>
-                                  <td className="py-2 text-center text-brand-blue font-bold font-mono">{metrics.expected}</td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-mono">{counted} {sub.unit || "Units"}</td>
-                                  <td className={`py-2 text-center font-black font-mono ${variance === 0 ? 'text-gray-400' : 'text-brand-blue underline'}`}>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{metrics.expected}</td>
+                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{counted} {sub.unit || "Units"}</td>
+                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
                                     {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
                                   </td>
                                 </tr>
                                 {variance !== 0 && (
                                   <tr className="bg-gray-50/50">
-                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-brand-blue text-[10px] text-gray-600 italic">
+                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
                                       Discrepancy Reason: {reason || "State reason omitted"}
                                     </td>
                                   </tr>
@@ -4973,8 +5004,8 @@ export default function App() {
                         {/* Left signature field */}
                         <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
                           <div className="flex items-center gap-1.5 pb-2">
-                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PERFORMED BY:</span>
-                            <span className="text-[10px] text-gray-700 font-sans font-bold truncate">
+                            <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PERFORMED BY:</span>
+                            <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                               {perfName}
                             </span>
                           </div>
@@ -4982,7 +5013,7 @@ export default function App() {
                             {userSig ? (
                               <img src={userSig} className="max-h-20 object-contain" alt="Performed by signature" />
                             ) : (
-                              <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
+                              <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
                             )}
                           </div>
                         </div>
@@ -4990,8 +5021,8 @@ export default function App() {
                         {/* Right signature field */}
                         <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
                           <div className="flex items-center gap-1.5 pb-2">
-                            <span className="text-[10px] text-gray-500 font-mono uppercase font-black tracking-wider">PIC:</span>
-                            <span className="text-[10px] text-gray-700 font-sans font-bold truncate">
+                            <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
+                            <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                               {picName}
                             </span>
                           </div>
@@ -4999,7 +5030,7 @@ export default function App() {
                             {picSig ? (
                               <img src={picSig} className="max-h-20 object-contain" alt="PIC signature" />
                             ) : (
-                              <span className="text-gray-400 text-[9px] uppercase tracking-wider italic">No signature captured</span>
+                              <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
                             )}
                           </div>
                         </div>
