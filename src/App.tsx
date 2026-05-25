@@ -1462,6 +1462,11 @@ export default function App() {
     let medId = selectedSubstance;
 
     try {
+      if (!selectedUser) {
+        toast.error("Please select a performing user from the dropdown");
+        return;
+      }
+
       if (transactionType === "IN" && !medId) {
         if (!newMed.name || !newMed.strength || !newMed.ndc || !newMed.unit || !newMed.packageSize || !newMed.minThreshold) {
           toast.error("Please fill in all medication fields");
@@ -1542,7 +1547,7 @@ export default function App() {
         return;
       }
 
-      const isUsingPhoto = userProfile?.isPhotoRequirementEnabled && !useSignatureFallback;
+      const isUsingPhoto = userProfile?.isPhotoRequirementEnabled && !useSignatureFallback && transactionType !== "VERIFY";
       if (isUsingPhoto) {
         if (!capturedPhoto) {
           toast.error("Photo capture is required for compliance");
@@ -1550,7 +1555,7 @@ export default function App() {
         }
       } else {
         if (sigPad.current?.isEmpty()) {
-          toast.error("Signature is required for compliance");
+          toast.error(transactionType === "VERIFY" ? "Signature is required to verify the physical count" : "Signature is required for compliance");
           return;
         }
       }
@@ -3482,7 +3487,7 @@ export default function App() {
                   </div>
 
                       <div className="grid gap-1.5">
-                        {(userProfile?.isPhotoRequirementEnabled && !useSignatureFallback) ? (
+                        {(userProfile?.isPhotoRequirementEnabled && !useSignatureFallback && transactionType !== "VERIFY") ? (
                           <div className="space-y-2">
                              <Label className="flex justify-between items-center text-brand-dark-grey text-xs">
                               Identity Verification Capture
@@ -4644,7 +4649,7 @@ export default function App() {
                 </div>
 
                 {/* Two interactive signature fields */}
-                <div className="mt-8 space-y-4">
+                <div className="mt-4 space-y-4">
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
@@ -4738,14 +4743,14 @@ export default function App() {
                 </div>
 
                 {/* Disclaimer shifted closer to the absolute bottom edge of the form container */}
-                <p className="text-[9px] text-brand-grey font-medium leading-normal text-left mt-8 pt-2 border-t border-brand-blue/5">
+                <p className="text-[9px] text-brand-grey font-medium leading-normal text-left mt-4 pt-2 border-t border-brand-blue/5">
                   By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
                 </p>
 
               </div>
             </ScrollArea>
 
-            <DialogFooter className="p-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl sm:flex-row items-center justify-between shrink-0">
+            <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl sm:flex-row items-center justify-between shrink-0">
               <Button
                 type="button"
                 variant="outline"
@@ -5029,7 +5034,7 @@ export default function App() {
               </div>
             </ScrollArea>
 
-            <DialogFooter className="p-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl justify-between items-center shrink-0">
+            <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl justify-between items-center shrink-0">
               <Button
                 type="button"
                 variant="outline"
@@ -5160,7 +5165,7 @@ export default function App() {
             )}
           </ScrollArea>
 
-          <DialogFooter className="p-6 bg-brand-blue/5 flex justify-end border-t border-brand-blue/10 rounded-b-2xl shrink-0">
+          <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex justify-end border-t border-brand-blue/10 rounded-b-2xl shrink-0">
             <Button
               id="recon-history-close"
               type="button"
