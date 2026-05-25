@@ -4652,12 +4652,12 @@ export default function App() {
                                 Performed By:
                               </span>
                               <Select value={reconUser} onValueChange={setReconUser}>
-                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 text-[10px] font-semibold w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                   <SelectValue placeholder="Select">
                                     {(() => {
                                       const u = users.find(usr => usr.id === reconUser);
                                       return u ? (
-                                        <span className="truncate">{u.name} {u.title && <span className="text-[9px] text-brand-dark-grey/70">({u.title})</span>}</span>
+                                        <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
                                       ) : null;
                                     })()}
                                   </SelectValue>
