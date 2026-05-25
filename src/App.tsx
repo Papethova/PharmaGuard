@@ -2837,7 +2837,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className={`flex-1 h-[calc(100dvh-3.5rem)] min-h-0 max-w-[1800px] mx-auto p-4 md:pt-2 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto overflow-hidden ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
+      <main className={`flex-1 h-[calc(100dvh-3.5rem)] min-h-0 max-w-[1800px] mx-auto px-4 pb-4 pt-1 md:pt-0.5 md:pb-8 md:px-8 lg:px-12 w-full flex flex-col touch-auto overflow-hidden ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
         <Tabs 
           value={currentTab} 
           orientation="vertical"
@@ -4472,7 +4472,7 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
           <ScrollArea className="flex-1 overflow-y-auto">
-              <div className="p-6 space-y-5">
+              <div className="p-6 pt-3 space-y-5">
                 
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5">
