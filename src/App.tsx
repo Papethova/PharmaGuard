@@ -4809,115 +4809,155 @@ export default function App() {
                   </div>
 
                   {/* Audit Grid/Table */}
-                  <div className="space-y-4">
-                    <table className="w-full text-xs font-sans text-gray-900">
-                      <colgroup>
-                        <col className="w-[22%]" />
-                        <col className="w-[11%]" />
-                        <col className="w-[11%]" />
-                        <col className="w-[8%]" />
-                        <col className="w-[8%]" />
-                        <col className="w-[8%]" />
-                        <col className="w-[11%]" />
-                        <col className="w-[11%]" />
-                        <col className="w-[10%]" />
-                      </colgroup>
-                      <thead>
-                        <tr className="border-b-2 border-gray-200">
-                          <th className="py-2 text-center font-bold">MEDICATION</th>
-                          <th className="py-2 text-center font-bold">NDC</th>
-                          <th className="py-2 text-center font-bold">LAST REPORT</th>
-                          <th className="py-2 text-center font-bold">PURCHASED</th>
-                          <th className="py-2 text-center font-bold">DISPENSED</th>
-                          <th className="py-2 text-center font-bold">ADJUSTED</th>
-                          <th className="py-2 text-center font-bold">EXPECTED COUNT</th>
-                          <th className="py-2 text-center font-bold">PHYSICAL COUNT</th>
-                          <th className="py-2 text-center font-bold">VARIANCE</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {selectedHistoricalReport ? (
-                          [...selectedHistoricalReport.items].map(item => {
-                            const variance = item.variance;
-                            return (
-                              <Fragment key={item.substanceId}>
-                                <tr className="h-10 text-center text-gray-900 font-sans">
-                                  <td className="py-1 text-center font-sans">
-                                    <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-900 font-bold ml-1">{item.strength}</span></span>
-                                  </td>
-                                  <td className="py-1 text-center font-sans">
-                                    <span className="font-bold text-gray-900 font-sans">{item.ndc}</span>
-                                  </td>
-                                  <td className="py-2 text-center text-gray-900 font-sans">
-                                    <div className="text-[10px] text-gray-900 font-normal">{item.prevReportDate || "N/A"}</div>
-                                    <div className="font-bold text-gray-900 mt-0.5">{item.lastClosingCount || 0}</div>
-                                  </td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">+{item.purchases || 0}</td>
-                                  <td className="py-2 text-center text-gray-900 font-sans">-{item.dispensed || 0}</td>
-                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                    {item.adjustments >= 0 ? `+${item.adjustments}` : item.adjustments}
-                                  </td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.expected || 0}</td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.physical || 0}</td>
-                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                    {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
-                                  </td>
-                                </tr>
-                                {variance !== 0 && (
-                                  <tr className="bg-gray-50/50">
-                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
-                                      Discrepancy Reason: {item.reason || "State reason omitted"}
-                                    </td>
-                                  </tr>
-                                )}
-                              </Fragment>
-                            );
-                          })
-                        ) : (
-                          [...substancesToReconcile].sort(compareSubstances).map(sub => {
-                            const metrics = getSubstanceHistoryMetrics(sub.id);
-                            const counted = getReconPhysicalCount(sub.id) ?? 0;
-                            const variance = counted - metrics.expected;
-                            const reason = reconReasons[sub.id] || "";
-                            
-                            return (
-                              <Fragment key={sub.id}>
-                                <tr className="h-10 text-center text-gray-900 font-sans">
-                                  <td className="py-1 text-center font-sans">
-                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-900 font-bold ml-1">{sub.strength}</span></span>
-                                  </td>
-                                  <td className="py-1 text-center font-sans">
-                                    <span className="font-bold text-gray-900 font-sans">{sub.ndc}</span>
-                                  </td>
-                                  <td className="py-2 text-center text-gray-900 font-sans">
-                                    <div className="text-[10px] text-gray-900 font-normal">{metrics.prevReportDate}</div>
-                                    <div className="font-bold text-gray-900 mt-0.5">{metrics.lastClosingCount}</div>
-                                  </td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">+{metrics.purchases}</td>
-                                  <td className="py-2 text-center text-gray-900 font-sans">-{metrics.dispensed}</td>
-                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                    {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
-                                  </td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{metrics.expected}</td>
-                                  <td className="py-2 text-center text-gray-900 font-bold font-sans">{counted} {sub.unit || "Units"}</td>
-                                  <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                    {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
-                                  </td>
-                                </tr>
-                                {variance !== 0 && (
-                                  <tr className="bg-gray-50/50">
-                                    <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
-                                      Discrepancy Reason: {reason || "State reason omitted"}
-                                    </td>
-                                  </tr>
-                                )}
-                              </Fragment>
-                            );
-                          })
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                  {(() => {
+                    const formatToFourDigitYear = (dateStr: string) => {
+                      if (!dateStr || dateStr === "N/A") return "N/A";
+                      const parts = dateStr.split("/");
+                      if (parts.length === 3) {
+                        let year = parts[2];
+                        if (year.length === 2) {
+                          year = "20" + year;
+                        }
+                        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${year}`;
+                      }
+                      return dateStr;
+                    };
+
+                    const headerPrevReportDate = (() => {
+                      if (selectedHistoricalReport) {
+                        const firstItem = selectedHistoricalReport.items[0];
+                        return formatToFourDigitYear(firstItem?.prevReportDate || "N/A");
+                      } else {
+                        const firstSub = substancesToReconcile[0];
+                        if (firstSub) {
+                          const metrics = getSubstanceHistoryMetrics(firstSub.id);
+                          return formatToFourDigitYear(metrics.prevReportDate);
+                        }
+                        return formatToFourDigitYear(lastReport.date);
+                      }
+                    })();
+
+                    return (
+                      <div className="space-y-4">
+                        <table className="w-full text-xs font-sans text-gray-900">
+                          <colgroup>
+                            <col className="w-[22%]" />
+                            <col className="w-[11%]" />
+                            <col className="w-[11%]" />
+                            <col className="w-[8%]" />
+                            <col className="w-[8%]" />
+                            <col className="w-[8%]" />
+                            <col className="w-[11%]" />
+                            <col className="w-[11%]" />
+                            <col className="w-[10%]" />
+                          </colgroup>
+                          <thead>
+                            <tr className="border-b-2 border-gray-200">
+                              <th className="py-2 text-center font-bold">MEDICATION</th>
+                              <th className="py-2 text-center font-bold">NDC</th>
+                              <th className="py-2 text-center font-bold leading-normal">
+                                <div>LAST REPORT</div>
+                                <div className="text-[10px] text-gray-500 font-normal mt-0.5">{headerPrevReportDate}</div>
+                              </th>
+                              <th className="py-2 text-center font-bold">PURCHASED</th>
+                              <th className="py-2 text-center font-bold">DISPENSED</th>
+                              <th className="py-2 text-center font-bold">ADJUSTED</th>
+                              <th className="py-2 text-center font-bold">EXPECTED COUNT</th>
+                              <th className="py-2 text-center font-bold">PHYSICAL COUNT</th>
+                              <th className="py-2 text-center font-bold">VARIANCE</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100">
+                            {selectedHistoricalReport ? (
+                              [...selectedHistoricalReport.items].map(item => {
+                                const variance = item.variance;
+                                return (
+                                  <Fragment key={item.substanceId}>
+                                    <tr className="h-10 text-center text-gray-900 font-sans">
+                                      <td className="py-1 text-center font-sans">
+                                        <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-900 font-bold ml-1">{item.strength}</span></span>
+                                      </td>
+                                      <td className="py-1 text-center font-sans">
+                                        <span className="font-bold text-gray-900 font-sans">{item.ndc}</span>
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-sans">
+                                        <div className="font-bold text-gray-900">{item.lastClosingCount || 0}</div>
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
+                                        {(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-sans">
+                                        {(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}
+                                      </td>
+                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
+                                        {item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.expected || 0}</td>
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.physical || 0}</td>
+                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
+                                        {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
+                                      </td>
+                                    </tr>
+                                    {variance !== 0 && (
+                                      <tr className="bg-gray-50/50">
+                                        <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
+                                          Discrepancy Reason: {item.reason || "State reason omitted"}
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Fragment>
+                                );
+                              })
+                            ) : (
+                              [...substancesToReconcile].sort(compareSubstances).map(sub => {
+                                const metrics = getSubstanceHistoryMetrics(sub.id);
+                                const counted = getReconPhysicalCount(sub.id) ?? 0;
+                                const variance = counted - metrics.expected;
+                                const reason = reconReasons[sub.id] || "";
+                                
+                                return (
+                                  <Fragment key={sub.id}>
+                                    <tr className="h-10 text-center text-gray-900 font-sans">
+                                      <td className="py-1 text-center font-sans">
+                                        <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-900 font-bold ml-1">{sub.strength}</span></span>
+                                      </td>
+                                      <td className="py-1 text-center font-sans">
+                                        <span className="font-bold text-gray-900 font-sans">{sub.ndc}</span>
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-sans">
+                                        <div className="font-bold text-gray-900">{metrics.lastClosingCount}</div>
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
+                                        {metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-sans">
+                                        {metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}
+                                      </td>
+                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
+                                        {metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}
+                                      </td>
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{metrics.expected}</td>
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{counted} {sub.unit || "Units"}</td>
+                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
+                                        {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
+                                      </td>
+                                    </tr>
+                                    {variance !== 0 && (
+                                      <tr className="bg-gray-50/50">
+                                        <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
+                                          Discrepancy Reason: {reason || "State reason omitted"}
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Fragment>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
 
                   {/* Signature box info */}
                   {(() => {
@@ -4930,19 +4970,23 @@ export default function App() {
                     const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
 
                     return (
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-8 pt-8">
+                      <div className="space-y-4 pt-4 border-t border-gray-100">
+                        {/* Moved disclaimer above signature fields in historical report block */}
+                        <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
+                          By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+                        </p>
+                        <div className="grid grid-cols-2 gap-8 pt-2">
                           {/* Left signature field */}
-                          <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
+                          <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
                             <div className="flex items-center gap-1.5 pb-2">
                               <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
                               <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                                 {perfName}
                               </span>
                             </div>
-                            <div className="flex-1 flex items-center justify-center my-1">
+                            <div className="flex-1 flex items-center justify-center">
                               {userSig ? (
-                                <img src={userSig} className="max-h-20 object-contain" alt="Performed by signature" />
+                                <img src={userSig} className="max-h-16 object-contain" alt="Performed by signature" />
                               ) : (
                                 <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
                               )}
@@ -4950,25 +4994,22 @@ export default function App() {
                           </div>
 
                           {/* Right signature field */}
-                          <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
+                          <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
                             <div className="flex items-center gap-1.5 pb-2">
                               <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
                               <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                                 {picName}
                               </span>
                             </div>
-                            <div className="flex-1 flex items-center justify-center my-1">
+                            <div className="flex-1 flex items-center justify-center">
                               {picSig ? (
-                                <img src={picSig} className="max-h-20 object-contain" alt="PIC signature" />
+                                <img src={picSig} className="max-h-16 object-contain" alt="PIC signature" />
                               ) : (
                                 <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
                               )}
                             </div>
                           </div>
                         </div>
-                        <p className="text-[9px] text-gray-900 font-medium leading-normal text-left pt-2 border-t border-gray-300">
-                          By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
-                        </p>
                       </div>
                     );
                   })()}
@@ -4977,15 +5018,14 @@ export default function App() {
               </div>
             </ScrollArea>
 
-            <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl justify-between items-center shrink-0">
+            <DialogFooter className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
                 type="button"
-                variant="outline"
                 onClick={() => {
                   setReconShowPreview(false);
                   setSelectedHistoricalReport(null);
                 }}
-                className="text-[10px] font-black uppercase tracking-widest text-brand-dark-grey hover:bg-brand-blue/5 border-brand-blue/10 rounded-xl h-12"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all"
               >
                 {selectedHistoricalReport ? "Return to Registry" : "Return to Editing"}
               </Button>
@@ -4994,7 +5034,7 @@ export default function App() {
                 onClick={() => {
                   window.print();
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue hover:brightness-110 text-white rounded-xl h-12 shadow-lg shadow-brand-blue/20 flex gap-2 items-center border-none"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center"
               >
                 <Printer className="h-4 w-4" />
                 EXECUTE SYSTEM PRINT
