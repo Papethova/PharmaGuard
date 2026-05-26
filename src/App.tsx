@@ -4483,7 +4483,7 @@ export default function App() {
 
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
-          <div className="flex-1 min-h-0 p-6 pt-4 pb-2 flex flex-col gap-4 overflow-hidden">
+          <div className="flex-1 min-h-0 p-6 pt-4 pb-1.5 flex flex-col gap-4 overflow-hidden">
                 
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5 shrink-0">
@@ -4647,23 +4647,23 @@ export default function App() {
                 </div>
 
                 {/* Two interactive signature fields and disclaimer grouped for perfect spacing balance */}
-                <div className="space-y-2 shrink-0">
+                <div className="space-y-1 shrink-0 -mt-2">
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
                     
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Left Sign-off: Performed By */}
+                        {/* Left Sign-off: Completed By */}
                         <div className="flex flex-col gap-0.5">
                           {/* Inner row for label, select, and clear */}
-                          <div className="flex items-end justify-between px-1 h-9">
+                          <div className="flex items-end justify-between px-1 h-7">
                             <div className="flex items-end gap-1.5 min-w-0 flex-1">
                               <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
-                                Performed By:
+                                Completed By:
                               </span>
                               <Select value={reconUser} onValueChange={setReconUser}>
-                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                   <SelectValue placeholder="Select...">
                                     {reconUserObj ? (
                                       <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
@@ -4694,7 +4694,7 @@ export default function App() {
                             </Button>
                           </div>
                           
-                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          <div className="h-[65px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={reconCanvasRef}
                               penColor="#0d3151"
@@ -4709,7 +4709,7 @@ export default function App() {
                         {/* Right Sign-off: PIC */}
                         <div className="flex flex-col gap-0.5">
                           {/* Inner row for PIC and clear */}
-                          <div className="flex items-end justify-between px-1 h-9">
+                          <div className="flex items-end justify-between px-1 h-7">
                             <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
                               PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
                             </span>
@@ -4728,7 +4728,7 @@ export default function App() {
                             </Button>
                           </div>
                           
-                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          <div className="h-[65px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={picCanvasRef}
                               penColor="#0d3151"
@@ -4744,14 +4744,14 @@ export default function App() {
                   })()}
 
                   {/* Reduced space disclaimer under signature fields */}
-                  <p className="shrink-0 text-[9px] text-brand-grey font-medium leading-normal text-left pt-2 border-t border-brand-blue/5">
+                  <p className="shrink-0 text-[9px] text-brand-grey font-medium leading-normal text-left pt-1 border-t border-brand-blue/5">
                     By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
                   </p>
                 </div>
 
           </div>
 
-            <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
+            <DialogFooter className="mb-0 mx-0 p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
                 id="recon-cancel-button"
                 type="button"
@@ -4797,7 +4797,7 @@ export default function App() {
                     <div className="text-right">
                       <p className="text-sm font-bold font-sans">REPORT #: {selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef}</p>
                       <p className="text-xs text-gray-900 font-sans font-semibold mt-1">
-                        PERFORMED BY: {
+                        COMPLETED BY: {
                           selectedHistoricalReport
                             ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
                             : (() => {
@@ -4936,7 +4936,7 @@ export default function App() {
                           {/* Left signature field */}
                           <div className="border border-black p-4 rounded-lg relative h-36 flex flex-col justify-between bg-gray-50/20">
                             <div className="flex items-center gap-1.5 pb-2">
-                              <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PERFORMED BY:</span>
+                              <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
                               <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                                 {perfName}
                               </span>
