@@ -3296,7 +3296,7 @@ export default function App() {
                     ) : transactionType === "VERIFY" ? (() => {
                       const subObj = selectedSubstanceDetail || inventory.find(s => s.id === selectedSubstance);
                       return (
-                        <div className="p-4 border-2 border-solid border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-3">
+                        <div className="p-4 border-2 border-solid border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-4">
                           <div className="flex justify-center">
                             <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue">
                               <Check className="h-7 w-7 text-brand-blue" strokeWidth={4} />
@@ -3304,29 +3304,35 @@ export default function App() {
                           </div>
                           <div className="space-y-1.5">
                             <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center">
-                              <span>I confirm that the physical count of:</span>
-                              <div className="my-3 flex flex-col items-center justify-center">
-                                <span className="font-bold text-brand-blue block text-base leading-tight">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
-                                <span className="text-xs text-brand-blue font-bold block mt-1 leading-none">NDC: {subObj?.ndc || ""}</span>
+                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center justify-between min-h-[160px] py-1">
+                              <span className="shrink-0 font-medium">I confirm that the physical count of:</span>
+                              
+                              <div className="flex flex-col items-center justify-center flex-1 my-3">
+                                <span className="font-bold text-brand-blue block text-base leading-tight text-center">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
+                                <span className="text-xs text-brand-blue font-bold block mt-1.5 leading-none text-center">NDC: {subObj?.ndc || ""}</span>
                               </div>
-                              <div className="flex items-center justify-center gap-1.5">
-                                <span>is currently</span>
+                              
+                              <div className="flex items-center justify-center gap-1.5 shrink-0 bg-brand-blue/5 border border-brand-blue/10 px-4 py-2 rounded-xl shadow-sm">
+                                <span className="font-medium text-brand-dark-grey/85">is currently</span>
                                 <Input 
                                   id="quantity" 
                                   type="number" 
                                   placeholder="0"
-                                  className="w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold m-0"
+                                  className="w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold m-0 rounded-md shadow-inner"
                                   value={quantity}
                                   onChange={(e) => setQuantity(e.target.value)}
                                 />{" "}
-                                <span>{subObj?.unit || "Units"}.</span>
+                                <span className="font-semibold text-brand-blue">{subObj?.unit || "Units"}.</span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full">
-                            <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest">
+                          <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full flex flex-col items-center gap-1">
+                            <div className="text-xs font-bold text-brand-blue flex items-center gap-1.5 px-3 py-1 bg-brand-blue/5 rounded-full border border-brand-blue/15 shadow-sm">
+                              <span>System Volume:</span>
+                              <span className="text-brand-dark-grey">{subObj?.currentStock ?? 0} {subObj?.unit || "Units"}</span>
+                            </div>
+                            <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest mt-1">
                               Timestamp: {new Date().toLocaleString()}
                             </div>
                           </div>
@@ -4154,7 +4160,7 @@ export default function App() {
                         </TableRow>
                       </TableHeader>
                       <TableBody className="text-brand-dark-grey">
-                        {transactions.filter(t => t.substanceId === selectedSubstanceDetail?.id).length === 0 ? (
+                        {transactions.filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC")).length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center py-8 text-brand-dark-grey/50 italic">
                               No transaction history found for this item.
@@ -4162,7 +4168,7 @@ export default function App() {
                           </TableRow>
                         ) : (
                           transactions
-                            .filter(t => t.substanceId === selectedSubstanceDetail?.id)
+                            .filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC"))
                             .sort((a, b) => {
                               const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
                               const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
