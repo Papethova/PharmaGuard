@@ -3304,22 +3304,24 @@ export default function App() {
                           </div>
                           <div className="space-y-1.5">
                             <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal">
-                              I confirm that the current physical count of:<br/>
-                              <div className="py-1">
-                                <span className="font-bold text-brand-blue block text-base mt-1">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
-                                <span className="text-xs text-brand-blue font-bold block mt-1">NDC: {subObj?.ndc || ""}</span>
+                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center">
+                              <span>I confirm that the physical count of:</span>
+                              <div className="my-3 flex flex-col items-center justify-center">
+                                <span className="font-bold text-brand-blue block text-base leading-tight">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
+                                <span className="text-xs text-brand-blue font-bold block mt-1 leading-none">NDC: {subObj?.ndc || ""}</span>
                               </div>
-                              is currently{" "}
-                              <Input 
-                                id="quantity" 
-                                type="number" 
-                                placeholder="0"
-                                className="inline-block mx-1.5 w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold"
-                                value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
-                              />{" "}
-                              {subObj?.unit || "Units"}.
+                              <div className="flex items-center justify-center gap-1.5">
+                                <span>is currently</span>
+                                <Input 
+                                  id="quantity" 
+                                  type="number" 
+                                  placeholder="0"
+                                  className="w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold m-0"
+                                  value={quantity}
+                                  onChange={(e) => setQuantity(e.target.value)}
+                                />{" "}
+                                <span>{subObj?.unit || "Units"}.</span>
+                              </div>
                             </div>
                           </div>
                           
