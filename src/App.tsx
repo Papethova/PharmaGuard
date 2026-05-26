@@ -4073,9 +4073,8 @@ export default function App() {
                   </div>
                 </DialogHeader>
                 
-                <ScrollArea className="flex-1 overflow-y-auto touch-auto">
-                  <div className="p-4">
-                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                <div className="p-4 shrink-0">
+                  <div className="flex flex-wrap items-center gap-3">
                     <Button 
                       size="sm"
                       onClick={() => {
@@ -4138,24 +4137,26 @@ export default function App() {
                       Edit Details
                     </Button>
                   </div>
+                </div>
 
-                  <div className="rounded-md border border-brand-grey/10 overflow-hidden">
-                    <Table>
-                      <TableHeader className="bg-brand-light-grey/50">
-                        <TableRow>
-                          <TableHead className={tableHeadClass}>Date</TableHead>
-                          <TableHead className={tableHeadClass}>NDC</TableHead>
-                          <TableHead className={tableHeadClass}>Reference #</TableHead>
-                          <TableHead className={tableHeadClass}>Action</TableHead>
-                          <TableHead className={tableHeadClass}>Qty</TableHead>
-                          <TableHead className={tableHeadClass}>Balance</TableHead>
-                          <TableHead className={tableHeadClass}>User</TableHead>
+                <div className="flex-1 min-h-0 px-4 pb-4">
+                  <div className="h-full rounded-md border border-brand-grey/10 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface">
+                    <Table className="relative border-separate border-spacing-0 w-full text-sm">
+                      <TableHeader className="sticky top-0 z-40 bg-brand-surface">
+                        <TableRow className="bg-brand-surface">
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody className="text-brand-dark-grey">
                         {transactions.filter(t => t.substanceId === selectedSubstanceDetail?.id).length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center py-8 text-brand-dark-grey/50 italic">
+                            <TableCell colSpan={7} className="text-center py-8 text-brand-dark-grey/50 italic">
                               No transaction history found for this item.
                             </TableCell>
                           </TableRow>
@@ -4168,7 +4169,7 @@ export default function App() {
                               return dateB - dateA;
                             })
                             .map((t) => (
-                              <TableRow key={t.id} className="text-xs h-12">
+                              <TableRow key={t.id} className="text-xs h-12 hover:bg-brand-blue/5 transition-colors">
                                 <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center">
                                   {formatDateTime(t.timestamp)}
                                 </TableCell>
@@ -4192,9 +4193,9 @@ export default function App() {
                                     <span className="text-brand-dark-grey/40 italic">-</span>
                                   )}
                                 </TableCell>
-                      <TableCell>
-                        <TransactionBadge type={t.type} size="sm" />
-                      </TableCell>
+                                <TableCell>
+                                  <TransactionBadge type={t.type} size="sm" />
+                                </TableCell>
                                 <TableCell className="text-center text-brand-dark-grey text-sm">
                                   {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
                                 </TableCell>
@@ -4214,7 +4215,6 @@ export default function App() {
                     </Table>
                   </div>
                 </div>
-              </ScrollArea>
                 
                 <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
                   <Button 
