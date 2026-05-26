@@ -3310,7 +3310,7 @@ export default function App() {
                                 <span className="font-bold text-brand-blue block text-base mt-1">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
                                 <span className="text-xs text-brand-blue font-bold block mt-1">NDC: {subObj?.ndc || ""}</span>
                               </div>
-                              is{" "}
+                              is currently{" "}
                               <Input 
                                 id="quantity" 
                                 type="number" 
@@ -4848,7 +4848,10 @@ export default function App() {
                       }</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold font-sans">REPORT #: {selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef}</p>
+                      <p className="text-sm font-bold font-sans">REPORT #: {(() => {
+                        const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
+                        return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
+                      })()}</p>
                       <p className="text-xs text-gray-900 font-sans font-semibold mt-1">
                         COMPLETED BY: {
                           selectedHistoricalReport
@@ -4907,28 +4910,28 @@ export default function App() {
                           </colgroup>
                            <thead>
                              <tr className="border-b-2 border-gray-200">
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">MEDICATION</th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">NDC</th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>MEDICATION</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>NDC</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>
                                  <div>LAST REPORT</div>
-                                 <div className="text-[9px] text-gray-500 font-normal mt-0.5">{headerPrevReportDate}</div>
+                                 <div className="text-[8px] text-gray-500 font-normal mt-0.5" style={{ lineHeight: '1' }}>{headerPrevReportDate}</div>
                                </th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">PURCHASED</th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">DISPENSED</th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">ADJUSTED</th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight font-sans">
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>PURCHASED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>DISPENSED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>ADJUSTED</th>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>
                                  <div className="flex flex-col items-center">
                                    <div>EXPECTED</div>
                                    <div className="mt-0.5">COUNT</div>
                                  </div>
                                </th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight font-sans">
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>
                                  <div className="flex flex-col items-center">
                                    <div>PHYSICAL</div>
                                    <div className="mt-0.5">COUNT</div>
                                  </div>
                                </th>
-                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">VARIANCE</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>VARIANCE</th>
                              </tr>
                            </thead>
                           <tbody className="divide-y divide-gray-100">
@@ -5183,18 +5186,23 @@ export default function App() {
                               {new Date(report.timestamp).toLocaleDateString()} at {new Date(report.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-black font-sans text-brand-blue group-hover:text-brand-yellow transition-colors" style={{ verticalAlign: 'middle' }}>
-                              {report.reportNumber}
+                              {report.reportNumber?.startsWith("REC-") ? report.reportNumber : `REC-${report.reportNumber}`}
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4" style={{ verticalAlign: 'middle' }}>
                               <span className="text-[10px] text-brand-blue font-black uppercase tracking-widest bg-brand-blue/5 px-2 py-0.5 rounded-lg border border-brand-blue/10">
                                 {report.scheduleFilter || "ALL"}
                               </span>
                             </td>
-                            <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
-                              {report.items?.length || 0} substances reconciled
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4" style={{ verticalAlign: 'middle' }}>
+                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-widest bg-brand-blue/5 px-2 py-1 rounded-lg border border-brand-blue/10">
+                                {report.items?.length || 0} substances reconciled
+                              </span>
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
-                              {report.performedByName} ({report.performedByTitle})
+                              <span className="font-bold text-brand-dark-grey">{report.performedByName}</span>
+                              {report.performedByTitle && (
+                                <span className="font-bold text-brand-dark-grey ml-1">({report.performedByTitle})</span>
+                              )}
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
                               {report.picName || "N/A"}
