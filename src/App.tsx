@@ -487,7 +487,7 @@ export default function App() {
     } else if (reconScheduleFilter === "C-III/C-IV/C-V") {
       suffix = "345";
     }
-    setReconRef(`${mm}${dd}${yy}C${suffix}`);
+    setReconRef(`REC-${mm}${dd}${yy}C${suffix}`);
   }, [reconScheduleFilter]);
 
   // Added history/selection states
@@ -518,8 +518,7 @@ export default function App() {
   const lastReport = useMemo(() => {
     const reconTxs = transactions.filter(t => 
       t.referenceNumber && 
-      (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-")) &&
-      t.referenceNumber !== reconRef
+      (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))
     );
     
     if (reconTxs.length === 0) {
@@ -647,7 +646,11 @@ export default function App() {
   }, [transactions, lastReport, reconRef, inventory]);
 
   const getLatestVerifiedCount = useCallback((subId: string) => {
-    const subTxs = transactions.filter(t => t.substanceId === subId && t.type === "VERIFY");
+    const subTxs = transactions.filter(t => 
+      t.substanceId === subId && 
+      t.type === "VERIFY" &&
+      (!t.referenceNumber || (!t.referenceNumber.startsWith("REC-") && !t.referenceNumber.startsWith("RECON-")))
+    );
     if (subTxs.length === 0) return null;
     
     const sorted = [...subTxs].sort((a, b) => {
@@ -2285,6 +2288,11 @@ export default function App() {
   const filteredTransactions = useMemo(() => 
     transactions
       .filter(t => {
+        // Exclude all reconciliation report transactions (reference starting with REC- or RECON-)
+        if (t.referenceNumber && (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))) {
+          return false;
+        }
+
         const matchesSchedule = activeSchedule === "ALL" || 
           inventory.find(s => s.id === t.substanceId)?.schedule === activeSchedule;
         const transactionDate = t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
@@ -3299,8 +3307,8 @@ export default function App() {
                             <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal">
                               I confirm that the current physical count of:<br/>
                               <div className="py-1">
-                                <span className="font-normal text-brand-blue block text-sm">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
-                                <span className="text-xs text-brand-blue font-normal block mt-0.5">NDC: {subObj?.ndc || ""}</span>
+                                <span className="font-bold text-brand-blue block text-base mt-1">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
+                                <span className="text-xs text-brand-blue font-bold block mt-1">NDC: {subObj?.ndc || ""}</span>
                               </div>
                               is{" "}
                               <Input 
@@ -4797,7 +4805,7 @@ export default function App() {
 
           </div>
 
-            <DialogFooter className="mb-0 mx-0 py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
+            <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
                 id="recon-cancel-button"
                 type="button"
@@ -4805,7 +4813,7 @@ export default function App() {
                   setIsReconOpen(false);
                   setCurrentTab("inventory");
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
               >
                 Cancel
               </Button>
@@ -4814,11 +4822,11 @@ export default function App() {
                 type="button"
                 onClick={handleReconciliationSubmit}
                 disabled={isReconSubmitting}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
               >
                 {isReconSubmitting ? "Generating..." : "Generate Report"}
               </Button>
-            </DialogFooter>
+            </div>
         </div>
 
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''}`}>
@@ -4897,22 +4905,32 @@ export default function App() {
                             <col className="w-[11%]" />
                             <col className="w-[10%]" />
                           </colgroup>
-                          <thead>
-                            <tr className="border-b-2 border-gray-200">
-                              <th className="py-1 text-center font-bold">MEDICATION</th>
-                              <th className="py-1 text-center font-bold">NDC</th>
-                              <th className="py-1 text-center font-bold leading-normal">
-                                <div>LAST REPORT</div>
-                                <div className="text-[10px] text-gray-500 font-normal mt-0.5">{headerPrevReportDate}</div>
-                              </th>
-                              <th className="py-1 text-center font-bold">PURCHASED</th>
-                              <th className="py-1 text-center font-bold">DISPENSED</th>
-                              <th className="py-1 text-center font-bold">ADJUSTED</th>
-                              <th className="py-1 text-center font-bold">EXPECTED COUNT</th>
-                              <th className="py-1 text-center font-bold">PHYSICAL COUNT</th>
-                              <th className="py-1 text-center font-bold">VARIANCE</th>
-                            </tr>
-                          </thead>
+                           <thead>
+                             <tr className="border-b-2 border-gray-200">
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">MEDICATION</th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">NDC</th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">
+                                 <div>LAST REPORT</div>
+                                 <div className="text-[9px] text-gray-500 font-normal mt-0.5">{headerPrevReportDate}</div>
+                               </th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">PURCHASED</th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">DISPENSED</th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">ADJUSTED</th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight font-sans">
+                                 <div className="flex flex-col items-center">
+                                   <div>EXPECTED</div>
+                                   <div className="mt-0.5">COUNT</div>
+                                 </div>
+                               </th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight font-sans">
+                                 <div className="flex flex-col items-center">
+                                   <div>PHYSICAL</div>
+                                   <div className="mt-0.5">COUNT</div>
+                                 </div>
+                               </th>
+                               <th className="py-0.5 text-center font-bold text-[10px] leading-tight">VARIANCE</th>
+                             </tr>
+                           </thead>
                           <tbody className="divide-y divide-gray-100">
                             {selectedHistoricalReport ? (
                               [...selectedHistoricalReport.items].map(item => {
@@ -5064,14 +5082,14 @@ export default function App() {
               </div>
             </ScrollArea>
 
-            <DialogFooter className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
+            <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
                 type="button"
                 onClick={() => {
                   setReconShowPreview(false);
                   setSelectedHistoricalReport(null);
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
               >
                 {selectedHistoricalReport ? "Return to Registry" : "Return to Editing"}
               </Button>
@@ -5080,12 +5098,12 @@ export default function App() {
                 onClick={() => {
                   window.print();
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center justify-center"
               >
                 <Printer className="h-4 w-4" />
                 EXECUTE SYSTEM PRINT
               </Button>
-            </DialogFooter>
+            </div>
 
             {/* Print utilities to style print view on Ctrl+P or button click */}
             <style>{`
@@ -5173,13 +5191,10 @@ export default function App() {
                               </span>
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
-                              {report.items?.length || 0} substances
+                              {report.items?.length || 0} substances reconciled
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
-                              <div className="flex flex-col items-center justify-center leading-normal">
-                                <span className="font-extrabold">{report.performedByName}</span>
-                                <span className="text-[10px] text-brand-dark-grey/50 font-normal">({report.performedByTitle})</span>
-                              </div>
+                              {report.performedByName} ({report.performedByTitle})
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
                               {report.picName || "N/A"}
@@ -5193,18 +5208,18 @@ export default function App() {
             </div>
           </div>
 
-          <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex justify-end border-t border-brand-blue/10 rounded-b-2xl shrink-0">
+          <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
             <Button
               id="recon-history-close"
               type="button"
               onClick={() => {
                 setReconViewMode("form");
               }}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none"
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
             >
               Back to Form
             </Button>
-          </DialogFooter>
+          </div>
         </div>
 
       </DialogContent>
