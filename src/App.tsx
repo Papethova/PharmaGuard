@@ -4147,16 +4147,16 @@ export default function App() {
 
                 <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col overflow-hidden">
                   <div className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface">
-                    <Table className="relative border-separate border-spacing-0 w-full text-sm">
-                      <TableHeader className="sticky top-0 z-40 bg-brand-light-grey/50">
-                        <TableRow className="bg-brand-light-grey/50">
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
+                    <table className="relative border-separate border-spacing-0 w-full text-sm">
+                      <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
+                        <TableRow className="bg-brand-light-grey">
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody className="text-brand-dark-grey">
@@ -4218,7 +4218,7 @@ export default function App() {
                             ))
                         )}
                       </TableBody>
-                    </Table>
+                    </table>
                   </div>
                 </div>
                 
