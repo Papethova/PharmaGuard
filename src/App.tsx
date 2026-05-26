@@ -19,6 +19,7 @@ import {
   Edit,
   Trash2,
   LogOut,
+  Folder,
   Check,
   Settings,
   Shield,
@@ -1836,6 +1837,16 @@ export default function App() {
       // Update local states to view newly created report
       setSelectedHistoricalReport({ id: reportDocRef.id, ...reportPayload });
       setReconShowPreview(true);
+
+      // Reset the reconciliation window inputs
+      setReconCounts({});
+      setReconReasons({});
+      setReconUser("");
+      setReconWitness("");
+      setReconSigData(null);
+      setPicSigData(null);
+      reconCanvasRef.current?.clear();
+      picCanvasRef.current?.clear();
     } catch (error: any) {
       toast.error(`System Error: ${error.message}`);
     } finally {
@@ -2922,7 +2933,7 @@ export default function App() {
                   className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <History className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                    <Search className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
@@ -2946,7 +2957,7 @@ export default function App() {
                   className="w-full justify-start gap-4 h-11 px-4 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-base text-brand-blue font-normal"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
-                    <Search className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                    <Clipboard className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
                   <span className={`whitespace-nowrap leading-none ${isReconOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Reconciliations</span>
                 </Button>
@@ -3274,41 +3285,44 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                    ) : transactionType === "VERIFY" ? (
-                      <div className="p-4 border-2 border-solid border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-3">
-                        <div className="flex justify-center">
-                          <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue">
-                            <Check className="h-7 w-7 text-brand-blue" strokeWidth={4} />
-                          </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                          <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal">
-                            I confirm that the current physical count of:<br/>
-                            <div className="py-1">
-                              <span className="font-normal text-brand-blue block text-sm">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength}</span>
-                              <span className="text-xs text-brand-blue font-normal block mt-0.5">NDC: {selectedSubstanceDetail?.ndc}</span>
+                    ) : transactionType === "VERIFY" ? (() => {
+                      const subObj = selectedSubstanceDetail || inventory.find(s => s.id === selectedSubstance);
+                      return (
+                        <div className="p-4 border-2 border-solid border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-3">
+                          <div className="flex justify-center">
+                            <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue">
+                              <Check className="h-7 w-7 text-brand-blue" strokeWidth={4} />
                             </div>
-                            is{" "}
-                            <Input 
-                              id="quantity" 
-                              type="number" 
-                              placeholder="0"
-                              className="inline-block mx-1.5 w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold"
-                              value={quantity}
-                              onChange={(e) => setQuantity(e.target.value)}
-                            />{" "}
-                            {selectedSubstanceDetail?.unit || "Units"}.
+                          </div>
+                          <div className="space-y-1.5">
+                            <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
+                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal">
+                              I confirm that the current physical count of:<br/>
+                              <div className="py-1">
+                                <span className="font-normal text-brand-blue block text-sm">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
+                                <span className="text-xs text-brand-blue font-normal block mt-0.5">NDC: {subObj?.ndc || ""}</span>
+                              </div>
+                              is{" "}
+                              <Input 
+                                id="quantity" 
+                                type="number" 
+                                placeholder="0"
+                                className="inline-block mx-1.5 w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
+                              />{" "}
+                              {subObj?.unit || "Units"}.
+                            </div>
+                          </div>
+                          
+                          <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full">
+                            <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest">
+                              Timestamp: {new Date().toLocaleString()}
+                            </div>
                           </div>
                         </div>
-                        
-                        <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full">
-                          <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest">
-                            Timestamp: {new Date().toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
+                      );
+                    })() : (
                     <div className="grid gap-1.5">
                       <Label htmlFor="substance" className="text-brand-dark-grey text-xs">Medication</Label>
                       <div className="relative">
@@ -4456,14 +4470,14 @@ export default function App() {
             <div className="flex items-center gap-4 text-left">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
                 {reconViewMode === "history" ? (
-                  <Clipboard className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+                  <Folder className="h-5 w-5 text-brand-blue" strokeWidth={3} />
                 ) : (
-                  <Search className="h-5 w-5 text-brand-blue" strokeWidth={3} />
+                  <Clipboard className="h-5 w-5 text-brand-blue" strokeWidth={3} />
                 )}
               </div>
               <div>
                 <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
-                  {reconViewMode === "history" ? "Controlled Substance Reconciliation Report History" : "Controlled Substance Reconciliation"}
+                  {reconViewMode === "history" ? "Controlled Substance Reconciliation Report Ledger" : "Controlled Substance Reconciliation"}
                 </DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
                   VERIFY PHYSICAL HOLDINGS AGAINST DIGITAL LEDGER LOGS TO MAINTAIN ACTIVE COMPLIANCE
@@ -4486,9 +4500,9 @@ export default function App() {
                   className="h-10 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-brand-yellow border border-brand-yellow/30 hover:bg-white/10 flex items-center gap-2 transition-all"
                 >
                   <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
-                    <Clipboard className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                    <Folder className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
                   </div>
-                  Report History
+                  Report Ledger
                 </Button>
               </div>
             )}
@@ -4524,7 +4538,7 @@ export default function App() {
 
                   <div className="flex items-center gap-2.5 text-left w-full sm:w-auto sm:justify-end">
                     <Label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0">Report Reference #</Label>
-                    <div className="h-8 px-3 border border-brand-blue/10 rounded-xl bg-brand-blue/5 flex items-center text-xs font-mono font-black text-brand-blue select-all shrink-0">
+                    <div className="h-8 px-3 border border-brand-blue/10 rounded-xl bg-brand-blue/5 flex items-center text-xs font-sans font-black text-brand-blue select-all shrink-0">
                       {reconRef}
                     </div>
                   </div>
@@ -4885,18 +4899,18 @@ export default function App() {
                           </colgroup>
                           <thead>
                             <tr className="border-b-2 border-gray-200">
-                              <th className="py-2 text-center font-bold">MEDICATION</th>
-                              <th className="py-2 text-center font-bold">NDC</th>
-                              <th className="py-2 text-center font-bold leading-normal">
+                              <th className="py-1 text-center font-bold">MEDICATION</th>
+                              <th className="py-1 text-center font-bold">NDC</th>
+                              <th className="py-1 text-center font-bold leading-normal">
                                 <div>LAST REPORT</div>
                                 <div className="text-[10px] text-gray-500 font-normal mt-0.5">{headerPrevReportDate}</div>
                               </th>
-                              <th className="py-2 text-center font-bold">PURCHASED</th>
-                              <th className="py-2 text-center font-bold">DISPENSED</th>
-                              <th className="py-2 text-center font-bold">ADJUSTED</th>
-                              <th className="py-2 text-center font-bold">EXPECTED COUNT</th>
-                              <th className="py-2 text-center font-bold">PHYSICAL COUNT</th>
-                              <th className="py-2 text-center font-bold">VARIANCE</th>
+                              <th className="py-1 text-center font-bold">PURCHASED</th>
+                              <th className="py-1 text-center font-bold">DISPENSED</th>
+                              <th className="py-1 text-center font-bold">ADJUSTED</th>
+                              <th className="py-1 text-center font-bold">EXPECTED COUNT</th>
+                              <th className="py-1 text-center font-bold">PHYSICAL COUNT</th>
+                              <th className="py-1 text-center font-bold">VARIANCE</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100">
@@ -4918,7 +4932,7 @@ export default function App() {
                                       <td className="py-2 text-center text-gray-900 font-bold font-sans">
                                         {(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
                                         {(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}
                                       </td>
                                       <td className="py-2 text-center font-bold text-gray-900 font-sans">
@@ -4962,7 +4976,7 @@ export default function App() {
                                       <td className="py-2 text-center text-gray-900 font-bold font-sans">
                                         {metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
+                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
                                         {metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}
                                       </td>
                                       <td className="py-2 text-center font-bold text-gray-900 font-sans">
@@ -5114,71 +5128,70 @@ export default function App() {
             </p>
           </div>
 
-          <ScrollArea className="flex-1 p-6">
-            {historicalReports.length === 0 ? (
-              <div className="text-center py-12 border-2 border-dashed border-brand-blue/15 rounded-xl bg-brand-blue/[0.01]">
-                <Clipboard className="h-10 w-10 text-brand-blue/40 mx-auto stroke-[1.5]" />
-                <p className="text-sm font-bold text-brand-blue/50 mt-4 leading-none">NO REPORTS ARCHIVED YET</p>
-                <p className="text-xs text-brand-dark-grey/50 mt-1.5 font-medium">Reconciliation reports generated by this node will automatically save here.</p>
+          <div className="flex-1 min-h-0 p-6 flex flex-col">
+            <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col flex-1 min-h-0 shadow-sm">
+              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
+                <table className="w-full border-separate border-spacing-0 text-xs text-left">
+                  <thead className="sticky top-0 z-40 bg-brand-blue">
+                    <tr className="bg-brand-blue hover:bg-brand-blue border-none">
+                      <th className="font-extrabold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0 px-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Report Date</th>
+                      <th className="font-extrabold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0 px-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Reference #</th>
+                      <th className="font-extrabold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0 px-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Schedules</th>
+                      <th className="font-extrabold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0 px-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medications</th>
+                      <th className="font-extrabold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0 px-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Completed By</th>
+                      <th className="font-extrabold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0 px-4" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>PIC</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-brand-surface text-brand-dark-grey divide-y divide-brand-blue/5">
+                    {historicalReports.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="text-center py-12 text-brand-dark-grey/50 italic font-medium">
+                          No reports archived in the ledger.
+                        </td>
+                      </tr>
+                    ) : (
+                      [...historicalReports]
+                        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                        .map((report) => (
+                          <tr 
+                            key={report.id} 
+                            onClick={() => {
+                              setSelectedHistoricalReport(report);
+                              setReconShowPreview(true);
+                            }}
+                            className="hover:bg-brand-blue/5 cursor-pointer transition-all duration-150 group animate-in fade-in slide-in-from-bottom-1 duration-150"
+                          >
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-semibold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
+                              {new Date(report.timestamp).toLocaleDateString()} at {new Date(report.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-black font-sans text-brand-blue group-hover:text-brand-yellow transition-colors" style={{ verticalAlign: 'middle' }}>
+                              {report.reportNumber}
+                            </td>
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4" style={{ verticalAlign: 'middle' }}>
+                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-widest bg-brand-blue/5 px-2 py-0.5 rounded-lg border border-brand-blue/10">
+                                {report.scheduleFilter || "ALL"}
+                              </span>
+                            </td>
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
+                              {report.items?.length || 0} substances
+                            </td>
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
+                              <div className="flex flex-col items-center justify-center leading-normal">
+                                <span className="font-extrabold">{report.performedByName}</span>
+                                <span className="text-[10px] text-brand-dark-grey/50 font-normal">({report.performedByTitle})</span>
+                              </div>
+                            </td>
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
+                              {report.picName || "N/A"}
+                            </td>
+                          </tr>
+                        ))
+                    )}
+                  </tbody>
+                </table>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
-                {[...historicalReports].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map((report) => (
-                  <div
-                    key={report.id}
-                    className="border border-brand-blue/10 rounded-xl hover:border-brand-blue/30 bg-brand-surface p-5 text-left transition-all hover:shadow-lg flex flex-col justify-between group relative overflow-hidden"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <span className="text-[10px] text-brand-blue font-black uppercase tracking-widest bg-brand-blue/5 px-2 py-0.5 rounded-lg border border-brand-blue/10">
-                            {report.scheduleFilter || "ALL"}
-                          </span>
-                          <h4 className="text-lg font-black text-brand-blue mt-2 tracking-tight group-hover:text-brand-yellow transition-all">
-                            {report.reportNumber}
-                          </h4>
-                        </div>
-                        <span className="text-[10px] uppercase font-black tracking-wider text-brand-dark-grey/50 font-mono">
-                          {new Date(report.timestamp).toLocaleDateString()}
-                        </span>
-                      </div>
-
-                      <div className="space-y-1 text-xs text-brand-dark-grey/80">
-                        <p className="flex items-center gap-1.5">
-                          <span className="font-bold">Performed:</span>
-                          <span className="truncate">{report.performedByName}</span>
-                          <span className="text-brand-dark-grey/50">({report.performedByTitle})</span>
-                        </p>
-                        <p className="flex items-center gap-1.5">
-                          <span className="font-bold">PIC:</span>
-                          <span className="truncate">{report.picName || users.find(u => u.title?.toUpperCase() === "PIC")?.name || "None"}</span>
-                        </p>
-                        <p className="flex items-center gap-1.5">
-                          <span className="font-bold">Medications:</span>
-                          <span>{report.items?.length || 0} substances reconciled</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 mt-4 border-t border-brand-blue/5 flex justify-end">
-                      <Button
-                        id={`btn-retrieve-${report.id}`}
-                        type="button"
-                        onClick={() => {
-                          setSelectedHistoricalReport(report);
-                          setReconShowPreview(true);
-                        }}
-                        className="h-8 px-4 text-[10px] font-black uppercase tracking-wider bg-brand-blue hover:brightness-110 text-white rounded-lg flex items-center gap-1.5 border-none shadow-sm"
-                      >
-                        <Search className="h-3.5 w-3.5" />
-                        Retrieve Statement
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
+            </div>
+          </div>
 
           <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex justify-end border-t border-brand-blue/10 rounded-b-2xl shrink-0">
             <Button
