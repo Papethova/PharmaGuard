@@ -1478,6 +1478,11 @@ export default function App() {
         return;
       }
 
+      if (transactionType === "VERIFY" && (quantity === "" || isNaN(Number(quantity)) || Number(quantity) < 0)) {
+        toast.error("Please enter a valid non-negative physical count");
+        return;
+      }
+
       let finalRef = referenceNumber.trim();
       
       if (transactionType === "OUT") {
@@ -1605,7 +1610,7 @@ export default function App() {
         strength: currentMed.strength,
         ndc: currentMed.ndc,
         type: transactionType,
-        quantity: transactionType === "VERIFY" ? previousStock : amount,
+        quantity: transactionType === "VERIFY" ? Number(quantity) : amount,
         previousStock,
         newStock,
         performedBy: user.uid,
@@ -1626,7 +1631,7 @@ export default function App() {
       await batch.commit();
 
       if (transactionType === "VERIFY") {
-        setReconCounts(prev => ({ ...prev, [targetMedId]: previousStock.toString() }));
+        setReconCounts(prev => ({ ...prev, [targetMedId]: quantity }));
       }
 
       toast.success("Registry Record Secured");
@@ -3284,7 +3289,16 @@ export default function App() {
                               <span className="font-normal text-brand-blue block text-sm">{selectedSubstanceDetail?.name}{" "}{selectedSubstanceDetail?.strength}</span>
                               <span className="text-xs text-brand-blue font-normal block mt-0.5">NDC: {selectedSubstanceDetail?.ndc}</span>
                             </div>
-                            matches the system balance of <span className="font-normal text-brand-blue">{selectedSubstanceDetail?.currentStock} {selectedSubstanceDetail?.unit}</span>.
+                            is{" "}
+                            <Input 
+                              id="quantity" 
+                              type="number" 
+                              placeholder="0"
+                              className="inline-block mx-1.5 w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold"
+                              value={quantity}
+                              onChange={(e) => setQuantity(e.target.value)}
+                            />{" "}
+                            {selectedSubstanceDetail?.unit || "Units"}.
                           </div>
                         </div>
                         
@@ -4524,7 +4538,12 @@ export default function App() {
                         <tr className="bg-brand-blue hover:bg-brand-blue border-none">
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
-                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Last Report ({lastReport.date})</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
+                            <div className="flex flex-col items-center justify-center leading-normal">
+                              <div>Last Report</div>
+                              <div className="text-[10px] text-white/70 font-normal mt-0.5">{lastReport.date}</div>
+                            </div>
+                          </th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchased</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Dispensed</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Adjusted</th>
@@ -4574,10 +4593,23 @@ export default function App() {
                                   <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <div className="flex justify-center items-center">
                                       {counted !== undefined ? (
-                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-brand-blue/5 border border-brand-blue/10 rounded-lg text-brand-blue font-black text-xs h-8">
+                                        <button
+                                          type="button"
+                                          className="flex items-center gap-1.5 px-3 py-1 bg-brand-blue/5 border border-brand-blue/10 rounded-lg text-brand-blue font-black text-xs h-8 hover:bg-brand-blue/10 hover:border-brand-blue/20 transition-all cursor-pointer shadow-sm select-none"
+                                          onClick={() => {
+                                            resetForm();
+                                            setSelectedSubstance(sub.id);
+                                            setSubstanceSearch(sub.name);
+                                            setTransactionType("VERIFY");
+                                            setReferenceNumber("");
+                                            setReason("");
+                                            setQuantity(counted.toString());
+                                            setIsLogOpen(true);
+                                          }}
+                                        >
                                           <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
                                           {counted}
-                                        </div>
+                                        </button>
                                       ) : (
                                         <Button
                                           size="sm"
