@@ -4483,7 +4483,7 @@ export default function App() {
 
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
-          <div className="flex-1 min-h-0 p-6 pt-4 flex flex-col gap-4 overflow-hidden">
+          <div className="flex-1 min-h-0 p-6 pt-4 pb-2 flex flex-col gap-4 overflow-hidden">
                 
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5 shrink-0">
@@ -4646,8 +4646,8 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Two interactive signature fields */}
-                <div className="mt-4 space-y-4">
+                {/* Two interactive signature fields and disclaimer grouped for perfect spacing balance */}
+                <div className="space-y-2 shrink-0">
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
@@ -4742,113 +4742,37 @@ export default function App() {
                       </div>
                     );
                   })()}
-                </div>
 
-                {/* Disclaimer shifted closer to the absolute bottom edge of the form container */}
-                <p className="shrink-0 text-[9px] text-brand-grey font-medium leading-normal text-left pt-2 border-t border-brand-blue/5">
-                  By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
-                </p>
+                  {/* Reduced space disclaimer under signature fields */}
+                  <p className="shrink-0 text-[9px] text-brand-grey font-medium leading-normal text-left pt-2 border-t border-brand-blue/5">
+                    By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+                  </p>
+                </div>
 
           </div>
 
-            <DialogFooter className="py-4 px-6 bg-brand-blue/5 flex gap-3 border-t border-brand-blue/10 rounded-b-2xl sm:flex-row items-center justify-between shrink-0">
+            <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
+                id="recon-cancel-button"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 onClick={() => {
-                  const allVerified = substancesToReconcile.every(sub => getReconPhysicalCount(sub.id) !== undefined);
-                  if (!allVerified) {
-                    toast.error("Please verify counts for all filtered items to preview report.");
-                    return;
-                  }
-                  if (!reconUser) {
-                    toast.error("Please select Performed By user.");
-                    return;
-                  }
-
-                  // Check if any variance items are missing explanations
-                  const missingReasons: string[] = [];
-                  substancesToReconcile.forEach(s => {
-                    const counted = getReconPhysicalCount(s.id) ?? 0;
-                    const metrics = getSubstanceHistoryMetrics(s.id);
-                    const variance = counted - metrics.expected;
-                    if (variance !== 0) {
-                      const reasonStr = reconReasons[s.id];
-                      if (!reasonStr || !reasonStr.trim()) {
-                        missingReasons.push(s.name);
-                      }
-                    }
-                  });
-                  if (missingReasons.length > 0) {
-                    toast.error(`Reason of variance required for: ${missingReasons.join(", ")}`);
-                    return;
-                  }
-
-                  // Capture and check signatures from canvases
-                  let localReconSig: string | null = null;
-                  if (reconCanvasRef.current) {
-                    const canvas = reconCanvasRef.current.getCanvas ? reconCanvasRef.current.getCanvas() : reconCanvasRef.current;
-                    if (canvas && !reconCanvasRef.current.isEmpty()) {
-                      const trimmed = trimSignatureCanvas(canvas);
-                      if (trimmed) {
-                        localReconSig = trimmed.toDataURL("image/png");
-                      }
-                    }
-                  }
-                  if (!localReconSig) {
-                    toast.error("Performed By signature is required.");
-                    return;
-                  }
-                  setReconSigData(localReconSig);
-
-                  let localPicSig: string | null = null;
-                  if (picCanvasRef.current) {
-                    const canvas = picCanvasRef.current.getCanvas ? picCanvasRef.current.getCanvas() : picCanvasRef.current;
-                    if (canvas && !picCanvasRef.current.isEmpty()) {
-                      const trimmed = trimSignatureCanvas(canvas);
-                      if (trimmed) {
-                        localPicSig = trimmed.toDataURL("image/png");
-                      }
-                    }
-                  }
-                  if (!localPicSig) {
-                    toast.error("PIC signature is required.");
-                    return;
-                  }
-                  setPicSigData(localPicSig);
-
-                  setSelectedHistoricalReport(null);
-                  setReconShowPreview(true);
+                  setIsReconOpen(false);
+                  setCurrentTab("inventory");
                 }}
-                className="text-[10px] font-black uppercase tracking-widest text-brand-blue border-brand-blue/10 hover:bg-brand-blue/5 rounded-xl shrink-0 gap-2 h-12 shadow-sm"
+                className="text-[10px] font-black uppercase tracking-widest text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl h-12 px-6 transition-all"
               >
-                <Printer className="h-4 w-4" />
-                Preview Form
+                Cancel
               </Button>
-
-              <div className="flex gap-3 justify-end items-center">
-                <Button
-                  id="recon-close-button"
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setIsReconOpen(false);
-                    setCurrentTab("inventory");
-                  }}
-                  className="text-[10px] font-black uppercase tracking-widest text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl block h-12"
-                >
-                  Close
-                </Button>
-                <Button
-                  id="recon-generate-report-button"
-                  type="button"
-                  onClick={handleReconciliationSubmit}
-                  disabled={isReconSubmitting}
-                  className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none"
-                >
-                  {isReconSubmitting ? "Generating..." : "Generate Report"}
-                </Button>
-              </div>
+              <Button
+                id="recon-generate-report-button"
+                type="button"
+                onClick={handleReconciliationSubmit}
+                disabled={isReconSubmitting}
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all"
+              >
+                {isReconSubmitting ? "Generating..." : "Generate Report"}
+              </Button>
             </DialogFooter>
         </div>
 
@@ -4920,10 +4844,10 @@ export default function App() {
                               <Fragment key={item.substanceId}>
                                 <tr className="h-10 text-center text-gray-900 font-sans">
                                   <td className="py-1 text-center font-sans">
-                                    <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span></span>
+                                    <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-900 font-bold ml-1">{item.strength}</span></span>
                                   </td>
                                   <td className="py-1 text-center font-sans">
-                                    <span className="text-[10px] text-gray-900 font-sans">{item.ndc}</span>
+                                    <span className="font-bold text-gray-900 font-sans">{item.ndc}</span>
                                   </td>
                                   <td className="py-2 text-center text-gray-900 font-sans">
                                     <div className="text-[10px] text-gray-900 font-normal">{item.prevReportDate || "N/A"}</div>
@@ -4961,10 +4885,10 @@ export default function App() {
                               <Fragment key={sub.id}>
                                 <tr className="h-10 text-center text-gray-900 font-sans">
                                   <td className="py-1 text-center font-sans">
-                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span></span>
+                                    <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-900 font-bold ml-1">{sub.strength}</span></span>
                                   </td>
                                   <td className="py-1 text-center font-sans">
-                                    <span className="text-[10px] text-gray-900 font-sans">{sub.ndc}</span>
+                                    <span className="font-bold text-gray-900 font-sans">{sub.ndc}</span>
                                   </td>
                                   <td className="py-2 text-center text-gray-900 font-sans">
                                     <div className="text-[10px] text-gray-900 font-normal">{metrics.prevReportDate}</div>
@@ -5159,7 +5083,7 @@ export default function App() {
                           <span className="truncate">{report.picName || users.find(u => u.title?.toUpperCase() === "PIC")?.name || "None"}</span>
                         </p>
                         <p className="flex items-center gap-1.5">
-                          <span className="font-bold">Medicines:</span>
+                          <span className="font-bold">Medications:</span>
                           <span>{report.items?.length || 0} substances reconciled</span>
                         </p>
                       </div>
