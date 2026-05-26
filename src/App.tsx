@@ -3312,8 +3312,8 @@ export default function App() {
                                 <span className="text-xs text-brand-blue font-bold block mt-1.5 leading-none text-center">NDC: {subObj?.ndc || ""}</span>
                               </div>
                               
-                              <div className="flex items-center justify-center gap-1.5 shrink-0 bg-brand-blue/5 border border-brand-blue/10 px-4 py-2 rounded-xl shadow-sm">
-                                <span className="font-medium text-brand-dark-grey/85">is currently</span>
+                              <div className="flex items-center justify-center gap-1.5 shrink-0">
+                                <span>is currently</span>
                                 <Input 
                                   id="quantity" 
                                   type="number" 
@@ -3322,14 +3322,14 @@ export default function App() {
                                   value={quantity}
                                   onChange={(e) => setQuantity(e.target.value)}
                                 />{" "}
-                                <span className="font-semibold text-brand-blue">{subObj?.unit || "Units"}.</span>
+                                <span>{subObj?.unit || "Units"}.</span>
                               </div>
                             </div>
                           </div>
                           
                           <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full flex flex-col items-center gap-1">
                             <div className="text-xs font-bold text-brand-blue flex items-center gap-1.5 px-3 py-1 bg-brand-blue/5 rounded-full border border-brand-blue/15 shadow-sm">
-                              <span>System Volume:</span>
+                              <span>System Balance:</span>
                               <span className="text-brand-dark-grey">{subObj?.currentStock ?? 0} {subObj?.unit || "Units"}</span>
                             </div>
                             <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest mt-1">
