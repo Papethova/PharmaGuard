@@ -435,6 +435,16 @@ export default function App() {
       document.documentElement.style.touchAction = "";
     };
   }, [isUserManagementOpen]);
+
+  // Prefill verify count with current inventory count
+  useEffect(() => {
+    if (isLogOpen && transactionType === "VERIFY" && !quantity) {
+      const activeSub = selectedSubstanceDetail || inventory.find(s => s.id === selectedSubstance);
+      if (activeSub) {
+        setQuantity(activeSub.currentStock.toString());
+      }
+    }
+  }, [transactionType, selectedSubstance, selectedSubstanceDetail, isLogOpen, inventory, quantity]);
   const [isEditMinThresholdOpen, setIsEditMinThresholdOpen] = useState(false);
   const [isEditMedDetailsOpen, setIsEditMedDetailsOpen] = useState(false);
   const [editingMed, setEditingMed] = useState<Substance | null>(null);
