@@ -486,6 +486,11 @@ export default function App() {
   const picCanvasRef = useRef<any>(null);
   const [picSigData, setPicSigData] = useState<string | null>(null);
 
+  // Added history/selection states
+  const [reconViewMode, setReconViewMode] = useState<"form" | "history">("form");
+  const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
+  const [historicalReports, setHistoricalReports] = useState<any[]>([]);
+
   useEffect(() => {
     const today = new Date();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -497,13 +502,36 @@ export default function App() {
     } else if (reconScheduleFilter === "C-III/C-IV/C-V") {
       suffix = "345";
     }
-    setReconRef(`REC-${mm}${dd}${yy}C${suffix}`);
-  }, [reconScheduleFilter]);
+    const baseRef = `REC-${mm}${dd}${yy}C${suffix}`;
 
-  // Added history/selection states
-  const [reconViewMode, setReconViewMode] = useState<"form" | "history">("form");
-  const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
-  const [historicalReports, setHistoricalReports] = useState<any[]>([]);
+    const existingNums = new Set<string>();
+    historicalReports.forEach(r => {
+      if (r.reportNumber) existingNums.add(r.reportNumber);
+    });
+    transactions.forEach(t => {
+      if (t.referenceNumber && (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))) {
+        existingNums.add(t.referenceNumber);
+      }
+    });
+
+    let maxIndex = 0;
+    existingNums.forEach(num => {
+      const sNum = num.trim();
+      if (sNum === baseRef) {
+        if (maxIndex < 1) maxIndex = 1;
+      } else if (sNum.startsWith(baseRef + "-")) {
+        const parts = sNum.split("-");
+        const lastPart = parts[parts.length - 1];
+        const idx = parseInt(lastPart, 10);
+        if (!isNaN(idx) && idx > maxIndex) {
+          maxIndex = idx;
+        }
+      }
+    });
+
+    const nextIndex = maxIndex + 1;
+    setReconRef(`${baseRef}-${nextIndex}`);
+  }, [reconScheduleFilter, historicalReports, transactions]);
 
   const getReportTitle = () => {
     const filter = selectedHistoricalReport ? selectedHistoricalReport.scheduleFilter : reconScheduleFilter;
@@ -528,7 +556,8 @@ export default function App() {
   const lastReport = useMemo(() => {
     const reconTxs = transactions.filter(t => 
       t.referenceNumber && 
-      (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))
+      (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-")) &&
+      t.referenceNumber !== reconRef
     );
     
     if (reconTxs.length === 0) {
