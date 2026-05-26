@@ -5211,10 +5211,11 @@ export default function App() {
                                 {report.scheduleFilter || "ALL"}
                               </span>
                             </td>
-                            <td className="text-center border-b border-brand-blue/5 py-4 px-4" style={{ verticalAlign: 'middle' }}>
-                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-widest bg-brand-blue/5 px-2 py-1 rounded-lg border border-brand-blue/10">
-                                {report.items?.length || 0} substances reconciled
-                              </span>
+                            <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-semibold font-sans text-brand-dark-grey text-xs" style={{ verticalAlign: 'middle' }}>
+                              {(() => {
+                                const count = report.items?.length || 0;
+                                return `${count} ${count === 1 ? "substance" : "substances"} reconciled`;
+                              })()}
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-bold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
                               <span className="font-bold text-brand-dark-grey">{report.performedByName}</span>
