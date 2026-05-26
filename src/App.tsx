@@ -4840,19 +4840,19 @@ export default function App() {
                   <div className="flex justify-between items-start border-b-2 border-black pb-4">
                     <div>
                       <h1 className="text-xl font-bold tracking-tight uppercase">{getReportTitle().toUpperCase()}</h1>
-                      <p className="text-xs text-gray-900 font-sans mt-1">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+                      <p className="text-xs text-gray-900 font-sans mt-1">REPORT #: {(() => {
+                        const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
+                        return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
+                      })()}</p>
+                      <p className="text-xs text-gray-900 font-sans">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
                       <p className="text-xs text-gray-900 font-sans">DATE EXECUTED: {
                         selectedHistoricalReport 
                           ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                           : new Date().toLocaleDateString()
                       }</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold font-sans">REPORT #: {(() => {
-                        const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
-                        return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
-                      })()}</p>
-                      <p className="text-xs text-gray-900 font-sans font-semibold mt-1">
+                    <div className="text-right self-end">
+                      <p className="text-sm font-bold font-sans text-gray-900">
                         COMPLETED BY: {
                           selectedHistoricalReport
                             ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
