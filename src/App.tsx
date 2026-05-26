@@ -4483,7 +4483,7 @@ export default function App() {
 
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
-          <div className="flex-1 min-h-0 p-6 pt-4 pb-1.5 flex flex-col gap-4 overflow-hidden">
+          <div className="flex-1 min-h-0 p-6 pt-4 pb-1.5 flex flex-col gap-3 overflow-hidden">
                 
                 {/* Meta details */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5 shrink-0">
@@ -4647,7 +4647,7 @@ export default function App() {
                 </div>
 
                 {/* Two interactive signature fields and disclaimer grouped for perfect spacing balance */}
-                <div className="space-y-1 shrink-0 -mt-2">
+                <div className="space-y-1.5 shrink-0">
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
@@ -4659,7 +4659,7 @@ export default function App() {
                           {/* Inner row for label, select, and clear */}
                           <div className="flex items-end justify-between px-1 h-7">
                             <div className="flex items-end gap-1.5 min-w-0 flex-1">
-                              <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
+                              <span className="text-xs text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
                                 Completed By:
                               </span>
                               <Select value={reconUser} onValueChange={setReconUser}>
@@ -4694,7 +4694,7 @@ export default function App() {
                             </Button>
                           </div>
                           
-                          <div className="h-[65px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={reconCanvasRef}
                               penColor="#0d3151"
@@ -4710,7 +4710,7 @@ export default function App() {
                         <div className="flex flex-col gap-0.5">
                           {/* Inner row for PIC and clear */}
                           <div className="flex items-end justify-between px-1 h-7">
-                            <span className="text-[10px] text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
+                            <span className="text-xs text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
                               PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
                             </span>
                             <Button 
@@ -4728,7 +4728,7 @@ export default function App() {
                             </Button>
                           </div>
                           
-                          <div className="h-[65px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
                             <SignatureCanvas 
                               ref={picCanvasRef}
                               penColor="#0d3151"
@@ -4751,16 +4751,15 @@ export default function App() {
 
           </div>
 
-            <DialogFooter className="mb-0 mx-0 p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
+            <DialogFooter className="mb-0 mx-0 py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
                 id="recon-cancel-button"
                 type="button"
-                variant="ghost"
                 onClick={() => {
                   setIsReconOpen(false);
                   setCurrentTab("inventory");
                 }}
-                className="text-[10px] font-black uppercase tracking-widest text-brand-dark-grey hover:bg-brand-blue/5 rounded-xl h-12 px-6 transition-all"
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all"
               >
                 Cancel
               </Button>
