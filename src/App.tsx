@@ -3304,15 +3304,13 @@ export default function App() {
                           </div>
                           <div className="space-y-1.5">
                             <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center justify-between min-h-[160px] py-1">
+                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center gap-2 py-1">
                               <span className="shrink-0 font-medium">I confirm that the physical count of:</span>
                               
-                              <div className="flex flex-col items-center justify-center flex-1 my-3">
-                                <span className="font-bold text-brand-blue block text-base leading-tight text-center">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
-                                <span className="text-xs text-brand-blue font-bold block mt-1.5 leading-none text-center">NDC: {subObj?.ndc || ""}</span>
-                              </div>
+                              <span className="font-bold text-brand-blue block text-base leading-tight text-center m-0">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
+                              <span className="text-xs text-brand-blue font-bold block leading-none text-center m-0">NDC: {subObj?.ndc || ""}</span>
                               
-                              <div className="flex items-center justify-center gap-1.5 shrink-0">
+                              <div className="flex items-center justify-center gap-1.5 shrink-0 m-0">
                                 <span>is currently</span>
                                 <Input 
                                   id="quantity" 
