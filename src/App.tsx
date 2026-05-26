@@ -3304,11 +3304,13 @@ export default function App() {
                           </div>
                           <div className="space-y-1.5">
                             <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center gap-2 py-1">
+                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center py-1">
                               <span className="shrink-0 font-medium">I confirm that the physical count of:</span>
                               
-                              <span className="font-bold text-brand-blue block text-base leading-tight text-center m-0">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
-                              <span className="text-xs text-brand-blue font-bold block leading-none text-center m-0">NDC: {subObj?.ndc || ""}</span>
+                              <div className="my-3.5 flex flex-col items-center justify-center">
+                                <span className="font-bold text-brand-blue block text-base leading-tight text-center">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
+                                <span className="text-xs text-brand-blue font-bold block mt-1.5 leading-none text-center">NDC: {subObj?.ndc || ""}</span>
+                              </div>
                               
                               <div className="flex items-center justify-center gap-1.5 shrink-0 m-0">
                                 <span>is currently</span>
@@ -3326,9 +3328,9 @@ export default function App() {
                           </div>
                           
                           <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full flex flex-col items-center gap-1">
-                            <div className="text-xs font-bold text-brand-blue flex items-center gap-1.5 px-3 py-1 bg-brand-blue/5 rounded-full border border-brand-blue/15 shadow-sm">
+                            <div className="text-xs font-bold text-brand-blue flex items-center gap-1.5 px-3 py-1 bg-brand-yellow rounded-full border border-brand-yellow/55 shadow-sm">
                               <span>System Balance:</span>
-                              <span className="text-brand-dark-grey">{subObj?.currentStock ?? 0} {subObj?.unit || "Units"}</span>
+                              <span className="text-brand-blue">{subObj?.currentStock ?? 0} {subObj?.unit || "Units"}</span>
                             </div>
                             <div className="text-[9px] text-brand-dark-grey/40 uppercase font-bold tracking-widest mt-1">
                               Timestamp: {new Date().toLocaleString()}
