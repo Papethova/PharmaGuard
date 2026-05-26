@@ -4061,8 +4061,8 @@ export default function App() {
             </div>
           </Card>
 
-            <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
-              <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] touch-none">
+          <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
+              <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col h-[80vh] max-h-[80vh] touch-none">
                 <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
@@ -4145,18 +4145,18 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 px-4 pb-4">
-                  <div className="h-full rounded-md border border-brand-grey/10 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface">
+                <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col overflow-hidden">
+                  <div className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface">
                     <Table className="relative border-separate border-spacing-0 w-full text-sm">
-                      <TableHeader className="sticky top-0 z-40 bg-brand-surface">
-                        <TableRow className="bg-brand-surface">
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-surface border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
+                      <TableHeader className="sticky top-0 z-40 bg-brand-light-grey/50">
+                        <TableRow className="bg-brand-light-grey/50">
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
+                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey/50 border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody className="text-brand-dark-grey">
