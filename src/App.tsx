@@ -2886,7 +2886,7 @@ export default function App() {
           <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
-          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-none">
+          <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-none lg:-mt-5">
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
