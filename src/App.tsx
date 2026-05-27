@@ -4353,10 +4353,10 @@ export default function App() {
                 )}
               </div>
 
-              <div className="grid gap-1.5 w-[160px]">
+              <div className="grid gap-1.5 w-[185px]">
                 <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center">Transaction Type</Label>
                 <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
-                  <SelectTrigger id="history-type-filter" className="h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5">
+                  <SelectTrigger id="history-type-filter" className="w-full h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5">
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
