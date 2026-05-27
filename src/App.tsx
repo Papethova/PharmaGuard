@@ -4276,8 +4276,8 @@ export default function App() {
           </TabsContent>
 
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
-            <div className="shrink-0 flex flex-wrap items-end gap-10 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
-              <div className="flex items-end gap-10">
+            <div className="shrink-0 flex flex-wrap items-end gap-4 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
+              <div className="flex items-end gap-4">
                 <div className="grid gap-1.5">
                   <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
                   <Input 
@@ -4357,16 +4357,35 @@ export default function App() {
                 <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center">Transaction Type</Label>
                 <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
                   <SelectTrigger id="history-type-filter" className="h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5">
-                    <SelectValue placeholder="All types" />
+                    <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent className="bg-brand-surface border-brand-blue/10">
-                    <SelectItem value="ALL">All Types</SelectItem>
-                    <SelectItem value="IN">In (Received)</SelectItem>
-                    <SelectItem value="OUT">Out (Dispensed)</SelectItem>
-                    <SelectItem value="ADJUST">Adjustment</SelectItem>
-                    <SelectItem value="VERIFY">Verification</SelectItem>
+                    <SelectItem value="ALL">All</SelectItem>
+                    <SelectItem value="OUT">Dispensed</SelectItem>
+                    <SelectItem value="IN">Added</SelectItem>
+                    <SelectItem value="ADJUST">Adjusted</SelectItem>
+                    <SelectItem value="VERIFY">Verified</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => { 
+                  setStartDate(""); 
+                  setEndDate(""); 
+                  setHistoryMedicationFilter("");
+                  setHistoryMedicationSearch("");
+                  setHistoryTypeFilter("ALL");
+                }}
+                className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5"
+              >
+                Clear Filter
+              </Button>
+
+              <div className="h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap">
+                Showing {filteredTransactions.length} transactions
               </div>
 
               {historyMedicationFilter && (
@@ -4385,25 +4404,6 @@ export default function App() {
                   </div>
                 </div>
               )}
-
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => { 
-                  setStartDate(""); 
-                  setEndDate(""); 
-                  setHistoryMedicationFilter("");
-                  setHistoryMedicationSearch("");
-                  setHistoryTypeFilter("ALL");
-                }}
-                className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5"
-              >
-                Clear Filter
-              </Button>
-
-              <div className="ml-auto text-xs text-brand-dark-grey/60 font-medium">
-                Showing {filteredTransactions.length} transactions
-              </div>
             </div>
             <Card className="flex-1 mt-4 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
