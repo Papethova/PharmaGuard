@@ -4276,99 +4276,83 @@ export default function App() {
           </TabsContent>
 
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
-            <div className="shrink-0 flex flex-wrap items-end gap-4 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
-              <div className="grid gap-1.5 w-[145px]">
-                <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
-                <Input 
-                  id="start-date"
-                  type="date" 
-                  value={startDate} 
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
-                />
-              </div>
-              <div className="grid gap-1.5 w-[145px]">
-                <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
-                <Input 
-                  id="end-date"
-                  type="date" 
-                  value={endDate} 
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
-                />
-              </div>
+            <div className="shrink-0 flex flex-col gap-3 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
+              <div className="flex flex-row flex-wrap items-end gap-3.5 w-full">
+                <div className="grid gap-1.5 w-[120px] shrink-0">
+                  <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
+                  <Input 
+                    id="start-date"
+                    type="date" 
+                    value={startDate} 
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                  />
+                </div>
+                <div className="grid gap-1.5 w-[120px] shrink-0">
+                  <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
+                  <Input 
+                    id="end-date"
+                    type="date" 
+                    value={endDate} 
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                  />
+                </div>
 
-              <div className="grid gap-1.5 min-w-[320px] relative">
-                <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
-                <Input
-                  id="history-med-search"
-                  placeholder="Search medication..."
-                  value={historyMedicationSearch}
-                  onChange={(e) => {
-                    setHistoryMedicationSearch(e.target.value);
-                    setHistoryMedicationFilter(""); 
-                    setIsHistorySearchFocused(true);
-                  }}
-                  onFocus={() => setIsHistorySearchFocused(true)}
-                  onBlur={() => {
-                    // Small delay to allow clicking on list items
-                    setTimeout(() => setIsHistorySearchFocused(false), 200);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setIsHistorySearchFocused(false);
-                    }
-                  }}
-                  className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4"
-                />
-                {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
-                  <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
-                    {inventory
-                      .filter(s => 
-                        s.name.toLowerCase().includes(historyMedicationSearch.toLowerCase()) || 
-                        s.ndc.includes(historyMedicationSearch)
-                      )
-                      .map(s => (
-                        <div
-                          key={s.id}
-                          className="px-3 py-2 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group"
-                          onClick={() => {
-                            setHistoryMedicationFilter(s.id);
-                            setHistoryMedicationSearch(s.name);
-                          }}
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
-                              <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
+                <div className="grid gap-1.5 w-[240px] shrink-0 relative">
+                  <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
+                  <Input
+                    id="history-med-search"
+                    placeholder="Search medication..."
+                    value={historyMedicationSearch}
+                    onChange={(e) => {
+                      setHistoryMedicationSearch(e.target.value);
+                      setHistoryMedicationFilter(""); 
+                      setIsHistorySearchFocused(true);
+                    }}
+                    onFocus={() => setIsHistorySearchFocused(true)}
+                    onBlur={() => {
+                      // Small delay to allow clicking on list items
+                      setTimeout(() => setIsHistorySearchFocused(false), 200);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setIsHistorySearchFocused(false);
+                      }
+                    }}
+                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4 w-full"
+                  />
+                  {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
+                    <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
+                      {inventory
+                        .filter(s => 
+                          s.name.toLowerCase().includes(historyMedicationSearch.toLowerCase()) || 
+                          s.ndc.includes(historyMedicationSearch)
+                        )
+                        .map(s => (
+                          <div
+                            key={s.id}
+                            className="px-3 py-2 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group"
+                            onClick={() => {
+                              setHistoryMedicationFilter(s.id);
+                              setHistoryMedicationSearch(s.name);
+                            }}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
+                                <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
+                              </div>
                             </div>
+                            <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
                           </div>
-                          <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
-                        </div>
-                      ))}
-                  </div>
-                )}
-                {historyMedicationFilter && (
-                  <div className="flex gap-4 mt-1.5 justify-start">
-                    <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[120px] flex flex-col items-center justify-center">
-                      <Label className="text-[9px] text-brand-blue uppercase font-bold leading-none mb-1">Strength</Label>
-                      <div className="text-xs font-normal text-brand-dark-grey truncate">
-                        {inventory.find(i => i.id === historyMedicationFilter)?.strength}
-                      </div>
+                        ))}
                     </div>
-                    <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[140px] flex flex-col items-center justify-center">
-                      <Label className="text-xs text-brand-blue uppercase font-bold leading-none mb-1">NDC</Label>
-                      <div className="text-sm font-normal text-brand-dark-grey truncate">
-                        {inventory.find(i => i.id === historyMedicationFilter)?.ndc}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              <div className="flex items-end gap-3 ml-auto">
-                <div className="grid gap-1.5 w-[115px]">
+                <div className="grid gap-1.5 w-[125px] shrink-0">
                   <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center whitespace-nowrap">Transaction Type</Label>
                   <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
                     <SelectTrigger id="history-type-filter" className="w-full h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5 px-2">
@@ -4390,7 +4374,7 @@ export default function App() {
                   </Select>
                 </div>
 
-                <div className="grid gap-1.5 w-[90px]">
+                <div className="grid gap-1.5 w-[90px] shrink-0">
                   <Label className="text-xs font-bold text-transparent select-none text-center">Action</Label>
                   <Button 
                     variant="outline" 
@@ -4408,13 +4392,29 @@ export default function App() {
                   </Button>
                 </div>
 
-                <div className="grid gap-1.5">
-                  <Label className="text-xs font-bold text-transparent select-none text-center">Count</Label>
+                <div className="ml-auto shrink-0 pb-1">
                   <div className="h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap px-1">
                     Showing {filteredTransactions.length} transactions
                   </div>
                 </div>
               </div>
+
+              {historyMedicationFilter && (
+                <div className="flex gap-4 mt-1 justify-start shrink-0">
+                  <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[120px] flex flex-col items-center justify-center animate-in fade-in slide-in-from-top-1">
+                    <Label className="text-[9px] text-brand-blue uppercase font-bold leading-none mb-1">Strength</Label>
+                    <div className="text-xs font-normal text-brand-dark-grey truncate">
+                      {inventory.find(i => i.id === historyMedicationFilter)?.strength}
+                    </div>
+                  </div>
+                  <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[140px] flex flex-col items-center justify-center animate-in fade-in slide-in-from-top-1">
+                    <Label className="text-[9px] text-brand-blue uppercase font-bold leading-none mb-1">NDC</Label>
+                    <div className="text-sm font-normal text-brand-dark-grey truncate">
+                      {inventory.find(i => i.id === historyMedicationFilter)?.ndc}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <Card className="flex-1 mt-4 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
