@@ -379,7 +379,7 @@ export default function App() {
   const [historyMedicationFilter, setHistoryMedicationFilter] = useState("");
   const [historyMedicationSearch, setHistoryMedicationSearch] = useState("");
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
-  const [historyTypeFilter, setHistoryTypeFilter] = useState<string>("ALL");
+  const [historyTypeFilter, setHistoryTypeFilter] = useState<string>("All");
 
   // Form state
   const [isNewMedSearchFocused, setIsNewMedSearchFocused] = useState(false);
@@ -2341,7 +2341,7 @@ export default function App() {
         const matchesSearch = historyMedicationFilter 
           ? t.substanceId === historyMedicationFilter 
           : (!historyMedicationSearch || t.substanceName.toLowerCase().includes(historyMedicationSearch.toLowerCase()) || t.ndc.includes(historyMedicationSearch));
-        const matchesType = historyTypeFilter === "ALL" || t.type === historyTypeFilter;
+        const matchesType = historyTypeFilter === "All" || t.type === historyTypeFilter;
 
         return matchesSchedule && matchesStartDate && matchesEndDate && matchesSearch && matchesType;
       })
@@ -4359,8 +4359,8 @@ export default function App() {
                   <SelectTrigger id="history-type-filter" className="h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5">
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
-                  <SelectContent className="bg-brand-surface border-brand-blue/10">
-                    <SelectItem value="ALL">All</SelectItem>
+                  <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
+                    <SelectItem value="All">All</SelectItem>
                     <SelectItem value="OUT">Dispensed</SelectItem>
                     <SelectItem value="IN">Added</SelectItem>
                     <SelectItem value="ADJUST">Adjusted</SelectItem>
@@ -4378,7 +4378,7 @@ export default function App() {
                     setEndDate(""); 
                     setHistoryMedicationFilter("");
                     setHistoryMedicationSearch("");
-                    setHistoryTypeFilter("ALL");
+                    setHistoryTypeFilter("All");
                   }}
                   className="h-7 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-full flex items-center justify-center py-0"
                 >
