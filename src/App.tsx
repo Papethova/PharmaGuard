@@ -4277,27 +4277,25 @@ export default function App() {
 
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="shrink-0 flex flex-wrap items-end gap-4 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
-              <div className="flex items-end gap-4">
-                <div className="grid gap-1.5">
-                  <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
-                  <Input 
-                    id="start-date"
-                    type="date" 
-                    value={startDate} 
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
-                  />
-                </div>
-                <div className="grid gap-1.5">
-                  <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
-                  <Input 
-                    id="end-date"
-                    type="date" 
-                    value={endDate} 
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
-                  />
-                </div>
+              <div className="grid gap-1.5 w-[145px]">
+                <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
+                <Input 
+                  id="start-date"
+                  type="date" 
+                  value={startDate} 
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
+                />
+              </div>
+              <div className="grid gap-1.5 w-[145px]">
+                <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
+                <Input 
+                  id="end-date"
+                  type="date" 
+                  value={endDate} 
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
+                />
               </div>
 
               <div className="grid gap-1.5 min-w-[320px] relative">
