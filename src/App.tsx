@@ -4285,7 +4285,7 @@ export default function App() {
                     type="date" 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center"
+                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
                   />
                 </div>
                 <div className="grid gap-1.5">
@@ -4295,7 +4295,7 @@ export default function App() {
                     type="date" 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center"
+                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue text-center py-0"
                   />
                 </div>
               </div>
