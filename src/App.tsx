@@ -4429,7 +4429,7 @@ export default function App() {
                       </TableRow>
                     ) : filteredTransactions.map((t) => (
                     <TableRow key={t.id} className="h-14">
-                      <TableCell className="text-xs font-mono text-brand-dark-grey/70 whitespace-nowrap text-center">
+                      <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center">
                         {formatDateTime(t.timestamp)}
                       </TableCell>
                       <TableCell className="text-center">
@@ -4477,47 +4477,49 @@ export default function App() {
           </Card>
         </TabsContent>
 
-          <TabsContent value="alerts" className="space-y-4 relative z-10 m-0">
-            <div className="grid gap-4">
-              {lowStockItems.length === 0 ? (
-                <Card className="border-brand-grey/10 shadow-sm p-12 text-center text-brand-dark-grey/50 bg-brand-surface">
-                  <p>All stock levels are currently above minimum thresholds.</p>
-                </Card>
-              ) : lowStockItems.map(item => (
-                <Card key={item.id} className="border-brand-grey/20 bg-brand-surface shadow-sm">
-                  <CardContent className="flex items-center justify-between p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20 relative">
-                        <AlertTriangle className="h-6 w-6 text-brand-blue relative z-10" />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-black text-brand-blue tracking-tight">{item.name}{" "}{item.strength}</h3>
-                        <div className="flex items-center gap-3 mt-1">
-                          <p className="text-lg text-brand-dark-grey">
-                            Current Stock: <span className="font-black text-brand-yellow text-xl">{item.currentStock}</span> / Min Threshold: <span className="font-bold text-xl">{item.minThreshold}</span>
-                          </p>
-                          <div className="h-4 w-[1px] bg-brand-grey/30" />
-                          <div className="flex items-center gap-1.5 text-sm">
-                            <span className="text-brand-dark-grey/60">NDC:</span>
-                            <button 
-                              onClick={() => handleNDCClick(item.ndc)}
-                              className="text-brand-blue hover:underline font-bold transition-colors"
-                            >
-                              {item.ndc}
-                            </button>
+          <TabsContent value="alerts" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-y-auto pr-1 pb-6 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
+              <div className="grid gap-4">
+                {lowStockItems.length === 0 ? (
+                  <Card className="border-brand-grey/10 shadow-sm p-12 text-center text-brand-dark-grey/50 bg-brand-surface">
+                    <p>All stock levels are currently above minimum thresholds.</p>
+                  </Card>
+                ) : lowStockItems.map(item => (
+                  <Card key={item.id} className="border-brand-grey/20 bg-brand-surface shadow-sm">
+                    <CardContent className="flex items-center justify-between p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20 relative">
+                          <AlertTriangle className="h-6 w-6 text-brand-blue relative z-10" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-black text-brand-blue tracking-tight">{item.name}{" "}{item.strength}</h3>
+                          <div className="flex items-center gap-3 mt-1">
+                            <p className="text-lg text-brand-dark-grey">
+                              Current Stock: <span className="font-black text-brand-yellow text-xl">{item.currentStock}</span> / Min Threshold: <span className="font-bold text-xl">{item.minThreshold}</span>
+                            </p>
+                            <div className="h-4 w-[1px] bg-brand-grey/30" />
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <span className="text-brand-dark-grey/60">NDC:</span>
+                              <button 
+                                onClick={() => handleNDCClick(item.ndc)}
+                                className="text-brand-blue hover:underline font-bold transition-colors"
+                              >
+                                {item.ndc}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <Button 
-                      className="bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 h-12 px-6 font-extrabold rounded-xl transition-all border-none"
-                      onClick={() => handleDismissAlert(item.id)}
-                    >
-                      Dismiss Alert
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      <Button 
+                        className="bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 h-12 px-6 font-extrabold rounded-xl transition-all border-none"
+                        onClick={() => handleDismissAlert(item.id)}
+                      >
+                        Dismiss Alert
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           </TabsContent>
         </div>
