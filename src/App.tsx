@@ -4335,7 +4335,7 @@ export default function App() {
                             className="px-3 py-2 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group"
                             onClick={() => {
                               setHistoryMedicationFilter(s.id);
-                              setHistoryMedicationSearch(s.name);
+                              setHistoryMedicationSearch(`${s.name} - ${s.strength} (${s.ndc})`);
                             }}
                           >
                             <div className="flex flex-col">
