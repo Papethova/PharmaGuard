@@ -379,6 +379,7 @@ export default function App() {
   const [historyMedicationFilter, setHistoryMedicationFilter] = useState("");
   const [historyMedicationSearch, setHistoryMedicationSearch] = useState("");
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
+  const [historyTypeFilter, setHistoryTypeFilter] = useState<string>("ALL");
 
   // Form state
   const [isNewMedSearchFocused, setIsNewMedSearchFocused] = useState(false);
@@ -2340,15 +2341,16 @@ export default function App() {
         const matchesSearch = historyMedicationFilter 
           ? t.substanceId === historyMedicationFilter 
           : (!historyMedicationSearch || t.substanceName.toLowerCase().includes(historyMedicationSearch.toLowerCase()) || t.ndc.includes(historyMedicationSearch));
+        const matchesType = historyTypeFilter === "ALL" || t.type === historyTypeFilter;
 
-        return matchesSchedule && matchesStartDate && matchesEndDate && matchesSearch;
+        return matchesSchedule && matchesStartDate && matchesEndDate && matchesSearch && matchesType;
       })
       .sort((a, b) => {
         const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
         const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
         return dateB - dateA;
       }),
-  [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch]);
+  [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
 
   const lowStockItems = useMemo(() => 
     inventory.filter(s => s.currentStock <= s.minThreshold && !dismissedAlerts.includes(s.id)),
@@ -4351,6 +4353,22 @@ export default function App() {
                 )}
               </div>
 
+              <div className="grid gap-1.5 w-[160px]">
+                <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center">Transaction Type</Label>
+                <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
+                  <SelectTrigger id="history-type-filter" className="h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5">
+                    <SelectValue placeholder="All types" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-brand-surface border-brand-blue/10">
+                    <SelectItem value="ALL">All Types</SelectItem>
+                    <SelectItem value="IN">In (Received)</SelectItem>
+                    <SelectItem value="OUT">Out (Dispensed)</SelectItem>
+                    <SelectItem value="ADJUST">Adjustment</SelectItem>
+                    <SelectItem value="VERIFY">Verification</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {historyMedicationFilter && (
                 <div className="flex gap-4">
                   <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[120px]">
@@ -4376,6 +4394,7 @@ export default function App() {
                   setEndDate(""); 
                   setHistoryMedicationFilter("");
                   setHistoryMedicationSearch("");
+                  setHistoryTypeFilter("ALL");
                 }}
                 className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5"
               >
