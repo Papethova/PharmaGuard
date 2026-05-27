@@ -4369,23 +4369,25 @@ export default function App() {
                 </Select>
               </div>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => { 
-                  setStartDate(""); 
-                  setEndDate(""); 
-                  setHistoryMedicationFilter("");
-                  setHistoryMedicationSearch("");
-                  setHistoryTypeFilter("ALL");
-                }}
-                className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5"
-              >
-                Clear Filter
-              </Button>
+              <div className="flex flex-col items-center justify-between h-[58px] min-w-[120px]">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => { 
+                    setStartDate(""); 
+                    setEndDate(""); 
+                    setHistoryMedicationFilter("");
+                    setHistoryMedicationSearch("");
+                    setHistoryTypeFilter("ALL");
+                  }}
+                  className="h-7 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-full flex items-center justify-center py-0"
+                >
+                  Clear Filter
+                </Button>
 
-              <div className="h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap">
-                Showing {filteredTransactions.length} transactions
+                <div className="h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap">
+                  Showing {filteredTransactions.length} transactions
+                </div>
               </div>
 
               {historyMedicationFilter && (
