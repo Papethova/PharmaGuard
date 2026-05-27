@@ -2338,9 +2338,12 @@ export default function App() {
         const transactionDate = t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
         const matchesStartDate = !startDate || transactionDate >= new Date(startDate);
         const matchesEndDate = !endDate || transactionDate <= new Date(endDate + "T23:59:59");
+        const cleanQuery = historyMedicationSearch
+          ? historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase()
+          : "";
         const matchesSearch = historyMedicationFilter 
           ? t.substanceId === historyMedicationFilter 
-          : (!historyMedicationSearch || t.substanceName.toLowerCase().includes(historyMedicationSearch.toLowerCase()) || t.ndc.includes(historyMedicationSearch));
+          : (!cleanQuery || t.substanceName.toLowerCase().includes(cleanQuery) || t.ndc.toLowerCase().includes(cleanQuery));
         const matchesType = historyTypeFilter === "All" || t.type === historyTypeFilter;
 
         return matchesSchedule && matchesStartDate && matchesEndDate && matchesSearch && matchesType;
@@ -4322,13 +4325,13 @@ export default function App() {
                     }}
                     className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4 w-full"
                   />
-                  {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
+                  {historyMedicationSearch && isHistorySearchFocused && (
                     <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
                       {inventory
-                        .filter(s => 
-                          s.name.toLowerCase().includes(historyMedicationSearch.toLowerCase()) || 
-                          s.ndc.includes(historyMedicationSearch)
-                        )
+                        .filter(s => {
+                          const query = historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase();
+                          return s.name.toLowerCase().includes(query) || s.ndc.toLowerCase().includes(query);
+                        })
                         .map(s => (
                           <div
                             key={s.id}
