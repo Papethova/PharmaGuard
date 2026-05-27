@@ -4352,19 +4352,34 @@ export default function App() {
                   </div>
                 )}
                 {historyMedicationFilter && (
-                  <div className="text-xs text-brand-dark-grey/70 flex gap-2 justify-center mt-1">
-                    <span>Strength: <span className="font-semibold text-brand-dark-grey">{inventory.find(i => i.id === historyMedicationFilter)?.strength}</span></span>
-                    <span className="text-brand-grey/30">|</span>
-                    <span>NDC: <span className="font-semibold text-brand-dark-grey">{inventory.find(i => i.id === historyMedicationFilter)?.ndc}</span></span>
+                  <div className="flex gap-4 mt-1.5 justify-start">
+                    <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[120px] flex flex-col items-center justify-center">
+                      <Label className="text-[9px] text-brand-blue uppercase font-bold leading-none mb-1">Strength</Label>
+                      <div className="text-xs font-normal text-brand-dark-grey truncate">
+                        {inventory.find(i => i.id === historyMedicationFilter)?.strength}
+                      </div>
+                    </div>
+                    <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[140px] flex flex-col items-center justify-center">
+                      <Label className="text-xs text-brand-blue uppercase font-bold leading-none mb-1">NDC</Label>
+                      <div className="text-sm font-normal text-brand-dark-grey truncate">
+                        {inventory.find(i => i.id === historyMedicationFilter)?.ndc}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
 
-              <div className="grid gap-1.5 w-[185px]">
+              <div className="grid gap-1.5 w-[210px]">
                 <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center">Transaction Type</Label>
                 <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
                   <SelectTrigger id="history-type-filter" className="w-full h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5">
-                    <SelectValue placeholder="All" />
+                    <SelectValue placeholder="All">
+                      {historyTypeFilter === "All" ? "All" :
+                       historyTypeFilter === "OUT" ? "Dispensed" :
+                       historyTypeFilter === "IN" ? "Added" :
+                       historyTypeFilter === "ADJUST" ? "Adjusted" :
+                       historyTypeFilter === "VERIFY" ? "Verified" : historyTypeFilter}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
                     <SelectItem value="All">All</SelectItem>
@@ -4376,7 +4391,7 @@ export default function App() {
                 </Select>
               </div>
 
-              <div className="flex flex-col items-center justify-between h-[58px] min-w-[120px]">
+              <div className="flex flex-col items-center justify-between h-[58px] min-w-[120px] ml-auto">
                 <Button 
                   variant="outline" 
                   size="sm" 
