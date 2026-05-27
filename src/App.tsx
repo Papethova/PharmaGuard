@@ -4285,7 +4285,7 @@ export default function App() {
                     type="date" 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-[110px] h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className="w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
                   />
                 </div>
                 <div className="grid gap-1.5 w-[110px] shrink-0">
@@ -4295,7 +4295,7 @@ export default function App() {
                     type="date" 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-[110px] h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className="w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
                   />
                 </div>
 
@@ -4320,7 +4320,7 @@ export default function App() {
                         setIsHistorySearchFocused(false);
                       }
                     }}
-                    className="h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4 w-full"
+                    className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4 w-full"
                   />
                   {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
                     <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
@@ -4355,7 +4355,7 @@ export default function App() {
                 <div className="grid gap-1.5 w-[125px] shrink-0">
                   <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center whitespace-nowrap">Transaction Type</Label>
                   <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
-                    <SelectTrigger id="history-type-filter" className="w-full h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5 px-2">
+                    <SelectTrigger id="history-type-filter" className="w-full !h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5 px-2">
                       <SelectValue placeholder="All">
                         {historyTypeFilter === "All" ? "All" :
                          historyTypeFilter === "OUT" ? "Dispensed" :
@@ -4376,7 +4376,6 @@ export default function App() {
 
                 <Button 
                   variant="outline" 
-                  size="sm" 
                   onClick={() => { 
                     setStartDate(""); 
                     setEndDate(""); 
@@ -4384,7 +4383,7 @@ export default function App() {
                     setHistoryMedicationSearch("");
                     setHistoryTypeFilter("All");
                   }}
-                  className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[90px] shrink-0 flex items-center justify-center p-0"
+                  className="!h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[90px] shrink-0 flex items-center justify-center p-0"
                 >
                   Clear Filter
                 </Button>
