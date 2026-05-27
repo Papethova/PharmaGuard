@@ -4278,24 +4278,24 @@ export default function App() {
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="shrink-0 flex flex-col gap-3 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
               <div className="flex flex-row flex-wrap items-end gap-3.5 w-full">
-                <div className="grid gap-1.5 w-[120px] shrink-0">
+                <div className="grid gap-1.5 w-[110px] shrink-0">
                   <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
                   <Input 
                     id="start-date"
                     type="date" 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className="w-[110px] h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
                   />
                 </div>
-                <div className="grid gap-1.5 w-[120px] shrink-0">
+                <div className="grid gap-1.5 w-[110px] shrink-0">
                   <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
                   <Input 
                     id="end-date"
                     type="date" 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className="w-[110px] h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
                   />
                 </div>
 
@@ -4374,28 +4374,23 @@ export default function App() {
                   </Select>
                 </div>
 
-                <div className="grid gap-1.5 w-[90px] shrink-0">
-                  <Label className="text-xs font-bold text-transparent select-none text-center">Action</Label>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => { 
-                      setStartDate(""); 
-                      setEndDate(""); 
-                      setHistoryMedicationFilter("");
-                      setHistoryMedicationSearch("");
-                      setHistoryTypeFilter("All");
-                    }}
-                    className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-full flex items-center justify-center p-0"
-                  >
-                    Clear Filter
-                  </Button>
-                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => { 
+                    setStartDate(""); 
+                    setEndDate(""); 
+                    setHistoryMedicationFilter("");
+                    setHistoryMedicationSearch("");
+                    setHistoryTypeFilter("All");
+                  }}
+                  className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[90px] shrink-0 flex items-center justify-center p-0"
+                >
+                  Clear Filter
+                </Button>
 
-                <div className="ml-auto shrink-0 pb-1">
-                  <div className="h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap px-1">
-                    Showing {filteredTransactions.length} transactions
-                  </div>
+                <div className="ml-auto shrink-0 h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap px-1">
+                  Showing {filteredTransactions.length} transactions
                 </div>
               </div>
 
