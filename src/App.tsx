@@ -4351,6 +4351,13 @@ export default function App() {
                       ))}
                   </div>
                 )}
+                {historyMedicationFilter && (
+                  <div className="text-xs text-brand-dark-grey/70 flex gap-2 justify-center mt-1">
+                    <span>Strength: <span className="font-semibold text-brand-dark-grey">{inventory.find(i => i.id === historyMedicationFilter)?.strength}</span></span>
+                    <span className="text-brand-grey/30">|</span>
+                    <span>NDC: <span className="font-semibold text-brand-dark-grey">{inventory.find(i => i.id === historyMedicationFilter)?.ndc}</span></span>
+                  </div>
+                )}
               </div>
 
               <div className="grid gap-1.5 w-[185px]">
@@ -4389,23 +4396,6 @@ export default function App() {
                   Showing {filteredTransactions.length} transactions
                 </div>
               </div>
-
-              {historyMedicationFilter && (
-                <div className="flex gap-4">
-                  <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[120px]">
-                    <Label className="text-[9px] text-brand-blue uppercase font-bold leading-none">Strength</Label>
-                    <div className="text-xs font-normal text-brand-dark-grey truncate">
-                      {inventory.find(i => i.id === historyMedicationFilter)?.strength}
-                    </div>
-                  </div>
-                  <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[140px]">
-                    <Label className="text-xs text-brand-blue uppercase font-bold leading-none">NDC</Label>
-                    <div className="text-sm font-normal text-brand-dark-grey truncate">
-                      {inventory.find(i => i.id === historyMedicationFilter)?.ndc}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
             <Card className="flex-1 mt-4 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
               <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
