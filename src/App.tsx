@@ -4367,46 +4367,52 @@ export default function App() {
                 )}
               </div>
 
-              <div className="grid gap-1.5 w-[210px]">
-                <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center">Transaction Type</Label>
-                <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
-                  <SelectTrigger id="history-type-filter" className="w-full h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5">
-                    <SelectValue placeholder="All">
-                      {historyTypeFilter === "All" ? "All" :
-                       historyTypeFilter === "OUT" ? "Dispensed" :
-                       historyTypeFilter === "IN" ? "Added" :
-                       historyTypeFilter === "ADJUST" ? "Adjusted" :
-                       historyTypeFilter === "VERIFY" ? "Verified" : historyTypeFilter}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
-                    <SelectItem value="All">All</SelectItem>
-                    <SelectItem value="OUT">Dispensed</SelectItem>
-                    <SelectItem value="IN">Added</SelectItem>
-                    <SelectItem value="ADJUST">Adjusted</SelectItem>
-                    <SelectItem value="VERIFY">Verified</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="flex items-end gap-3 ml-auto">
+                <div className="grid gap-1.5 w-[115px]">
+                  <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center whitespace-nowrap">Transaction Type</Label>
+                  <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
+                    <SelectTrigger id="history-type-filter" className="w-full h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5 px-2">
+                      <SelectValue placeholder="All">
+                        {historyTypeFilter === "All" ? "All" :
+                         historyTypeFilter === "OUT" ? "Dispensed" :
+                         historyTypeFilter === "IN" ? "Added" :
+                         historyTypeFilter === "ADJUST" ? "Adjusted" :
+                         historyTypeFilter === "VERIFY" ? "Verified" : historyTypeFilter}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
+                      <SelectItem value="All">All</SelectItem>
+                      <SelectItem value="OUT">Dispensed</SelectItem>
+                      <SelectItem value="IN">Added</SelectItem>
+                      <SelectItem value="ADJUST">Adjusted</SelectItem>
+                      <SelectItem value="VERIFY">Verified</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="flex flex-col items-center justify-between h-[58px] min-w-[120px] ml-auto">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => { 
-                    setStartDate(""); 
-                    setEndDate(""); 
-                    setHistoryMedicationFilter("");
-                    setHistoryMedicationSearch("");
-                    setHistoryTypeFilter("All");
-                  }}
-                  className="h-7 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-full flex items-center justify-center py-0"
-                >
-                  Clear Filter
-                </Button>
+                <div className="grid gap-1.5 w-[90px]">
+                  <Label className="text-xs font-bold text-transparent select-none text-center">Action</Label>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => { 
+                      setStartDate(""); 
+                      setEndDate(""); 
+                      setHistoryMedicationFilter("");
+                      setHistoryMedicationSearch("");
+                      setHistoryTypeFilter("All");
+                    }}
+                    className="h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-full flex items-center justify-center p-0"
+                  >
+                    Clear Filter
+                  </Button>
+                </div>
 
-                <div className="h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap">
-                  Showing {filteredTransactions.length} transactions
+                <div className="grid gap-1.5">
+                  <Label className="text-xs font-bold text-transparent select-none text-center">Count</Label>
+                  <div className="h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap px-1">
+                    Showing {filteredTransactions.length} transactions
+                  </div>
                 </div>
               </div>
             </div>
