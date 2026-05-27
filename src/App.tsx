@@ -4977,15 +4977,15 @@ export default function App() {
                       <div className="space-y-4">
                         <table className="w-full text-xs font-sans text-gray-900">
                           <colgroup>
-                            <col className="w-[22%]" />
+                            <col className="w-[33%]" />
                             <col className="w-[11%]" />
                             <col className="w-[11%]" />
                             <col className="w-[8%]" />
                             <col className="w-[8%]" />
                             <col className="w-[8%]" />
-                            <col className="w-[11%]" />
-                            <col className="w-[11%]" />
-                            <col className="w-[10%]" />
+                            <col className="w-[7%]" />
+                            <col className="w-[7%]" />
+                            <col className="w-[7%]" />
                           </colgroup>
                            <thead>
                              <tr className="border-b-2 border-gray-200">
@@ -5116,12 +5116,12 @@ export default function App() {
                     const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
 
                     return (
-                      <div className="space-y-4 pt-4 border-t border-gray-100">
+                      <div className="space-y-1.5 pt-3 border-t border-gray-100">
                         {/* Moved disclaimer above signature fields in historical report block */}
                         <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
                           By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
                         </p>
-                        <div className="grid grid-cols-2 gap-8 pt-2">
+                        <div className="grid grid-cols-2 gap-8 pt-1">
                           {/* Left signature field */}
                           <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
                             <div className="flex items-center gap-1.5 pb-2">
@@ -5183,7 +5183,7 @@ export default function App() {
                 className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center justify-center"
               >
                 <Printer className="h-4 w-4" />
-                EXECUTE SYSTEM PRINT
+                PRINT REPORT
               </Button>
             </div>
 
