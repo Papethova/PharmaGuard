@@ -4836,23 +4836,44 @@ export default function App() {
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
                       <thead className="sticky top-0 z-40">
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication & Strength</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
-                            <div className="flex flex-col items-center justify-center leading-tight">
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Medication & Strength</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>NDC</th>
+                          
+                          {/* Last Report Column */}
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                            <div className="flex flex-col items-center justify-between h-full leading-tight py-0.5">
                               <span>Last Report</span>
-                              <span className="text-[10px] font-normal tracking-wider text-brand-blue/80">Count</span>
+                              <span>Count</span>
                             </div>
                           </th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Purchased</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Expected</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Physical Count</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
+                          
+                          {/* Purchased Column */}
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                            <div className="flex flex-col items-center justify-start h-full leading-tight py-0.5">
+                              <span>Purchased</span>
+                            </div>
+                          </th>
+                          
+                          {/* Dispensed Column */}
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                            <div className="flex flex-col items-center justify-start h-full leading-tight py-0.5">
+                              <span>Dispensed</span>
+                            </div>
+                          </th>
+                          
+                          {/* Adjusted Column */}
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                            <div className="flex flex-col items-center justify-start h-full leading-tight py-0.5">
+                              <span>Adjusted</span>
+                            </div>
+                          </th>
+                          
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Expected</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Physical Count</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Variance</th>
                         </tr>
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th colSpan={4} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-7 py-0" style={{ top: '28px', verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
+                          <th colSpan={4} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-5 py-0 border-none" style={{ top: '44px', verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
                             since {lastReport.date}
                           </th>
                         </tr>
