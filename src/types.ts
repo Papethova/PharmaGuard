@@ -45,6 +45,7 @@ export interface UserProfile {
   organizationName?: string;
   status: 'active' | 'suspended' | 'pending';
   isPhotoRequirementEnabled?: boolean;
+  reconFilters?: string[];
   docId?: string; // Track exact document key in Firestore
   createdAt?: any;
   updatedAt?: any;

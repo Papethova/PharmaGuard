@@ -476,6 +476,14 @@ export default function App() {
   // Reconciliation states
   const [isReconOpen, setIsReconOpen] = useState(false);
   const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">("ALL");
+
+  useEffect(() => {
+    const activeBubbles = userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"];
+    if (!activeBubbles.includes(reconScheduleFilter)) {
+      setReconScheduleFilter(activeBubbles[0] as any);
+    }
+  }, [userProfile?.reconFilters, reconScheduleFilter]);
+
   const [reconCounts, setReconCounts] = useState<Record<string, string>>({});
   const [reconReasons, setReconReasons] = useState<Record<string, string>>({});
   const [reconUser, setReconUser] = useState("");
@@ -2952,6 +2960,34 @@ export default function App() {
     }
   };
 
+  const toggleReconFilter = async (filterVal: "ALL" | "C-II" | "C-III/C-IV/C-V") => {
+    if (!user || !user.email) return;
+    const userEmail = user.email.toLowerCase();
+    const currentFilters = userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"];
+    let newFilters: string[];
+    
+    if (currentFilters.includes(filterVal)) {
+      if (currentFilters.length <= 1) {
+        toast.warning("At least one report option must remain selected.");
+        return;
+      }
+      newFilters = currentFilters.filter(f => f !== filterVal);
+    } else {
+      newFilters = [...currentFilters, filterVal];
+    }
+    
+    try {
+      const userDocRef = doc(db, "users", userEmail);
+      await updateDoc(userDocRef, {
+        reconFilters: newFilters
+      });
+      setUserProfile(prev => prev ? { ...prev, reconFilters: newFilters } : null);
+      toast.success("Reconciliation options matching profile updated.");
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
+    }
+  };
+
   return (
     <div className="h-[100dvh] overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
       <header className={`shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
@@ -4009,6 +4045,34 @@ export default function App() {
                         <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                       </div>
                     </div>
+
+                    <div className="pt-2">
+                      <Label className="text-[10px] font-black uppercase text-brand-blue/80 tracking-widest block mb-1">Reconciliation Report Options</Label>
+                      <div className="flex gap-1.5 pt-1">
+                        {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => {
+                          const labelMap = {
+                            "ALL": "All",
+                            "C-II": "C-II",
+                            "C-III/C-IV/C-V": "C-III/C-IV/C-V"
+                          };
+                          const isSelected = (userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"]).includes(filterVal);
+                          return (
+                            <button
+                              key={filterVal}
+                              type="button"
+                              onClick={() => toggleReconFilter(filterVal)}
+                              className={`flex-1 h-9 rounded-full text-xs font-black transition-all border ${
+                                isSelected
+                                  ? "bg-brand-yellow text-brand-blue border-brand-yellow shadow-sm"
+                                  : "bg-brand-surface text-brand-grey border-brand-grey/20 hover:bg-brand-blue/5"
+                              }`}
+                            >
+                              ({labelMap[filterVal]})
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -4695,13 +4759,13 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5 shrink-0">
                   <div className="flex items-center gap-2 text-left w-full sm:w-auto">
                     <div className="flex items-center gap-2">
-                      {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => (
+                      {(userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"]).map((filterVal) => (
                         <Button
                           key={filterVal}
                           type="button"
                           variant={reconScheduleFilter === filterVal ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setReconScheduleFilter(filterVal)}
+                          onClick={() => setReconScheduleFilter(filterVal as any)}
                           className={`rounded-full px-6 h-10 text-xs font-extrabold tracking-wider transition-all ${
                             reconScheduleFilter === filterVal
                               ? "bg-brand-blue text-white border-brand-blue shadow-md"
