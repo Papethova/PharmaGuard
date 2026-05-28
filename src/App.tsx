@@ -4655,7 +4655,7 @@ export default function App() {
               </div>
               <div>
                 <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
-                  {reconViewMode === "history" ? "Controlled Substance Reconciliation Report Ledger" : "Controlled Substance Reconciliation"}
+                  {reconViewMode === "history" ? "Controlled Substance Reconciliation Report Registry" : "Controlled Substance Reconciliation"}
                 </DialogTitle>
                 <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
                   VERIFY PHYSICAL HOLDINGS AGAINST DIGITAL LEDGER LOGS TO MAINTAIN ACTIVE COMPLIANCE
@@ -4680,7 +4680,7 @@ export default function App() {
                   <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
                     <Folder className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
                   </div>
-                  Report Ledger
+                  Report Registry
                 </Button>
               </div>
             )}
@@ -4739,7 +4739,7 @@ export default function App() {
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
                         </tr>
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th colSpan={4} className="font-semibold text-[10px] text-brand-blue/75 text-center bg-brand-yellow sticky z-30 h-7 py-0" style={{ top: '28px', verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
+                          <th colSpan={4} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-7 py-0" style={{ top: '28px', verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
                             since {lastReport.date}
                           </th>
                         </tr>
@@ -5079,29 +5079,31 @@ export default function App() {
                             <col className="w-[7%]" />
                           </colgroup>
                            <thead>
-                             <tr className="border-b-2 border-gray-200">
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>MEDICATION</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>NDC</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>
-                                 <div>LAST REPORT</div>
-                                 <div className="text-[8px] text-gray-500 font-normal mt-0.5" style={{ lineHeight: '1' }}>{headerPrevReportDate}</div>
-                               </th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>PURCHASED</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>DISPENSED</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>ADJUSTED</th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>
+                             <tr className="border-b border-gray-100">
+                               <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>MEDICATION</th>
+                               <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>NDC</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>LAST REPORT</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>PURCHASED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>DISPENSED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>ADJUSTED</th>
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center">
                                    <div>EXPECTED</div>
                                    <div className="mt-0.5">COUNT</div>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center">
                                    <div>PHYSICAL</div>
                                    <div className="mt-0.5">COUNT</div>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1' }}>VARIANCE</th>
+                               <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>VARIANCE</th>
+                             </tr>
+                             <tr className="border-b-2 border-gray-200">
+                               <th colSpan={4} className="text-center font-normal text-[8px] text-gray-500" style={{ paddingTop: '0.5px', paddingBottom: '2.5px', height: '10px', lineHeight: '1', verticalAlign: 'top' }}>
+                                 since {headerPrevReportDate}
+                               </th>
                              </tr>
                            </thead>
                           <tbody className="divide-y divide-gray-100">
@@ -5315,7 +5317,7 @@ export default function App() {
               ARCHIVED RECONCILIATION REPORTS ({historicalReports.length})
             </h3>
             <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
-              Select any report from the ledger below to retrieve and print certified historical snapshots.
+              Select any report from the registry below to retrieve and print certified historical snapshots.
             </p>
           </div>
 
@@ -5337,7 +5339,7 @@ export default function App() {
                     {historicalReports.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="text-center py-12 text-brand-dark-grey/50 italic font-medium">
-                          No reports archived in the ledger.
+                          No reports archived in the registry.
                         </td>
                       </tr>
                     ) : (
