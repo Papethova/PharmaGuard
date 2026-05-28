@@ -13,6 +13,7 @@
         "licenseNumber": { "type": "string" },
         "organizationName": { "type": "string" },
         "isPhotoRequirementEnabled": { "type": "boolean" },
+        "isSignatureRequirementEnabled": { "type": "boolean" },
         "migratedFromUid": { "type": "string" }
       },
       "required": ["uid", "email", "displayName", "role", "status"]

@@ -50,6 +50,7 @@ service cloud.firestore {
              (!('organizationName' in data) || (data.organizationName is string && data.organizationName.size() <= 128)) &&
              (!('licenseNumber' in data) || (data.licenseNumber is string && data.licenseNumber.size() <= 64)) &&
              (!('isPhotoRequirementEnabled' in data) || data.isPhotoRequirementEnabled is bool) &&
+             (!('isSignatureRequirementEnabled' in data) || data.isSignatureRequirementEnabled is bool) &&
              (!('migratedFromUid' in data) || (data.migratedFromUid is string && data.migratedFromUid.size() <= 128)) &&
              (!('migratedToUid' in data) || (data.migratedToUid is string && data.migratedToUid.size() <= 128)) &&
              (!('createdAt' in data) || data.createdAt == request.time || data.createdAt is timestamp) &&

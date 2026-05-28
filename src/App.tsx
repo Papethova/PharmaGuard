@@ -26,6 +26,7 @@ import {
   Search,
   AlertCircle,
   Camera,
+  PenTool,
   Lock,
   Ghost,
   Database,
@@ -1686,12 +1687,14 @@ export default function App() {
       }
 
       const isUsingPhoto = userProfile?.isPhotoRequirementEnabled && !useSignatureFallback && transactionType !== "VERIFY";
+      const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
+
       if (isUsingPhoto) {
         if (!capturedPhoto) {
           toast.error("Photo capture is required for compliance");
           return;
         }
-      } else {
+      } else if (isSigRequired) {
         const pad = sigPad.current;
         if (!pad || pad.isEmpty()) {
           toast.error(transactionType === "VERIFY" ? "Signature is required to verify the physical count" : "Signature is required for compliance");
@@ -1704,7 +1707,7 @@ export default function App() {
       
       const batch = writeBatch(db);
       let signature = "";
-      if (!isUsingPhoto) {
+      if (!isUsingPhoto && isSigRequired) {
         const canvas = sigPad.current?.getCanvas();
         const trimmedCanvas = canvas ? trimSignatureCanvas(canvas) : null;
         signature = trimmedCanvas ? trimmedCanvas.toDataURL("image/png") : (canvas ? canvas.toDataURL("image/png") : "");
@@ -1821,8 +1824,10 @@ export default function App() {
       return;
     }
 
+    const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
+
     let signature = reconSigData || "";
-    if (reconCanvasRef.current) {
+    if (isSigRequired && reconCanvasRef.current) {
       const canvas = reconCanvasRef.current.getCanvas ? reconCanvasRef.current.getCanvas() : reconCanvasRef.current;
       if (canvas && !reconCanvasRef.current.isEmpty()) {
         const trimmedCanvas = trimSignatureCanvas(canvas);
@@ -1832,13 +1837,13 @@ export default function App() {
       }
     }
 
-    if (!signature) {
+    if (isSigRequired && !signature) {
       toast.error("Performed By signature is required.");
       return;
     }
 
     let picSignature = picSigData || "";
-    if (picCanvasRef.current) {
+    if (isSigRequired && picCanvasRef.current) {
       const canvas = picCanvasRef.current.getCanvas ? picCanvasRef.current.getCanvas() : picCanvasRef.current;
       if (canvas && !picCanvasRef.current.isEmpty()) {
         const trimmedCanvas = trimSignatureCanvas(canvas);
@@ -1848,7 +1853,7 @@ export default function App() {
       }
     }
 
-    if (!picSignature) {
+    if (isSigRequired && !picSignature) {
       toast.error("PIC signature is required.");
       return;
     }
@@ -2960,6 +2965,23 @@ export default function App() {
     }
   };
 
+  const toggleSignatureRequirement = async () => {
+    if (!user || !user.email) return;
+    const userEmail = user.email.toLowerCase();
+    const newValue = userProfile?.isSignatureRequirementEnabled === false ? true : false;
+    
+    try {
+      const userDocRef = doc(db, "users", userEmail);
+      await updateDoc(userDocRef, {
+        isSignatureRequirementEnabled: newValue
+      });
+      setUserProfile(prev => prev ? { ...prev, isSignatureRequirementEnabled: newValue } : null);
+      toast.success(`Signature requirement ${newValue ? 'enabled' : 'disabled'}`);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
+    }
+  };
+
   const toggleReconFilter = async (filterVal: "ALL" | "C-II" | "C-III/C-IV/C-V") => {
     if (!user || !user.email) return;
     const userEmail = user.email.toLowerCase();
@@ -4026,28 +4048,48 @@ export default function App() {
                 </DialogHeader>
 
                 <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-none">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-black text-brand-dark-grey tracking-widest">System Configuration</Label>
-                    <div 
-                      className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
-                      onClick={togglePhotoRequirement}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
-                          <Camera className="h-4 w-4" />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-black text-brand-dark-grey tracking-widest">System Configuration</Label>
+                      <div 
+                        className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                        onClick={togglePhotoRequirement}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                            <Camera className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
+                            <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className={`text-xs transition-colors ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Photo Verification</p>
-                          <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isPhotoRequirementEnabled ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Capture photos for each transaction</p>
+                        <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                          <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                         </div>
                       </div>
-                      <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isPhotoRequirementEnabled ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
-                        <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isPhotoRequirementEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+
+                      <div 
+                        className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group mt-2"
+                        onClick={toggleSignatureRequirement}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isSignatureRequirementEnabled !== false ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                            <PenTool className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className={`text-xs transition-colors ${userProfile?.isSignatureRequirementEnabled !== false ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>Signature Verification</p>
+                            <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isSignatureRequirementEnabled !== false ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Enforce digital signatures on transactions & reports</p>
+                          </div>
+                        </div>
+                        <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isSignatureRequirementEnabled !== false ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                          <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isSignatureRequirementEnabled !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                        </div>
                       </div>
                     </div>
 
                     <div className="pt-2">
-                      <Label className="text-xs font-black text-black tracking-widest uppercase block mb-1">Reconciliation Report Options</Label>
+                      <Label className="text-xs font-black text-brand-dark-grey tracking-widest block mb-1">Reconciliation Report Options</Label>
                       <div className="flex gap-1.5 pt-1">
                         {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => {
                           const labelMap = {
@@ -4075,7 +4117,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 pt-1">
                     <Label className="text-xs font-black text-brand-dark-grey tracking-widest">Add Authorized User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
@@ -4944,6 +4986,7 @@ export default function App() {
                   {(() => {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
+                    const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
                     
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -4972,31 +5015,41 @@ export default function App() {
                                 </SelectContent>
                               </Select>
                             </div>
-                            <Button 
-                              type="button"
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                reconCanvasRef.current?.clear();
-                                setReconSigData(null);
-                              }}
-                            >
-                              Clear
-                            </Button>
+                            {isSigRequired && (
+                              <Button 
+                                type="button"
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  reconCanvasRef.current?.clear();
+                                  setReconSigData(null);
+                                }}
+                              >
+                                Clear
+                              </Button>
+                            )}
                           </div>
                           
-                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                            <SignatureCanvas 
-                              ref={reconCanvasRef}
-                              penColor="#0d3151"
-                              canvasProps={{
-                                id: "reconciliation-signature-canvas",
-                                className: "w-full h-full cursor-crosshair bg-transparent"
-                              }}
-                            />
-                          </div>
+                          {isSigRequired ? (
+                            <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                              <SignatureCanvas 
+                                ref={reconCanvasRef}
+                                penColor="#0d3151"
+                                canvasProps={{
+                                  id: "reconciliation-signature-canvas",
+                                  className: "w-full h-full cursor-crosshair bg-transparent"
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="h-[36px] flex items-center px-3 bg-brand-blue/5 border border-brand-blue/10 rounded-xl mt-1">
+                              <span className="text-[10px] text-brand-blue/60 font-bold uppercase tracking-wider">
+                                Active Node: Authentication Confirmed
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Right Sign-off: PIC */}
@@ -5006,31 +5059,41 @@ export default function App() {
                             <span className="text-xs text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
                               PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
                             </span>
-                            <Button 
-                              type="button"
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                picCanvasRef.current?.clear();
-                                setPicSigData(null);
-                              }}
-                            >
-                              Clear
-                            </Button>
+                            {isSigRequired && (
+                              <Button 
+                                type="button"
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  picCanvasRef.current?.clear();
+                                  setPicSigData(null);
+                                }}
+                              >
+                                Clear
+                              </Button>
+                            )}
                           </div>
                           
-                          <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                            <SignatureCanvas 
-                              ref={picCanvasRef}
-                              penColor="#0d3151"
-                              canvasProps={{
-                                  id: "reconciliation-pic-signature-canvas",
-                                  className: "w-full h-full cursor-crosshair bg-transparent"
-                              }}
-                            />
-                          </div>
+                          {isSigRequired ? (
+                            <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                              <SignatureCanvas 
+                                ref={picCanvasRef}
+                                penColor="#0d3151"
+                                canvasProps={{
+                                    id: "reconciliation-pic-signature-canvas",
+                                    className: "w-full h-full cursor-crosshair bg-transparent"
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="h-[36px] flex items-center px-3 bg-brand-blue/5 border border-brand-blue/10 rounded-xl mt-1">
+                              <span className="text-[10px] text-brand-blue/60 font-bold uppercase tracking-wider">
+                                PIC Sign-off Bypassed
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -5276,6 +5339,7 @@ export default function App() {
                     const picName = selectedHistoricalReport ? selectedHistoricalReport.picName : (picUserObj?.name || "PIC NOT ASSIGNED");
                     const userSig = selectedHistoricalReport ? selectedHistoricalReport.reconSigData : reconSigData;
                     const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
+                    const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
                     return (
                       <div className="space-y-1.5 pt-3 border-t border-gray-100">
@@ -5296,7 +5360,9 @@ export default function App() {
                               {userSig ? (
                                 <img src={userSig} className="max-h-16 object-contain" alt="Performed by signature" />
                               ) : (
-                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
+                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                                  {isSigRequired ? "No signature captured" : "System Authenticated"}
+                                </span>
                               )}
                             </div>
                           </div>
@@ -5313,7 +5379,9 @@ export default function App() {
                               {picSig ? (
                                 <img src={picSig} className="max-h-16 object-contain" alt="PIC signature" />
                               ) : (
-                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">No signature captured</span>
+                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                                  {isSigRequired ? "No signature captured" : "System Authenticated"}
+                                </span>
                               )}
                             </div>
                           </div>
