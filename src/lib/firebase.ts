@@ -34,6 +34,7 @@ export const auth = getAuth(app);
 
 // Initialize Firestore with standard settings. 
 // Using long polling and in-memory cache to stay resilient in restricted Chrome/Safari iframe environments.
+// Respect the custom workspace firestore Database ID defined in firebase-applet-config.json
 const firestoreDatabaseId = validConfig.firestoreDatabaseId || "(default)";
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,

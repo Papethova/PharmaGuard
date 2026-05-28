@@ -106,7 +106,9 @@ import {
   getDocFromServer,
   updateDoc,
   deleteDoc,
-  limit
+  limit,
+  initializeFirestore,
+  memoryLocalCache
 } from "firebase/firestore";
 
 
@@ -223,7 +225,6 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
     path
   }
   console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
 }
 
 const escapeEmail = (text: string | null | undefined) => {
@@ -1022,26 +1023,59 @@ export default function App() {
             try {
               const legacyDoc = await getDoc(doc(db, "users", currentUser.uid));
               if (legacyDoc.exists()) {
-                const legacySubstances = await getDocs(collection(db, "users", currentUser.uid, "substances"));
-                const currentSubstances = await getDocs(collection(db, "users", emailId, "substances"));
+                const legacyData = legacyDoc.data() || {};
+                const batch = writeBatch(db);
                 
-                if (legacySubstances.size > 0 && currentSubstances.size === 0) {
-                  const batch = writeBatch(db);
-                  if (!userDoc?.exists()) {
-                    batch.set(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
-                  }
-                  for (const s of legacySubstances.docs) batch.set(doc(db, "users", emailId, "substances", s.id), s.data());
-                  const legacyTx = await getDocs(collection(db, "users", currentUser.uid, "transactions"));
-                  for (const t of legacyTx.docs) batch.set(doc(db, "users", emailId, "transactions", t.id), t.data());
-                  const legacyStaff = await getDocs(collection(db, "users", currentUser.uid, "staff"));
-                  for (const s of legacyStaff.docs) batch.set(doc(db, "users", emailId, "staff", s.id), s.data());
-                  await batch.commit();
-                  toast.success("Identity Unification Successful");
-                  userDoc = await getDoc(userDocRef);
-                } else if (!userDoc?.exists()) {
-                  await setDoc(userDocRef, { ...legacyDoc.data(), migratedFromUid: currentUser.uid, updatedAt: serverTimestamp() });
-                  userDoc = await getDoc(userDocRef);
+                // Write the parent profile document first
+                if (!userDoc?.exists()) {
+                  batch.set(userDocRef, { 
+                    ...legacyData, 
+                    email: emailId,
+                    migratedFromUid: currentUser.uid, 
+                    updatedAt: serverTimestamp() 
+                  }, { merge: true });
                 }
+
+                // Retrieve and migrate sub-collections individually with safe try-catches
+                try {
+                  const legacySubstances = await getDocs(collection(db, "users", currentUser.uid, "substances"));
+                  legacySubstances.docs.forEach(s => {
+                    batch.set(doc(db, "users", emailId, "substances", s.id), s.data(), { merge: true });
+                  });
+                } catch (subErr) {
+                  console.warn("Could not copy legacy substances during identity unification:", subErr);
+                }
+
+                try {
+                  const legacyTx = await getDocs(collection(db, "users", currentUser.uid, "transactions"));
+                  legacyTx.docs.forEach(t => {
+                    batch.set(doc(db, "users", emailId, "transactions", t.id), t.data(), { merge: true });
+                  });
+                } catch (txErr) {
+                  console.warn("Could not copy legacy transactions during identity unification:", txErr);
+                }
+
+                try {
+                  const legacyStaff = await getDocs(collection(db, "users", currentUser.uid, "staff"));
+                  legacyStaff.docs.forEach(s => {
+                    batch.set(doc(db, "users", emailId, "staff", s.id), s.data(), { merge: true });
+                  });
+                } catch (staffErr) {
+                  console.warn("Could not copy legacy staff list during identity unification:", staffErr);
+                }
+
+                try {
+                  const legacyReports = await getDocs(collection(db, "users", currentUser.uid, "reconciliation_reports"));
+                  legacyReports.docs.forEach(r => {
+                    batch.set(doc(db, "users", emailId, "reconciliation_reports", r.id), r.data(), { merge: true });
+                  });
+                } catch (repErr) {
+                  console.warn("Could not copy legacy reconciliation reports during identity unification:", repErr);
+                }
+
+                await batch.commit();
+                toast.success("Identity Unification Successful");
+                userDoc = await getDoc(userDocRef);
               }
             } catch (e) {
               console.warn("Migration Assistant deferred:", e);
@@ -1050,41 +1084,109 @@ export default function App() {
 
           // 2. Profile Creation for New Users
           if (!userDoc || !userDoc.exists()) {
-            const isPasswordUser = currentUser.providerData.some(p => p.providerId === 'password') || (currentUser.email && !currentUser.providerData.some(p => p.providerId === 'google.com'));
-            
-            if (isPasswordUser && orgNameRef.current === "" && authModeRef.current !== "signup") {
-              console.log("Purged email/password user detected. Revoking and deleting session.");
-              try {
-                await currentUser.delete();
-              } catch (delError) {
-                console.warn("Could not delete purged auth user in onAuthStateChanged:", delError);
-              }
-              await signOut(auth);
-              setUser(null);
-              setUserProfile(null);
-              toast.error("This user does not exist. Access has been revoked or node was purged.");
-              setIsUserDoesNotExistOpen(true);
-              setIsAuthReady(true);
-              setIsInitializing(false);
-              return;
-            }
-
             const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
             const newProfile: UserProfile = {
               uid: currentUser.uid,
-              email: currentUser.email?.toLowerCase() || "",
+              email: currentUser.email?.toLowerCase() || emailId,
               displayName: currentUser.displayName || orgNameRef.current || "User",
               role: isMaster ? "admin" : "pharmacist",
               status: isMaster ? "active" : "pending",
-              organizationName: orgNameRef.current || "",
+              organizationName: orgNameRef.current || (isMaster ? "Master Authority" : ""),
               licenseNumber: "",
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp()
             };
-            await setDoc(userDocRef, newProfile);
+            await setDoc(userDocRef, newProfile, { merge: true });
+            userDoc = await getDoc(userDocRef);
           } else if (currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && userDoc.data()?.status !== 'active') {
             // Master Admin Authority Verification
             await updateDoc(userDocRef, { status: 'active', role: 'admin' });
+          }
+
+          // 2.5 Cross-Database Active Integrity Assistant
+          // If the logged-in user has 0 substances in the custom active database, check if they have substances in the default database and auto-recover them.
+          try {
+            const activeSubstances = await getDocs(collection(db, "users", emailId, "substances"));
+            if (activeSubstances.empty) {
+              const defaultDb = initializeFirestore(auth.app, {
+                experimentalForceLongPolling: true,
+                localCache: memoryLocalCache()
+              }, "(default)");
+              
+              const legacySubstances = await getDocs(collection(defaultDb, "users", emailId, "substances"));
+              if (!legacySubstances.empty) {
+                console.log(`Auto-recovery initialized: Synchronizing substances for ${emailId}`);
+                let batch = writeBatch(db);
+                let count = 0;
+                
+                // Copy substances
+                for (const s of legacySubstances.docs) {
+                  if (count >= 400) {
+                    await batch.commit();
+                    batch = writeBatch(db);
+                    count = 0;
+                  }
+                  batch.set(doc(db, "users", emailId, "substances", s.id), s.data(), { merge: true });
+                  count += 1;
+                }
+
+                // Copy transactions if any
+                try {
+                  const legacyTx = await getDocs(collection(defaultDb, "users", emailId, "transactions"));
+                  for (const t of legacyTx.docs) {
+                    if (count >= 400) {
+                      await batch.commit();
+                      batch = writeBatch(db);
+                      count = 0;
+                    }
+                    batch.set(doc(db, "users", emailId, "transactions", t.id), t.data(), { merge: true });
+                    count += 1;
+                  }
+                } catch (txErr) {
+                  console.warn("Auto-recovery transactions fetch deferred:", txErr);
+                }
+
+                // Copy staff if any
+                try {
+                  const legacyStaff = await getDocs(collection(defaultDb, "users", emailId, "staff"));
+                  for (const st of legacyStaff.docs) {
+                    if (count >= 400) {
+                      await batch.commit();
+                      batch = writeBatch(db);
+                      count = 0;
+                    }
+                    batch.set(doc(db, "users", emailId, "staff", st.id), st.data(), { merge: true });
+                    count += 1;
+                  }
+                } catch (staffErr) {
+                  console.warn("Auto-recovery staff fetch deferred:", staffErr);
+                }
+
+                // Copy reports if any
+                try {
+                  const legacyReports = await getDocs(collection(defaultDb, "users", emailId, "reconciliation_reports"));
+                  for (const r of legacyReports.docs) {
+                    if (count >= 400) {
+                      await batch.commit();
+                      batch = writeBatch(db);
+                      count = 0;
+                    }
+                    batch.set(doc(db, "users", emailId, "reconciliation_reports", r.id), r.data(), { merge: true });
+                    count += 1;
+                  }
+                } catch (repErr) {
+                  console.warn("Auto-recovery reports fetch deferred:", repErr);
+                }
+
+                if (count > 0) {
+                  await batch.commit();
+                }
+                
+                toast.success("Legacy Registry Data Recovered & Synchronized Successfully");
+              }
+            }
+          } catch (recoveryErr) {
+            console.warn("Cross-Database Sync Integrity Assistant deferred:", recoveryErr);
           }
 
           // 3. Real-time profile listener on the stable primary identifier
@@ -1398,25 +1500,6 @@ export default function App() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const loggedInUser = userCredential.user;
       const emailId = loggedInUser.email?.toLowerCase() || loggedInUser.uid;
-
-      // Immediately check if the user document exists in Firestore
-      const userDocRef = doc(db, "users", emailId);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-        console.log("Purged user logged in. Destroying auth account and logging out.");
-        try {
-          await loggedInUser.delete();
-        } catch (delError) {
-          console.warn("Could not delete purged auth user in login handler:", delError);
-        }
-        await signOut(auth);
-        setUser(null);
-        setUserProfile(null);
-        toast.error("This user does not exist. Access has been revoked or node was purged.");
-        setIsUserDoesNotExistOpen(true);
-        return;
-      }
 
       toast.success("Log in successful");
       setEmail("");
@@ -2343,7 +2426,10 @@ export default function App() {
           : "";
         const matchesSearch = historyMedicationFilter 
           ? t.substanceId === historyMedicationFilter 
-          : (!cleanQuery || t.substanceName.toLowerCase().includes(cleanQuery) || t.ndc.toLowerCase().includes(cleanQuery));
+          : (!cleanQuery || 
+             t.substanceName.toLowerCase().includes(cleanQuery) || 
+             t.ndc.toLowerCase().includes(cleanQuery) ||
+             (t.strength && t.strength.toLowerCase().includes(cleanQuery)));
         const matchesType = historyTypeFilter === "All" || t.type === historyTypeFilter;
 
         return matchesSchedule && matchesStartDate && matchesEndDate && matchesSearch && matchesType;
@@ -4325,12 +4411,14 @@ export default function App() {
                     }}
                     className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4 w-full"
                   />
-                  {historyMedicationSearch && isHistorySearchFocused && (
+                  {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
                     <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
                       {inventory
                         .filter(s => {
                           const query = historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase();
-                          return s.name.toLowerCase().includes(query) || s.ndc.toLowerCase().includes(query);
+                          return s.name.toLowerCase().includes(query) || 
+                                 s.ndc.toLowerCase().includes(query) ||
+                                 (s.strength && s.strength.toLowerCase().includes(query));
                         })
                         .map(s => (
                           <div
@@ -4338,7 +4426,7 @@ export default function App() {
                             className="px-3 py-2 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group"
                             onClick={() => {
                               setHistoryMedicationFilter(s.id);
-                              setHistoryMedicationSearch(`${s.name} - ${s.strength} (${s.ndc})`);
+                              setHistoryMedicationSearch(s.name);
                             }}
                           >
                             <div className="flex flex-col">
