@@ -2442,8 +2442,12 @@ export default function App() {
   [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
 
   const lowStockItems = useMemo(() => 
-    inventory.filter(s => s.currentStock <= s.minThreshold && !dismissedAlerts.includes(s.id)),
-  [inventory, dismissedAlerts]);
+    inventory.filter(s => 
+      (activeSchedule === "ALL" || s.schedule === activeSchedule) && 
+      s.currentStock <= s.minThreshold && 
+      !dismissedAlerts.includes(s.id)
+    ),
+  [inventory, dismissedAlerts, activeSchedule]);
 
   const substancesToReconcile = useMemo(() => {
     return inventory.filter(s => {
