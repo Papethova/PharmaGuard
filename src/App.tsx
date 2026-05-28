@@ -3818,7 +3818,7 @@ export default function App() {
                               <canvas ref={canvasRef} className="hidden" />
                             </div>
                           </div>
-                        ) : (
+                        ) : userProfile?.isSignatureRequirementEnabled !== false ? (
                           <div className="space-y-2">
                             <Label className="flex justify-between items-center text-brand-dark-grey text-xs">
                               User Signature
@@ -3845,7 +3845,7 @@ export default function App() {
                               />
                             </div>
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -4029,9 +4029,9 @@ export default function App() {
               <DialogContent 
                 showCloseButton={false} 
                 initialFocus={false}
-                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[600px] max-h-[85vh] touch-none"
+                className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[740px] max-h-[92vh]"
               >
-                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0 touch-none">
+                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <Users className="h-5 w-5 text-brand-blue" />
@@ -4047,10 +4047,10 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5 touch-none">
+                <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-black text-brand-dark-grey tracking-widest">System Configuration</Label>
+                      <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider">System Configuration</Label>
                       <div 
                         className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                         onClick={togglePhotoRequirement}
@@ -4089,7 +4089,7 @@ export default function App() {
                     </div>
 
                     <div className="pt-2">
-                      <Label className="text-xs font-black text-brand-dark-grey tracking-widest block mb-1">Reconciliation Report Options</Label>
+                      <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider block mb-1">Reconciliation Report Options</Label>
                       <div className="flex gap-1.5 pt-1">
                         {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => {
                           const labelMap = {
@@ -4118,7 +4118,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-2 pt-1">
-                    <Label className="text-xs font-black text-brand-dark-grey tracking-widest">Add Authorized User</Label>
+                    <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider">Add Authorized User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Full Name..." 
@@ -4147,9 +4147,9 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 flex flex-col touch-none">
+                <div className="flex-grow min-h-0 flex flex-col">
                   <div className="px-6 pt-3 pb-1 shrink-0">
-                    <Label className="text-xs font-black text-brand-dark-grey tracking-widest">Authorized Registry Personnel</Label>
+                    <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider">Authorized Registry Personnel</Label>
                   </div>
                   <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
@@ -4991,112 +4991,118 @@ export default function App() {
                     const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
                     
                     return (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Left Sign-off: Completed By */}
-                        <div className="flex flex-col gap-0.5">
-                          {/* Inner row for label, select, and clear */}
-                          <div className="flex items-end justify-between px-1 h-7">
-                            <div className="flex items-end gap-1.5 min-w-0 flex-1">
-                              <span className="text-xs text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
-                                Completed By:
-                              </span>
-                              <Select value={reconUser} onValueChange={setReconUser}>
-                                <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                  <SelectValue placeholder="Select...">
-                                    {reconUserObj ? (
-                                      <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
-                                    ) : null}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent className="bg-brand-surface" align="start">
-                                  {users.map(u => (
-                                    <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
-                                      {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            {isSigRequired && (
-                              <Button 
-                                type="button"
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  reconCanvasRef.current?.clear();
-                                  setReconSigData(null);
-                                }}
-                              >
-                                Clear
-                              </Button>
-                            )}
-                          </div>
-                          
-                          {isSigRequired ? (
-                            <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                              <SignatureCanvas 
-                                ref={reconCanvasRef}
-                                penColor="#0d3151"
-                                canvasProps={{
-                                  id: "reconciliation-signature-canvas",
-                                  className: "w-full h-full cursor-crosshair bg-transparent"
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            <div className="h-[36px] flex items-center px-3 bg-brand-blue/5 border border-brand-blue/10 rounded-xl mt-1">
-                              <span className="text-[10px] text-brand-blue/60 font-bold uppercase tracking-wider">
-                                Active Node: Authentication Confirmed
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Right Sign-off: PIC */}
-                        <div className="flex flex-col gap-0.5">
-                          {/* Inner row for PIC and clear */}
-                          <div className="flex items-end justify-between px-1 h-7">
-                            <span className="text-xs text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
-                              PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
-                            </span>
-                            {isSigRequired && (
-                              <Button 
-                                type="button"
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  picCanvasRef.current?.clear();
-                                  setPicSigData(null);
-                                }}
-                              >
-                                Clear
-                              </Button>
-                            )}
-                          </div>
-                          
-                          {isSigRequired ? (
-                            <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
-                              <SignatureCanvas 
-                                ref={picCanvasRef}
-                                penColor="#0d3151"
-                                canvasProps={{
-                                    id: "reconciliation-pic-signature-canvas",
+                      <div className="grid grid-cols-1 gap-4">
+                        {isSigRequired ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Left Sign-off: Completed By */}
+                            <div className="flex flex-col gap-0.5">
+                              {/* Inner row for label, select, and clear */}
+                              <div className="flex items-end justify-between px-1 h-7">
+                                <div className="flex items-end gap-1.5 min-w-0 flex-1">
+                                  <span className="text-xs text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
+                                    Completed By:
+                                  </span>
+                                  <Select value={reconUser} onValueChange={setReconUser}>
+                                    <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                      <SelectValue placeholder="Select...">
+                                        {reconUserObj ? (
+                                          <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
+                                        ) : null}
+                                      </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-brand-surface" align="start">
+                                      {users.map(u => (
+                                        <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
+                                          {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <Button 
+                                  type="button"
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    reconCanvasRef.current?.clear();
+                                    setReconSigData(null);
+                                  }}
+                                >
+                                  Clear
+                                </Button>
+                              </div>
+                              
+                              <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                                <SignatureCanvas 
+                                  ref={reconCanvasRef}
+                                  penColor="#0d3151"
+                                  canvasProps={{
+                                    id: "reconciliation-signature-canvas",
                                     className: "w-full h-full cursor-crosshair bg-transparent"
-                                }}
-                              />
+                                  }}
+                                />
+                              </div>
                             </div>
-                          ) : (
-                            <div className="h-[36px] flex items-center px-3 bg-brand-blue/5 border border-brand-blue/10 rounded-xl mt-1">
-                              <span className="text-[10px] text-brand-blue/60 font-bold uppercase tracking-wider">
-                                PIC Sign-off Bypassed
-                              </span>
+
+                            {/* Right Sign-off: PIC */}
+                            <div className="flex flex-col gap-0.5">
+                              {/* Inner row for PIC and clear */}
+                              <div className="flex items-end justify-between px-1 h-7">
+                                <span className="text-xs text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
+                                  PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
+                                </span>
+                                <Button 
+                                  type="button"
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-5 text-[9px] text-brand-blue hover:text-brand-blue/80 px-1 font-bold shrink-0 hover:bg-transparent pb-0"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    picCanvasRef.current?.clear();
+                                    setPicSigData(null);
+                                  }}
+                                >
+                                  Clear
+                                </Button>
+                              </div>
+                              
+                              <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                                <SignatureCanvas 
+                                  ref={picCanvasRef}
+                                  penColor="#0d3151"
+                                  canvasProps={{
+                                      id: "reconciliation-pic-signature-canvas",
+                                      className: "w-full h-full cursor-crosshair bg-transparent"
+                                  }}
+                                />
+                              </div>
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-1 max-w-sm">
+                            <Label htmlFor="recon-pharmacist" className="text-xs font-normal text-brand-dark-grey text-left">
+                              Completed By
+                            </Label>
+                            <Select value={reconUser} onValueChange={setReconUser}>
+                              <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-full ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                <SelectValue placeholder="Select...">
+                                  {reconUserObj ? (
+                                    <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
+                                  ) : null}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent className="bg-brand-surface" align="start">
+                                {users.map(u => (
+                                  <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
+                                    {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
@@ -5349,45 +5355,52 @@ export default function App() {
                         <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
                           By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
                         </p>
-                        <div className="grid grid-cols-2 gap-8 pt-1">
-                          {/* Left signature field */}
-                          <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
-                            <div className="flex items-center gap-1.5 pb-2">
-                              <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
-                              <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                                {perfName}
-                              </span>
-                            </div>
-                            <div className="flex-1 flex items-center justify-center">
-                              {userSig ? (
-                                <img src={userSig} className="max-h-16 object-contain" alt="Performed by signature" />
-                              ) : (
-                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                                  {isSigRequired ? "No signature captured" : "System Authenticated"}
+                        {isSigRequired ? (
+                          <div className="grid grid-cols-2 gap-8 pt-1">
+                            {/* Left signature field */}
+                            <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
+                              <div className="flex items-center gap-1.5 pb-2">
+                                <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
+                                <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                                  {perfName}
                                 </span>
-                              )}
+                              </div>
+                              <div className="flex-1 flex items-center justify-center">
+                                {userSig ? (
+                                  <img src={userSig} className="max-h-16 object-contain" alt="Performed by signature" />
+                                ) : (
+                                  <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                                    No signature captured
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          </div>
 
-                          {/* Right signature field */}
-                          <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
-                            <div className="flex items-center gap-1.5 pb-2">
-                              <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
-                              <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                                {picName}
-                              </span>
-                            </div>
-                            <div className="flex-1 flex items-center justify-center">
-                              {picSig ? (
-                                <img src={picSig} className="max-h-16 object-contain" alt="PIC signature" />
-                              ) : (
-                                <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                                  {isSigRequired ? "No signature captured" : "System Authenticated"}
+                            {/* Right signature field */}
+                            <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
+                              <div className="flex items-center gap-1.5 pb-2">
+                                <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
+                                <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                                  {picName}
                                 </span>
-                              )}
+                              </div>
+                              <div className="flex-1 flex items-center justify-center">
+                                {picSig ? (
+                                  <img src={picSig} className="max-h-16 object-contain" alt="PIC signature" />
+                                ) : (
+                                  <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                                    No signature captured
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="pt-2 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
+                            <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
+                            <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
