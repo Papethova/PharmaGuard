@@ -4724,20 +4724,20 @@ export default function App() {
                 <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col flex-1 min-h-0">
                   <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
-                      <thead className="sticky top-0 z-40 bg-brand-blue">
-                        <tr className="bg-brand-blue hover:bg-brand-blue border-none">
+                      <thead className="sticky top-0 z-40">
+                        <tr className="border-none" style={{ border: 'none' }}>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication & Strength</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-none sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Last Report</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-none sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchased</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-none sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Dispensed</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-none sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Adjusted</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Last Report</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Purchased</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Expected</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Physical Count</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
                         </tr>
-                        <tr className="bg-brand-blue hover:bg-brand-blue border-none">
-                          <th colSpan={4} className="font-semibold text-[10px] text-brand-blue/75 text-center bg-brand-yellow border-none sticky z-30 h-7 py-0" style={{ top: '28px', verticalAlign: 'middle', lineHeight: 'normal' }}>
+                        <tr className="border-none" style={{ border: 'none' }}>
+                          <th colSpan={4} className="font-semibold text-[10px] text-brand-blue/75 text-center bg-brand-yellow sticky z-30 h-7 py-0" style={{ top: '28px', verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
                             since {lastReport.date}
                           </th>
                         </tr>
