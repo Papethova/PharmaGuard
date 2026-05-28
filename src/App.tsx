@@ -4768,13 +4768,13 @@ export default function App() {
                                   <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80" style={{ verticalAlign: 'middle' }}>
                                     {metrics.lastClosingCount}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey" style={{ verticalAlign: 'middle' }}>
                                     +{metrics.purchases}
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey" style={{ verticalAlign: 'middle' }}>
                                     -{metrics.dispensed}
                                   </td>
-                                  <td className={`text-center border-b border-brand-blue/10 py-1.5 text-xs font-black ${metrics.adjustments === 0 ? 'text-brand-dark-grey/50' : metrics.adjustments > 0 ? 'text-brand-blue/90' : 'text-brand-grey'}`} style={{ verticalAlign: 'middle' }}>
+                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey" style={{ verticalAlign: 'middle' }}>
                                     {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
