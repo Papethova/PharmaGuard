@@ -4730,7 +4730,7 @@ export default function App() {
                         <tr className="border-none" style={{ border: 'none' }}>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication & Strength</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Last Report</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Last Report Count</th>
                           <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Purchased</th>
                           <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
                           <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-7 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
@@ -5082,7 +5082,7 @@ export default function App() {
                              <tr className="border-b border-gray-100">
                                <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>MEDICATION</th>
                                <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>NDC</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>LAST REPORT</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>LAST REPORT COUNT</th>
                                <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>PURCHASED</th>
                                <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>DISPENSED</th>
                                <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>ADJUSTED</th>
