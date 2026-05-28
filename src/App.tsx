@@ -1007,6 +1007,8 @@ export default function App() {
         return;
       }
       
+      setIsInitializing(true);
+      
       try {
         if (currentUser) {
           // Identity Recovery & Profile Synchronization
