@@ -4047,7 +4047,7 @@ export default function App() {
                     </div>
 
                     <div className="pt-2">
-                      <Label className="text-[10px] font-black uppercase text-brand-blue/80 tracking-widest block mb-1">Reconciliation Report Options</Label>
+                      <Label className="text-xs font-black text-black tracking-widest uppercase block mb-1">Reconciliation Report Options</Label>
                       <div className="flex gap-1.5 pt-1">
                         {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => {
                           const labelMap = {
@@ -4063,11 +4063,11 @@ export default function App() {
                               onClick={() => toggleReconFilter(filterVal)}
                               className={`flex-1 h-9 rounded-full text-xs font-black transition-all border ${
                                 isSelected
-                                  ? "bg-brand-yellow text-brand-blue border-brand-yellow shadow-sm"
+                                  ? "bg-brand-blue text-white border-brand-blue shadow-sm"
                                   : "bg-brand-surface text-brand-grey border-brand-grey/20 hover:bg-brand-blue/5"
                               }`}
                             >
-                              ({labelMap[filterVal]})
+                              {labelMap[filterVal]}
                             </button>
                           );
                         })}
@@ -4759,7 +4759,9 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5 shrink-0">
                   <div className="flex items-center gap-2 text-left w-full sm:w-auto">
                     <div className="flex items-center gap-2">
-                      {(userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"]).map((filterVal) => (
+                      {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).filter(val =>
+                        (userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"]).includes(val)
+                      ).map((filterVal) => (
                         <Button
                           key={filterVal}
                           type="button"
