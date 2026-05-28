@@ -4485,7 +4485,7 @@ export default function App() {
               </div>
 
               {historyMedicationFilter && (
-                <div className="flex gap-4 mt-1 justify-start shrink-0">
+                <div className="flex gap-4 mt-1 justify-start shrink-0 sm:ml-[248px]">
                   <div className="p-1.5 bg-brand-blue/5 rounded border border-brand-blue/10 min-w-[120px] flex flex-col items-center justify-center animate-in fade-in slide-in-from-top-1">
                     <Label className="text-[9px] text-brand-blue uppercase font-bold leading-none mb-1">Strength</Label>
                     <div className="text-xs font-normal text-brand-dark-grey truncate">
