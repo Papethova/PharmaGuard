@@ -4726,7 +4726,7 @@ export default function App() {
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
                       <thead className="sticky top-0 z-40 bg-brand-blue">
                         <tr className="bg-brand-blue hover:bg-brand-blue border-none">
-                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication & Strength</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
                           <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
                             <div className="flex flex-col items-center justify-center leading-normal">
