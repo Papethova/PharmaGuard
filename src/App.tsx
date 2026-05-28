@@ -4031,7 +4031,7 @@ export default function App() {
                 initialFocus={false}
                 className="sm:max-w-[500px] bg-brand-surface border-brand-blue/10 p-0 overflow-hidden rounded-2xl flex flex-col h-[740px] max-h-[92vh]"
               >
-                <DialogHeader className="p-6 pb-4 bg-brand-blue text-white relative shrink-0">
+                <DialogHeader className="p-6 pb-3 bg-brand-blue text-white relative shrink-0">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
                       <Users className="h-5 w-5 text-brand-blue" />
@@ -4047,10 +4047,10 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="px-6 py-4 space-y-4 shrink-0 border-b border-brand-blue/5">
-                  <div className="space-y-4">
+                <div className="px-6 pt-2 pb-2 space-y-3 shrink-0">
+                  <div className="space-y-3">
                     <div className="space-y-2">
-                      <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider">System Configuration</Label>
+                      <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">System Configuration</Label>
                       <div 
                         className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                         onClick={togglePhotoRequirement}
@@ -4088,8 +4088,8 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="pt-2">
-                      <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider block mb-1">Reconciliation Report Options</Label>
+                    <div className="pt-1.5">
+                      <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider block mb-1">Reconciliation Report Options</Label>
                       <div className="flex gap-1.5 pt-1">
                         {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => {
                           const labelMap = {
@@ -4117,8 +4117,8 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="space-y-2 pt-1">
-                    <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider">Add Authorized User</Label>
+                  <div className="space-y-1.5 pt-1">
+                    <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">Add Authorized User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
                         placeholder="Full Name..." 
@@ -4148,10 +4148,10 @@ export default function App() {
                 </div>
 
                 <div className="flex-grow min-h-0 flex flex-col">
-                  <div className="px-6 pt-3 pb-1 shrink-0">
-                    <Label className="text-xs font-normal text-brand-dark-grey uppercase tracking-wider">Authorized Registry Personnel</Label>
+                  <div className="px-6 pt-1 pb-1 shrink-0">
+                    <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">Authorized Registry Personnel</Label>
                   </div>
-                  <div className="flex-1 min-h-0 px-6 pb-6 mt-1 flex flex-col overflow-hidden">
+                  <div className="flex-1 min-h-0 px-6 pb-2 mt-1 flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 border border-brand-grey/20 rounded-lg bg-brand-surface shadow-inner relative overflow-hidden flex flex-col">
                       <div className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto min-h-0">
                         <table className="w-full caption-bottom text-sm border-separate border-spacing-0 relative">
@@ -4235,7 +4235,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-none shadow-inner">
+                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-none shadow-inner flex items-center justify-center mx-0 mb-0">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
