@@ -4731,12 +4731,27 @@ export default function App() {
                           <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
                             <div className="flex flex-col items-center justify-center leading-normal">
                               <div>Last Report</div>
-                              <div className="text-[10px] text-brand-blue/75 font-normal mt-0.5">{lastReport.date}</div>
+                              <div className="text-[10px] text-brand-blue/75 font-normal mt-0.5">on {lastReport.date}</div>
                             </div>
                           </th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Purchased</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Dispensed</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Adjusted</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
+                            <div className="flex flex-col items-center justify-center leading-normal">
+                              <div>Purchased</div>
+                              <div className="text-[10px] text-brand-blue/75 font-normal mt-0.5">since {lastReport.date}</div>
+                            </div>
+                          </th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
+                            <div className="flex flex-col items-center justify-center leading-normal">
+                              <div>Dispensed</div>
+                              <div className="text-[10px] text-brand-blue/75 font-normal mt-0.5">since {lastReport.date}</div>
+                            </div>
+                          </th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
+                            <div className="flex flex-col items-center justify-center leading-normal">
+                              <div>Adjusted</div>
+                              <div className="text-[10px] text-brand-blue/75 font-normal mt-0.5">since {lastReport.date}</div>
+                            </div>
+                          </th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Expected</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Physical Count</th>
                           <th className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
