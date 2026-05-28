@@ -4047,12 +4047,12 @@ export default function App() {
                   </div>
                 </DialogHeader>
 
-                <div className="px-6 pt-2 pb-2 space-y-3 shrink-0">
+                <div className="px-6 pt-1 pb-0 space-y-3 shrink-0">
                   <div className="space-y-3">
                     <div className="space-y-2">
                       <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">System Configuration</Label>
                       <div 
-                        className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                         className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
                         onClick={togglePhotoRequirement}
                       >
                         <div className="flex items-center gap-3">
@@ -4117,7 +4117,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="space-y-1.5 pt-1">
+                  <div className="space-y-1.5 pt-1.5">
                     <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">Add Authorized User</Label>
                     <div className="flex gap-2 items-center">
                       <Input 
@@ -4148,7 +4148,7 @@ export default function App() {
                 </div>
 
                 <div className="flex-grow min-h-0 flex flex-col">
-                  <div className="px-6 pt-1 pb-1 shrink-0">
+                  <div className="px-6 pt-[18px] pb-1 shrink-0">
                     <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">Authorized Registry Personnel</Label>
                   </div>
                   <div className="flex-1 min-h-0 px-6 pb-2 mt-1 flex flex-col overflow-hidden">
@@ -4836,11 +4836,11 @@ export default function App() {
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
                       <thead className="sticky top-0 z-40">
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Medication & Strength</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>NDC</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Medication & Strength</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>NDC</th>
                           
                           {/* Last Report Column */}
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-10 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
                             <div className="flex flex-col items-center justify-between h-full leading-tight py-0.5">
                               <span>Last Report</span>
                               <span>Count</span>
@@ -4848,32 +4848,32 @@ export default function App() {
                           </th>
                           
                           {/* Purchased Column */}
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-10 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
                             <div className="flex flex-col items-center justify-start h-full leading-tight py-0.5">
                               <span>Purchased</span>
                             </div>
                           </th>
                           
                           {/* Dispensed Column */}
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-10 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
                             <div className="flex flex-col items-center justify-start h-full leading-tight py-0.5">
                               <span>Dispensed</span>
                             </div>
                           </th>
                           
                           {/* Adjusted Column */}
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-11 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-30 h-10 py-1 border-none" style={{ top: 0, verticalAlign: 'top', lineHeight: 'normal', border: 'none' }}>
                             <div className="flex flex-col items-center justify-start h-full leading-tight py-0.5">
                               <span>Adjusted</span>
                             </div>
                           </th>
                           
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Expected</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Physical Count</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-16 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Variance</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Expected</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Physical Count</th>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0 border-none" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Variance</th>
                         </tr>
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th colSpan={4} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-5 py-0 border-none" style={{ top: '44px', verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
+                          <th colSpan={4} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-4 py-0 border-none" style={{ top: '40px', verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
                             since {lastReport.date}
                           </th>
                         </tr>
@@ -5013,33 +5013,33 @@ export default function App() {
                     
                     return (
                       <div className="grid grid-cols-1 gap-4">
-                        {isSigRequired ? (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {/* Left Sign-off: Completed By */}
-                            <div className="flex flex-col gap-0.5">
-                              {/* Inner row for label, select, and clear */}
-                              <div className="flex items-end justify-between px-1 h-7">
-                                <div className="flex items-end gap-1.5 min-w-0 flex-1">
-                                  <span className="text-xs text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
-                                    Completed By:
-                                  </span>
-                                  <Select value={reconUser} onValueChange={setReconUser}>
-                                    <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                      <SelectValue placeholder="Select...">
-                                        {reconUserObj ? (
-                                          <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
-                                        ) : null}
-                                      </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-brand-surface" align="start">
-                                      {users.map(u => (
-                                        <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
-                                          {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {/* Left Sign-off: Completed By */}
+                          <div className="flex flex-col gap-0.5 animate-fade-in">
+                            {/* Inner row for label, select, and clear */}
+                            <div className="flex items-end justify-between px-1 h-7">
+                              <div className="flex items-end gap-1.5 min-w-0 flex-1">
+                                <span className="text-xs text-brand-blue font-black uppercase tracking-wider shrink-0 pb-0">
+                                  Completed By:
+                                </span>
+                                <Select value={reconUser} onValueChange={setReconUser}>
+                                  <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                    <SelectValue placeholder="Select...">
+                                      {reconUserObj ? (
+                                        <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
+                                      ) : null}
+                                    </SelectValue>
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-brand-surface" align="start">
+                                    {users.map(u => (
+                                      <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
+                                        {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              {isSigRequired && (
                                 <Button 
                                   type="button"
                                   variant="ghost" 
@@ -5053,9 +5053,11 @@ export default function App() {
                                 >
                                   Clear
                                 </Button>
-                              </div>
-                              
-                              <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                              )}
+                            </div>
+                            
+                            {isSigRequired && (
+                              <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden mt-0.5">
                                 <SignatureCanvas 
                                   ref={reconCanvasRef}
                                   penColor="#0d3151"
@@ -5065,15 +5067,17 @@ export default function App() {
                                   }}
                                 />
                               </div>
-                            </div>
+                            )}
+                          </div>
 
-                            {/* Right Sign-off: PIC */}
-                            <div className="flex flex-col gap-0.5">
-                              {/* Inner row for PIC and clear */}
-                              <div className="flex items-end justify-between px-1 h-7">
-                                <span className="text-xs text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
-                                  PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
-                                </span>
+                          {/* Right Sign-off: PIC */}
+                          <div className="flex flex-col gap-0.5 animate-fade-in">
+                            {/* Inner row for PIC and clear */}
+                            <div className="flex items-end justify-between px-1 h-7">
+                              <span className="text-xs text-brand-blue font-black uppercase tracking-wider truncate mr-2 pb-0">
+                                PIC: {picUserObj?.name || "PIC NOT ASSIGNED"}
+                              </span>
+                              {isSigRequired && (
                                 <Button 
                                   type="button"
                                   variant="ghost" 
@@ -5087,9 +5091,11 @@ export default function App() {
                                 >
                                   Clear
                                 </Button>
-                              </div>
-                              
-                              <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden">
+                              )}
+                            </div>
+                            
+                            {isSigRequired && (
+                              <div className="h-[105px] relative border border-brand-blue/15 bg-brand-blue/[0.02] rounded-xl overflow-hidden mt-0.5">
                                 <SignatureCanvas 
                                   ref={picCanvasRef}
                                   penColor="#0d3151"
@@ -5099,31 +5105,9 @@ export default function App() {
                                   }}
                                 />
                               </div>
-                            </div>
+                            )}
                           </div>
-                        ) : (
-                          <div className="flex flex-col gap-1 max-w-sm">
-                            <Label htmlFor="recon-pharmacist" className="text-xs font-normal text-brand-dark-grey text-left">
-                              Completed By
-                            </Label>
-                            <Select value={reconUser} onValueChange={setReconUser}>
-                              <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-full ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                <SelectValue placeholder="Select...">
-                                  {reconUserObj ? (
-                                    <span>{reconUserObj.name} {reconUserObj.title && <span className="text-brand-dark-grey">({reconUserObj.title})</span>}</span>
-                                  ) : null}
-                                </SelectValue>
-                              </SelectTrigger>
-                              <SelectContent className="bg-brand-surface" align="start">
-                                {users.map(u => (
-                                  <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3">
-                                    {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        )}
+                        </div>
                       </div>
                     );
                   })()}
