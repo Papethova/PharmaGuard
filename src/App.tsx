@@ -5132,13 +5132,18 @@ export default function App() {
                             <col className="w-[7%]" />
                           </colgroup>
                            <thead>
-                             <tr className="border-b border-gray-100">
+                             <tr className="">
                                <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>MEDICATION</th>
                                <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>NDC</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>LAST REPORT COUNT</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>PURCHASED</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>DISPENSED</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>ADJUSTED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '0.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1.1', verticalAlign: 'bottom' }}>
+                                 <div className="flex flex-col items-center justify-center leading-tight">
+                                   <span>LAST REPORT</span>
+                                   <span>COUNT</span>
+                                 </div>
+                               </th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '0.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>PURCHASED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '0.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>DISPENSED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '0.5px', paddingBottom: '0.5px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>ADJUSTED</th>
                                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center">
                                    <div>EXPECTED</div>
@@ -5154,8 +5159,8 @@ export default function App() {
                                <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>VARIANCE</th>
                              </tr>
                              <tr className="border-b-2 border-gray-200">
-                               <th colSpan={4} className="text-center font-normal text-[8px] text-gray-500" style={{ paddingTop: '0.5px', paddingBottom: '2.5px', height: '10px', lineHeight: '1', verticalAlign: 'top' }}>
-                                 since {headerPrevReportDate}
+                               <th colSpan={4} className="text-center font-bold text-[10px]" style={{ paddingTop: '0.5px', paddingBottom: '2.5px', height: '10px', lineHeight: '1', verticalAlign: 'top' }}>
+                                 Since {headerPrevReportDate}
                                </th>
                              </tr>
                            </thead>
