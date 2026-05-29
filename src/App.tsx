@@ -1024,13 +1024,20 @@ export default function App() {
           const emailId = currentUser.email?.toLowerCase() || currentUser.uid;
           const userDocRef = doc(db, "users", emailId);
           
-          let userDoc = await getDoc(userDocRef).catch((e) => {
-             console.warn("Initial user doc fetch failed:", e);
-             return null;
-          });
+          let userDoc = null;
+          let fetchFailed = false;
+          try {
+            userDoc = await getDoc(userDocRef);
+          } catch (e: any) {
+            console.warn("Initial user doc fetch failed:", e);
+            fetchFailed = true;
+            toast.error("Database connection issue. Retrying secure loading in the background...", {
+              description: "Please check your network. Transactions will load when the connection is restored."
+            });
+          }
 
           // 1. Identity Recovery: Handle UID-based legacy records migrating to Email identifier
-          if (currentUser.uid !== emailId) {
+          if (!fetchFailed && currentUser.uid !== emailId) {
             try {
               const legacyDoc = await getDoc(doc(db, "users", currentUser.uid));
               if (legacyDoc.exists()) {
@@ -1093,111 +1100,35 @@ export default function App() {
             }
           }
 
-          // 2. Profile Creation for New Users
-          if (!userDoc || !userDoc.exists()) {
-            const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
-            const newProfile: UserProfile = {
-              uid: currentUser.uid,
-              email: currentUser.email?.toLowerCase() || emailId,
-              displayName: currentUser.displayName || orgNameRef.current || "User",
-              role: isMaster ? "admin" : "pharmacist",
-              status: isMaster ? "active" : "pending",
-              organizationName: orgNameRef.current || (isMaster ? "Master Authority" : ""),
-              licenseNumber: "",
-              createdAt: serverTimestamp(),
-              updatedAt: serverTimestamp()
-            };
-            await setDoc(userDocRef, newProfile, { merge: true });
-            userDoc = await getDoc(userDocRef);
-          } else if (currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && userDoc.data()?.status !== 'active') {
-            // Master Admin Authority Verification
-            await updateDoc(userDocRef, { status: 'active', role: 'admin' });
-          }
-
-          // 2.5 Cross-Database Active Integrity Assistant
-          // If the logged-in user has 0 substances in the custom active database, check if they have substances in the default database and auto-recover them.
-          try {
-            const activeSubstances = await getDocs(collection(db, "users", emailId, "substances"));
-            if (activeSubstances.empty) {
-              const defaultDb = initializeFirestore(auth.app, {
-                experimentalForceLongPolling: true,
-                localCache: memoryLocalCache()
-              }, "(default)");
-              
-              const legacySubstances = await getDocs(collection(defaultDb, "users", emailId, "substances"));
-              if (!legacySubstances.empty) {
-                console.log(`Auto-recovery initialized: Synchronizing substances for ${emailId}`);
-                let batch = writeBatch(db);
-                let count = 0;
-                
-                // Copy substances
-                for (const s of legacySubstances.docs) {
-                  if (count >= 400) {
-                    await batch.commit();
-                    batch = writeBatch(db);
-                    count = 0;
-                  }
-                  batch.set(doc(db, "users", emailId, "substances", s.id), s.data(), { merge: true });
-                  count += 1;
-                }
-
-                // Copy transactions if any
-                try {
-                  const legacyTx = await getDocs(collection(defaultDb, "users", emailId, "transactions"));
-                  for (const t of legacyTx.docs) {
-                    if (count >= 400) {
-                      await batch.commit();
-                      batch = writeBatch(db);
-                      count = 0;
-                    }
-                    batch.set(doc(db, "users", emailId, "transactions", t.id), t.data(), { merge: true });
-                    count += 1;
-                  }
-                } catch (txErr) {
-                  console.warn("Auto-recovery transactions fetch deferred:", txErr);
-                }
-
-                // Copy staff if any
-                try {
-                  const legacyStaff = await getDocs(collection(defaultDb, "users", emailId, "staff"));
-                  for (const st of legacyStaff.docs) {
-                    if (count >= 400) {
-                      await batch.commit();
-                      batch = writeBatch(db);
-                      count = 0;
-                    }
-                    batch.set(doc(db, "users", emailId, "staff", st.id), st.data(), { merge: true });
-                    count += 1;
-                  }
-                } catch (staffErr) {
-                  console.warn("Auto-recovery staff fetch deferred:", staffErr);
-                }
-
-                // Copy reports if any
-                try {
-                  const legacyReports = await getDocs(collection(defaultDb, "users", emailId, "reconciliation_reports"));
-                  for (const r of legacyReports.docs) {
-                    if (count >= 400) {
-                      await batch.commit();
-                      batch = writeBatch(db);
-                      count = 0;
-                    }
-                    batch.set(doc(db, "users", emailId, "reconciliation_reports", r.id), r.data(), { merge: true });
-                    count += 1;
-                  }
-                } catch (repErr) {
-                  console.warn("Auto-recovery reports fetch deferred:", repErr);
-                }
-
-                if (count > 0) {
-                  await batch.commit();
-                }
-                
-                toast.success("Legacy Registry Data Recovered & Synchronized Successfully");
+          // 2. Profile Creation for New Users (Skip this if we had a fetch failure to avoid overwriting or creating blank nodes)
+          if (!fetchFailed) {
+            if (!userDoc || !userDoc.exists()) {
+              const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
+              const newProfile: UserProfile = {
+                uid: currentUser.uid,
+                email: currentUser.email?.toLowerCase() || emailId,
+                displayName: currentUser.displayName || orgNameRef.current || "User",
+                role: isMaster ? "admin" : "pharmacist",
+                status: isMaster ? "active" : "pending",
+                organizationName: orgNameRef.current || "",
+                licenseNumber: "",
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+              };
+              await setDoc(userDocRef, newProfile, { merge: true });
+              userDoc = await getDoc(userDocRef);
+            } else {
+              // Self-healing database correction: if persistent record in Firestore has "Master Authority", automatically clear it
+              const currentData = userDoc.data();
+              if (currentData && currentData.organizationName === "Master Authority") {
+                console.log(`Self-healing database correction: clearing "Master Authority" for ${emailId}`);
+                await updateDoc(userDocRef, { organizationName: "" });
+              }
+              if (currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && currentData?.status !== 'active') {
+                // Master Admin Authority Verification
+                await updateDoc(userDocRef, { status: 'active', role: 'admin' });
               }
             }
-          } catch (recoveryErr) {
-            console.warn("Cross-Database Sync Integrity Assistant deferred:", recoveryErr);
           }
 
           // 3. Real-time profile listener on the stable primary identifier
