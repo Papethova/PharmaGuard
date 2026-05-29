@@ -3782,7 +3782,7 @@ export default function App() {
                   </div>
                 </ScrollArea>
               
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3 shrink-0">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3 shrink-0">
                   <Button 
                     onClick={() => {
                       setIsLogOpen(false);
@@ -3938,7 +3938,7 @@ export default function App() {
                   </div>
                 </ScrollArea>
 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
                     className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
                     onClick={() => setViewingTransaction(null)}
@@ -4395,7 +4395,7 @@ export default function App() {
                   </div>
                 </div>
                 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
                   <Button 
                     onClick={() => setSelectedSubstanceDetail(null)} 
                     className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
@@ -5944,7 +5944,7 @@ export default function App() {
           </div>
         </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 p-6 bg-brand-blue/5 border-t border-brand-blue/10">
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10">
           <Button 
             onClick={() => setIsDeleteConfirmOpen(false)} 
             className="bg-brand-blue text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-xl flex-1 transition-all hover:brightness-110 shadow-lg shadow-brand-blue/10"
@@ -5990,7 +5990,7 @@ export default function App() {
           </div>
         </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 p-6 bg-brand-blue/5 border-t border-brand-blue/10">
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10">
           <Button variant="default" onClick={() => setUserToDeleteConfirm(null)} className="flex-1 bg-brand-blue text-white hover:bg-brand-blue/90 font-black uppercase tracking-widest text-[10px] h-11 border-none shadow-lg shadow-brand-blue/10">
             Keep User
           </Button>
@@ -6035,7 +6035,7 @@ export default function App() {
             </p>
           </div>
         </div>
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+        <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => setIsLogoutConfirmOpen(false)} 
             className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
@@ -6109,7 +6109,7 @@ export default function App() {
           )}
         </div>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+        <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => setIsEditMinThresholdOpen(false)} 
             className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
@@ -6248,7 +6248,7 @@ export default function App() {
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3 shrink-0">
+        <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3 shrink-0">
           <Button 
             onClick={() => setIsEditMedDetailsOpen(false)} 
             className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
@@ -6307,7 +6307,7 @@ export default function App() {
           </div>
         </div>
 
-        <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
+        <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => setIsProfileEditOpen(false)}
             className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
@@ -6349,7 +6349,7 @@ export default function App() {
             </p>
           </div>
         </div>
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 p-6 bg-brand-blue/5 border-t border-brand-blue/10">
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10">
           <Button onClick={() => setIsResetConfirmOpen(false)} className="bg-brand-blue text-white font-black uppercase tracking-widest text-[10px] h-12 flex-1 rounded-xl">
             Cancel
           </Button>
