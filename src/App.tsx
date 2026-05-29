@@ -4775,9 +4775,9 @@ export default function App() {
                               <span>Count</span>
                             </div>
                           </th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-7 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '2px', lineHeight: 'normal', border: 'none' }}>Purchased</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-7 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '2px', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-7 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '2px', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-7 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Purchased</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-7 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-7 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
                             <div className="flex flex-col items-center justify-center">
                               <span>Expected</span>
@@ -4793,7 +4793,7 @@ export default function App() {
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-14 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
                         </tr>
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-7 py-0" style={{ top: '27px', verticalAlign: 'top', paddingTop: '2.5px', lineHeight: 'normal', border: 'none' }}>
+                          <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-7 py-0" style={{ top: '27px', verticalAlign: 'top', paddingTop: '0px', lineHeight: 'normal', border: 'none' }}>
                             Since {lastReport.date}
                           </th>
                         </tr>
