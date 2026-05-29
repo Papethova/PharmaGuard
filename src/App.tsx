@@ -4166,7 +4166,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
