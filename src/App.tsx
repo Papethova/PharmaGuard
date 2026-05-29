@@ -489,7 +489,6 @@ export default function App() {
   const [reconReasons, setReconReasons] = useState<Record<string, string>>({});
   const [reconUser, setReconUser] = useState("");
   const [reconWitness, setReconWitness] = useState("");
-  const [reconRef, setReconRef] = useState("");
   const [isReconSubmitting, setIsReconSubmitting] = useState(false);
   const [reconShowPreview, setReconShowPreview] = useState(false);
   const reconCanvasRef = useRef<any>(null);
@@ -502,7 +501,7 @@ export default function App() {
   const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
   const [historicalReports, setHistoricalReports] = useState<any[]>([]);
 
-  useEffect(() => {
+  const reconRef = useMemo(() => {
     const today = new Date();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
@@ -541,7 +540,7 @@ export default function App() {
     });
 
     const nextIndex = maxIndex + 1;
-    setReconRef(`${baseRef}-${nextIndex}`);
+    return `${baseRef}-${nextIndex}`;
   }, [reconScheduleFilter, historicalReports, transactions]);
 
   const getReportTitle = () => {
@@ -565,16 +564,29 @@ export default function App() {
   }, [isReconOpen]);
 
   const lastReport = useMemo(() => {
-    const reconTxs = transactions.filter(t => 
-      t.referenceNumber && 
-      (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-")) &&
-      t.referenceNumber !== reconRef
-    );
-    
+    const reconTxs = transactions.filter(t => {
+      if (!t.referenceNumber) return false;
+      if (!(t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))) return false;
+      if (t.referenceNumber === reconRef) return false;
+
+      // Filter based on reconScheduleFilter if not ALL
+      if (reconScheduleFilter !== "ALL") {
+        const sub = inventory.find(s => s.id === t.substanceId);
+        if (!sub) return false;
+        if (reconScheduleFilter === "C-II") {
+          return sub.schedule === "C-II";
+        }
+        if (reconScheduleFilter === "C-III/C-IV/C-V") {
+          return sub.schedule === "C-III" || sub.schedule === "C-IV" || sub.schedule === "C-V";
+        }
+      }
+      return true;
+    });
+
     if (reconTxs.length === 0) {
       return { date: "N/A", counts: {} as Record<string, number>, ref: "N/A", timestampMs: 0 };
     }
-    
+
     const sortedReconTxs = [...reconTxs].sort((a, b) => {
       const aTime = getTimestampMs(a.timestamp);
       const bTime = getTimestampMs(b.timestamp);
@@ -582,10 +594,10 @@ export default function App() {
     });
 
     const latestRef = sortedReconTxs[0].referenceNumber || "";
-    
+
     let lastDate = "N/A";
     let lastReportTimestampMs = 0;
-    
+
     const latestRefTxs = reconTxs.filter(t => t.referenceNumber === latestRef);
     latestRefTxs.forEach(t => {
       const ms = getTimestampMs(t.timestamp);
@@ -610,14 +622,14 @@ export default function App() {
       const yy = String(d.getFullYear()).slice(-2);
       lastDate = `${mm}/${dd}/${yy}`;
     }
-    
+
     const counts: Record<string, number> = {};
     sortedReconTxs.filter(t => t.referenceNumber === latestRef).forEach(t => {
       counts[t.substanceId] = t.newStock;
     });
-    
+
     return { date: lastDate, counts, ref: latestRef, timestampMs: lastReportTimestampMs };
-  }, [transactions, reconRef]);
+  }, [transactions, reconRef, inventory, reconScheduleFilter]);
 
   const getSubstanceHistoryMetrics = useCallback((subId: string) => {
     const subTxs = transactions.filter(t => t.substanceId === subId);
