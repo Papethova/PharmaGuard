@@ -5143,37 +5143,32 @@ export default function App() {
                             <col className="w-[7%]" />
                             <col className="w-[7%]" />
                           </colgroup>
-                           <thead>
-                             <tr className="border-t-2 border-gray-900">
-                               <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>MEDICATION</th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>NDC</th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
+                            <thead>
+                              <tr className="border-t-2 border-b-2 border-gray-900">
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>MEDICATION</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>NDC</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-tight">
                                    <span>LAST REPORT</span>
                                    <span>COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '1px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>PURCHASED</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '1px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>DISPENSED</th>
-                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '1px', height: '10px', lineHeight: '1', verticalAlign: 'bottom' }}>ADJUSTED</th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>PURCHASED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>DISPENSED</th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>ADJUSTED</th>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center">
                                    <div>EXPECTED</div>
                                    <div className="mt-0.5">COUNT</div>
                                  </div>
                                </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center">
                                    <div>PHYSICAL</div>
                                    <div className="mt-0.5">COUNT</div>
                                  </div>
                                </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px]" style={{ paddingTop: '2px', paddingBottom: '2px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>VARIANCE</th>
-                             </tr>
-                             <tr className="border-b-2 border-gray-200">
-                               <th colSpan={3} className="text-center font-bold text-[10px]" style={{ paddingTop: '1px', paddingBottom: '2px', height: '10px', lineHeight: '1', verticalAlign: 'top' }}>
-                                 Since {headerPrevReportDate}
-                               </th>
+                               <th className="text-center font-bold text-[10px]" style={{ paddingTop: '4px', paddingBottom: '4px', height: '18px', lineHeight: '1.1', verticalAlign: 'middle' }}>VARIANCE</th>
                              </tr>
                            </thead>
                           <tbody className="divide-y divide-gray-100">
