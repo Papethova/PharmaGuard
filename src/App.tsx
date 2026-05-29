@@ -3308,6 +3308,8 @@ export default function App() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                           <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
+                                          <span className="text-[8px] text-brand-dark-grey/30 select-none pointer-events-none">•</span>
+                                          <span className="text-[10px] text-brand-blue font-bold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                         </div>
                                       </div>
                                       <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -3527,6 +3529,8 @@ export default function App() {
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
+                                      <span className="text-[8px] text-brand-dark-grey/30 select-none pointer-events-none">•</span>
+                                      <span className="text-[10px] text-brand-blue font-bold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                     </div>
                                   </div>
                                   <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
@@ -3634,13 +3638,13 @@ export default function App() {
                     </div>
 
                     {selectedSubstance && quantity && transactionType !== "VERIFY" && (
-                      <div className="p-2 bg-brand-blue/5 rounded-lg border border-brand-blue/10 flex justify-between items-center h-9">
-                        <span className="text-[10px] font-normal text-brand-blue uppercase">Projected</span>
+                      <div className="p-2 bg-brand-blue/5 rounded-lg border border-brand-blue/10 flex justify-between items-center h-9 shadow-sm">
+                        <span className="text-[10px] font-bold text-brand-blue uppercase">Projected</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-brand-dark-grey/60">
+                          <span className="text-[10px] text-brand-dark-grey/80 font-bold">
                             {inventory.find(i => i.id === selectedSubstance)?.currentStock} →
                           </span>
-                          <span className="text-sm font-normal text-brand-blue">
+                          <span className="text-sm font-black text-brand-blue">
                             {(inventory.find(i => i.id === selectedSubstance)?.currentStock || 0) + 
                              (transactionType === "IN" ? Number(quantity) : 
                               transactionType === "OUT" ? -Number(quantity) : 
