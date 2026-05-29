@@ -4166,13 +4166,13 @@ export default function App() {
                   </div>
                 </div>
 
-                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto flex justify-end">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
                       setCurrentTab('inventory');
                     }} 
-                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
+                    className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
                   >
                     Close User Management
                   </Button>
@@ -4395,10 +4395,10 @@ export default function App() {
                   </div>
                 </div>
                 
-                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto flex justify-end">
                   <Button 
                     onClick={() => setSelectedSubstanceDetail(null)} 
-                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
+                    className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
                   >
                     Close History Log
                   </Button>
@@ -5574,7 +5574,7 @@ export default function App() {
             </div>
 
             <div className="flex items-center justify-center py-1">
-              <svg className="h-10 w-10 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="h-16 w-16 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
                 {/* Single downward bold/blocky arrow: wide square stem with large triangle head */}
                 <path d="M8,3 H16 V11 H21 L12,21 L3,11 H8 Z" />
               </svg>
