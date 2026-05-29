@@ -4079,7 +4079,7 @@ export default function App() {
                 </div>
 
                 <div className="flex-grow min-h-0 flex flex-col">
-                  <div className="px-6 pt-[18px] pb-1 shrink-0">
+                  <div className="px-6 pt-1.5 pb-1 shrink-0">
                     <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">Authorized Registry Personnel</Label>
                   </div>
                   <div className="flex-1 min-h-0 px-6 pb-2 mt-1 flex flex-col overflow-hidden">
@@ -4166,7 +4166,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-none shadow-inner flex items-center justify-center mx-0 mb-0">
+                <DialogFooter className="p-6 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto">
                   <Button 
                     onClick={() => {
                       setIsUserManagementOpen(false);
