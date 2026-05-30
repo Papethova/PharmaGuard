@@ -3123,7 +3123,7 @@ export default function App() {
                   type="button"
                   onClick={() => {
                     // Reset reconciliation forms
-                    setReconScheduleFilter("ALL");
+                    setReconScheduleFilter("C-II");
                     setReconCounts({});
                     setReconReasons({});
                     setReconUser("");
