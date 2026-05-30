@@ -973,6 +973,83 @@ export default function App() {
     minThreshold: ""
   });
 
+  // =========================================================================
+  // DB WRITE OPTIMIZATION STRATEGIES (Options A, B, and C)
+  // =========================================================================
+
+  // Ref to hold the timeout id for debouncing profile writes
+  const profileDebounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Ref to collect pending profile updates to be saved in a single batch
+  const pendingProfileUpdatesRef = useRef<Partial<UserProfile>>({});
+
+  const debouncedUpdateProfile = useCallback((updates: Partial<UserProfile>) => {
+    if (!user || !user.email) return;
+    const userEmail = user.email.toLowerCase();
+
+    // Option A: Skip redundant writes check
+    const currentProfileData = userProfile || {};
+    const filteredUpdates: Partial<UserProfile> = {};
+    let hasActualChanges = false;
+
+    Object.keys(updates).forEach((key) => {
+      const k = key as keyof UserProfile;
+      if (Array.isArray(updates[k]) && Array.isArray(currentProfileData[k])) {
+        const arr1 = updates[k] as any[];
+        const arr2 = currentProfileData[k] as any[];
+        if (arr1.length !== arr2.length || arr1.some((v, i) => v !== arr2[i])) {
+          (filteredUpdates as any)[k] = updates[k];
+          hasActualChanges = true;
+        }
+      } else if (updates[k] !== currentProfileData[k]) {
+        (filteredUpdates as any)[k] = updates[k];
+        hasActualChanges = true;
+      }
+    });
+
+    if (!hasActualChanges && Object.keys(pendingProfileUpdatesRef.current).length === 0) {
+      console.log("Option A: Bypassed redundant profile update write.");
+      return;
+    }
+
+    // Merge the actual changes into our pending updates ref
+    pendingProfileUpdatesRef.current = {
+      ...pendingProfileUpdatesRef.current,
+      ...filteredUpdates,
+    };
+
+    // Option B: Reset the 2.5s idle timer if user continues typing or interacting
+    if (profileDebounceTimeoutRef.current) {
+      clearTimeout(profileDebounceTimeoutRef.current);
+    }
+
+    profileDebounceTimeoutRef.current = setTimeout(async () => {
+      const finalUpdates = { ...pendingProfileUpdatesRef.current };
+      if (Object.keys(finalUpdates).length === 0) return;
+
+      console.log("Option B - Saving debounced profile updates to Firestore (2.5s Idle):", finalUpdates);
+      try {
+        const userDocRef = doc(db, "users", userEmail);
+        await updateDoc(userDocRef, {
+          ...finalUpdates,
+          updatedAt: serverTimestamp()
+        });
+        pendingProfileUpdatesRef.current = {};
+        console.log("Firestore state successfully synchronized.");
+      } catch (error) {
+        console.error("Debounced Firestore sync failed:", error);
+        handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
+      }
+    }, 2500); // 2.5 seconds idle time for Option B
+  }, [user, userProfile]);
+
+  useEffect(() => {
+    return () => {
+      if (profileDebounceTimeoutRef.current) {
+        clearTimeout(profileDebounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Auth Listener
   useEffect(() => {
     // Advanced Safety Heartbeat: Ensure we never stay on a white screen
@@ -1938,6 +2015,18 @@ export default function App() {
   const handleUpdateMinThreshold = async () => {
     if (!user || !editingMed) return;
     const emailId = user.email?.toLowerCase() || user.uid;
+
+    // Option A: Skip redundant writes check
+    const originalSub = inventory.find(sub => sub.id === editingMed.id);
+    if (originalSub && originalSub.minThreshold === Number(editingMed.minThreshold)) {
+      console.log("Option A: Redundant write skipped for minThreshold");
+      toast.success("Safeguard Threshold Adjusted");
+      setIsEditMinThresholdOpen(false);
+      setEditingMed(null);
+      setSelectedSubstanceDetail(null);
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       await updateDoc(doc(db, "users", emailId, "substances", editingMed.id), {
@@ -1958,10 +2047,33 @@ export default function App() {
   const handleUpdateMedDetails = async () => {
     if (!user || !editingMed) return;
     const emailId = user.email?.toLowerCase() || user.uid;
+
+    // Option A: Skip redundant writes check
+    const originalSub = inventory.find(sub => sub.id === editingMed.id);
+    if (originalSub && 
+        originalSub.name === editingMed.name &&
+        originalSub.strength === editingMed.strength &&
+        originalSub.schedule === editingMed.schedule &&
+        originalSub.ndc === editingMed.ndc &&
+        originalSub.unit === editingMed.unit &&
+        originalSub.packageSize === Number(editingMed.packageSize) &&
+        originalSub.minThreshold === Number(editingMed.minThreshold)) {
+      console.log("Option A: Redundant write skipped for med details");
+      toast.success("Catalog Registry Updated");
+      setIsEditMedDetailsOpen(false);
+      setEditingMed(null);
+      setSelectedSubstanceDetail(null);
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       await updateDoc(doc(db, "users", emailId, "substances", editingMed.id), {
-        ...editingMed,
+        name: editingMed.name,
+        strength: editingMed.strength,
+        schedule: editingMed.schedule,
+        ndc: editingMed.ndc,
+        unit: editingMed.unit,
         packageSize: Number(editingMed.packageSize),
         minThreshold: Number(editingMed.minThreshold),
         lastUpdated: serverTimestamp()
@@ -2287,6 +2399,18 @@ export default function App() {
   const handleUpdateUser = async () => {
     if (!user || !editingUser) return;
     const emailId = user.email?.toLowerCase() || user.uid;
+
+    // Option A: Skip redundant writes check
+    const originalStaff = users.find(u => u.id === editingUser.id);
+    if (originalStaff && 
+        originalStaff.name.trim() === editingUser.name.trim() && 
+        originalStaff.title === editingUser.title) {
+      console.log("Option A: Redundant write skipped for staff identity");
+      toast.success("User Record Adjusted");
+      setEditingUser(null);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await updateDoc(doc(db, "users", emailId, "staff", editingUser.id), { 
@@ -2484,8 +2608,17 @@ export default function App() {
       return;
     }
     
-    setIsSubmitting(true);
     const emailId = user.email?.toLowerCase() || user.uid;
+
+    // Option A: Skip redundant writes check
+    if (userProfile.organizationName === editingOrgName.trim()) {
+      console.log("Option A: Redundant write skipped for organizationName");
+      toast.success("Organization Identity Updated Successfully");
+      setIsProfileEditOpen(false);
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       console.log(`Updating Profile Identity for node: ${emailId}`);
       
@@ -2927,44 +3060,33 @@ export default function App() {
     );
   }
 
-  const togglePhotoRequirement = async () => {
-    if (!user || !user.email) return;
-    const userEmail = user.email.toLowerCase();
-    const newValue = !userProfile?.isPhotoRequirementEnabled;
+  const togglePhotoRequirement = () => {
+    if (!user || !userProfile) return;
+    const newValue = !userProfile.isPhotoRequirementEnabled;
     
-    try {
-      const userDocRef = doc(db, "users", userEmail);
-      await updateDoc(userDocRef, {
-        isPhotoRequirementEnabled: newValue
-      });
-      setUserProfile(prev => prev ? { ...prev, isPhotoRequirementEnabled: newValue } : null);
-      toast.success(`Photo requirement ${newValue ? 'enabled' : 'disabled'}`);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
-    }
+    // Update local React state instantly for responsive UI
+    setUserProfile(prev => prev ? { ...prev, isPhotoRequirementEnabled: newValue } : null);
+    toast.success(`Photo requirement ${newValue ? 'enabled' : 'disabled'}`);
+
+    // Queue with Option A validation & Option B 2.5s debounce
+    debouncedUpdateProfile({ isPhotoRequirementEnabled: newValue });
   };
 
-  const toggleSignatureRequirement = async () => {
-    if (!user || !user.email) return;
-    const userEmail = user.email.toLowerCase();
-    const newValue = userProfile?.isSignatureRequirementEnabled === false ? true : false;
+  const toggleSignatureRequirement = () => {
+    if (!user || !userProfile) return;
+    const newValue = userProfile.isSignatureRequirementEnabled === false ? true : false;
     
-    try {
-      const userDocRef = doc(db, "users", userEmail);
-      await updateDoc(userDocRef, {
-        isSignatureRequirementEnabled: newValue
-      });
-      setUserProfile(prev => prev ? { ...prev, isSignatureRequirementEnabled: newValue } : null);
-      toast.success(`Signature requirement ${newValue ? 'enabled' : 'disabled'}`);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
-    }
+    // Update local React state instantly for responsive UI
+    setUserProfile(prev => prev ? { ...prev, isSignatureRequirementEnabled: newValue } : null);
+    toast.success(`Signature requirement ${newValue ? 'enabled' : 'disabled'}`);
+
+    // Queue with Option A validation & Option B 2.5s debounce
+    debouncedUpdateProfile({ isSignatureRequirementEnabled: newValue });
   };
 
-  const toggleReconFilter = async (filterVal: "ALL" | "C-II" | "C-III/C-IV/C-V") => {
-    if (!user || !user.email) return;
-    const userEmail = user.email.toLowerCase();
-    const currentFilters = userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"];
+  const toggleReconFilter = (filterVal: "ALL" | "C-II" | "C-III/C-IV/C-V") => {
+    if (!user || !userProfile) return;
+    const currentFilters = userProfile.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"];
     let newFilters: string[];
     
     if (currentFilters.includes(filterVal)) {
@@ -2977,16 +3099,12 @@ export default function App() {
       newFilters = [...currentFilters, filterVal];
     }
     
-    try {
-      const userDocRef = doc(db, "users", userEmail);
-      await updateDoc(userDocRef, {
-        reconFilters: newFilters
-      });
-      setUserProfile(prev => prev ? { ...prev, reconFilters: newFilters } : null);
-      toast.success("Reconciliation options matching profile updated.");
-    } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
-    }
+    // Update local React state instantly for responsive UI
+    setUserProfile(prev => prev ? { ...prev, reconFilters: newFilters } : null);
+    toast.success("Reconciliation options matching profile updated.");
+
+    // Queue with Option A validation & Option B 2.5s debounce
+    debouncedUpdateProfile({ reconFilters: newFilters });
   };
 
   return (
