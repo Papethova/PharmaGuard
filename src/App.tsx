@@ -2421,9 +2421,9 @@ export default function App() {
         const matchesSearch = historyMedicationFilter 
           ? t.substanceId === historyMedicationFilter 
           : (!cleanQuery || 
-             t.substanceName.toLowerCase().includes(cleanQuery) || 
-             t.ndc.toLowerCase().includes(cleanQuery) ||
-             (t.strength && t.strength.toLowerCase().includes(cleanQuery)));
+             t.substanceName.toLowerCase().startsWith(cleanQuery) || 
+             t.ndc.toLowerCase().startsWith(cleanQuery) ||
+             (t.strength && t.strength.toLowerCase().startsWith(cleanQuery)));
         const matchesType = historyTypeFilter === "All" || t.type === historyTypeFilter;
 
         return matchesSchedule && matchesStartDate && matchesEndDate && matchesSearch && matchesType;
@@ -3311,8 +3311,8 @@ export default function App() {
                               <div className="absolute z-[100] w-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-60 overflow-y-auto left-0 top-full">
                                 {inventory
                                   .filter(s => 
-                                    s.name.toLowerCase().includes(newMed.name.toLowerCase()) || 
-                                    s.ndc.includes(newMed.name)
+                                    s.name.toLowerCase().startsWith(newMed.name.toLowerCase()) || 
+                                    s.ndc.startsWith(newMed.name)
                                   )
                                   .sort((a, b) => {
                                     // 1. Alphabetical by name
@@ -3362,8 +3362,8 @@ export default function App() {
                                     </div>
                                   ))}
                                 {inventory.filter(s => 
-                                  s.name.toLowerCase().includes(newMed.name.toLowerCase()) || 
-                                  s.ndc.includes(newMed.name)
+                                  s.name.toLowerCase().startsWith(newMed.name.toLowerCase()) || 
+                                  s.ndc.startsWith(newMed.name)
                                 ).length === 0 && (
                                   <div className="px-3 py-2 text-xs text-brand-dark-grey/50 italic">New medication entry...</div>
                                 )}
@@ -3539,8 +3539,8 @@ export default function App() {
                           <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-xl max-h-60 overflow-y-auto">
                             {inventory
                               .filter(s => 
-                                s.name.toLowerCase().includes(substanceSearch.toLowerCase()) || 
-                                s.ndc.includes(substanceSearch)
+                                s.name.toLowerCase().startsWith(substanceSearch.toLowerCase()) || 
+                                s.ndc.startsWith(substanceSearch)
                               )
                               .sort((a, b) => {
                                 // 1. Alphabetical by name
@@ -3581,8 +3581,8 @@ export default function App() {
                                 </div>
                               ))}
                             {inventory.filter(s => 
-                              s.name.toLowerCase().includes(substanceSearch.toLowerCase()) || 
-                              s.ndc.includes(substanceSearch)
+                              s.name.toLowerCase().startsWith(substanceSearch.toLowerCase()) || 
+                              s.ndc.startsWith(substanceSearch)
                             ).length === 0 && (
                               <div className="px-3 py-2 text-xs text-brand-dark-grey/50 italic">No matches found</div>
                             )}
@@ -4482,9 +4482,9 @@ export default function App() {
                       {inventory
                         .filter(s => {
                           const query = historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase();
-                          return s.name.toLowerCase().includes(query) || 
-                                 s.ndc.toLowerCase().includes(query) ||
-                                 (s.strength && s.strength.toLowerCase().includes(query));
+                          return s.name.toLowerCase().startsWith(query) || 
+                                 s.ndc.toLowerCase().startsWith(query) ||
+                                 (s.strength && s.strength.toLowerCase().startsWith(query));
                         })
                         .map(s => (
                           <div
