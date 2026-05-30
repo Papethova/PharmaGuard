@@ -4786,39 +4786,23 @@ export default function App() {
 
                 {/* Substance Table List */}
                 <div className="border border-brand-blue/10 rounded-xl overflow-hidden bg-brand-surface flex flex-col flex-1 min-h-0">
+                  <div className="p-3 bg-brand-yellow/10 border-b border-brand-blue/10 text-xs text-brand-blue font-extrabold flex justify-between items-center shrink-0">
+                    <span className="uppercase tracking-wider">Reconciliation Reporting Ledger</span>
+                    <span className="uppercase tracking-wider text-brand-blue bg-brand-blue/5 border border-brand-blue/10 px-2 py-0.5 rounded-lg">Period Starting: Since {lastReport.date}</span>
+                  </div>
                   <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                     <table className="w-full border-separate border-spacing-0 text-xs text-left">
                       <thead className="sticky top-0 z-40">
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication & Strength</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
-                            <div className="flex flex-col items-center justify-center">
-                              <span>Last Report</span>
-                              <span>Count</span>
-                            </div>
-                          </th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Purchased</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
-                            <div className="flex flex-col items-center justify-center">
-                              <span>Expected</span>
-                              <span>Count</span>
-                            </div>
-                          </th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
-                            <div className="flex flex-col items-center justify-center">
-                              <span>Physical</span>
-                              <span>Count</span>
-                            </div>
-                          </th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
-                        </tr>
-                        <tr className="border-none" style={{ border: 'none' }}>
-                          <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-6 py-0" style={{ top: '24px', verticalAlign: 'top', paddingTop: '0px', lineHeight: 'normal', border: 'none' }}>
-                            Since {lastReport.date}
-                          </th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication & Strength</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Last Report Count</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Purchased</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky top-0 z-42 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Expected Count</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center w-[110px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Physical Count</th>
+                          <th className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-10 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -5095,33 +5079,65 @@ export default function App() {
                 <div id="reconciliation-printable-invoice" className="p-8 space-y-6 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
                   
                   {/* Visual Official Letterhead */}
-                  <div className="flex justify-between items-start border-b-2 border-black pb-4">
-                    <div>
-                      <h1 className="text-xl font-bold tracking-tight uppercase">{getReportTitle().toUpperCase()}</h1>
-                      <p className="text-xs text-gray-900 font-sans mt-1">REPORT #: {(() => {
-                        const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
-                        return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
-                      })()}</p>
-                      <p className="text-xs text-gray-900 font-sans">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
-                      <p className="text-xs text-gray-900 font-sans">DATE EXECUTED: {
-                        selectedHistoricalReport 
-                          ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                          : new Date().toLocaleDateString()
-                      }</p>
-                    </div>
-                    <div className="text-right self-end">
-                      <p className="text-sm font-bold font-sans text-gray-900">
-                        COMPLETED BY: {
-                          selectedHistoricalReport
-                            ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
-                            : (() => {
-                                const selectedUserObj = users.find(u => u.id === reconUser);
-                                return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
-                              })()
+                  {(() => {
+                    const formatToFourDigitYear = (dateStr: string) => {
+                      if (!dateStr || dateStr === "N/A") return "N/A";
+                      const parts = dateStr.split("/");
+                      if (parts.length === 3) {
+                        let year = parts[2];
+                        if (year.length === 2) {
+                          year = "20" + year;
                         }
-                      </p>
-                    </div>
-                  </div>
+                        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${year}`;
+                      }
+                      return dateStr;
+                    };
+
+                    const headerPrevReportDate = (() => {
+                      if (selectedHistoricalReport) {
+                        const firstItem = selectedHistoricalReport.items[0];
+                        return formatToFourDigitYear(firstItem?.prevReportDate || "N/A");
+                      } else {
+                        const firstSub = substancesToReconcile[0];
+                        if (firstSub) {
+                          const metrics = getSubstanceHistoryMetrics(firstSub.id);
+                          return formatToFourDigitYear(metrics.prevReportDate);
+                        }
+                        return formatToFourDigitYear(lastReport.date);
+                      }
+                    })();
+
+                    return (
+                      <div className="flex justify-between items-start border-b-2 border-black pb-4">
+                        <div>
+                          <h1 className="text-xl font-bold tracking-tight uppercase">{getReportTitle().toUpperCase()}</h1>
+                          <p className="text-xs text-gray-900 font-sans mt-1">REPORT #: {(() => {
+                            const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
+                            return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
+                          })()}</p>
+                          <p className="text-xs text-gray-900 font-sans">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+                          <p className="text-xs text-gray-900 font-sans">SINCE DATE: {headerPrevReportDate}</p>
+                          <p className="text-xs text-gray-900 font-sans">DATE EXECUTED: {
+                            selectedHistoricalReport 
+                              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                              : new Date().toLocaleDateString()
+                          }</p>
+                        </div>
+                        <div className="text-right self-end">
+                          <p className="text-sm font-bold font-sans text-gray-900">
+                            COMPLETED BY: {
+                              selectedHistoricalReport
+                                ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
+                                : (() => {
+                                    const selectedUserObj = users.find(u => u.id === reconUser);
+                                    return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
+                                  })()
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* Audit Grid/Table */}
                   {(() => {
