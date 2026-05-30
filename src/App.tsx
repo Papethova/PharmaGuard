@@ -5527,9 +5527,9 @@ export default function App() {
 
         <div className="p-6 space-y-5 flex-1 overflow-visible">
           {/* Form */}
-          <div className="space-y-4">
-            <div className="space-y-1.5 text-left relative">
-              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Source Node</label>
+          <div className="flex flex-col gap-6 pt-5">
+            <div className="relative text-left">
+              <label className="absolute -top-5 left-1 text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Source Node</label>
               <div className="relative">
                 <Input
                   placeholder="Type to search source node..."
@@ -5598,15 +5598,15 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center py-1">
+            <div className="flex items-center justify-center py-0">
               <svg className="h-16 w-16 text-brand-blue" viewBox="0 0 24 24" fill="currentColor">
                 {/* Single downward bold/blocky arrow: wide square stem with large triangle head */}
                 <path d="M8,3 H16 V11 H21 L12,21 L3,11 H8 Z" />
               </svg>
             </div>
 
-            <div className="space-y-1.5 text-left relative">
-              <label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Destination Node</label>
+            <div className="relative text-left">
+              <label className="absolute -top-5 left-1 text-[10px] uppercase font-black tracking-wider text-brand-blue/80">Destination Node</label>
               <div className="relative">
                 <Input
                   placeholder="Type to search destination node..."
