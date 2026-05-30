@@ -476,14 +476,7 @@ export default function App() {
 
   // Reconciliation states
   const [isReconOpen, setIsReconOpen] = useState(false);
-  const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">("ALL");
-
-  useEffect(() => {
-    const activeBubbles = userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"];
-    if (!activeBubbles.includes(reconScheduleFilter)) {
-      setReconScheduleFilter(activeBubbles[0] as any);
-    }
-  }, [userProfile?.reconFilters, reconScheduleFilter]);
+  const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">("C-II");
 
   const [reconCounts, setReconCounts] = useState<Record<string, string>>({});
   const [reconReasons, setReconReasons] = useState<Record<string, string>>({});
@@ -1057,7 +1050,8 @@ export default function App() {
                 const batch = writeBatch(db);
                 
                 // Write the parent profile document first
-                if (!userDoc?.exists()) {
+                const existingOrgName = userDoc?.exists() ? (userDoc.data()?.organizationName || "") : "";
+                if (!userDoc?.exists() || !existingOrgName) {
                   batch.set(userDocRef, { 
                     ...legacyData, 
                     email: emailId,
@@ -1184,6 +1178,9 @@ export default function App() {
       setInventory([]);
       setTransactions([]);
       setUsers([]);
+      setHistoricalReports([]);
+      setReconCounts({});
+      setReconReasons({});
       return;
     }
 
@@ -2140,8 +2137,36 @@ export default function App() {
       const srcStaffRef = collection(db, "users", srcEmail, "staff");
       const srcStaffSnap = await getDocs(srcStaffRef);
 
+      const srcReportsRef = collection(db, "users", srcEmail, "reconciliation_reports");
+      const srcReportsSnap = await getDocs(srcReportsRef);
+
+      // Get parent node profile info to copy/merge
+      let srcProfileData: any = null;
+      try {
+        const srcUserDoc = await getDoc(doc(db, "users", srcEmail));
+        if (srcUserDoc.exists()) {
+          srcProfileData = srcUserDoc.data();
+        }
+      } catch (profileErr) {
+        console.warn("Could not copy source profile during node migration:", profileErr);
+      }
+
       let batch = writeBatch(db);
       let count = 0;
+
+      // Copy parent profile document metadata
+      if (srcProfileData) {
+        const destUserDocRef = doc(db, "users", destEmail);
+        batch.set(destUserDocRef, {
+          organizationName: srcProfileData.organizationName || "",
+          displayName: srcProfileData.displayName || "",
+          role: srcProfileData.role || "pharmacist",
+          status: srcProfileData.status || "active",
+          licenseNumber: srcProfileData.licenseNumber || "",
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        count += 1;
+      }
 
       for (const d of srcSubstancesSnap.docs) {
         if (count >= 400) {
@@ -2176,12 +2201,23 @@ export default function App() {
         count += 1;
       }
 
+      for (const d of srcReportsSnap.docs) {
+        if (count >= 400) {
+          await batch.commit();
+          batch = writeBatch(db);
+          count = 0;
+        }
+        const destDocRef = doc(db, "users", destEmail, "reconciliation_reports", d.id);
+        batch.set(destDocRef, d.data());
+        count += 1;
+      }
+
       if (count > 0) {
         await batch.commit();
       }
 
       toast.success(
-        `Migration Successful: Copied ${srcSubstancesSnap.size} substances, ${srcTransactionsSnap.size} transactions, and ${srcStaffSnap.size} staff records to ${destEmail} (source data protected & preserved).`,
+        `Migration Successful: Copied profile metadata, ${srcSubstancesSnap.size} substances, ${srcTransactionsSnap.size} transactions, ${srcReportsSnap.size} reconciliation reports, and ${srcStaffSnap.size} staff records to ${destEmail} (source data protected & preserved).`,
         { id: toastId, duration: 8000 }
       );
 
@@ -3651,12 +3687,12 @@ export default function App() {
 
                     {selectedSubstance && quantity && transactionType !== "VERIFY" && (
                       <div className="p-2 bg-brand-blue/5 rounded-lg border border-brand-blue/10 flex justify-between items-center h-9 shadow-sm">
-                        <span className="text-[10px] font-bold text-brand-blue uppercase">Projected</span>
+                        <span className="text-sm font-bold text-brand-blue uppercase">Projected</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-brand-dark-grey/80 font-bold">
+                          <span className="text-sm text-brand-dark-grey/80 font-bold">
                             {inventory.find(i => i.id === selectedSubstance)?.currentStock} →
                           </span>
-                          <span className="text-sm font-black text-brand-blue">
+                          <span className="text-sm font-bold text-brand-blue">
                             {(inventory.find(i => i.id === selectedSubstance)?.currentStock || 0) + 
                              (transactionType === "IN" ? Number(quantity) : 
                               transactionType === "OUT" ? -Number(quantity) : 
@@ -4035,33 +4071,8 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="pt-1.5">
-                      <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider block mb-1">Reconciliation Report Options</Label>
-                      <div className="flex gap-1.5 pt-1">
-                        {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => {
-                          const labelMap = {
-                            "ALL": "All",
-                            "C-II": "C-II",
-                            "C-III/C-IV/C-V": "C-III/C-IV/C-V"
-                          };
-                          const isSelected = (userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"]).includes(filterVal);
-                          return (
-                            <button
-                              key={filterVal}
-                              type="button"
-                              onClick={() => toggleReconFilter(filterVal)}
-                              className={`flex-1 h-9 rounded-full text-xs font-black transition-all border ${
-                                isSelected
-                                  ? "bg-brand-blue text-white border-brand-blue shadow-sm"
-                                  : "bg-brand-surface text-brand-grey border-brand-grey/20 hover:bg-brand-blue/5"
-                              }`}
-                            >
-                              {labelMap[filterVal]}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    
+                    {/* Removed Reconciliation Report Options Section */}
                   </div>
 
                   <div className="space-y-1.5 pt-1.5">
@@ -4748,9 +4759,7 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 px-4 border border-brand-blue/10 rounded-xl bg-brand-blue/5 shrink-0">
                   <div className="flex items-center gap-2 text-left w-full sm:w-auto">
                     <div className="flex items-center gap-2">
-                      {(["ALL", "C-II", "C-III/C-IV/C-V"] as const).filter(val =>
-                        (userProfile?.reconFilters || ["ALL", "C-II", "C-III/C-IV/C-V"]).includes(val)
-                      ).map((filterVal) => (
+                      {(["C-II", "C-III/C-IV/C-V"] as const).map((filterVal) => (
                         <Button
                           key={filterVal}
                           type="button"
@@ -6294,7 +6303,13 @@ export default function App() {
       </DialogContent>
     </Dialog>
 
-    <Dialog open={isProfileEditOpen} onOpenChange={setIsProfileEditOpen}>
+    <Dialog open={isProfileEditOpen} onOpenChange={(open) => {
+      if (!open && !userProfile?.organizationName) {
+        toast.error("Compliance Enforced: You must establish your clinical organization identity to continue.");
+        return;
+      }
+      setIsProfileEditOpen(open);
+    }}>
       <DialogContent showCloseButton={false} className="sm:max-w-[400px] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 overflow-hidden rounded-2xl">
         <DialogHeader className="p-6 bg-brand-blue text-white relative">
           <div className="flex items-center gap-4 relative z-10">
@@ -6336,12 +6351,14 @@ export default function App() {
         </div>
 
         <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
-          <Button 
-            onClick={() => setIsProfileEditOpen(false)}
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
-          >
-            Cancel
-          </Button>
+          {userProfile?.organizationName && (
+            <Button 
+              onClick={() => setIsProfileEditOpen(false)}
+              className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+            >
+              Cancel
+            </Button>
+          )}
           <Button 
             onClick={handleUpdateOrgProfile}
             disabled={isSubmitting}
