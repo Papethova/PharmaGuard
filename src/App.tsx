@@ -5196,59 +5196,54 @@ export default function App() {
                             <col className="w-[7%]" />
                           </colgroup>
                             <thead>
-                              <tr className="border-t-2 border-b border-gray-900">
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                              <tr className="border-t-2 border-b-2 border-gray-900">
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>MEDICATION</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>NDC</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>LAST REPORT</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>PURCHASED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>DISPENSED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>ADJUSTED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>EXPECTED</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>PHYSICAL</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>VARIANCE</span>
                                  </div>
-                               </th>
-                              </tr>
-                              <tr className="border-b-2 border-gray-900 bg-gray-50/10">
-                               <th colSpan={9} className="text-center font-bold text-[9px] text-gray-900 font-sans py-1.5" style={{ verticalAlign: 'middle' }}>
-                                 Reporting Period Starting: Since {headerPrevReportDate}
                                </th>
                               </tr>
                             </thead>
@@ -5333,7 +5328,7 @@ export default function App() {
                                         <span className="text-[10px] leading-none">{metrics.expected}</span>
                                       </td>
                                       <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{counted} {sub.unit || "Units"}</span>
+                                        <span className="text-[10px] leading-none">{counted}</span>
                                       </td>
                                       <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
                                         <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
