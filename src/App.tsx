@@ -3352,11 +3352,12 @@ export default function App() {
                                       <div className="flex items-center gap-2 flex-wrap">
                                         <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                                         <span className="text-[10px] text-brand-dark-grey font-normal">{s.strength}</span>
-                                        <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
-                                        <span className="text-[8px] text-brand-dark-grey/30 select-none pointer-events-none">•</span>
-                                        <span className="text-[10px] text-brand-blue font-bold">Stock: {s.currentStock} {s.unit || "Units"}</span>
+                                        <span className="text-[10px] text-brand-blue font-black uppercase">{s.ndc}</span>
                                       </div>
-                                      <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
+                                        <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
+                                      </div>
                                     </div>
                                   ))}
                                 {inventory.filter(s => 
@@ -3569,11 +3570,12 @@ export default function App() {
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                                     <span className="text-[10px] text-brand-dark-grey font-normal">{s.strength}</span>
-                                    <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
-                                    <span className="text-[8px] text-brand-dark-grey/30 select-none pointer-events-none">•</span>
-                                    <span className="text-[10px] text-brand-blue font-bold">Stock: {s.currentStock} {s.unit || "Units"}</span>
+                                    <span className="text-[10px] text-brand-blue font-black uppercase">{s.ndc}</span>
                                   </div>
-                                  <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
+                                    <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
+                                  </div>
                                 </div>
                               ))}
                             {inventory.filter(s => 
