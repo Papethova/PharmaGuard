@@ -5361,7 +5361,9 @@ export default function App() {
                     const reconUserObj = users.find(u => u.id === reconUser);
                     const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
                     
-                    const perfName = selectedHistoricalReport ? selectedHistoricalReport.performedByName : (reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned");
+                    const perfName = selectedHistoricalReport
+                      ? `${selectedHistoricalReport.performedByName}${selectedHistoricalReport.performedByTitle ? ` (${selectedHistoricalReport.performedByTitle})` : ""}`
+                      : (reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned");
                     const picName = selectedHistoricalReport ? selectedHistoricalReport.picName : (picUserObj?.name || "PIC NOT ASSIGNED");
                     const userSig = selectedHistoricalReport ? selectedHistoricalReport.reconSigData : reconSigData;
                     const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
