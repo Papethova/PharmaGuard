@@ -5130,11 +5130,6 @@ export default function App() {
                             return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
                           })()}</p>
                           <p className="text-xs text-gray-900 font-sans">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
-                          <p className="text-xs text-gray-900 font-sans">DATE EXECUTED: {
-                            selectedHistoricalReport 
-                              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                              : new Date().toLocaleDateString()
-                          }</p>
                         </div>
                         <div className="text-right self-end">
                           <p className="text-sm font-bold font-sans text-gray-900">
@@ -5147,6 +5142,11 @@ export default function App() {
                                   })()
                             }
                           </p>
+                          <p className="text-xs text-gray-900 font-sans mt-0.5">DATE EXECUTED: {
+                            selectedHistoricalReport 
+                              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                              : new Date().toLocaleDateString()
+                          }</p>
                         </div>
                       </div>
                     );
