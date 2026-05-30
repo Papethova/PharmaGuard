@@ -5090,7 +5090,7 @@ export default function App() {
           <ScrollArea className="flex-1 overflow-y-auto">
               {/* Added print root anchor */}
               <div id="reconciliation-printable-root">
-                <div id="reconciliation-printable-invoice" className="p-8 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
+                <div id="reconciliation-printable-invoice" className="px-8 pb-8 pt-2 space-y-1.5 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
                   
                   {/* Visual Official Letterhead */}
                   {(() => {
@@ -5196,59 +5196,59 @@ export default function App() {
                             <col className="w-[7%]" />
                           </colgroup>
                             <thead>
-                              <tr className="border-t-2 border-gray-900">
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                              <tr className="border-t-2 border-b border-gray-900">
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>MEDICATION</span>
                                  </div>
                                </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>NDC</span>
                                  </div>
                                </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>LAST REPORT</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>PURCHASED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>DISPENSED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>ADJUSTED</span>
                                  </div>
                                </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>EXPECTED</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>PHYSICAL</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '6px 2px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>VARIANCE</span>
                                  </div>
                                </th>
                               </tr>
-                              <tr className="border-b-2 border-gray-900">
-                               <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans" style={{ paddingTop: '0px', paddingBottom: '1px', verticalAlign: 'top' }}>
-                                 Since {headerPrevReportDate}
+                              <tr className="border-b-2 border-gray-900 bg-gray-50/10">
+                               <th colSpan={9} className="text-center font-bold text-[9px] text-gray-900 font-sans py-1.5" style={{ verticalAlign: 'middle' }}>
+                                 Reporting Period Starting: Since {headerPrevReportDate}
                                </th>
                               </tr>
                             </thead>
@@ -5259,28 +5259,34 @@ export default function App() {
                                 return (
                                   <Fragment key={item.substanceId}>
                                     <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
-                                        <span className="font-bold text-gray-900">{item.substanceName} <span className="text-gray-900 font-bold ml-1">{item.strength}</span></span>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                                        <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${item.substanceName} ${item.strength}`}>
+                                          {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
+                                        </div>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
-                                        <span className="font-bold text-gray-900 font-sans">{item.ndc}</span>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                                        <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
-                                        <div className="font-bold text-gray-900">{item.lastClosingCount || 0}</div>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                                        <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
-                                        {(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
-                                        {(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
                                       </td>
-                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                        {item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}
+                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.expected || 0}</td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{item.physical || 0}</td>
-                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                        {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{item.expected || 0}</span>
+                                      </td>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{item.physical || 0}</span>
+                                      </td>
+                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
                                       </td>
                                     </tr>
                                     {variance !== 0 && (
@@ -5303,28 +5309,34 @@ export default function App() {
                                 return (
                                   <Fragment key={sub.id}>
                                     <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
-                                        <span className="font-bold text-gray-900">{sub.name} <span className="text-gray-900 font-bold ml-1">{sub.strength}</span></span>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                                        <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${sub.name} ${sub.strength}`}>
+                                          {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
+                                        </div>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
-                                        <span className="font-bold text-gray-900 font-sans">{sub.ndc}</span>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                                        <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-sans">
-                                        <div className="font-bold text-gray-900">{metrics.lastClosingCount}</div>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                                        <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
-                                        {metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">
-                                        {metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
                                       </td>
-                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                        {metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}
+                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
                                       </td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{metrics.expected}</td>
-                                      <td className="py-2 text-center text-gray-900 font-bold font-sans">{counted} {sub.unit || "Units"}</td>
-                                      <td className="py-2 text-center font-bold text-gray-900 font-sans">
-                                        {variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{metrics.expected}</span>
+                                      </td>
+                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{counted} {sub.unit || "Units"}</span>
+                                      </td>
+                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                                        <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
                                       </td>
                                     </tr>
                                     {variance !== 0 && (
