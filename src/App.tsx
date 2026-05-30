@@ -5122,7 +5122,7 @@ export default function App() {
                     })();
 
                     return (
-                      <div className="flex justify-between items-start border-b border-black pb-2">
+                      <div className="flex justify-between items-start pb-2">
                         <div>
                           <h1 className="text-xl font-bold tracking-tight uppercase">{getReportTitle().toUpperCase()}</h1>
                           <p className="text-xs text-gray-900 font-sans mt-1">REPORT #: {(() => {
@@ -5196,54 +5196,59 @@ export default function App() {
                             <col className="w-[7%]" />
                           </colgroup>
                             <thead>
-                              <tr className="border-t-2 border-b-2 border-gray-900">
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                              <tr className="border-t-2 border-gray-900">
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>MEDICATION</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>NDC</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>LAST REPORT</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>PURCHASED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>DISPENSED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>ADJUSTED</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>EXPECTED</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>PHYSICAL</span>
                                    <span className="mt-0.5">COUNT</span>
                                  </div>
                                </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ padding: '8px 2px', verticalAlign: 'middle' }}>
+                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                                  <div className="flex flex-col items-center justify-center leading-none">
                                    <span>VARIANCE</span>
                                  </div>
+                               </th>
+                              </tr>
+                              <tr className="border-b-2 border-gray-900">
+                               <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans" style={{ paddingTop: '0px', paddingBottom: '1px', verticalAlign: 'top' }}>
+                                 Since {headerPrevReportDate}
                                </th>
                               </tr>
                             </thead>
