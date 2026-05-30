@@ -5122,7 +5122,7 @@ export default function App() {
                     })();
 
                     return (
-                      <div className="flex justify-between items-start pb-2">
+                      <div className="flex justify-between items-start pb-0">
                         <div>
                           <h1 className="text-xl font-bold tracking-tight uppercase">{getReportTitle().toUpperCase()}</h1>
                           <p className="text-xs text-gray-900 font-sans mt-1">REPORT #: {(() => {
@@ -5182,7 +5182,7 @@ export default function App() {
                     })();
 
                     return (
-                      <div className="mt-0">
+                      <div className="-mt-1">
                         <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
                           <colgroup>
                             <col className="w-[33%]" />
