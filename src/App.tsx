@@ -3354,9 +3354,9 @@ export default function App() {
                                           <span className="font-normal text-sm group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                                           <span className="font-normal text-sm text-brand-dark-grey/80">{s.strength}</span>
                                         </div>
-                                        <span className="text-[10px] text-brand-blue/75 font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
+                                        <span className="text-xs text-brand-blue font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
                                       </div>
-                                      <div className="flex items-center shrink-0 justify-end text-right pl-3">
+                                      <div className="flex items-center gap-2 shrink-0 justify-end w-36 pl-3 text-right">
                                         <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                       </div>
                                     </div>
@@ -3573,9 +3573,9 @@ export default function App() {
                                       <span className="font-normal text-sm group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
                                       <span className="font-normal text-sm text-brand-dark-grey/80">{s.strength}</span>
                                     </div>
-                                    <span className="text-[10px] text-brand-blue/75 font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
+                                    <span className="text-xs text-brand-blue font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
                                   </div>
-                                  <div className="flex items-center shrink-0 justify-end text-right pl-3">
+                                  <div className="flex items-center gap-2 shrink-0 justify-end w-36 pl-3 text-right">
                                     <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                   </div>
                                 </div>
