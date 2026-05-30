@@ -5090,7 +5090,7 @@ export default function App() {
           <ScrollArea className="flex-1 overflow-y-auto">
               {/* Added print root anchor */}
               <div id="reconciliation-printable-root">
-                <div id="reconciliation-printable-invoice" className="px-8 pb-8 pt-2 space-y-1.5 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
+                <div id="reconciliation-printable-invoice" className="px-8 pb-3 pt-2 space-y-1.5 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
                   
                   {/* Visual Official Letterhead */}
                   {(() => {
@@ -5370,16 +5370,16 @@ export default function App() {
                     const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
                     return (
-                      <div className="space-y-1.5 pt-3 border-t border-gray-100">
+                      <div className="space-y-1 pt-1.5 border-t border-gray-100">
                         {/* Moved disclaimer above signature fields in historical report block */}
                         <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
                           By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
                         </p>
                         {isSigRequired ? (
-                          <div className="grid grid-cols-2 gap-8 pt-1">
+                          <div className="grid grid-cols-2 gap-4 pt-1">
                             {/* Left signature field */}
-                            <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
-                              <div className="flex items-center gap-1.5 pb-2">
+                            <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                              <div className="flex items-center gap-1.5 pb-1">
                                 <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
                                 <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                                   {perfName}
@@ -5387,7 +5387,7 @@ export default function App() {
                               </div>
                               <div className="flex-1 flex items-center justify-center">
                                 {userSig ? (
-                                  <img src={userSig} className="max-h-16 object-contain" alt="Performed by signature" />
+                                  <img src={userSig} className="max-h-12 object-contain" alt="Performed by signature" />
                                 ) : (
                                   <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
                                     No signature captured
@@ -5397,8 +5397,8 @@ export default function App() {
                             </div>
 
                             {/* Right signature field */}
-                            <div className="border border-black p-4 rounded-lg relative h-28 flex flex-col justify-between bg-gray-50/20">
-                              <div className="flex items-center gap-1.5 pb-2">
+                            <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                              <div className="flex items-center gap-1.5 pb-1">
                                 <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
                                 <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                                   {picName}
@@ -5406,7 +5406,7 @@ export default function App() {
                               </div>
                               <div className="flex-1 flex items-center justify-center">
                                 {picSig ? (
-                                  <img src={picSig} className="max-h-16 object-contain" alt="PIC signature" />
+                                  <img src={picSig} className="max-h-12 object-contain" alt="PIC signature" />
                                 ) : (
                                   <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
                                     No signature captured
@@ -5416,7 +5416,7 @@ export default function App() {
                             </div>
                           </div>
                         ) : (
-                          <div className="pt-2 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
+                          <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
                             <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
                             <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
                           </div>
