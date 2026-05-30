@@ -3349,16 +3349,15 @@ export default function App() {
                                         setIsNewMedSearchFocused(false);
                                       }}
                                     >
-                                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                        <span className="font-semibold text-sm group-hover:text-brand-blue text-brand-dark-grey truncate">{s.name}</span>
-                                        <span className="text-sm font-semibold text-brand-dark-grey shrink-0">{s.strength}</span>
+                                      <div className="flex flex-col min-w-0 flex-1">
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                          <span className="font-normal text-sm group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
+                                          <span className="font-normal text-sm text-brand-dark-grey/80">{s.strength}</span>
+                                        </div>
+                                        <span className="text-[10px] text-brand-blue/75 font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
                                       </div>
-                                      <div className="w-28 shrink-0 text-center">
-                                        <span className="text-xs text-brand-blue font-bold uppercase tracking-wider">{s.ndc}</span>
-                                      </div>
-                                      <div className="flex items-center gap-2 shrink-0 justify-end w-36">
-                                        <span className="text-[10px] text-brand-blue font-extrabold text-right">Stock: {s.currentStock} {s.unit || "Units"}</span>
-                                        <Badge variant="outline" className="text-[10px] h-4 px-1 shrink-0">{s.schedule}</Badge>
+                                      <div className="flex items-center shrink-0 justify-end text-right pl-3">
+                                        <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                       </div>
                                     </div>
                                   ))}
@@ -3569,16 +3568,15 @@ export default function App() {
                                     setSubstanceSearch(s.name);
                                   }}
                                 >
-                                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                    <span className="font-semibold text-sm group-hover:text-brand-blue text-brand-dark-grey truncate">{s.name}</span>
-                                    <span className="text-sm font-semibold text-brand-dark-grey shrink-0">{s.strength}</span>
+                                  <div className="flex flex-col min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <span className="font-normal text-sm group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
+                                      <span className="font-normal text-sm text-brand-dark-grey/80">{s.strength}</span>
+                                    </div>
+                                    <span className="text-[10px] text-brand-blue/75 font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
                                   </div>
-                                  <div className="w-28 shrink-0 text-center">
-                                    <span className="text-xs text-brand-blue font-bold uppercase tracking-wider">{s.ndc}</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 shrink-0 justify-end w-36">
-                                    <span className="text-[10px] text-brand-blue font-extrabold text-right">Stock: {s.currentStock} {s.unit || "Units"}</span>
-                                    <Badge variant="outline" className="text-[10px] h-4 px-1 shrink-0">{s.schedule}</Badge>
+                                  <div className="flex items-center shrink-0 justify-end text-right pl-3">
+                                    <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                   </div>
                                 </div>
                               ))}
