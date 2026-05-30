@@ -3356,7 +3356,7 @@ export default function App() {
                                         </div>
                                         <span className="text-xs text-brand-blue font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
                                       </div>
-                                      <div className="flex items-center gap-2 shrink-0 justify-end w-36 pl-3 text-right">
+                                      <div className="flex items-center shrink-0 justify-start w-36 pl-3 text-left">
                                         <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                       </div>
                                     </div>
@@ -3575,7 +3575,7 @@ export default function App() {
                                     </div>
                                     <span className="text-xs text-brand-blue font-bold uppercase tracking-wider mt-0.5">{s.ndc}</span>
                                   </div>
-                                  <div className="flex items-center gap-2 shrink-0 justify-end w-36 pl-3 text-right">
+                                  <div className="flex items-center shrink-0 justify-start w-36 pl-3 text-left">
                                     <span className="text-[10px] text-brand-blue font-extrabold">Stock: {s.currentStock} {s.unit || "Units"}</span>
                                   </div>
                                 </div>
