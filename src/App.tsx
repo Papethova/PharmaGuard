@@ -5454,6 +5454,17 @@ export default function App() {
 
             {/* Print utilities to style print view on Ctrl+P or button click */}
             <style>{`
+              @page {
+                size: auto;
+                margin: 12mm 15mm 15mm 15mm;
+                @bottom-right {
+                  content: "page " counter(page) " of " counter(pages);
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                  font-size: 8px;
+                  font-weight: bold;
+                  color: #111827;
+                }
+              }
               @media print {
                 body {
                   background: white !important;
