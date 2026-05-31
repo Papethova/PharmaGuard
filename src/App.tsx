@@ -4614,10 +4614,12 @@ export default function App() {
                             }}
                           >
                             <div className="flex flex-col">
-                              <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-brand-dark-grey/60">{s.strength}</span>
-                                <span className="text-[10px] text-brand-blue/70 font-normal">{s.ndc}</span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.name}</span>
+                                <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.strength}</span>
+                              </div>
+                              <div className="flex items-center mt-0.5">
+                                <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
                               </div>
                             </div>
                             <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
