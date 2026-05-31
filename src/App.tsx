@@ -4391,27 +4391,27 @@ export default function App() {
                       ) : filteredInventory.map((item) => (
                     <TableRow 
                       key={item.id} 
-                      className="hover:bg-brand-blue/5 transition-colors cursor-pointer group h-14"
+                      className="hover:bg-brand-blue/5 transition-colors cursor-pointer group h-10"
                       onClick={() => setSelectedSubstanceDetail(item)}
                     >
-                      <TableCell className="text-sm text-brand-dark-grey text-center">
+                      <TableCell className="text-sm text-brand-dark-grey text-center py-1">
                         <span className="font-normal">{item.name}</span>{" "}
                         <span className="text-sm text-brand-dark-grey/80">{item.strength}</span>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center py-1">
                         <Badge variant="outline" className={`border-brand-blue/20 text-brand-blue bg-brand-blue/5 text-[10px] px-2 py-0.5 mx-auto`}>
                           {item.schedule}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-normal text-sm text-center">
+                      <TableCell className="font-normal text-sm text-center py-1">
                         <button 
-                          onClick={(e) => { e.stopPropagation(); handleNDCClick(item.ndc); }}
+                           onClick={(e) => { e.stopPropagation(); handleNDCClick(item.ndc); }}
                           className="text-brand-blue hover:underline font-normal transition-colors"
                         >
                           {item.ndc}
                         </button>
                       </TableCell>
-                      <TableCell className={`text-center font-normal text-sm ${item.currentStock <= item.minThreshold ? 'text-brand-yellow' : 'text-brand-dark-grey'}`}>
+                      <TableCell className={`text-center font-normal text-sm py-1 ${item.currentStock <= item.minThreshold ? 'text-brand-yellow' : 'text-brand-dark-grey'}`}>
                         {item.currentStock} {item.unit}
                       </TableCell>
                     </TableRow>
