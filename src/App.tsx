@@ -4935,7 +4935,7 @@ export default function App() {
                         </tr>
                         <tr className="border-none" style={{ border: 'none' }}>
                           <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-yellow sticky z-30 h-6 py-0" style={{ top: '24px', verticalAlign: 'top', paddingTop: '0px', lineHeight: 'normal', border: 'none' }}>
-                            Since Last Report On {lastReport.date}
+                            SINCE LAST REPORT ON {lastReport.date}
                           </th>
                         </tr>
                       </thead>
@@ -5368,7 +5368,7 @@ export default function App() {
                               </tr>
                               <tr className="border-b-2 border-gray-900">
                                <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans" style={{ paddingTop: '0px', paddingBottom: '1px', verticalAlign: 'top' }}>
-                                 Since Last Report On {headerPrevReportDate}
+                                 SINCE LAST REPORT ON {headerPrevReportDate}
                                </th>
                               </tr>
                             </thead>
