@@ -48,6 +48,7 @@ service cloud.firestore {
              data.status in ['active', 'suspended', 'pending'] &&
              data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'status']) &&
              (!('organizationName' in data) || (data.organizationName is string && data.organizationName.size() <= 128)) &&
+             (!('password' in data) || (data.password is string && data.password.size() <= 128)) &&
              (!('licenseNumber' in data) || (data.licenseNumber is string && data.licenseNumber.size() <= 64)) &&
              (!('isPhotoRequirementEnabled' in data) || data.isPhotoRequirementEnabled is bool) &&
              (!('isSignatureRequirementEnabled' in data) || data.isSignatureRequirementEnabled is bool) &&

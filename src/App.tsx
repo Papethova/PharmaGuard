@@ -868,6 +868,10 @@ export default function App() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const passwordRef = useRef("");
+  useEffect(() => {
+    passwordRef.current = password;
+  }, [password]);
   const [showPassword, setShowPassword] = useState(false);
   const [orgName, setOrgName] = useState("");
   const orgNameRef = useRef("");
@@ -1194,6 +1198,7 @@ export default function App() {
                 role: isMaster ? "admin" : "pharmacist",
                 status: isMaster ? "active" : "pending",
                 organizationName: orgNameRef.current || "",
+                password: passwordRef.current || "",
                 licenseNumber: "",
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
@@ -6058,9 +6063,9 @@ export default function App() {
                     filteredUserProfiles.map((profile) => (
                       <tr key={profile.docId || profile.uid} className="hover:bg-brand-blue/5 transition-colors h-14">
                         <td className="py-2 px-4 w-[80%]">
-                          <div className="flex flex-col gap-0 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-xs text-brand-dark-grey truncate no-interact">
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
                                 {escapeEmail(profile.organizationName || profile.displayName || "Unregistered Node")}
                               </span>
                               {profile.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && (
@@ -6080,21 +6085,21 @@ export default function App() {
                                 {profile.status === 'active' ? '● Active' : profile.status === 'pending' ? '● Pending' : '● Suspended'}
                               </Badge>
                             </div>
-                            <div className="flex items-center gap-2">
-                               <span className="text-[10px] text-brand-grey font-medium truncate block no-interact">
-                                 <span className="cursor-default select-none no-underline">
-                                   {profile.email ? escapeEmail(profile.email) : "No Email Bound"}
-                                   {profile.email && (
-                                     <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded ml-2 select-all leading-none inline-flex items-center">
-                                       pass: {profile.password || "Legacy Account (Hashed)"}
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5 min-w-0">
+                               <span className="text-[10px] text-brand-grey font-medium break-all block no-interact">
+                                 <span className="cursor-default select-none no-underline flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                                   <span>{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
+                                   {profile.email && profile.password && (
+                                     <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded select-all leading-none inline-flex items-center whitespace-nowrap">
+                                        pass: {profile.password}
                                      </span>
                                    )}
                                  </span>
                                </span>
-                               <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10">
+                               <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10 whitespace-nowrap">
                                  UID: {profile.docId}
                                </Badge>
-                             </div>
+                            </div>
                           </div>
                         </td>
                         <td className="py-2 px-4 w-[20%] text-right">
