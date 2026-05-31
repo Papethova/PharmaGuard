@@ -3608,15 +3608,30 @@ export default function App() {
                           </div>
                           <div className="space-y-1.5">
                             <h3 className="text-base font-bold text-brand-blue">Confirm Inventory Count</h3>
-                            <div className="text-xs text-brand-dark-grey/70 leading-relaxed font-normal flex flex-col items-center justify-between h-[115px] py-0.5">
-                              <span className="shrink-0 font-medium">I confirm that the physical count of:</span>
+                            <div className="flex flex-col items-center">
+                              {/* Text line above the name */}
+                              <span className="shrink-0 font-medium text-xs text-brand-dark-grey/70 leading-none">
+                                I confirm that the physical count of:
+                              </span>
                               
+                              {/* Space above the name to the text line above it (Exactly 64px) */}
+                              <div className="h-16" />
+                              
+                              {/* Name and NDC in the center */}
                               <div className="flex flex-col items-center justify-center">
-                                <span className="font-bold text-brand-blue block text-base leading-tight text-center">{subObj?.name || ""}{" "}{subObj?.strength || ""}</span>
-                                <span className="text-xs text-brand-blue font-bold block mt-1 leading-none text-center">NDC: {subObj?.ndc || ""}</span>
+                                <span className="font-bold text-brand-blue block text-base leading-none text-center">
+                                  {subObj?.name || ""}{" "}{subObj?.strength || ""}
+                                </span>
+                                <span className="text-xs text-brand-blue font-bold block mt-1.5 leading-none text-center">
+                                  NDC: {subObj?.ndc || ""}
+                                </span>
                               </div>
                               
-                              <div className="flex items-center justify-center gap-1.5 shrink-0 m-0">
+                              {/* Space below the NDC to the top edge of the bubble below it (Exactly 12px) */}
+                              <div className="h-3" />
+                              
+                              {/* Quantity selection row (exactly 32px height) */}
+                              <div className="h-8 flex items-center justify-center gap-1.5 shrink-0 m-0 p-0 text-xs text-brand-dark-grey/70 leading-none">
                                 <span>is currently</span>
                                 <Input 
                                   id="quantity" 
@@ -3628,10 +3643,13 @@ export default function App() {
                                 />{" "}
                                 <span>{subObj?.unit || "Units"}.</span>
                               </div>
+                              
+                              {/* Remaining space to the border line (Exactly 12px) */}
+                              <div className="h-3" />
                             </div>
                           </div>
                           
-                          <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full flex flex-col items-center gap-1">
+                          <div className="pt-2 border-t-2 border-solid border-brand-blue/10 w-full flex flex-col items-center gap-1">
                             <div className="text-xs font-bold text-brand-blue flex items-center gap-1.5 px-3 py-1 bg-brand-yellow rounded-full border border-brand-yellow/55 shadow-sm">
                               <span>System Balance:</span>
                               <span className="text-brand-blue">{subObj?.currentStock ?? 0} {subObj?.unit || "Units"}</span>
