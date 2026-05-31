@@ -4797,7 +4797,7 @@ export default function App() {
                   <Card className="border-brand-grey/10 shadow-sm p-12 text-center text-brand-dark-grey/50 bg-brand-surface">
                     <p>
                       {userProfile?.isAlertsEnabled === false 
-                        ? "There are no alerts because the option has been disabled." 
+                        ? "Alerts are currently disabled. Enable them in settings to view notifications." 
                         : "All stock levels are currently above minimum thresholds."}
                     </p>
                   </Card>
