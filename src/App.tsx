@@ -3614,8 +3614,8 @@ export default function App() {
                                 I confirm that the physical count of:
                               </span>
                               
-                              {/* Space above the name to the text line above it (Exactly 64px) */}
-                              <div className="h-16" />
+                              {/* Space A: exactly 40px of empty space */}
+                              <div className="h-10" />
                               
                               {/* Name and NDC in the center */}
                               <div className="flex flex-col items-center justify-center">
@@ -3627,25 +3627,21 @@ export default function App() {
                                 </span>
                               </div>
                               
-                              {/* Space below the NDC to the top edge of the bubble below it (Exactly 12px) */}
-                              <div className="h-3" />
-                              
-                              {/* Quantity selection row (exactly 32px height) */}
-                              <div className="h-8 flex items-center justify-center gap-1.5 shrink-0 m-0 p-0 text-xs text-brand-dark-grey/70 leading-none">
-                                <span>is currently</span>
-                                <Input 
-                                  id="quantity" 
-                                  type="number" 
-                                  placeholder="0"
-                                  className="w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold m-0 rounded-md shadow-inner"
-                                  value={quantity}
-                                  onChange={(e) => setQuantity(e.target.value)}
-                                />{" "}
-                                <span>{subObj?.unit || "Units"}.</span>
+                              {/* Space B: exactly 40px containing the quantity selection row, matching Space A exactly */}
+                              <div className="h-10 flex items-center justify-center">
+                                <div className="flex items-center justify-center gap-1.5 text-xs text-brand-dark-grey/70 leading-none">
+                                  <span>is currently</span>
+                                  <Input 
+                                    id="quantity" 
+                                    type="number" 
+                                    placeholder="0"
+                                    className="w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold m-0 rounded-md shadow-inner"
+                                    value={quantity}
+                                    onChange={(e) => setQuantity(e.target.value)}
+                                  />{" "}
+                                  <span>{subObj?.unit || "Units"}.</span>
+                                </div>
                               </div>
-                              
-                              {/* Remaining space to the border line (Exactly 12px) */}
-                              <div className="h-3" />
                             </div>
                           </div>
                           
