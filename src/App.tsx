@@ -6371,7 +6371,7 @@ export default function App() {
             <>
               <div className="p-3 bg-brand-blue/5 rounded-md border border-brand-blue/10 mb-4 text-center">
                 <div className="text-sm font-bold text-brand-blue">{editingMed.name}{" "}{editingMed.strength}</div>
-                <div className="text-xs text-brand-dark-grey/60">NDC: {editingMed.ndc}</div>
+                <div className="text-xs text-brand-blue font-bold mt-0.5">NDC: {editingMed.ndc}</div>
               </div>
 
                 <div className="grid gap-1.5">
