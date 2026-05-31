@@ -3600,7 +3600,7 @@ export default function App() {
                     ) : transactionType === "VERIFY" ? (() => {
                       const subObj = selectedSubstanceDetail || inventory.find(s => s.id === selectedSubstance);
                       return (
-                        <div className="p-4 border-2 border-solid border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-4">
+                        <div className="pt-4 px-4 pb-3 border-2 border-solid border-brand-blue/20 rounded-xl bg-brand-blue/5 text-center space-y-4">
                           <div className="flex justify-center">
                             <div className="h-14 w-14 rounded-full bg-brand-yellow flex items-center justify-center shadow-lg border-4 border-brand-blue">
                               <Check className="h-7 w-7 text-brand-blue" strokeWidth={4} />
@@ -3627,8 +3627,8 @@ export default function App() {
                                 </span>
                               </div>
                               
-                              {/* Space below the NDC to the top edge of the bubble below it */}
-                              <div className="h-3" />
+                              {/* Space below the NDC to the top edge of the bubble below it (increased slightly to h-4 to align visually) */}
+                              <div className="h-4" />
                               
                               {/* Quantity selection row/bubble */}
                               <div className="flex items-center justify-center gap-1.5 text-xs text-brand-dark-grey/70 leading-none">
@@ -3646,7 +3646,7 @@ export default function App() {
                             </div>
                           </div>
                           
-                          <div className="pt-2 border-t-2 border-solid border-brand-blue/10 w-full flex flex-col items-center gap-1">
+                          <div className="pt-3 border-t-2 border-solid border-brand-blue/10 w-full flex flex-col items-center gap-1.5">
                             <div className="text-xs font-bold text-brand-blue flex items-center gap-1.5 px-3 py-1 bg-brand-yellow rounded-full border border-brand-yellow/55 shadow-sm">
                               <span>System Balance:</span>
                               <span className="text-brand-blue">{subObj?.currentStock ?? 0} {subObj?.unit || "Units"}</span>
