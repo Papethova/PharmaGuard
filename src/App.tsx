@@ -1506,6 +1506,48 @@ export default function App() {
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === 'auth/email-already-in-use' || error.message?.toLowerCase().includes("already") || error.message?.toLowerCase().includes("in use")) {
+        const emailId = trimmedEmail.toLowerCase();
+        try {
+          const userDocRef = doc(db, "users", emailId);
+          const userDoc = await getDocFromServer(userDocRef);
+          if (!userDoc.exists()) {
+            // Node was purged/deleted from Firestore, but Auth account still exists.
+            // Attempt to restore/recreate it by logging in with the credentials they just submitted.
+            try {
+              const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, password);
+              const loggedInUser = userCredential.user;
+              await updateProfile(loggedInUser, { displayName: trimmedOrgName });
+              
+              const isMaster = emailId === MASTER_ADMIN_EMAIL.toLowerCase();
+              await setDoc(userDocRef, {
+                uid: loggedInUser.uid,
+                email: emailId,
+                displayName: trimmedOrgName,
+                organizationName: trimmedOrgName,
+                password: password,
+                role: isMaster ? "admin" : "pharmacist",
+                status: isMaster ? "active" : "pending"
+              }, { merge: true });
+
+              if (isMaster) {
+                toast.success("Registration successful! Your terminal credentials are now live.");
+              } else {
+                toast.success("Registration successful! Access is pending administrative approval.");
+              }
+              setEmail("");
+              setPassword("");
+              setOrgName("");
+              return;
+            } catch (loginErr: any) {
+              console.error("Failed to restore purged node via login:", loginErr);
+              toast.error("An account with this email exists in authentication but has no active registry profile. Please enter the original password for this email to register and restore this node.");
+              return;
+            }
+          }
+        } catch (fsErr) {
+          console.error("Error checking Firestore for purged node:", fsErr);
+        }
+
         setIsAlreadyRegisteredOpen(true);
         toast.error("Compliance error: An active node is already registered with this email address.");
       } else if (error.code === 'auth/invalid-email') {
