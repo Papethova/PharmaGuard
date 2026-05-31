@@ -5278,7 +5278,7 @@ export default function App() {
 
                     return (
                       <div className="flex justify-between items-end pb-0">
-                        <div className="flex flex-col gap-y-1">
+                        <div className="flex flex-col gap-y-1.5">
                           <h1 className="text-xl font-bold tracking-tight uppercase leading-none">{getReportTitle().toUpperCase()}</h1>
                           <p className="text-xs text-gray-900 font-sans leading-none">REPORT #: {(() => {
                             const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
@@ -5286,7 +5286,7 @@ export default function App() {
                           })()}</p>
                           <p className="text-xs text-gray-900 font-sans leading-none">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
                         </div>
-                        <div className="text-right flex flex-col items-end justify-end gap-y-1">
+                        <div className="text-right flex flex-col items-end justify-end gap-y-1.5">
                           <p className="text-sm font-bold font-sans text-gray-900 leading-none">
                             COMPLETED BY: {
                               selectedHistoricalReport
@@ -5337,7 +5337,7 @@ export default function App() {
                     })();
 
                     return (
-                      <div className="-mt-1">
+                      <div>
                         <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
                           <colgroup>
                             <col className="w-[33%]" />
