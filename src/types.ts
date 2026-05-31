@@ -43,6 +43,7 @@ export interface UserProfile {
   role: 'pharmacist' | 'technician' | 'admin';
   licenseNumber?: string;
   organizationName?: string;
+  password?: string;
   status: 'active' | 'suspended' | 'pending';
   isPhotoRequirementEnabled?: boolean;
   isSignatureRequirementEnabled?: boolean;

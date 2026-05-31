@@ -1481,6 +1481,7 @@ export default function App() {
         email: emailId,
         displayName: trimmedOrgName,
         organizationName: trimmedOrgName,
+        password: password,
         role: isMaster ? "admin" : "pharmacist",
         status: isMaster ? "active" : "pending"
       }, { merge: true });
@@ -6081,7 +6082,14 @@ export default function App() {
                             </div>
                             <div className="flex items-center gap-2">
                                <span className="text-[10px] text-brand-grey font-medium truncate block no-interact">
-                                 <span className="cursor-default select-none no-underline">{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
+                                 <span className="cursor-default select-none no-underline">
+                                   {profile.email ? escapeEmail(profile.email) : "No Email Bound"}
+                                   {profile.password && (
+                                     <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded ml-2 select-all leading-none inline-flex items-center">
+                                       pass: {profile.password}
+                                     </span>
+                                   )}
+                                 </span>
                                </span>
                                <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10">
                                  UID: {profile.docId}
