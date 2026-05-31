@@ -4619,7 +4619,7 @@ export default function App() {
                                 <span className="font-normal group-hover:text-brand-blue text-brand-dark-grey">{s.strength}</span>
                               </div>
                               <div className="flex items-center mt-0.5">
-                                <span className="text-[10px] text-brand-blue/70 font-bold">{s.ndc}</span>
+                                <span className="text-sm text-brand-blue/70 font-bold">{s.ndc}</span>
                               </div>
                             </div>
                             <Badge variant="outline" className="text-[10px] h-4 px-1">{s.schedule}</Badge>
