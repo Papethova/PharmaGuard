@@ -14,6 +14,7 @@
         "organizationName": { "type": "string" },
         "isPhotoRequirementEnabled": { "type": "boolean" },
         "isSignatureRequirementEnabled": { "type": "boolean" },
+        "isAlertsEnabled": { "type": "boolean" },
         "migratedFromUid": { "type": "string" }
       },
       "required": ["uid", "email", "displayName", "role", "status"]

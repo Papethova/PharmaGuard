@@ -46,6 +46,7 @@ export interface UserProfile {
   status: 'active' | 'suspended' | 'pending';
   isPhotoRequirementEnabled?: boolean;
   isSignatureRequirementEnabled?: boolean;
+  isAlertsEnabled?: boolean;
   reconFilters?: string[];
   docId?: string; // Track exact document key in Firestore
   createdAt?: any;

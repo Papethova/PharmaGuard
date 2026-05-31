@@ -2559,13 +2559,14 @@ export default function App() {
       }),
   [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
 
-  const lowStockItems = useMemo(() => 
-    inventory.filter(s => 
+  const lowStockItems = useMemo(() => {
+    if (userProfile?.isAlertsEnabled === false) return [];
+    return inventory.filter(s => 
       (activeSchedule === "ALL" || s.schedule === activeSchedule) && 
       s.currentStock <= s.minThreshold && 
       !dismissedAlerts.includes(s.id)
-    ),
-  [inventory, dismissedAlerts, activeSchedule]);
+    );
+  }, [inventory, dismissedAlerts, activeSchedule, userProfile?.isAlertsEnabled]);
 
   const substancesToReconcile = useMemo(() => {
     return inventory.filter(s => {
@@ -3082,6 +3083,18 @@ export default function App() {
 
     // Queue with Option A validation & Option B 2.5s debounce
     debouncedUpdateProfile({ isSignatureRequirementEnabled: newValue });
+  };
+
+  const toggleAlertsRequirement = () => {
+    if (!user || !userProfile) return;
+    const newValue = userProfile.isAlertsEnabled === false ? true : false;
+    
+    // Update local React state instantly for responsive UI
+    setUserProfile(prev => prev ? { ...prev, isAlertsEnabled: newValue } : null);
+    toast.success(`System alerts ${newValue ? 'enabled' : 'disabled'}`);
+
+    // Queue with Option A validation & Option B 2.5s debounce
+    debouncedUpdateProfile({ isAlertsEnabled: newValue });
   };
 
   const toggleReconFilter = (filterVal: "ALL" | "C-II" | "C-III/C-IV/C-V") => {
@@ -4181,6 +4194,24 @@ export default function App() {
                         </div>
                         <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isSignatureRequirementEnabled !== false ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
                           <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isSignatureRequirementEnabled !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                        </div>
+                      </div>
+
+                      <div 
+                        className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group mt-2"
+                        onClick={toggleAlertsRequirement}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${userProfile?.isAlertsEnabled !== false ? 'bg-brand-yellow text-brand-blue' : 'bg-brand-grey/20 text-brand-grey'}`}>
+                            <AlertTriangle className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className={`text-xs transition-colors ${userProfile?.isAlertsEnabled !== false ? 'text-brand-blue font-black' : 'text-brand-blue/50 font-bold'}`}>System Alerts</p>
+                            <p className={`text-[8px] font-medium uppercase tracking-tight ${userProfile?.isAlertsEnabled !== false ? 'text-brand-blue' : 'text-brand-blue/40'}`}>Enable low-stock visual alerts and menu tracking</p>
+                          </div>
+                        </div>
+                        <div className={`w-10 h-5 rounded-full p-1 transition-all ${userProfile?.isAlertsEnabled !== false ? 'bg-brand-blue' : 'bg-brand-grey/30'}`}>
+                          <div className={`h-3 w-3 bg-white rounded-full transition-all ${userProfile?.isAlertsEnabled !== false ? 'translate-x-5' : 'translate-x-0'}`} />
                         </div>
                       </div>
                     </div>
