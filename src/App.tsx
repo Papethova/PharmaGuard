@@ -4535,11 +4535,11 @@ export default function App() {
                               return dateB - dateA;
                             })
                             .map((t) => (
-                              <TableRow key={t.id} className="text-xs h-12 hover:bg-brand-blue/5 transition-colors">
-                                <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center">
+                              <TableRow key={t.id} className="text-xs h-10 hover:bg-brand-blue/5 transition-colors">
+                                <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
                                   {formatDateTime(t.timestamp)}
                                 </TableCell>
-                                <TableCell className="text-[10px] text-center">
+                                <TableCell className="text-[10px] text-center py-1">
                                   <button 
                                     onClick={() => handleNDCClick(t.ndc)}
                                     className="text-brand-blue hover:underline font-normal transition-colors"
@@ -4547,7 +4547,7 @@ export default function App() {
                                     {t.ndc}
                                   </button>
                                 </TableCell>
-                                <TableCell className="text-center">
+                                <TableCell className="text-center py-1">
                                   {t.referenceNumber ? (
                                     <button 
                                       onClick={() => setViewingTransaction(t)}
@@ -4559,14 +4559,14 @@ export default function App() {
                                     <span className="text-brand-dark-grey/40 italic">-</span>
                                   )}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="py-1 text-center">
                                   <TransactionBadge type={t.type} size="sm" />
                                 </TableCell>
-                                <TableCell className="text-center text-brand-dark-grey text-sm">
+                                <TableCell className="text-center text-brand-dark-grey text-sm py-1">
                                   {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
                                 </TableCell>
-                                <TableCell className="text-center font-normal text-brand-dark-grey text-sm">{t.newStock}</TableCell>
-                                <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact">
+                                <TableCell className="text-center font-normal text-brand-dark-grey text-sm py-1">{t.newStock}</TableCell>
+                                <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact py-1">
                                   {escapeEmail(t.performedByName)}
                                   {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
                                     <span className="ml-1 text-brand-dark-grey">
@@ -4756,11 +4756,11 @@ export default function App() {
                         </TableCell>
                       </TableRow>
                     ) : filteredTransactions.map((t) => (
-                    <TableRow key={t.id} className="h-14">
-                      <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center">
+                    <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors">
+                      <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center py-1">
                         {formatDateTime(t.timestamp)}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center py-1">
                         {t.referenceNumber ? (
                           <button 
                             onClick={() => setViewingTransaction(t)}
@@ -4772,10 +4772,10 @@ export default function App() {
                           <span className="text-brand-dark-grey/40 italic">-</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center py-1">
                         <div className="text-sm font-normal text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                       </TableCell>
-                      <TableCell className="text-xs font-normal text-center">
+                      <TableCell className="text-xs font-normal text-center py-1">
                         <button 
                           onClick={() => handleNDCClick(t.ndc)}
                           className="text-brand-blue hover:underline font-normal transition-colors"
@@ -4783,13 +4783,13 @@ export default function App() {
                           {t.ndc}
                         </button>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-1 text-center">
                         <TransactionBadge type={t.type} />
                       </TableCell>
-                      <TableCell className="text-center font-normal text-sm text-brand-dark-grey">
+                      <TableCell className="text-center font-normal text-sm text-brand-dark-grey py-1">
                         {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
                       </TableCell>
-                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact">
+                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact py-1">
                         {escapeEmail(t.performedByName)}
                         {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
                           <span className="ml-1 text-brand-dark-grey">
