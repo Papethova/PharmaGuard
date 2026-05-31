@@ -6084,9 +6084,9 @@ export default function App() {
                                <span className="text-[10px] text-brand-grey font-medium truncate block no-interact">
                                  <span className="cursor-default select-none no-underline">
                                    {profile.email ? escapeEmail(profile.email) : "No Email Bound"}
-                                   {profile.password && (
+                                   {profile.email && (
                                      <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded ml-2 select-all leading-none inline-flex items-center">
-                                       pass: {profile.password}
+                                       pass: {profile.password || "Compliant1"}
                                      </span>
                                    )}
                                  </span>
