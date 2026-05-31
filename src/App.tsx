@@ -1190,23 +1190,27 @@ export default function App() {
           // 2. Profile Creation for New Users (Skip this if we had a fetch failure to avoid overwriting or creating blank nodes)
           if (!fetchFailed) {
             if (!userDoc || !userDoc.exists()) {
-              const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
-              const newProfile: UserProfile = {
-                uid: currentUser.uid,
-                email: currentUser.email?.toLowerCase() || emailId,
-                displayName: currentUser.displayName || orgNameRef.current || "User",
-                role: isMaster ? "admin" : "pharmacist",
-                status: isMaster ? "active" : "pending",
-                organizationName: orgNameRef.current || "",
-                licenseNumber: "",
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-              };
-              if (passwordRef.current) {
-                newProfile.password = passwordRef.current;
+              if (authModeRef.current === "signup") {
+                console.log("onAuthStateChanged: Skipping auto-profile creation during signup to let handleEmailSignUp handle it definitively.");
+              } else {
+                const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
+                const newProfile: UserProfile = {
+                  uid: currentUser.uid,
+                  email: currentUser.email?.toLowerCase() || emailId,
+                  displayName: currentUser.displayName || orgNameRef.current || "User",
+                  role: isMaster ? "admin" : "pharmacist",
+                  status: isMaster ? "active" : "pending",
+                  organizationName: orgNameRef.current || "",
+                  licenseNumber: "",
+                  createdAt: serverTimestamp(),
+                  updatedAt: serverTimestamp()
+                };
+                if (passwordRef.current) {
+                  newProfile.password = passwordRef.current;
+                }
+                await setDoc(userDocRef, newProfile, { merge: true });
+                userDoc = await getDoc(userDocRef);
               }
-              await setDoc(userDocRef, newProfile, { merge: true });
-              userDoc = await getDoc(userDocRef);
             } else {
               // Self-healing database correction: if persistent record in Firestore has "Master Authority", automatically clear it
               const currentData = userDoc.data();
