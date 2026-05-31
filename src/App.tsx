@@ -5277,17 +5277,17 @@ export default function App() {
                     })();
 
                     return (
-                      <div className="flex justify-between items-start pb-0">
+                      <div className="flex justify-between items-end pb-0">
                         <div>
-                          <h1 className="text-xl font-bold tracking-tight uppercase">{getReportTitle().toUpperCase()}</h1>
-                          <p className="text-xs text-gray-900 font-sans mt-1">REPORT #: {(() => {
+                          <h1 className="text-xl font-bold tracking-tight uppercase leading-none">{getReportTitle().toUpperCase()}</h1>
+                          <p className="text-xs text-gray-900 font-sans mt-1.5 leading-none">REPORT #: {(() => {
                             const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
                             return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
                           })()}</p>
-                          <p className="text-xs text-gray-900 font-sans">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+                          <p className="text-xs text-gray-900 font-sans mt-1.5 leading-none">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
                         </div>
-                        <div className="text-right self-end">
-                          <p className="text-sm font-bold font-sans text-gray-900">
+                        <div className="text-right flex flex-col items-end justify-end">
+                          <p className="text-sm font-bold font-sans text-gray-900 leading-none mb-1.5">
                             COMPLETED BY: {
                               selectedHistoricalReport
                                 ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
@@ -5297,7 +5297,7 @@ export default function App() {
                                   })()
                             }
                           </p>
-                          <p className="text-sm font-bold font-sans text-gray-900 mt-0.5">DATE EXECUTED: {
+                          <p className="text-sm font-normal font-sans text-gray-900 leading-none">DATE EXECUTED: {
                             selectedHistoricalReport 
                               ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                               : new Date().toLocaleDateString()
