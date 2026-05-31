@@ -5293,7 +5293,7 @@ export default function App() {
                                   })()
                             }
                           </p>
-                          <p className="text-xs text-gray-900 font-sans mt-0.5">DATE EXECUTED: {
+                          <p className="text-sm font-bold font-sans text-gray-900 mt-0.5">DATE EXECUTED: {
                             selectedHistoricalReport 
                               ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                               : new Date().toLocaleDateString()
