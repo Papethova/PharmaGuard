@@ -3614,33 +3614,34 @@ export default function App() {
                                 I confirm that the physical count of:
                               </span>
                               
-                              {/* Space A: exactly 40px of empty space */}
-                              <div className="h-10" />
+                              {/* Space above the medication name to the text line above it */}
+                              <div className="h-3" />
                               
                               {/* Name and NDC in the center */}
                               <div className="flex flex-col items-center justify-center">
                                 <span className="font-bold text-brand-blue block text-base leading-none text-center">
                                   {subObj?.name || ""}{" "}{subObj?.strength || ""}
                                 </span>
-                                <span className="text-xs text-brand-blue font-bold block mt-1.5 leading-none text-center">
+                                <span className="text-xs text-brand-blue font-bold block mt-1 leading-none text-center">
                                   NDC: {subObj?.ndc || ""}
                                 </span>
                               </div>
                               
-                              {/* Space B: exactly 40px containing the quantity selection row, matching Space A exactly */}
-                              <div className="h-10 flex items-center justify-center">
-                                <div className="flex items-center justify-center gap-1.5 text-xs text-brand-dark-grey/70 leading-none">
-                                  <span>is currently</span>
-                                  <Input 
-                                    id="quantity" 
-                                    type="number" 
-                                    placeholder="0"
-                                    className="w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold m-0 rounded-md shadow-inner"
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(e.target.value)}
-                                  />{" "}
-                                  <span>{subObj?.unit || "Units"}.</span>
-                                </div>
+                              {/* Space below the NDC to the top edge of the bubble below it */}
+                              <div className="h-3" />
+                              
+                              {/* Quantity selection row/bubble */}
+                              <div className="flex items-center justify-center gap-1.5 text-xs text-brand-dark-grey/70 leading-none">
+                                <span>is currently</span>
+                                <Input 
+                                  id="quantity" 
+                                  type="number" 
+                                  placeholder="0"
+                                  className="w-24 text-center border-brand-grey/20 focus-visible:ring-brand-blue bg-brand-surface text-brand-dark-grey h-8 px-2 font-bold m-0 rounded-md shadow-inner"
+                                  value={quantity}
+                                  onChange={(e) => setQuantity(e.target.value)}
+                                />{" "}
+                                <span>{subObj?.unit || "Units"}.</span>
                               </div>
                             </div>
                           </div>
