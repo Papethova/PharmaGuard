@@ -1198,11 +1198,13 @@ export default function App() {
                 role: isMaster ? "admin" : "pharmacist",
                 status: isMaster ? "active" : "pending",
                 organizationName: orgNameRef.current || "",
-                password: passwordRef.current || "",
                 licenseNumber: "",
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
               };
+              if (passwordRef.current) {
+                newProfile.password = passwordRef.current;
+              }
               await setDoc(userDocRef, newProfile, { merge: true });
               userDoc = await getDoc(userDocRef);
             } else {
@@ -6089,7 +6091,7 @@ export default function App() {
                                <span className="text-[10px] text-brand-grey font-medium break-all block no-interact">
                                  <span className="cursor-default select-none no-underline flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                                    <span>{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
-                                   {profile.email && profile.password && (
+                                   {profile.email && profile.password && profile.password.toLowerCase() !== "legacy account" && (
                                      <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded select-all leading-none inline-flex items-center whitespace-nowrap">
                                         pass: {profile.password}
                                      </span>
