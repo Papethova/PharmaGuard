@@ -4795,7 +4795,11 @@ export default function App() {
               <div className="grid gap-4">
                 {lowStockItems.length === 0 ? (
                   <Card className="border-brand-grey/10 shadow-sm p-12 text-center text-brand-dark-grey/50 bg-brand-surface">
-                    <p>All stock levels are currently above minimum thresholds.</p>
+                    <p>
+                      {userProfile?.isAlertsEnabled === false 
+                        ? "There are no alerts because the option has been disabled." 
+                        : "All stock levels are currently above minimum thresholds."}
+                    </p>
                   </Card>
                 ) : lowStockItems.map(item => (
                   <Card key={item.id} className="border-brand-grey/20 bg-brand-surface shadow-sm">
