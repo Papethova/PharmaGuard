@@ -3036,8 +3036,8 @@ export default function App() {
           className="max-w-md w-full"
         >
           <div className="bg-white p-8 rounded-2xl shadow-xl border border-brand-blue/10 flex flex-col items-center space-y-6">
-            <div className="bg-brand-blue p-6 rounded-full shadow-lg shadow-brand-blue/20">
-              <X className="w-16 h-16 text-brand-yellow" strokeWidth={3} />
+            <div className="bg-brand-yellow p-6 rounded-full shadow-lg shadow-brand-yellow/20">
+              <X className="w-16 h-16 text-brand-blue" strokeWidth={3} />
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-brand-dark-grey">Subscription Suspended</h2>
