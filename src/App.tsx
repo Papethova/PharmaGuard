@@ -5278,16 +5278,16 @@ export default function App() {
 
                     return (
                       <div className="flex justify-between items-end pb-0">
-                        <div>
+                        <div className="flex flex-col gap-y-1">
                           <h1 className="text-xl font-bold tracking-tight uppercase leading-none">{getReportTitle().toUpperCase()}</h1>
-                          <p className="text-xs text-gray-900 font-sans mt-1.5 leading-none">REPORT #: {(() => {
+                          <p className="text-xs text-gray-900 font-sans leading-none">REPORT #: {(() => {
                             const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
                             return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
                           })()}</p>
-                          <p className="text-xs text-gray-900 font-sans mt-1.5 leading-none">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+                          <p className="text-xs text-gray-900 font-sans leading-none">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
                         </div>
-                        <div className="text-right flex flex-col items-end justify-end">
-                          <p className="text-sm font-bold font-sans text-gray-900 leading-none mb-1.5">
+                        <div className="text-right flex flex-col items-end justify-end gap-y-1">
+                          <p className="text-sm font-bold font-sans text-gray-900 leading-none">
                             COMPLETED BY: {
                               selectedHistoricalReport
                                 ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
