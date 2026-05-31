@@ -6086,7 +6086,7 @@ export default function App() {
                                    {profile.email ? escapeEmail(profile.email) : "No Email Bound"}
                                    {profile.email && (
                                      <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded ml-2 select-all leading-none inline-flex items-center">
-                                       pass: {profile.password || "Compliant1"}
+                                       pass: {profile.password || "Legacy Account (Hashed)"}
                                      </span>
                                    )}
                                  </span>
