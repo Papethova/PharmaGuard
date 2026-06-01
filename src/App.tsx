@@ -3892,7 +3892,7 @@ export default function App() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
                     <div className="grid gap-1.5">
                       <Label htmlFor="user-select" className="text-brand-dark-grey text-xs">Performing User</Label>
-                      <Select value={selectedUser} onValueChange={setSelectedUser}>
+                      <Select value={selectedUser || undefined} onValueChange={setSelectedUser}>
                         <SelectTrigger id="user-select" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!selectedUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Select...">
                             {(() => {
@@ -4239,7 +4239,7 @@ export default function App() {
                 setIsUserManagementOpen(open);
                 if (!open) setCurrentTab('inventory');
               }}
-              modal={false}
+              modal="trap-focus"
             >
               <DialogContent 
                 showCloseButton={false} 
@@ -4334,7 +4334,7 @@ export default function App() {
                         onChange={(e) => setNewUserName(e.target.value)}
                         className="bg-brand-surface border-brand-grey/20 focus-visible:ring-brand-blue h-8 flex-1 text-sm"
                       />
-                      <Select value={newUserTitle} onValueChange={setNewUserTitle}>
+                      <Select value={newUserTitle || undefined} onValueChange={setNewUserTitle}>
                         <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-xs font-normal ${!newUserTitle ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
@@ -4961,7 +4961,7 @@ export default function App() {
     )}
 
     {/* Reconciliation Report Dialog */}
-    <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }} modal={false}>
+    <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }} modal="trap-focus">
       <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] h-[90vh] max-h-[90vh] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
         <DialogHeader className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center justify-between relative z-10 w-full">
@@ -5223,7 +5223,7 @@ export default function App() {
                                 <span className={`text-xs text-brand-blue font-black uppercase tracking-wider shrink-0 ${isSigRequired ? 'pb-0' : ''}`}>
                                   Completed By:
                                 </span>
-                                <Select value={reconUser} onValueChange={setReconUser}>
+                                <Select value={reconUser || undefined} onValueChange={setReconUser}>
                                   <SelectTrigger id="recon-pharmacist" className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-7 font-normal data-placeholder:text-brand-grey/50 data-placeholder:font-normal w-[140px] shrink-0 ${!reconUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                     <SelectValue placeholder="Select...">
                                       {reconUserObj ? (
@@ -6511,7 +6511,7 @@ export default function App() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-    <Dialog open={isEditMedDetailsOpen} onOpenChange={setIsEditMedDetailsOpen} modal={false}>
+    <Dialog open={isEditMedDetailsOpen} onOpenChange={setIsEditMedDetailsOpen} modal="trap-focus">
       <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
         <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center gap-4 relative z-10 text-left">
