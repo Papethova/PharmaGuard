@@ -4696,8 +4696,21 @@ export default function App() {
                     type={startDateFocused ? "date" : "text"} 
                     value={startDateFocused ? startDate : (startDate ? new Date(startDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "")} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    onFocus={() => setStartDateFocused(true)}
+                    onFocus={(e) => {
+                      setStartDateFocused(true);
+                      const currentTarget = e.currentTarget;
+                      setTimeout(() => {
+                        try {
+                          currentTarget.showPicker();
+                        } catch (err) {}
+                      }, 50);
+                    }}
                     onBlur={() => setStartDateFocused(false)}
+                    onClick={(e) => {
+                      try {
+                        e.currentTarget.showPicker();
+                      } catch (err) {}
+                    }}
                     className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 ${startDate ? 'has-value' : ''}`}
                   />
                 </div>
@@ -4708,8 +4721,21 @@ export default function App() {
                     type={endDateFocused ? "date" : "text"} 
                     value={endDateFocused ? endDate : (endDate ? new Date(endDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "")}
                     onChange={(e) => setEndDate(e.target.value)}
-                    onFocus={() => setEndDateFocused(true)}
+                    onFocus={(e) => {
+                      setEndDateFocused(true);
+                      const currentTarget = e.currentTarget;
+                      setTimeout(() => {
+                        try {
+                          currentTarget.showPicker();
+                        } catch (err) {}
+                      }, 50);
+                    }}
                     onBlur={() => setEndDateFocused(false)}
+                    onClick={(e) => {
+                      try {
+                        e.currentTarget.showPicker();
+                      } catch (err) {}
+                    }}
                     className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 ${endDate ? 'has-value' : ''}`}
                   />
                 </div>
