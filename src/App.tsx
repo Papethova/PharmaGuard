@@ -13,6 +13,7 @@ import {
   X,
   Pill,
   ArrowDown,
+  ArrowRight,
   RefreshCcw,
   Users,
   UserPlus,
@@ -3885,8 +3886,9 @@ export default function App() {
                       <div className="p-2 bg-brand-blue/5 rounded-lg border border-brand-blue/10 flex justify-between items-center h-9 shadow-sm">
                         <span className="text-sm font-bold text-brand-blue uppercase">Projected</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-brand-dark-grey/80 font-bold">
-                            {inventory.find(i => i.id === selectedSubstance)?.currentStock} →
+                          <span className="text-sm text-brand-dark-grey/80 font-bold flex items-center gap-2">
+                            <span>{inventory.find(i => i.id === selectedSubstance)?.currentStock}</span>
+                            <ArrowRight strokeWidth={4.5} className="h-4 w-4 text-brand-blue shrink-0" />
                           </span>
                           <span className="text-sm font-bold text-brand-blue">
                             {(inventory.find(i => i.id === selectedSubstance)?.currentStock || 0) + 
