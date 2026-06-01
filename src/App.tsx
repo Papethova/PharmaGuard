@@ -6157,7 +6157,7 @@ export default function App() {
                                    <span>{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
                                    {profile.email && profile.password && profile.password.toLowerCase() !== "legacy account" && (
                                      <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded select-all leading-none inline-flex items-center whitespace-nowrap">
-                                        pass: {profile.password}
+                                        PW: {profile.password}
                                      </span>
                                    )}
                                  </span>
