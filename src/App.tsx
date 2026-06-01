@@ -4338,7 +4338,7 @@ export default function App() {
                         <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-8 flex items-center w-28 text-xs font-normal ${!newUserTitle ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                           <SelectValue placeholder="Title...." />
                         </SelectTrigger>
-                        <SelectContent className="bg-brand-surface border-brand-blue/10">
+                        <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
                           <SelectItem value="PIC">PIC</SelectItem>
                           <SelectItem value="RPh">RPh</SelectItem>
                           <SelectItem value="Tech">Tech</SelectItem>
@@ -4392,7 +4392,7 @@ export default function App() {
                                         <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-6 flex items-center w-20 text-[10px] font-normal ${!editingUser?.title ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
                                           <SelectValue placeholder="Title" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-brand-surface border-brand-blue/10">
+                                        <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
                                           <SelectItem value="PIC">PIC</SelectItem>
                                           <SelectItem value="RPh">RPh</SelectItem>
                                           <SelectItem value="Tech">Tech</SelectItem>
