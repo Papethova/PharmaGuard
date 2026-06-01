@@ -5014,15 +5014,15 @@ export default function App() {
                         <tr className="border-none" style={{ border: 'none' }}>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Medication & Strength</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>NDC</th>
-                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-blue/10 sticky top-0 z-42 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
+                          <th rowSpan={2} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-[#e9f0fa] sticky top-0 z-42 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal', border: 'none' }}>
                             <div className="flex flex-col items-center justify-center">
                               <span>Last Report</span>
                               <span>Count</span>
                             </div>
                           </th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-blue/10 sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Purchased</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-blue/10 sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
-                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-blue/10 sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-[#e9f0fa] sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Purchased</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-[#e9f0fa] sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Dispensed</th>
+                          <th className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-[#e9f0fa] sticky top-0 z-42 h-6 py-0" style={{ top: 0, verticalAlign: 'bottom', paddingBottom: '0px', lineHeight: 'normal', border: 'none' }}>Adjusted</th>
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>
                             <div className="flex flex-col items-center justify-center">
                               <span>Expected</span>
@@ -5038,7 +5038,7 @@ export default function App() {
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
                         </tr>
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-brand-blue/10 sticky z-30 h-6 py-0" style={{ top: '24px', verticalAlign: 'top', paddingTop: '0px', lineHeight: 'normal', border: 'none' }}>
+                          <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-[#e9f0fa] sticky z-30 h-6 py-0" style={{ top: '24px', verticalAlign: 'top', paddingTop: '0px', lineHeight: 'normal', border: 'none' }}>
                             SINCE LAST REPORT ON {lastReport.date}
                           </th>
                         </tr>
