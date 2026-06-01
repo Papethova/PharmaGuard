@@ -2832,9 +2832,13 @@ export default function App() {
                       </div>
                     )}
 
-                    <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs" disabled={isSubmitting}>
+                    <button
+                      type="submit"
+                      className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs rounded-lg flex items-center justify-center hover:bg-brand-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans cursor-pointer"
+                      disabled={isSubmitting}
+                    >
                       {isSubmitting ? "Verifying..." : "Verify & Enter"}
-                    </Button>
+                    </button>
                   </form>
 
                   <div className="relative my-2">
@@ -2952,9 +2956,13 @@ export default function App() {
                       </div>
                     )}
                   
-                  <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-1" disabled={isSubmitting}>
+                  <button
+                    type="submit"
+                    className="w-full h-11 bg-brand-blue text-brand-yellow font-black uppercase tracking-widest text-xs mt-1 rounded-lg flex items-center justify-center hover:bg-brand-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans cursor-pointer"
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? "Provisioning..." : "Register Organization"}
-                  </Button>
+                  </button>
 
                   <button 
                     type="button" 
@@ -2998,9 +3006,13 @@ export default function App() {
                       className="h-10 border-brand-blue/10 text-sm bg-brand-surface"
                       required
                     />
-                    <Button type="submit" className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs" disabled={isSubmitting}>
+                    <button
+                      type="submit"
+                      className="w-full h-11 bg-brand-blue text-brand-yellow font-black tracking-widest uppercase text-xs rounded-lg flex items-center justify-center hover:bg-brand-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans cursor-pointer"
+                      disabled={isSubmitting}
+                    >
                       {isSubmitting ? "Sending..." : "Send Recovery Link"}
-                    </Button>
+                    </button>
                     <button 
                       type="button" 
                       onClick={() => setAuthMode("google")}
