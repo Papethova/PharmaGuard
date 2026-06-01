@@ -4694,7 +4694,7 @@ export default function App() {
                     type="date" 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 ${startDate ? 'has-value' : ''}`}
                   />
                 </div>
                 <div className="grid gap-1.5 w-[110px] shrink-0">
@@ -4704,7 +4704,7 @@ export default function App() {
                     type="date" 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 ${endDate ? 'has-value' : ''}`}
                   />
                 </div>
 
