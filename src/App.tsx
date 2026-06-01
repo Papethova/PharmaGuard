@@ -3206,6 +3206,310 @@ export default function App() {
     debouncedUpdateProfile({ reconFilters: newFilters });
   };
 
+  const renderReconciliationReportContent = (isForPrint: boolean) => {
+    const formatToFourDigitYear = (dateStr: string) => {
+      if (!dateStr || dateStr === "N/A") return "N/A";
+      const parts = dateStr.split("/");
+      if (parts.length === 3) {
+        let year = parts[2];
+        if (year.length === 2) {
+          year = "20" + year;
+        }
+        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${year}`;
+      }
+      return dateStr;
+    };
+
+    const headerPrevReportDate = (() => {
+      if (selectedHistoricalReport) {
+        const firstItem = selectedHistoricalReport.items[0];
+        return formatToFourDigitYear(firstItem?.prevReportDate || "N/A");
+      } else {
+        const firstSub = substancesToReconcile[0];
+        if (firstSub) {
+          const metrics = getSubstanceHistoryMetrics(firstSub.id);
+          return formatToFourDigitYear(metrics.prevReportDate);
+        }
+        return formatToFourDigitYear(lastReport.date);
+      }
+    })();
+
+    const reconUserObj = users.find(u => u.id === reconUser);
+    const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
+    
+    const perfName = selectedHistoricalReport
+      ? `${selectedHistoricalReport.performedByName}${selectedHistoricalReport.performedByTitle ? ` (${selectedHistoricalReport.performedByTitle})` : ""}`
+      : (reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned");
+    const picName = selectedHistoricalReport ? selectedHistoricalReport.picName : (picUserObj?.name || "PIC NOT ASSIGNED");
+    const userSig = selectedHistoricalReport ? selectedHistoricalReport.reconSigData : reconSigData;
+    const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
+    const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
+
+    return (
+      <div id={isForPrint ? "reconciliation-printable-root" : undefined}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className="px-8 pb-3 pt-2 space-y-1.5 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
+          
+          {/* Visual Official Letterhead */}
+          <div className="flex justify-between items-end pb-0">
+            <div className="flex flex-col space-y-1">
+              <h1 className="text-xl font-bold tracking-tight uppercase leading-none">{getReportTitle().toUpperCase()}</h1>
+              <p className="text-xs text-gray-900 font-sans leading-none">REPORT #: {(() => {
+                const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
+                return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
+              })()}</p>
+              <p className="text-xs text-gray-900 font-sans leading-none">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+            </div>
+            <div className="text-right flex flex-col items-end justify-end space-y-1">
+              <p className="text-sm font-bold font-sans text-gray-900 leading-none">
+                COMPLETED BY: {
+                  selectedHistoricalReport
+                    ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
+                    : (() => {
+                        const selectedUserObj = users.find(u => u.id === reconUser);
+                        return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
+                      })()
+                }
+              </p>
+              <p className="text-sm font-normal font-sans text-gray-900 leading-none">DATE EXECUTED: {
+                selectedHistoricalReport 
+                  ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                  : new Date().toLocaleDateString()
+              }</p>
+            </div>
+          </div>
+
+          {/* Audit Grid/Table */}
+          <div className="!mt-1">
+            <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
+              <colgroup>
+                <col className="w-[33%]" />
+                <col className="w-[11%]" />
+                <col className="w-[11%]" />
+                <col className="w-[8%]" />
+                <col className="w-[8%]" />
+                <col className="w-[8%]" />
+                <col className="w-[7%]" />
+                <col className="w-[7%]" />
+                <col className="w-[7%]" />
+              </colgroup>
+              <thead>
+                <tr className="border-t-2 border-gray-900">
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>MEDICATION</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>NDC</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>LAST REPORT</span>
+                      <span className="mt-0.5">COUNT</span>
+                    </div>
+                  </th>
+                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>PURCHASED</span>
+                    </div>
+                  </th>
+                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>DISPENSED</span>
+                    </div>
+                  </th>
+                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>ADJUSTED</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>EXPECTED</span>
+                      <span className="mt-0.5">COUNT</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>PHYSICAL</span>
+                      <span className="mt-0.5">COUNT</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>VARIANCE</span>
+                    </div>
+                  </th>
+                </tr>
+                <tr className="border-b-2 border-gray-900">
+                  <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans" style={{ paddingTop: '0px', paddingBottom: '1px', verticalAlign: 'top' }}>
+                    SINCE LAST REPORT ON {headerPrevReportDate}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {selectedHistoricalReport ? (
+                  [...selectedHistoricalReport.items].sort(compareSubstances).map(item => {
+                    const variance = item.variance;
+                    return (
+                      <Fragment key={item.substanceId}>
+                        <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${item.substanceName} ${item.strength}`}>
+                              {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
+                            </div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{item.expected || 0}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{item.physical || 0}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                          </td>
+                        </tr>
+                        {variance !== 0 && (
+                          <tr className="bg-gray-50/50">
+                            <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
+                              Discrepancy Reason: {item.reason || "State reason omitted"}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })
+                ) : (
+                  [...substancesToReconcile].sort(compareSubstances).map(sub => {
+                    const metrics = getSubstanceHistoryMetrics(sub.id);
+                    const counted = getReconPhysicalCount(sub.id) ?? 0;
+                    const variance = counted - metrics.expected;
+                    const reason = reconReasons[sub.id] || "";
+                    
+                    return (
+                      <Fragment key={sub.id}>
+                        <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${sub.name} ${sub.strength}`}>
+                              {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
+                            </div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.expected}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{counted}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                          </td>
+                        </tr>
+                        {variance !== 0 && (
+                          <tr className="bg-gray-50/50">
+                            <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
+                              Discrepancy Reason: {reason || "State reason omitted"}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Signature box info */}
+          <div className="space-y-1 pt-1.5 border-t border-gray-100">
+            {/* Moved disclaimer above signature fields in historical report block */}
+            <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
+              By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+            </p>
+            {isSigRequired ? (
+              <div className="grid grid-cols-2 gap-4 pt-1">
+                {/* Left signature field */}
+                <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                  <div className="flex items-center gap-1.5 pb-1">
+                    <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
+                    <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                      {perfName}
+                    </span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
+                    {userSig ? (
+                      <img src={userSig} className="max-h-12 object-contain" alt="Performed by signature" />
+                    ) : (
+                      <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                        No signature captured
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right signature field */}
+                <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                  <div className="flex items-center gap-1.5 pb-1">
+                    <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
+                    <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                      {picName}
+                    </span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
+                    {picSig ? (
+                      <img src={picSig} className="max-h-12 object-contain" alt="PIC signature" />
+                    ) : (
+                      <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                        No signature captured
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
+                <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
+                <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="h-[100dvh] overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
       <header className={`shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
@@ -4959,6 +5263,10 @@ export default function App() {
       />,
       document.body
     )}
+    {reconShowPreview && createPortal(
+      renderReconciliationReportContent(true),
+      document.body
+    )}
 
     {/* Reconciliation Report Dialog */}
     <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }} modal="trap-focus">
@@ -5348,346 +5656,8 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''}`}>
           {/* Print Report Review Page (Gorgeously Styled) */}
           <ScrollArea className="flex-1 overflow-y-auto">
-              {/* Added print root anchor */}
-              <div id="reconciliation-printable-root">
-                <div id="reconciliation-printable-invoice" className="px-8 pb-3 pt-2 space-y-1.5 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
-                  
-                  {/* Visual Official Letterhead */}
-                  {(() => {
-                    const formatToFourDigitYear = (dateStr: string) => {
-                      if (!dateStr || dateStr === "N/A") return "N/A";
-                      const parts = dateStr.split("/");
-                      if (parts.length === 3) {
-                        let year = parts[2];
-                        if (year.length === 2) {
-                          year = "20" + year;
-                        }
-                        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${year}`;
-                      }
-                      return dateStr;
-                    };
-
-                    const headerPrevReportDate = (() => {
-                      if (selectedHistoricalReport) {
-                        const firstItem = selectedHistoricalReport.items[0];
-                        return formatToFourDigitYear(firstItem?.prevReportDate || "N/A");
-                      } else {
-                        const firstSub = substancesToReconcile[0];
-                        if (firstSub) {
-                          const metrics = getSubstanceHistoryMetrics(firstSub.id);
-                          return formatToFourDigitYear(metrics.prevReportDate);
-                        }
-                        return formatToFourDigitYear(lastReport.date);
-                      }
-                    })();
-
-                    return (
-                      <div className="flex justify-between items-end pb-0">
-                        <div className="flex flex-col space-y-1">
-                          <h1 className="text-xl font-bold tracking-tight uppercase leading-none">{getReportTitle().toUpperCase()}</h1>
-                          <p className="text-xs text-gray-900 font-sans leading-none">REPORT #: {(() => {
-                            const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
-                            return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
-                          })()}</p>
-                          <p className="text-xs text-gray-900 font-sans leading-none">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
-                        </div>
-                        <div className="text-right flex flex-col items-end justify-end space-y-1">
-                          <p className="text-sm font-bold font-sans text-gray-900 leading-none">
-                            COMPLETED BY: {
-                              selectedHistoricalReport
-                                ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
-                                : (() => {
-                                    const selectedUserObj = users.find(u => u.id === reconUser);
-                                    return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
-                                  })()
-                            }
-                          </p>
-                          <p className="text-sm font-normal font-sans text-gray-900 leading-none">DATE EXECUTED: {
-                            selectedHistoricalReport 
-                              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                              : new Date().toLocaleDateString()
-                          }</p>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Audit Grid/Table */}
-                  {(() => {
-                    const formatToFourDigitYear = (dateStr: string) => {
-                      if (!dateStr || dateStr === "N/A") return "N/A";
-                      const parts = dateStr.split("/");
-                      if (parts.length === 3) {
-                        let year = parts[2];
-                        if (year.length === 2) {
-                          year = "20" + year;
-                        }
-                        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${year}`;
-                      }
-                      return dateStr;
-                    };
-
-                    const headerPrevReportDate = (() => {
-                      if (selectedHistoricalReport) {
-                        const firstItem = selectedHistoricalReport.items[0];
-                        return formatToFourDigitYear(firstItem?.prevReportDate || "N/A");
-                      } else {
-                        const firstSub = substancesToReconcile[0];
-                        if (firstSub) {
-                          const metrics = getSubstanceHistoryMetrics(firstSub.id);
-                          return formatToFourDigitYear(metrics.prevReportDate);
-                        }
-                        return formatToFourDigitYear(lastReport.date);
-                      }
-                    })();
-
-                    return (
-                      <div className="!mt-1">
-                        <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
-                          <colgroup>
-                            <col className="w-[33%]" />
-                            <col className="w-[11%]" />
-                            <col className="w-[11%]" />
-                            <col className="w-[8%]" />
-                            <col className="w-[8%]" />
-                            <col className="w-[8%]" />
-                            <col className="w-[7%]" />
-                            <col className="w-[7%]" />
-                            <col className="w-[7%]" />
-                          </colgroup>
-                            <thead>
-                              <tr className="border-t-2 border-gray-900">
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>MEDICATION</span>
-                                 </div>
-                               </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>NDC</span>
-                                 </div>
-                               </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>LAST REPORT</span>
-                                   <span className="mt-0.5">COUNT</span>
-                                 </div>
-                               </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>PURCHASED</span>
-                                 </div>
-                               </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>DISPENSED</span>
-                                 </div>
-                               </th>
-                               <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>ADJUSTED</span>
-                                 </div>
-                               </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>EXPECTED</span>
-                                   <span className="mt-0.5">COUNT</span>
-                                 </div>
-                               </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>PHYSICAL</span>
-                                   <span className="mt-0.5">COUNT</span>
-                                 </div>
-                               </th>
-                               <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                                 <div className="flex flex-col items-center justify-center leading-none">
-                                   <span>VARIANCE</span>
-                                 </div>
-                               </th>
-                              </tr>
-                              <tr className="border-b-2 border-gray-900">
-                               <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans" style={{ paddingTop: '0px', paddingBottom: '1px', verticalAlign: 'top' }}>
-                                 SINCE LAST REPORT ON {headerPrevReportDate}
-                               </th>
-                              </tr>
-                            </thead>
-                          <tbody className="divide-y divide-gray-100">
-                            {selectedHistoricalReport ? (
-                              [...selectedHistoricalReport.items].sort(compareSubstances).map(item => {
-                                const variance = item.variance;
-                                return (
-                                  <Fragment key={item.substanceId}>
-                                    <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                                        <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${item.substanceName} ${item.strength}`}>
-                                          {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
-                                        </div>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                                        <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                                        <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{item.expected || 0}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{item.physical || 0}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
-                                      </td>
-                                    </tr>
-                                    {variance !== 0 && (
-                                      <tr className="bg-gray-50/50">
-                                        <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
-                                          Discrepancy Reason: {item.reason || "State reason omitted"}
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </Fragment>
-                                );
-                              })
-                            ) : (
-                              [...substancesToReconcile].sort(compareSubstances).map(sub => {
-                                const metrics = getSubstanceHistoryMetrics(sub.id);
-                                const counted = getReconPhysicalCount(sub.id) ?? 0;
-                                const variance = counted - metrics.expected;
-                                const reason = reconReasons[sub.id] || "";
-                                
-                                return (
-                                  <Fragment key={sub.id}>
-                                    <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                                        <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${sub.name} ${sub.strength}`}>
-                                          {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
-                                        </div>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                                        <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                                        <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{metrics.expected}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{counted}</span>
-                                      </td>
-                                      <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                                        <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
-                                      </td>
-                                    </tr>
-                                    {variance !== 0 && (
-                                      <tr className="bg-gray-50/50">
-                                        <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
-                                          Discrepancy Reason: {reason || "State reason omitted"}
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </Fragment>
-                                );
-                              })
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Signature box info */}
-                  {(() => {
-                    const reconUserObj = users.find(u => u.id === reconUser);
-                    const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
-                    
-                    const perfName = selectedHistoricalReport
-                      ? `${selectedHistoricalReport.performedByName}${selectedHistoricalReport.performedByTitle ? ` (${selectedHistoricalReport.performedByTitle})` : ""}`
-                      : (reconUserObj ? `${reconUserObj.name}${reconUserObj.title ? ` (${reconUserObj.title})` : ""}` : "Unassigned");
-                    const picName = selectedHistoricalReport ? selectedHistoricalReport.picName : (picUserObj?.name || "PIC NOT ASSIGNED");
-                    const userSig = selectedHistoricalReport ? selectedHistoricalReport.reconSigData : reconSigData;
-                    const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
-                    const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
-
-                    return (
-                      <div className="space-y-1 pt-1.5 border-t border-gray-100">
-                        {/* Moved disclaimer above signature fields in historical report block */}
-                        <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
-                          By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
-                        </p>
-                        {isSigRequired ? (
-                          <div className="grid grid-cols-2 gap-4 pt-1">
-                            {/* Left signature field */}
-                            <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
-                              <div className="flex items-center gap-1.5 pb-1">
-                                <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
-                                <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                                  {perfName}
-                                </span>
-                              </div>
-                              <div className="flex-1 flex items-center justify-center">
-                                {userSig ? (
-                                  <img src={userSig} className="max-h-12 object-contain" alt="Performed by signature" />
-                                ) : (
-                                  <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                                    No signature captured
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Right signature field */}
-                            <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
-                              <div className="flex items-center gap-1.5 pb-1">
-                                <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
-                                <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                                  {picName}
-                                </span>
-                              </div>
-                              <div className="flex-1 flex items-center justify-center">
-                                {picSig ? (
-                                  <img src={picSig} className="max-h-12 object-contain" alt="PIC signature" />
-                                ) : (
-                                  <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                                    No signature captured
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
-                            <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
-                            <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                </div>
-              </div>
-            </ScrollArea>
+            {renderReconciliationReportContent(false)}
+          </ScrollArea>
 
             <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
@@ -5725,14 +5695,16 @@ export default function App() {
                   color: #111827;
                 }
               }
+              @media screen {
+                #reconciliation-printable-root {
+                  display: none !important;
+                }
+              }
               @media print {
-                body {
-                  visibility: hidden !important;
-                  background: white !important;
-                  color: black !important;
+                body > *:not(#reconciliation-printable-root) {
+                  display: none !important;
                 }
                 #reconciliation-printable-root {
-                  visibility: visible !important;
                   display: block !important;
                   position: absolute !important;
                   left: 0 !important;
@@ -5746,16 +5718,6 @@ export default function App() {
                 }
                 #reconciliation-printable-root * {
                   visibility: visible !important;
-                }
-                html, body, #root, [data-radix-portal], [role="dialog"], .dialog-content-wrapper {
-                  overflow: visible !important;
-                  height: auto !important;
-                  max-height: none !important;
-                }
-                .dialog-overlay, .dialog-content-wrapper {
-                  background: transparent !important;
-                  box-shadow: none !important;
-                  border: none !important;
                 }
               }
             `}</style>
