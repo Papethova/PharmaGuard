@@ -2461,6 +2461,7 @@ export default function App() {
       });
       toast.success("User Record Secured");
       setNewUserName("");
+      setNewUserTitle("");
     } catch (error: any) {
       console.error("Add User Error:", error);
       toast.error(`Process Failure: ${error.message || "Unknown Error"}`);
