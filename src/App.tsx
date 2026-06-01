@@ -381,6 +381,8 @@ export default function App() {
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [startDateFocused, setStartDateFocused] = useState(false);
+  const [endDateFocused, setEndDateFocused] = useState(false);
   const [historyMedicationFilter, setHistoryMedicationFilter] = useState("");
   const [historyMedicationSearch, setHistoryMedicationSearch] = useState("");
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
@@ -4691,9 +4693,11 @@ export default function App() {
                   <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
                   <Input 
                     id="start-date"
-                    type="date" 
-                    value={startDate} 
+                    type={startDateFocused ? "date" : "text"} 
+                    value={startDateFocused ? startDate : (startDate ? new Date(startDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "")} 
                     onChange={(e) => setStartDate(e.target.value)}
+                    onFocus={() => setStartDateFocused(true)}
+                    onBlur={() => setStartDateFocused(false)}
                     className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 ${startDate ? 'has-value' : ''}`}
                   />
                 </div>
@@ -4701,9 +4705,11 @@ export default function App() {
                   <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
                   <Input 
                     id="end-date"
-                    type="date" 
-                    value={endDate} 
+                    type={endDateFocused ? "date" : "text"} 
+                    value={endDateFocused ? endDate : (endDate ? new Date(endDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "")}
                     onChange={(e) => setEndDate(e.target.value)}
+                    onFocus={() => setEndDateFocused(true)}
+                    onBlur={() => setEndDateFocused(false)}
                     className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 ${endDate ? 'has-value' : ''}`}
                   />
                 </div>
