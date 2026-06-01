@@ -258,3 +258,9 @@ input[type="date"]:focus::-webkit-datetime-edit {
   color: inherit !important;
 }
 
+/* Hide the calendar icon picker indicator to match iPad */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none !important;
+}
+
