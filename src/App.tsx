@@ -5727,22 +5727,30 @@ export default function App() {
               }
               @media print {
                 body {
+                  visibility: hidden !important;
                   background: white !important;
                   color: black !important;
                 }
-                body > *:not(#reconciliation-printable-root) {
-                  display: none !important;
-                }
                 #reconciliation-printable-root {
+                  visibility: visible !important;
                   display: block !important;
-                  position: absolute;
-                  left: 0;
-                  top: 0;
+                  position: absolute !important;
+                  left: 0 !important;
+                  top: 0 !important;
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
                   padding: 0 !important;
                   margin: 0 !important;
+                  background: white !important;
+                }
+                #reconciliation-printable-root * {
+                  visibility: visible !important;
+                }
+                html, body, #root, [data-radix-portal], [role="dialog"], .dialog-content-wrapper {
+                  overflow: visible !important;
+                  height: auto !important;
+                  max-height: none !important;
                 }
                 .dialog-overlay, .dialog-content-wrapper {
                   background: transparent !important;
