@@ -1196,23 +1196,16 @@ export default function App() {
               if (authModeRef.current === "signup") {
                 console.log("onAuthStateChanged: Skipping auto-profile creation during signup to let handleEmailSignUp handle it definitively.");
               } else {
-                const isMaster = currentUser.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
-                const newProfile: UserProfile = {
-                  uid: currentUser.uid,
-                  email: currentUser.email?.toLowerCase() || emailId,
-                  displayName: currentUser.displayName || orgNameRef.current || "User",
-                  role: isMaster ? "admin" : "pharmacist",
-                  status: isMaster ? "active" : "pending",
-                  organizationName: orgNameRef.current || "",
-                  licenseNumber: "",
-                  createdAt: serverTimestamp(),
-                  updatedAt: serverTimestamp()
-                };
-                if (passwordRef.current) {
-                  newProfile.password = passwordRef.current;
-                }
-                await setDoc(userDocRef, newProfile, { merge: true });
-                userDoc = await getDoc(userDocRef);
+                // Not in signup mode and the Firestore document is missing. Log out immediately and show unregistered message.
+                console.log("No registered profile found in Firestore. Disallowing login.");
+                await signOut(auth);
+                setUserProfile(null);
+                setUser(null);
+                toast.error("Either the email or password you entered is incorrect, or an account does not exist for this email address");
+                setIsUserDoesNotExistOpen(true);
+                setIsInitializing(false);
+                setIsAuthReady(true);
+                return;
               }
             } else {
               // Self-healing database correction: if persistent record in Firestore has "Master Authority", automatically clear it
@@ -1230,10 +1223,17 @@ export default function App() {
 
           // 3. Real-time profile listener on the stable primary identifier
           if (unsubProfile) unsubProfile();
-          unsubProfile = onSnapshot(userDocRef, (doc) => {
+          unsubProfile = onSnapshot(userDocRef, async (doc) => {
             if (doc.exists()) {
               const data = doc.data() as UserProfile;
               setUserProfile(data);
+            } else {
+              // Node was deleted/purged in real-time! Force log out.
+              console.log(`Real-time: User profile ${emailId} no longer exists. Signing out.`);
+              await signOut(auth);
+              setUserProfile(null);
+              setUser(null);
+              toast.error("Your organizational node has been revoked or purged. Access terminated.");
             }
           }, (error) => {
             handleFirestoreError(error, OperationType.GET, `users/${emailId}`);
@@ -2161,6 +2161,22 @@ export default function App() {
 
   const handleDeleteUserProfile = async (docIdToDelete: string) => {
     try {
+      // Clean and purge all subcollection data for the node before deleting the profile itself
+      const collectionsToClear = ["substances", "transactions", "staff", "reconciliation_reports"];
+      for (const collName of collectionsToClear) {
+        const collRef = collection(db, "users", docIdToDelete, collName);
+        const snapshot = await getDocs(collRef);
+        const docs = snapshot.docs;
+        for (let i = 0; i < docs.length; i += 500) {
+          const batch = writeBatch(db);
+          const chunk = docs.slice(i, i + 500);
+          chunk.forEach(d => {
+            batch.delete(d.ref);
+          });
+          await batch.commit();
+        }
+      }
+
       await deleteDoc(doc(db, "users", docIdToDelete));
       toast.success("Organizational Node Revoked and Purged Successfully");
       setIsDeleteConfirmOpen(false);
