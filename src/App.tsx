@@ -307,8 +307,10 @@ const parseNumericStrength = (str: string): number => {
   return match ? parseFloat(match[1]) : 0;
 };
 
-const compareSubstances = (a: Substance, b: Substance): number => {
-  const nameCompare = (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base", numeric: true });
+const compareSubstances = (a: any, b: any): number => {
+  const aName = a.name || a.substanceName || "";
+  const bName = b.name || b.substanceName || "";
+  const nameCompare = aName.localeCompare(bName, undefined, { sensitivity: "base", numeric: true });
   if (nameCompare !== 0) return nameCompare;
 
   const aStr = parseNumericStrength(a.strength || "");
@@ -1945,7 +1947,7 @@ export default function App() {
       const picUserObj = users.find(u => u.title?.toUpperCase() === "PIC");
 
       // Build items array to freeze state for the historical report
-      const reportedItems = substancesToReconcile.map(s => {
+      const reportedItems = [...substancesToReconcile].sort(compareSubstances).map(s => {
         const physical = getReconPhysicalCount(s.id) ?? 0;
         const metrics = getSubstanceHistoryMetrics(s.id);
         const variance = physical - metrics.expected;
@@ -5480,7 +5482,7 @@ export default function App() {
                             </thead>
                           <tbody className="divide-y divide-gray-100">
                             {selectedHistoricalReport ? (
-                              [...selectedHistoricalReport.items].map(item => {
+                              [...selectedHistoricalReport.items].sort(compareSubstances).map(item => {
                                 const variance = item.variance;
                                 return (
                                   <Fragment key={item.substanceId}>
