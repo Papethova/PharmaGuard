@@ -1356,7 +1356,7 @@ export default function App() {
       unsubStaff();
       unsubReports();
     };
-  }, [user]);
+  }, [user, userProfile?.status]);
 
   // Super Admin Listener
   useEffect(() => {
