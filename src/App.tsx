@@ -4238,6 +4238,7 @@ export default function App() {
                 setIsUserManagementOpen(open);
                 if (!open) setCurrentTab('inventory');
               }}
+              modal={false}
             >
               <DialogContent 
                 showCloseButton={false} 
@@ -4959,7 +4960,7 @@ export default function App() {
     )}
 
     {/* Reconciliation Report Dialog */}
-    <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }}>
+    <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }} modal={false}>
       <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] h-[90vh] max-h-[90vh] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
         <DialogHeader className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center justify-between relative z-10 w-full">
@@ -6509,7 +6510,7 @@ export default function App() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-    <Dialog open={isEditMedDetailsOpen} onOpenChange={setIsEditMedDetailsOpen}>
+    <Dialog open={isEditMedDetailsOpen} onOpenChange={setIsEditMedDetailsOpen} modal={false}>
       <DialogContent showCloseButton={false} className="sm:max-w-[500px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh]">
         <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center gap-4 relative z-10 text-left">
