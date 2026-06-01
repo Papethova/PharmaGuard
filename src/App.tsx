@@ -301,10 +301,20 @@ const getTimestampMs = (ts: any): number => {
   return new Date(ts).getTime();
 };
 
-const parseNumericStrength = (str: string): number => {
-  if (!str) return 0;
-  const match = str.match(/(\d+(?:\.\d+)?)/);
-  return match ? parseFloat(match[1]) : 0;
+const parseCompoundStrength = (str: string): { first: number; second: number } => {
+  if (!str) return { first: 0, second: 0 };
+  const compoundMatch = str.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (compoundMatch) {
+    return {
+      first: parseFloat(compoundMatch[1]),
+      second: parseFloat(compoundMatch[2])
+    };
+  }
+  const singleMatch = str.match(/(\d+(?:\.\d+)?)/);
+  return {
+    first: singleMatch ? parseFloat(singleMatch[1]) : 0,
+    second: 0
+  };
 };
 
 const compareSubstances = (a: any, b: any): number => {
@@ -313,9 +323,15 @@ const compareSubstances = (a: any, b: any): number => {
   const nameCompare = aName.localeCompare(bName, undefined, { sensitivity: "base", numeric: true });
   if (nameCompare !== 0) return nameCompare;
 
-  const aStr = parseNumericStrength(a.strength || "");
-  const bStr = parseNumericStrength(b.strength || "");
-  if (aStr !== bStr) return aStr - bStr;
+  const aStrength = parseCompoundStrength(a.strength || "");
+  const bStrength = parseCompoundStrength(b.strength || "");
+
+  if (aStrength.second !== bStrength.second) {
+    return aStrength.second - bStrength.second;
+  }
+  if (aStrength.first !== bStrength.first) {
+    return aStrength.first - bStrength.first;
+  }
 
   const aPkg = a.packageSize || 0;
   const bPkg = b.packageSize || 0;
@@ -3835,23 +3851,7 @@ export default function App() {
                                     s.name.toLowerCase().startsWith(newMed.name.toLowerCase()) || 
                                     s.ndc.startsWith(newMed.name)
                                   )
-                                  .sort((a, b) => {
-                                    // 1. Alphabetical by name
-                                    const nameCompare = a.name.localeCompare(b.name);
-                                    if (nameCompare !== 0) return nameCompare;
-                                    
-                                    // 2. Lowest strength first
-                                    const getStrengthValue = (str: string) => {
-                                      const match = str.match(/(\d+(\.\d+)?)/);
-                                      return match ? parseFloat(match[0]) : 0;
-                                    };
-                                    const strengthA = getStrengthValue(a.strength);
-                                    const strengthB = getStrengthValue(b.strength);
-                                    if (strengthA !== strengthB) return strengthA - strengthB;
-
-                                    // 3. Least inventory count first
-                                    return a.currentStock - b.currentStock;
-                                  })
+                                  .sort(compareSubstances)
                                   .map(s => (
                                     <div
                                       key={s.id}
@@ -4078,23 +4078,7 @@ export default function App() {
                                 s.name.toLowerCase().startsWith(substanceSearch.toLowerCase()) || 
                                 s.ndc.startsWith(substanceSearch)
                               )
-                              .sort((a, b) => {
-                                // 1. Alphabetical by name
-                                const nameCompare = a.name.localeCompare(b.name);
-                                if (nameCompare !== 0) return nameCompare;
-                                
-                                // 2. Lowest strength first
-                                const getStrengthValue = (str: string) => {
-                                  const match = str.match(/(\d+(\.\d+)?)/);
-                                  return match ? parseFloat(match[0]) : 0;
-                                };
-                                const strengthA = getStrengthValue(a.strength);
-                                const strengthB = getStrengthValue(b.strength);
-                                if (strengthA !== strengthB) return strengthA - strengthB;
-
-                                // 3. Least inventory count first
-                                return a.currentStock - b.currentStock;
-                              })
+                              .sort(compareSubstances)
                               .map(s => (
                                 <div
                                   key={s.id}
