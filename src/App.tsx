@@ -3262,8 +3262,8 @@ export default function App() {
     const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
     return (
-      <div id={isForPrint ? "reconciliation-printable-root" : undefined}>
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className="px-8 pb-3 pt-2 space-y-1.5 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans">
+      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "max-w-[1000px] mx-auto p-4" : ""}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`px-8 pb-4 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${!isForPrint ? "shadow-md border border-gray-200 rounded-xl" : ""}`}>
           
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
@@ -3468,7 +3468,7 @@ export default function App() {
           </div>
 
           {/* Signature box info */}
-          <div className="space-y-1 pt-1.5 border-t border-gray-100">
+          <div className="space-y-1 pt-1.5 border-t border-gray-100 break-inside-avoid">
             {/* Moved disclaimer above signature fields in historical report block */}
             <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
               By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
@@ -5669,7 +5669,7 @@ export default function App() {
             {/* Print utilities to style print view on Ctrl+P or button click */}
             <style>{`
               @page {
-                size: auto;
+                size: landscape;
                 margin: 12mm 15mm 15mm 15mm;
                 @bottom-right {
                   content: "page " counter(page) " of " counter(pages);
@@ -5685,14 +5685,20 @@ export default function App() {
                 }
               }
               @media print {
+                html, body {
+                  overflow: visible !important;
+                  height: auto !important;
+                  max-height: none !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+                  background: white !important;
+                }
                 body > *:not(#reconciliation-printable-root) {
                   display: none !important;
                 }
                 #reconciliation-printable-root {
                   display: block !important;
-                  position: absolute !important;
-                  left: 0 !important;
-                  top: 0 !important;
+                  position: relative !important;
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
@@ -5702,6 +5708,14 @@ export default function App() {
                 }
                 #reconciliation-printable-root * {
                   visibility: visible !important;
+                }
+                tr {
+                  page-break-inside: avoid !important;
+                  break-inside: avoid !important;
+                }
+                .break-inside-avoid {
+                  page-break-inside: avoid !important;
+                  break-inside: avoid !important;
                 }
               }
             `}</style>
