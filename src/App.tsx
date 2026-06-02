@@ -5686,7 +5686,9 @@ export default function App() {
               }
               @media print {
                 html, body {
+                  position: static !important;
                   overflow: visible !important;
+                  width: auto !important;
                   height: auto !important;
                   max-height: none !important;
                   margin: 0 !important;
