@@ -406,17 +406,14 @@ export default function App() {
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>("All");
 
-  // Pagination & Database Sync limits for speed and low-reads
-  const [syncLimit, setSyncLimit] = useState<number>(() => {
-    const saved = localStorage.getItem("inventory_sync_limit");
-    return saved ? parseInt(saved, 10) : 50;
-  });
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(15);
+  // Database Sync limits for speed and low-reads
+  const [syncLimit, setSyncLimit] = useState<number>(50);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeSchedule, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, pageSize]);
+  // Stub variables for hidden pagination compatibility
+  const pageSize = 15;
+  const currentPage = 1;
+  const setCurrentPage = (_p: any) => {};
+  const setPageSize = (_s: any) => {};
 
   // Form state
   const [isNewMedSearchFocused, setIsNewMedSearchFocused] = useState(false);
@@ -1792,15 +1789,9 @@ export default function App() {
         return;
       }
 
-      const isUsingPhoto = userProfile?.isPhotoRequirementEnabled && !useSignatureFallback && transactionType !== "VERIFY";
       const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
-      if (isUsingPhoto) {
-        if (!capturedPhoto) {
-          toast.error("Photo capture is required for compliance");
-          return;
-        }
-      } else if (isSigRequired) {
+      if (isSigRequired) {
         const pad = sigPad.current;
         if (!pad || pad.isEmpty()) {
           toast.error(transactionType === "VERIFY" ? "Signature is required to verify the physical count" : "Signature is required for compliance");
@@ -1813,7 +1804,7 @@ export default function App() {
       
       const batch = writeBatch(db);
       let signature = "";
-      if (!isUsingPhoto && isSigRequired) {
+      if (isSigRequired) {
         const canvas = sigPad.current?.getCanvas();
         const trimmedCanvas = canvas ? trimSignatureCanvas(canvas) : null;
         signature = trimmedCanvas ? trimmedCanvas.toDataURL("image/png") : (canvas ? canvas.toDataURL("image/png") : "");
@@ -1866,7 +1857,7 @@ export default function App() {
         reason: transactionType === "ADJUST" ? reason : (transactionType === "IN" ? "Inventory Addition" : transactionType === "OUT" ? "Dispensed" : "Verified"),
         referenceNumber: finalRef,
         signature,
-        photo: capturedPhoto || ""
+        photo: ""
       });
       
       batch.update(doc(db, "users", emailId, "substances", targetMedId), {
@@ -2664,14 +2655,6 @@ export default function App() {
         return dateB - dateA;
       }),
   [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
-
-  const paginatedTransactions = useMemo(() => {
-    const totalTxs = filteredTransactions.length;
-    const totalPagesCount = Math.max(1, Math.ceil(totalTxs / pageSize));
-    const safePage = Math.min(currentPage, totalPagesCount);
-    const startIdx = (safePage - 1) * pageSize;
-    return filteredTransactions.slice(startIdx, startIdx + pageSize);
-  }, [filteredTransactions, currentPage, pageSize]);
 
   const lowStockItems = useMemo(() => {
     if (userProfile?.isAlertsEnabled === false) return [];
@@ -4345,7 +4328,7 @@ export default function App() {
                   </div>
 
                       <div className="grid gap-1.5">
-                        {(userProfile?.isPhotoRequirementEnabled && !useSignatureFallback && transactionType !== "VERIFY") ? (
+                        {false ? (
                           <div className="space-y-2">
                              <Label className="flex justify-between items-center text-brand-dark-grey text-xs">
                               Identity Verification Capture
@@ -4442,7 +4425,8 @@ export default function App() {
                               <canvas ref={canvasRef} className="hidden" />
                             </div>
                           </div>
-                        ) : userProfile?.isSignatureRequirementEnabled !== false ? (
+                        ) : null}
+                        {userProfile?.isSignatureRequirementEnabled !== false ? (
                           <div className="space-y-2">
                             <Label className="flex justify-between items-center text-brand-dark-grey text-xs">
                               User Signature
@@ -4677,7 +4661,7 @@ export default function App() {
                     <div className="space-y-2">
                       <Label className="text-xs font-semibold text-brand-dark-grey uppercase tracking-wider">System Configuration</Label>
                       <div 
-                         className="flex items-center justify-between p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/10 cursor-pointer hover:bg-brand-blue/10 transition-colors group"
+                         className="hidden"
                         onClick={togglePhotoRequirement}
                       >
                         <div className="flex items-center gap-3">
@@ -5025,8 +5009,7 @@ export default function App() {
                   </Select>
                 </div>
 
-                <div className="grid gap-1.5 w-[110px] shrink-0">
-                  <Label htmlFor="history-sync-limit" className="text-xs font-bold text-brand-blue text-center whitespace-nowrap">Sync Window</Label>
+                <div className="hidden">
                   <Select value={String(syncLimit)} onValueChange={(val) => {
                     const limitVal = parseInt(val, 10);
                     setSyncLimit(limitVal);
@@ -5084,7 +5067,17 @@ export default function App() {
               )}
             </div>
             <Card className="flex-1 mt-4 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
-              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
+              <div 
+                className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto"
+                onScroll={(e) => {
+                  const target = e.currentTarget;
+                  if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
+                    if (filteredTransactions.length >= syncLimit) {
+                      setSyncLimit(prev => prev + 50);
+                    }
+                  }
+                }}
+              >
                 <table className="w-full caption-bottom text-sm border-separate border-spacing-0">
                   <TableHeader className="sticky top-0 z-40 bg-brand-blue">
                     <TableRow className="bg-brand-blue">
@@ -5098,14 +5091,14 @@ export default function App() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedTransactions.length === 0 ? (
+                    {filteredTransactions.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center py-12 text-brand-dark-grey/50">
                           <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
                           <p>No transactions found for this schedule.</p>
                         </TableCell>
                       </TableRow>
-                    ) : paginatedTransactions.map((t) => (
+                    ) : filteredTransactions.map((t) => (
                     <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors">
                       <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center py-1">
                         {formatDateTime(t.timestamp)}
@@ -5153,7 +5146,7 @@ export default function App() {
               </table>
             </div>
             {/* Pagination Footer */}
-            {filteredTransactions.length > 0 && (
+            {false && filteredTransactions.length > 0 && (
               <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t border-brand-grey/10 bg-brand-surface/40 select-none shrink-0 gap-4">
                 <div className="flex items-center gap-4 text-xs font-medium text-brand-dark-grey/70 font-sans">
                   <div className="flex items-center gap-1.5">
