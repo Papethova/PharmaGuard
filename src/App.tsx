@@ -5754,13 +5754,21 @@ export default function App() {
                 }
                 #reconciliation-printable-root {
                   display: block !important;
-                  position: relative !important;
+                  position: static !important;
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
                   padding: 0 !important;
                   margin: 0 !important;
                   background: white !important;
+                }
+                #reconciliation-printable-invoice {
+                  display: block !important;
+                  position: static !important;
+                  width: 100% !important;
+                  height: auto !important;
+                  overflow: visible !important;
+                  max-height: none !important;
                 }
                 #reconciliation-printable-root * {
                   visibility: visible !important;
