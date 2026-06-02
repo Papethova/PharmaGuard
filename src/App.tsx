@@ -36,7 +36,11 @@ import {
   Mail,
   Clipboard,
   ClipboardCheck,
-  Printer
+  Printer,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -401,6 +405,18 @@ export default function App() {
   const [historyMedicationSearch, setHistoryMedicationSearch] = useState("");
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>("All");
+
+  // Pagination & Database Sync limits for speed and low-reads
+  const [syncLimit, setSyncLimit] = useState<number>(() => {
+    const saved = localStorage.getItem("inventory_sync_limit");
+    return saved ? parseInt(saved, 10) : 50;
+  });
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(15);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeSchedule, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, pageSize]);
 
   // Form state
   const [isNewMedSearchFocused, setIsNewMedSearchFocused] = useState(false);
@@ -1314,7 +1330,7 @@ export default function App() {
       }
     });
 
-    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(500)), (snapshot) => {
+    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(syncLimit)), (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
       setTransactions(items);
     }, (error) => {
@@ -1372,7 +1388,7 @@ export default function App() {
       unsubStaff();
       unsubReports();
     };
-  }, [user, userProfile?.status]);
+  }, [user, userProfile?.status, syncLimit]);
 
   // Super Admin Listener
   useEffect(() => {
@@ -2648,6 +2664,14 @@ export default function App() {
         return dateB - dateA;
       }),
   [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
+
+  const paginatedTransactions = useMemo(() => {
+    const totalTxs = filteredTransactions.length;
+    const totalPagesCount = Math.max(1, Math.ceil(totalTxs / pageSize));
+    const safePage = Math.min(currentPage, totalPagesCount);
+    const startIdx = (safePage - 1) * pageSize;
+    return filteredTransactions.slice(startIdx, startIdx + pageSize);
+  }, [filteredTransactions, currentPage, pageSize]);
 
   const lowStockItems = useMemo(() => {
     if (userProfile?.isAlertsEnabled === false) return [];
@@ -5001,6 +5025,28 @@ export default function App() {
                   </Select>
                 </div>
 
+                <div className="grid gap-1.5 w-[110px] shrink-0">
+                  <Label htmlFor="history-sync-limit" className="text-xs font-bold text-brand-blue text-center whitespace-nowrap">Sync Window</Label>
+                  <Select value={String(syncLimit)} onValueChange={(val) => {
+                    const limitVal = parseInt(val, 10);
+                    setSyncLimit(limitVal);
+                    localStorage.setItem("inventory_sync_limit", val);
+                  }}>
+                    <SelectTrigger id="history-sync-limit" className="w-full !h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5 px-2">
+                      <SelectValue placeholder="50 Recs">
+                        {`Last ${syncLimit}`}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
+                      <SelectItem value="25">Last 25</SelectItem>
+                      <SelectItem value="50">Last 50</SelectItem>
+                      <SelectItem value="100">Last 100</SelectItem>
+                      <SelectItem value="250">Last 250</SelectItem>
+                      <SelectItem value="500">Last 500</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <Button 
                   variant="outline" 
                   onClick={() => { 
@@ -5052,14 +5098,14 @@ export default function App() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTransactions.length === 0 ? (
+                    {paginatedTransactions.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-12 text-brand-dark-grey/50">
+                        <TableCell colSpan={7} className="text-center py-12 text-brand-dark-grey/50">
                           <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
                           <p>No transactions found for this schedule.</p>
                         </TableCell>
                       </TableRow>
-                    ) : filteredTransactions.map((t) => (
+                    ) : paginatedTransactions.map((t) => (
                     <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors">
                       <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center py-1">
                         {formatDateTime(t.timestamp)}
@@ -5106,6 +5152,82 @@ export default function App() {
                 </TableBody>
               </table>
             </div>
+            {/* Pagination Footer */}
+            {filteredTransactions.length > 0 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t border-brand-grey/10 bg-brand-surface/40 select-none shrink-0 gap-4">
+                <div className="flex items-center gap-4 text-xs font-medium text-brand-dark-grey/70 font-sans">
+                  <div className="flex items-center gap-1.5">
+                    <span>Rows per page:</span>
+                    <Select value={String(pageSize)} onValueChange={(val) => {
+                      setPageSize(parseInt(val, 10));
+                      setCurrentPage(1);
+                    }}>
+                      <SelectTrigger className="w-16 h-8 text-xs border-brand-grey/20 focus:ring-brand-blue bg-brand-surface py-0 px-2">
+                        <SelectValue placeholder="15" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-brand-surface border-brand-blue/10 min-w-[70px]" align="start">
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="15">15</SelectItem>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    {`Showing ${Math.min(filteredTransactions.length, (currentPage - 1) * pageSize + 1)}-${Math.min(filteredTransactions.length, currentPage * pageSize)} of ${filteredTransactions.length}`}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 p-0 border-brand-grey/20 hover:bg-brand-blue/5 text-brand-blue disabled:opacity-40 flex items-center justify-center bg-brand-surface"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    title="First Page"
+                  >
+                    <ChevronsLeft className="h-4 w-4 text-brand-blue" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 p-0 border-brand-grey/20 hover:bg-brand-blue/5 text-brand-blue disabled:opacity-40 flex items-center justify-center bg-brand-surface"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    title="Previous Page"
+                  >
+                    <ChevronLeft className="h-4 w-4 text-brand-blue" />
+                  </Button>
+                  
+                  <span className="text-xs font-semibold text-brand-blue px-2 min-w-[80px] text-center font-sans">
+                    Page {currentPage} of {Math.max(1, Math.ceil(filteredTransactions.length / pageSize))}
+                  </span>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 p-0 border-brand-grey/20 hover:bg-brand-blue/5 text-brand-blue disabled:opacity-40 flex items-center justify-center bg-brand-surface"
+                    onClick={() => setCurrentPage(prev => Math.min(Math.max(1, Math.ceil(filteredTransactions.length / pageSize)), prev + 1))}
+                    disabled={currentPage >= Math.ceil(filteredTransactions.length / pageSize)}
+                    title="Next Page"
+                  >
+                    <ChevronRight className="h-4 w-4 text-brand-blue" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 p-0 border-brand-grey/20 hover:bg-brand-blue/5 text-brand-blue disabled:opacity-40 flex items-center justify-center bg-brand-surface"
+                    onClick={() => setCurrentPage(Math.max(1, Math.ceil(filteredTransactions.length / pageSize)))}
+                    disabled={currentPage >= Math.ceil(filteredTransactions.length / pageSize)}
+                    title="Last Page"
+                  >
+                    <ChevronsRight className="h-4 w-4 text-brand-blue" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
         </TabsContent>
 
