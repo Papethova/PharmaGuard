@@ -3265,9 +3265,9 @@ export default function App() {
       <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "max-w-[1000px] mx-auto p-4" : ""}>
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`relative overflow-hidden px-8 pb-4 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${!isForPrint ? "shadow-md border border-gray-200 rounded-xl" : ""}`}>
           
-          {/* Faint Watermark Shield background */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
-            <Shield className="w-[380px] h-[380px] text-black" style={{ opacity: 0.035, transform: 'rotate(-10deg)' }} />
+          {/* Faint Watermark background using PharmaLogo */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]" style={{ transform: "rotate(-10deg)" }}>
+            <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
           {/* Visual Official Letterhead */}
