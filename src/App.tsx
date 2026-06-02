@@ -407,7 +407,7 @@ export default function App() {
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>("All");
 
   // Database Sync limits for speed and low-reads
-  const [syncLimit, setSyncLimit] = useState<number>(50);
+  const [syncLimit, setSyncLimit] = useState<number>(30);
 
   // Stub variables for hidden pagination compatibility
   const pageSize = 15;
