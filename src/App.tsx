@@ -5410,22 +5410,52 @@ export default function App() {
                                   >
                                     <span className="font-bold text-black group-hover:text-brand-blue group-hover:underline text-xs">{sub.name} {sub.strength}</span>
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
-                                    <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
+                                  <td 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 cursor-pointer hover:bg-brand-blue/10 transition-colors group" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
+                                    <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 group-hover:underline leading-none shrink-0">{sub.ndc}</span>
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80 bg-brand-blue/5" style={{ verticalAlign: 'middle' }}>
+                                  <td 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80 bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
                                     {metrics.lastClosingCount}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5" style={{ verticalAlign: 'middle' }}>
+                                  <td 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
                                     +{metrics.purchases}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5" style={{ verticalAlign: 'middle' }}>
+                                  <td 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
                                     -{metrics.dispensed}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5" style={{ verticalAlign: 'middle' }}>
+                                  <td 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
                                     {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue" style={{ verticalAlign: 'middle' }}>
+                                  <td 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue cursor-pointer hover:bg-brand-blue/10 hover:underline transition-all" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
                                     {metrics.expected}
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
@@ -5469,7 +5499,12 @@ export default function App() {
                                       )}
                                     </div>
                                   </td>
-                                  <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
+                                  <td 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 cursor-pointer hover:bg-brand-blue/10 transition-colors" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
                                     <div className="flex justify-center items-center">
                                       {counted === undefined ? (
                                         <span className="text-[10px] text-brand-grey/50 font-medium whitespace-nowrap">Pending...</span>
