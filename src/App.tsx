@@ -3373,7 +3373,16 @@ export default function App() {
                       <Fragment key={item.substanceId}>
                         <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
                           <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${item.substanceName} ${item.strength}`}>
+                            <div 
+                              onClick={() => {
+                                if (!isForPrint) {
+                                  const invItem = inventory.find(i => i.id === item.substanceId);
+                                  if (invItem) setSelectedSubstanceDetail(invItem);
+                                }
+                              }}
+                              className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                              title={`${item.substanceName} ${item.strength} - Click to view transaction history`}
+                            >
                               {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
                             </div>
                           </td>
@@ -3423,7 +3432,11 @@ export default function App() {
                       <Fragment key={sub.id}>
                         <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
                           <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <div className="font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap" title={`${sub.name} ${sub.strength}`}>
+                            <div 
+                              onClick={() => !isForPrint && setSelectedSubstanceDetail(sub)}
+                              className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                              title={`${sub.name} ${sub.strength} - Click to view transaction history`}
+                            >
                               {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
                             </div>
                           </td>
@@ -4798,179 +4811,7 @@ export default function App() {
               </table>
             </div>
           </Card>
-
-          <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
-              <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col h-[80vh] max-h-[80vh] touch-none">
-                <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto">
-                  <div className="flex items-center gap-4 relative z-10 text-left">
-                    <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-                      <History className="h-5 w-5 text-brand-blue" />
-                    </div>
-                    <div className="flex flex-col gap-0">
-                        <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
-                          Transaction History: {selectedSubstanceDetail?.name}&nbsp;{selectedSubstanceDetail?.strength}
-                        </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/80 font-bold text-[10px] tracking-widest mt-1">
-                        NDC: {selectedSubstanceDetail?.ndc}
-                      </DialogDescription>
-                    </div>
-                  </div>
-                </DialogHeader>
-                
-                <div className="p-4 shrink-0">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Button 
-                      size="sm"
-                      onClick={() => {
-                        if (selectedSubstanceDetail) {
-                          resetForm();
-                          setSelectedSubstance(selectedSubstanceDetail.id);
-                          setSubstanceSearch(selectedSubstanceDetail.name);
-                          setTransactionType("VERIFY");
-                          setReferenceNumber("");
-                          setReason("");
-                          setIsLogOpen(true);
-                        }
-                      }}
-                      className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
-                    >
-                      <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-                        <Check className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
-                      </div>
-                      Confirm Count
-                    </Button>
-                    <Button 
-                      onClick={() => {
-                        if (selectedSubstanceDetail) {
-                          setEditingMed({
-                            ...selectedSubstanceDetail,
-                            minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
-                            packageSize: selectedSubstanceDetail.packageSize.toString() as any
-                          });
-                        }
-                        setIsEditMinThresholdOpen(true);
-                      }}
-                      className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
-                    >
-                      <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-                        <div className="relative h-4 w-4 flex items-center justify-center">
-                          <svg className="h-full w-full absolute text-brand-blue overflow-visible" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="2 7 8.5 11.5 13.5 8.5 22 17" />
-                            <line x1="0" y1="15.25" x2="24" y2="15.25" strokeWidth="2" />
-                          </svg>
-                        </div>
-                      </div>
-                      Edit Threshold
-                    </Button>
-                    <Button 
-                      onClick={() => {
-                        if (selectedSubstanceDetail) {
-                          setEditingMed({
-                            ...selectedSubstanceDetail,
-                            minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
-                            packageSize: selectedSubstanceDetail.packageSize.toString() as any
-                          });
-                          setIsEditMedDetailsOpen(true);
-                        }
-                      }}
-                      className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
-                    >
-                      <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-                        <Edit className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
-                      </div>
-                      Edit Details
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col overflow-hidden">
-                  <div className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface">
-                    <table className="relative border-separate border-spacing-0 w-full text-sm">
-                      <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
-                        <TableRow className="bg-brand-light-grey">
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
-                          <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody className="text-brand-dark-grey">
-                        {transactions.filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC")).length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={7} className="text-center py-8 text-brand-dark-grey/50 italic">
-                              No transaction history found for this item.
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          transactions
-                            .filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC"))
-                            .sort((a, b) => {
-                              const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
-                              const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
-                              return dateB - dateA;
-                            })
-                            .map((t) => (
-                              <TableRow key={t.id} className="text-xs h-10 hover:bg-brand-blue/5 transition-colors">
-                                <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
-                                  {formatDateTime(t.timestamp)}
-                                </TableCell>
-                                <TableCell className="text-[10px] text-center py-1">
-                                  <button 
-                                    onClick={() => handleNDCClick(t.ndc)}
-                                    className="text-brand-blue hover:underline font-normal transition-colors"
-                                  >
-                                    {t.ndc}
-                                  </button>
-                                </TableCell>
-                                <TableCell className="text-center py-1">
-                                  {t.referenceNumber ? (
-                                    <button 
-                                      onClick={() => setViewingTransaction(t)}
-                                      className="text-brand-blue hover:underline font-normal"
-                                    >
-                                      {formatRefForDisplay(t.referenceNumber)}
-                                    </button>
-                                  ) : (
-                                    <span className="text-brand-dark-grey/40 italic">-</span>
-                                  )}
-                                </TableCell>
-                                <TableCell className="py-1 text-center">
-                                  <TransactionBadge type={t.type} size="sm" />
-                                </TableCell>
-                                <TableCell className="text-center text-brand-dark-grey text-sm py-1">
-                                  {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
-                                </TableCell>
-                                <TableCell className="text-center font-normal text-brand-dark-grey text-sm py-1">{t.newStock}</TableCell>
-                                <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact py-1">
-                                  {escapeEmail(t.performedByName)}
-                                  {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
-                                    <span className="ml-1 text-brand-dark-grey">
-                                      ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
-                                    </span>
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            ))
-                        )}
-                      </TableBody>
-                    </table>
-                  </div>
-                </div>
-                
-                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto flex justify-end">
-                  <Button 
-                    onClick={() => setSelectedSubstanceDetail(null)} 
-                    className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
-                  >
-                    Close History Log
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </TabsContent>
+        </TabsContent>
 
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="shrink-0 flex flex-col gap-3 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
@@ -5252,6 +5093,179 @@ export default function App() {
       document.body
     )}
 
+    {/* Transaction History Dialog (Globally available helper) */}
+    <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col h-[80vh] max-h-[80vh] touch-none">
+        <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto">
+          <div className="flex items-center gap-4 relative z-10 text-left">
+            <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+              <History className="h-5 w-5 text-brand-blue" />
+            </div>
+            <div className="flex flex-col gap-0">
+              <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+                Transaction History: {selectedSubstanceDetail?.name}&nbsp;{selectedSubstanceDetail?.strength}
+              </DialogTitle>
+              <DialogDescription className="text-brand-yellow/80 font-bold text-[10px] tracking-widest mt-1">
+                NDC: {selectedSubstanceDetail?.ndc}
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+        
+        <div className="p-4 shrink-0">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button 
+              size="sm"
+              onClick={() => {
+                if (selectedSubstanceDetail) {
+                  resetForm();
+                  setSelectedSubstance(selectedSubstanceDetail.id);
+                  setSubstanceSearch(selectedSubstanceDetail.name);
+                  setTransactionType("VERIFY");
+                  setReferenceNumber("");
+                  setReason("");
+                  setIsLogOpen(true);
+                }
+              }}
+              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
+            >
+              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+                <Check className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+              </div>
+              Confirm Count
+            </Button>
+            <Button 
+              onClick={() => {
+                if (selectedSubstanceDetail) {
+                  setEditingMed({
+                    ...selectedSubstanceDetail,
+                    minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
+                    packageSize: selectedSubstanceDetail.packageSize.toString() as any
+                  });
+                }
+                setIsEditMinThresholdOpen(true);
+              }}
+              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
+            >
+              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+                <div className="relative h-4 w-4 flex items-center justify-center">
+                  <svg className="h-full w-full absolute text-brand-blue overflow-visible" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="2 7 8.5 11.5 13.5 8.5 22 17" />
+                    <line x1="0" y1="15.25" x2="24" y2="15.25" strokeWidth="2" />
+                  </svg>
+                </div>
+              </div>
+              Edit Threshold
+            </Button>
+            <Button 
+              onClick={() => {
+                if (selectedSubstanceDetail) {
+                  setEditingMed({
+                    ...selectedSubstanceDetail,
+                    minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
+                    packageSize: selectedSubstanceDetail.packageSize.toString() as any
+                  });
+                  setIsEditMedDetailsOpen(true);
+                }
+              }}
+              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
+            >
+              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+                <Edit className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+              </div>
+              Edit Details
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface">
+            <table className="relative border-separate border-spacing-0 w-full text-sm">
+              <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
+                <TableRow className="bg-brand-light-grey">
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="text-brand-dark-grey">
+                {transactions.filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC")).length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-brand-dark-grey/50 italic">
+                      No transaction history found for this item.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  transactions
+                    .filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC"))
+                    .sort((a, b) => {
+                      const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+                      const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+                      return dateB - dateA;
+                    })
+                    .map((t) => (
+                      <TableRow key={t.id} className="text-xs h-10 hover:bg-brand-blue/5 transition-colors">
+                        <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
+                          {formatDateTime(t.timestamp)}
+                        </TableCell>
+                        <TableCell className="text-[10px] text-center py-1">
+                          <button 
+                            onClick={() => handleNDCClick(t.ndc)}
+                            className="text-brand-blue hover:underline font-normal transition-colors"
+                          >
+                            {t.ndc}
+                          </button>
+                        </TableCell>
+                        <TableCell className="text-center py-1">
+                          {t.referenceNumber ? (
+                            <button 
+                              onClick={() => setViewingTransaction(t)}
+                              className="text-brand-blue hover:underline font-normal"
+                            >
+                              {formatRefForDisplay(t.referenceNumber)}
+                            </button>
+                          ) : (
+                            <span className="text-brand-dark-grey/40 italic">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="py-1 text-center">
+                          <TransactionBadge type={t.type} size="sm" />
+                        </TableCell>
+                        <TableCell className="text-center text-brand-dark-grey text-sm py-1">
+                          {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
+                        </TableCell>
+                        <TableCell className="text-center font-normal text-brand-dark-grey text-sm py-1">{t.newStock}</TableCell>
+                        <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact py-1">
+                          {escapeEmail(t.performedByName)}
+                          {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
+                            <span className="ml-1 text-brand-dark-grey">
+                              ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
+                            </span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                )}
+              </TableBody>
+            </table>
+          </div>
+        </div>
+        
+        <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto flex justify-end">
+          <Button 
+            onClick={() => setSelectedSubstanceDetail(null)} 
+            className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
+          >
+            Close History Log
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     {/* Reconciliation Report Dialog */}
     <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }} modal="trap-focus">
       <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] h-[90vh] max-h-[90vh] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
@@ -5388,8 +5402,13 @@ export default function App() {
                             return (
                               <Fragment key={sub.id}>
                                 <tr className="hover:bg-brand-blue/5 border-b border-brand-blue/10">
-                                  <td className="text-center font-semibold border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
-                                    <span className="font-bold text-black text-xs">{sub.name} {sub.strength}</span>
+                                  <td 
+                                    className="text-center font-semibold border-b border-brand-blue/10 py-1.5 cursor-pointer hover:bg-brand-blue/10 transition-colors group" 
+                                    style={{ verticalAlign: 'middle' }}
+                                    onClick={() => setSelectedSubstanceDetail(sub)}
+                                    title="Click to view transaction history"
+                                  >
+                                    <span className="font-bold text-black group-hover:text-brand-blue group-hover:underline text-xs">{sub.name} {sub.strength}</span>
                                   </td>
                                   <td className="text-center border-b border-brand-blue/10 py-1.5" style={{ verticalAlign: 'middle' }}>
                                     <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 leading-none shrink-0">{sub.ndc}</span>
