@@ -5737,6 +5737,13 @@ export default function App() {
                   font-weight: bold;
                   color: #111827;
                 }
+                @bottom-left {
+                  content: "Generated With PharmaGuard";
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                  font-size: 8px;
+                  font-weight: bold;
+                  color: #111827;
+                }
               }
               @media screen {
                 #reconciliation-printable-root {
