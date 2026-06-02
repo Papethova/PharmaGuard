@@ -3266,7 +3266,7 @@ export default function App() {
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`relative px-8 pb-4 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${!isForPrint ? "overflow-hidden shadow-md border border-gray-200 rounded-xl" : ""}`}>
           
           {/* Faint Watermark background using PharmaLogo */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]" style={{ transform: "rotate(-10deg)" }}>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]">
             <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
