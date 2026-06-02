@@ -575,6 +575,23 @@ export default function App() {
     }
   }, [isReconOpen]);
 
+  useEffect(() => {
+    let originalTitle = "PharmaGuard";
+    const handleBeforePrint = () => {
+      originalTitle = document.title || "PharmaGuard";
+      document.title = " ";
+    };
+    const handleAfterPrint = () => {
+      document.title = originalTitle;
+    };
+    window.addEventListener("beforeprint", handleBeforePrint);
+    window.addEventListener("afterprint", handleAfterPrint);
+    return () => {
+      window.removeEventListener("beforeprint", handleBeforePrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
+  }, []);
+
   const lastReport = useMemo(() => {
     const reconTxs = transactions.filter(t => {
       if (!t.referenceNumber) return false;
@@ -3265,10 +3282,18 @@ export default function App() {
       <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "max-w-[1000px] mx-auto p-4" : ""}>
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`px-8 pb-4 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${!isForPrint ? "shadow-md border border-gray-200 rounded-xl" : ""}`}>
           
+          {/* Print-only Margin Header simulator */}
+          {isForPrint && (
+            <div className="hidden print:flex justify-between items-center w-full text-[9px] font-bold text-gray-400 border-b border-gray-200 pb-2 mb-2 uppercase font-sans">
+              <div>{new Date().toLocaleString()}</div>
+              <div>PHARMAGUARD</div>
+            </div>
+          )}
+
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
             <div className="flex flex-col space-y-1 min-w-0 flex-1">
-              <h1 className="text-lg font-bold tracking-tight uppercase leading-none whitespace-nowrap overflow-hidden text-ellipsis">{getReportTitle().toUpperCase()}</h1>
+              <h1 className="text-sm font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
               <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
                 const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
                 return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
