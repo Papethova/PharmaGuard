@@ -3263,7 +3263,7 @@ export default function App() {
 
     return (
       <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "max-w-[1000px] mx-auto p-4" : ""}>
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`relative px-8 pb-4 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${!isForPrint ? "overflow-hidden shadow-md border border-gray-200 rounded-xl" : ""}`}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`relative px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${isForPrint ? "pb-24 print:pb-24" : "pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"}`}>
           
           {/* Faint Watermark background using PharmaLogo */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]">
@@ -3273,7 +3273,7 @@ export default function App() {
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
             <div className="flex flex-col space-y-1 min-w-0 flex-1">
-              <h1 className="text-xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
               <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
                 const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
                 return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
@@ -5729,7 +5729,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 12mm 15mm 15mm 15mm;
+                margin: 10mm 15mm 10mm 15mm;
                 @bottom-right {
                   content: "page " counter(page) " of " counter(pages);
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -5747,12 +5747,16 @@ export default function App() {
                 html, body {
                   position: static !important;
                   overflow: visible !important;
+                  overflow-x: visible !important;
+                  overflow-y: visible !important;
                   width: auto !important;
                   height: auto !important;
                   max-height: none !important;
                   margin: 0 !important;
                   padding: 0 !important;
                   background: white !important;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
                 }
                 body > *:not(#reconciliation-printable-root) {
                   display: none !important;
@@ -5769,7 +5773,7 @@ export default function App() {
                 }
                 #reconciliation-printable-invoice {
                   display: block !important;
-                  position: static !important;
+                  position: relative !important;
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
