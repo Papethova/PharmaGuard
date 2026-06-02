@@ -3263,6 +3263,86 @@ export default function App() {
 
     return (
       <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "max-w-[1000px] mx-auto p-4" : ""}>
+        {isForPrint && (
+          <style>{`
+            @page {
+              size: landscape;
+              margin: 10mm 15mm 10mm 15mm;
+              @bottom-right {
+                content: "page " counter(page) " of " counter(pages);
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 8px;
+                font-weight: bold;
+                color: #111827;
+              }
+              @bottom-left {
+                content: "Generated With PharmaGuard";
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 8px;
+                font-weight: bold;
+                color: #111827;
+              }
+            }
+            @media screen {
+              #reconciliation-printable-root {
+                display: none !important;
+              }
+            }
+            @media print {
+              html, body {
+                position: static !important;
+                overflow: visible !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+                width: auto !important;
+                height: auto !important;
+                max-height: none !important;
+                min-height: 0 !important;
+                top: auto !important;
+                left: auto !important;
+                right: auto !important;
+                bottom: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              body > *:not(#reconciliation-printable-root) {
+                display: none !important;
+              }
+              #reconciliation-printable-root {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+              }
+              #reconciliation-printable-invoice {
+                display: block !important;
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                max-height: none !important;
+              }
+              #reconciliation-printable-root * {
+                visibility: visible !important;
+              }
+              tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+              }
+              .break-inside-avoid {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+              }
+            }
+          `}</style>
+        )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`relative px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${isForPrint ? "pb-24 print:pb-24" : "pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"}`}>
           
           {/* Faint Watermark background using PharmaLogo */}
@@ -3273,7 +3353,7 @@ export default function App() {
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
             <div className="flex flex-col space-y-1 min-w-0 flex-1">
-              <h1 className="text-2xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
+              <h1 className="text-xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
               <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
                 const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
                 return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
@@ -5759,6 +5839,11 @@ export default function App() {
                   width: auto !important;
                   height: auto !important;
                   max-height: none !important;
+                  min-height: 0 !important;
+                  top: auto !important;
+                  left: auto !important;
+                  right: auto !important;
+                  bottom: auto !important;
                   margin: 0 !important;
                   padding: 0 !important;
                   background: white !important;
