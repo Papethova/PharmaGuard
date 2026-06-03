@@ -242,3 +242,79 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@media print {
+  html, body {
+    position: static !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    overscroll-behavior: auto !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    display: block !important;
+  }
+
+  #root, 
+  [data-sonner-toaster], 
+  [role="dialog"], 
+  [data-slot="dialog-overlay"], 
+  [data-slot="dialog-content"],
+  div[data-radix-portal] {
+    display: none !important;
+  }
+
+  body > *:not(#reconciliation-printable-root) {
+    display: none !important;
+  }
+
+  #reconciliation-printable-root {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  #reconciliation-printable-invoice {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  #reconciliation-printable-root * {
+    visibility: visible !important;
+  }
+
+  /* Force rows to not slice in half across pages */
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .break-inside-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
