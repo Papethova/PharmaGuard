@@ -293,7 +293,7 @@
 
   #reconciliation-printable-invoice {
     display: block !important;
-    position: relative !important;
+    position: static !important;
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;

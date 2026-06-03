@@ -2876,6 +2876,40 @@ export default function App() {
       });
   }, [isUsingFallback, transactions, substanceTransactions, selectedSubstanceDetail?.id]);
 
+  // Auto-fill logic for general Audit Log when filters exclude matches, ensuring search can find older items
+  useEffect(() => {
+    if (transactions.length > 0 && transactions.length >= syncLimit) {
+      if (filteredTransactions.length < 30) {
+        setSyncLimit(prev => Math.min(prev + 30, 1000));
+      }
+    }
+  }, [transactions.length, syncLimit, filteredTransactions.length]);
+
+  // Auto-fill logic for Substance Detail History dialog
+  useEffect(() => {
+    if (selectedSubstanceDetail) {
+      const rawLimit = isUsingFallback ? syncLimit : substanceHistoryLimit;
+      const rawLength = isUsingFallback ? transactions.length : substanceTransactions.length;
+      if (rawLength > 0 && rawLength >= rawLimit) {
+        if (medicationHistoryTransactions.length < 30) {
+          if (isUsingFallback) {
+            setSyncLimit(prev => Math.min(prev + 30, 1000));
+          } else {
+            setSubstanceHistoryLimit(prev => Math.min(prev + 30, 1000));
+          }
+        }
+      }
+    }
+  }, [
+    selectedSubstanceDetail,
+    isUsingFallback,
+    transactions.length,
+    syncLimit,
+    substanceTransactions.length,
+    substanceHistoryLimit,
+    medicationHistoryTransactions.length
+  ]);
+
   const lowStockItems = useMemo(() => {
     if (userProfile?.isAlertsEnabled === false) return [];
     return inventory.filter(s => 
@@ -3550,7 +3584,7 @@ export default function App() {
               }
               #reconciliation-printable-invoice {
                 display: block !important;
-                position: relative !important;
+                position: static !important;
                 width: 100% !important;
                 height: auto !important;
                 overflow: visible !important;
@@ -3570,7 +3604,7 @@ export default function App() {
             }
           `}</style>
         )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`relative px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans ${isForPrint ? "pb-24 print:pb-24" : "pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"}`}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "static pb-24 print:static print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           
           {/* Faint Watermark background using PharmaLogo */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]">
@@ -6201,7 +6235,7 @@ export default function App() {
                 }
                 #reconciliation-printable-invoice {
                   display: block !important;
-                  position: relative !important;
+                  position: static !important;
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
