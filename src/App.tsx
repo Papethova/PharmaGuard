@@ -6061,7 +6061,123 @@ export default function App() {
               <Button
                 type="button"
                 onClick={() => {
-                  window.print();
+                  const printableElement = document.getElementById("reconciliation-printable-root");
+                  if (!printableElement) {
+                    window.print();
+                    return;
+                  }
+
+                  const iframe = document.createElement("iframe");
+                  iframe.style.position = "absolute";
+                  iframe.style.width = "0";
+                  iframe.style.height = "0";
+                  iframe.style.border = "none";
+                  iframe.style.visibility = "hidden";
+                  
+                  document.body.appendChild(iframe);
+                  
+                  const iframeWindow = iframe.contentWindow;
+                  const iframeDoc = iframe.contentDocument || iframeWindow?.document;
+                  if (!iframeWindow || !iframeDoc) {
+                    window.print();
+                    return;
+                  }
+
+                  iframeDoc.open();
+                  iframeDoc.write(`
+                    <!DOCTYPE html>
+                    <html>
+                      <head>
+                        <title>Reconciliation Report Print Preview</title>
+                        <meta charset="utf-8">
+                      </head>
+                      <body style="background: white; margin: 0; padding: 0;">
+                        <div id="reconciliation-printable-root">
+                          ${printableElement.innerHTML}
+                        </div>
+                      </body>
+                    </html>
+                  `);
+                  iframeDoc.close();
+
+                  const styleElements = document.querySelectorAll("link[rel='stylesheet'], style");
+                  styleElements.forEach((style) => {
+                    iframeDoc.head.appendChild(style.cloneNode(true));
+                  });
+
+                  const inlineStyle = iframeDoc.createElement("style");
+                  inlineStyle.textContent = `
+                    @page {
+                      size: landscape;
+                      margin: 10mm 15mm 10mm 15mm;
+                      @bottom-right {
+                        content: "page " counter(page) " of " counter(pages);
+                        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                        font-size: 8px;
+                        font-weight: bold;
+                        color: #111827;
+                      }
+                      @bottom-left {
+                        content: "Generated With PharmaGuard";
+                        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                        font-size: 8px;
+                        font-weight: bold;
+                        color: #111827;
+                      }
+                    }
+                    html, body {
+                      position: static !important;
+                      overflow: visible !important;
+                      overflow-x: visible !important;
+                      overflow-y: visible !important;
+                      width: 100% !important;
+                      height: auto !important;
+                      min-height: 0 !important;
+                      max-height: none !important;
+                      margin: 0 !important;
+                      padding: 0 !important;
+                      background: white !important;
+                      display: block !important;
+                      -webkit-print-color-adjust: exact !important;
+                      print-color-adjust: exact !important;
+                    }
+                    #reconciliation-printable-root {
+                      display: block !important;
+                      position: static !important;
+                      width: 100% !important;
+                      height: auto !important;
+                      overflow: visible !important;
+                      padding: 0 !important;
+                      margin: 0 !important;
+                      background: white !important;
+                    }
+                    #reconciliation-printable-invoice {
+                      display: block !important;
+                      position: relative !important;
+                      width: 100% !important;
+                      height: auto !important;
+                      overflow: visible !important;
+                      max-height: none !important;
+                      background: white !important;
+                    }
+                    tr {
+                      page-break-inside: avoid !important;
+                      break-inside: avoid !important;
+                    }
+                    .break-inside-avoid {
+                      page-break-inside: avoid !important;
+                      break-inside: avoid !important;
+                    }
+                  `;
+                  iframeDoc.head.appendChild(inlineStyle);
+
+                  setTimeout(() => {
+                    iframeWindow.focus();
+                    iframeWindow.print();
+                    setTimeout(() => {
+                      document.body.removeChild(iframe);
+                    }, 1000);
+                  }, 300);
                 }}
                 className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center justify-center"
               >
