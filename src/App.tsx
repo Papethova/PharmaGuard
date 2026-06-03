@@ -5662,8 +5662,34 @@ export default function App() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  medicationHistoryTransactions.map((t) => (
-                      <TableRow key={t.id} className="text-xs h-10 hover:bg-brand-blue/5 transition-colors">
+                  medicationHistoryTransactions.map((t) => {
+                    const isNewSinceLastReport = (() => {
+                      if (!isReconOpen) return false;
+                      if (!historicalReports || historicalReports.length === 0) return false;
+                      
+                      let maxReportTime = 0;
+                      historicalReports.forEach(r => {
+                        if (r.timestamp) {
+                          const ms = new Date(r.timestamp).getTime();
+                          if (ms > maxReportTime) {
+                            maxReportTime = ms;
+                          }
+                        }
+                      });
+                      
+                      if (maxReportTime === 0) return false;
+                      return getTimestampMs(t.timestamp) > maxReportTime;
+                    })();
+
+                    return (
+                      <TableRow 
+                        key={t.id} 
+                        className={`text-xs h-10 transition-colors ${
+                          isNewSinceLastReport 
+                            ? "bg-brand-light-grey/80 hover:bg-brand-blue/10 font-medium" 
+                            : "bg-white hover:bg-brand-blue/5"
+                        }`}
+                      >
                         <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
                           {formatDateTime(t.timestamp)}
                         </TableCell>
@@ -5703,7 +5729,8 @@ export default function App() {
                           )}
                         </TableCell>
                       </TableRow>
-                    ))
+                    );
+                  })
                 )}
               </TableBody>
             </table>
