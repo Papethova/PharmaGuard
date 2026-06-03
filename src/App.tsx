@@ -1436,7 +1436,7 @@ export default function App() {
     };
   }, []);
 
-  // Real-time Data Listeners
+  // Active state cleaning hook when user logging status changes
   useEffect(() => {
     if (!user) {
       setInventory([]);
@@ -1446,25 +1446,22 @@ export default function App() {
       setReconCounts({});
       setReconTimestamps({});
       setReconReasons({});
-      return;
     }
+  }, [user]);
+
+  // Real-time Data Listeners split to prevent redundant re-subscription reads of all collections
+  // whenever any sub-limit or single sync property updates in real-time.
+  useEffect(() => {
+    if (!user) return;
 
     const emailId = user.email?.toLowerCase() || user.uid;
     const uid = user.uid;
-    
-    // Recovery Logic: If we have an email but no data at the email path, we should check the UID path for legacy data
-    // This is handled by the identity recovery earlier, but for the actual listeners, we need to be careful.
-    // However, listeners should stay on the Unified Node once migrated.
-    
     const substancesRef = collection(db, "users", emailId, "substances");
-    const transactionsRef = collection(db, "users", emailId, "transactions");
-    const staffRef = collection(db, "users", emailId, "staff");
 
     const unsubSubstances = onSnapshot(substancesRef, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Substance));
       setInventory(items);
     }, (error) => {
-      // Avoid toast spam for unapproved accounts that can't list their own subcollections yet
       if (userProfile?.status === 'active') {
         handleFirestoreError(error, OperationType.LIST, `users/${uid}/substances`);
       } else {
@@ -1472,16 +1469,15 @@ export default function App() {
       }
     });
 
-    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(syncLimit)), (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-      setTransactions(items);
-    }, (error) => {
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/transactions`);
-      } else {
-        console.warn("Transactions listener failed - likely pending approval:", error);
-      }
-    });
+    return () => unsubSubstances();
+  }, [user, userProfile?.status]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const emailId = user.email?.toLowerCase() || user.uid;
+    const uid = user.uid;
+    const staffRef = collection(db, "users", emailId, "staff");
 
     const unsubStaff = onSnapshot(staffRef, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ 
@@ -1490,7 +1486,6 @@ export default function App() {
         title: doc.data().title as string
       }));
       
-      // Sort: PIC > RPh > Tech > Others, then Alphabetical
       items.sort((a, b) => {
         const getPriority = (title: string = "") => {
           const t = title.toUpperCase();
@@ -1516,7 +1511,15 @@ export default function App() {
       }
     });
 
+    return () => unsubStaff();
+  }, [user, userProfile?.status]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const emailId = user.email?.toLowerCase() || user.uid;
     const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
+
     const unsubReports = onSnapshot(reportsRef, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setHistoricalReports(items);
@@ -1524,12 +1527,28 @@ export default function App() {
       console.warn("Reports listener failed:", error);
     });
 
-    return () => {
-      unsubSubstances();
-      unsubTransactions();
-      unsubStaff();
-      unsubReports();
-    };
+    return () => unsubReports();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const emailId = user.email?.toLowerCase() || user.uid;
+    const uid = user.uid;
+    const transactionsRef = collection(db, "users", emailId, "transactions");
+
+    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(syncLimit)), (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      setTransactions(items);
+    }, (error) => {
+      if (userProfile?.status === 'active') {
+        handleFirestoreError(error, OperationType.LIST, `users/${uid}/transactions`);
+      } else {
+        console.warn("Transactions listener failed - likely pending approval:", error);
+      }
+    });
+
+    return () => unsubTransactions();
   }, [user, userProfile?.status, syncLimit]);
 
   // Medication-specific transactions listener for high-performance and deep historical records
@@ -2876,27 +2895,33 @@ export default function App() {
       });
   }, [isUsingFallback, transactions, substanceTransactions, selectedSubstanceDetail?.id]);
 
-  // Auto-fill logic for general Audit Log when filters exclude matches, ensuring search can find older items
+  // Auto-fill logic for general Audit Log when filters exclude matches, debounced to prevent infinite loops and excess Firestore reads
   useEffect(() => {
     if (transactions.length > 0 && transactions.length >= syncLimit) {
       if (filteredTransactions.length < 30) {
-        setSyncLimit(prev => Math.min(prev + 30, 1000));
+        const timer = setTimeout(() => {
+          setSyncLimit(prev => Math.min(prev + 30, 1000));
+        }, 1500); // 1.5s debounce to stop hot loops & keep search highly cost-effective
+        return () => clearTimeout(timer);
       }
     }
   }, [transactions.length, syncLimit, filteredTransactions.length]);
 
-  // Auto-fill logic for Substance Detail History dialog
+  // Auto-fill logic for Substance Detail History dialog, debounced to stop runaway queries costing unnecessary reads
   useEffect(() => {
     if (selectedSubstanceDetail) {
       const rawLimit = isUsingFallback ? syncLimit : substanceHistoryLimit;
       const rawLength = isUsingFallback ? transactions.length : substanceTransactions.length;
       if (rawLength > 0 && rawLength >= rawLimit) {
         if (medicationHistoryTransactions.length < 30) {
-          if (isUsingFallback) {
-            setSyncLimit(prev => Math.min(prev + 30, 1000));
-          } else {
-            setSubstanceHistoryLimit(prev => Math.min(prev + 30, 1000));
-          }
+          const timer = setTimeout(() => {
+            if (isUsingFallback) {
+              setSyncLimit(prev => Math.min(prev + 30, 1000));
+            } else {
+              setSubstanceHistoryLimit(prev => Math.min(prev + 30, 1000));
+            }
+          }, 1500); // 1.5s rate-limit gate ensures data loads gracefully without draining GCP free tier read quota
+          return () => clearTimeout(timer);
         }
       }
     }
