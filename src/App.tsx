@@ -6188,21 +6188,41 @@ export default function App() {
                                   size: landscape;
                                   margin: 10mm 15mm 10mm 15mm;
                                 }
+                                html, body {
+                                  width: 100% !important;
+                                  height: auto !important;
+                                  min-height: 0 !important;
+                                  max-height: none !important;
+                                  overflow: visible !important;
+                                  overflow-x: visible !important;
+                                  overflow-y: visible !important;
+                                  position: static !important;
+                                  top: auto !important;
+                                  left: auto !important;
+                                  right: auto !important;
+                                  bottom: auto !important;
+                                  overscroll-behavior: auto !important;
+                                  background: white !important;
+                                  color: black !important;
+                                }
                                 body {
                                   margin: 0 !important;
                                   padding: 0 !important;
-                                  background: white !important;
-                                  color: black !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                                   -webkit-print-color-adjust: exact !important;
                                   print-color-adjust: exact !important;
+                                  display: block !important;
                                 }
                                 #reconciliation-printable-root {
                                   display: block !important;
                                   position: static !important;
                                   width: 100% !important;
                                   height: auto !important;
+                                  min-height: 0 !important;
+                                  max-height: none !important;
                                   overflow: visible !important;
+                                  padding: 0 !important;
+                                  margin: 0 !important;
                                   background: white !important;
                                 }
                                 #reconciliation-printable-invoice {
@@ -6210,8 +6230,9 @@ export default function App() {
                                   position: static !important;
                                   width: 100% !important;
                                   height: auto !important;
-                                  overflow: visible !important;
+                                  min-height: 0 !important;
                                   max-height: none !important;
+                                  overflow: visible !important;
                                   box-shadow: none !important;
                                   border: none !important;
                                 }
