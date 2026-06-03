@@ -6166,7 +6166,96 @@ export default function App() {
               <Button
                 type="button"
                 onClick={() => {
-                  window.print();
+                  let printedViaPopup = false;
+                  try {
+                    const printContent = document.getElementById("reconciliation-printable-root")?.innerHTML;
+                    if (printContent) {
+                      // Grab all head style and link tags to compile styling accurately inside the popup
+                      const styleTags = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
+                        .map(tag => tag.outerHTML)
+                        .join("\n");
+                        
+                      const printWindow = window.open("", "_blank");
+                      if (printWindow) {
+                        printWindow.document.write(`
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <title>PharmaGuard Reconciliation Report</title>
+                              ${styleTags}
+                              <style>
+                                @page {
+                                  size: landscape;
+                                  margin: 10mm 15mm 10mm 15mm;
+                                }
+                                body {
+                                  margin: 0 !important;
+                                  padding: 0 !important;
+                                  background: white !important;
+                                  color: black !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                                  -webkit-print-color-adjust: exact !important;
+                                  print-color-adjust: exact !important;
+                                }
+                                #reconciliation-printable-root {
+                                  display: block !important;
+                                  position: static !important;
+                                  width: 100% !important;
+                                  height: auto !important;
+                                  overflow: visible !important;
+                                  background: white !important;
+                                }
+                                #reconciliation-printable-invoice {
+                                  display: block !important;
+                                  position: static !important;
+                                  width: 100% !important;
+                                  height: auto !important;
+                                  overflow: visible !important;
+                                  max-height: none !important;
+                                  box-shadow: none !important;
+                                  border: none !important;
+                                }
+                                tr {
+                                  page-break-inside: avoid !important;
+                                  break-inside: avoid !important;
+                                }
+                                .break-inside-avoid {
+                                  page-break-inside: avoid !important;
+                                  break-inside: avoid !important;
+                                }
+                              </style>
+                            </head>
+                            <body class="bg-white">
+                              <div id="reconciliation-printable-root">
+                                ${printContent}
+                              </div>
+                              <script>
+                                function triggerPrint() {
+                                  setTimeout(() => {
+                                    window.print();
+                                    setTimeout(() => { window.close(); }, 1500);
+                                  }, 800);
+                                }
+                                if (document.readyState === 'complete') {
+                                  triggerPrint();
+                                } else {
+                                  window.addEventListener('load', triggerPrint);
+                                }
+                              </script>
+                            </body>
+                          </html>
+                        `);
+                        printWindow.document.close();
+                        printedViaPopup = true;
+                      }
+                    }
+                  } catch (e) {
+                    console.warn("Failed to print via popup tab, using standard fallback print:", e);
+                  }
+
+                  if (!printedViaPopup) {
+                    window.print();
+                  }
                 }}
                 className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center justify-center"
               >
