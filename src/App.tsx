@@ -511,6 +511,7 @@ export default function App() {
   const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">("C-II");
 
   const [reconCounts, setReconCounts] = useState<Record<string, string>>({});
+  const [reconTimestamps, setReconTimestamps] = useState<Record<string, string>>({});
   const [reconReasons, setReconReasons] = useState<Record<string, string>>({});
   const [reconUser, setReconUser] = useState("");
   const [reconWitness, setReconWitness] = useState("");
@@ -1300,6 +1301,7 @@ export default function App() {
       setUsers([]);
       setHistoricalReports([]);
       setReconCounts({});
+      setReconTimestamps({});
       setReconReasons({});
       return;
     }
@@ -1791,7 +1793,7 @@ export default function App() {
 
       const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
-      if (isSigRequired) {
+      if (isSigRequired && !(isReconOpen && transactionType === "VERIFY")) {
         const pad = sigPad.current;
         if (!pad || pad.isEmpty()) {
           toast.error(transactionType === "VERIFY" ? "Signature is required to verify the physical count" : "Signature is required for compliance");
@@ -1829,6 +1831,16 @@ export default function App() {
       }
 
       if (!currentMed) throw new Error("Medication not discovered in node");
+
+      if (isReconOpen && transactionType === "VERIFY") {
+        setReconCounts(prev => ({ ...prev, [targetMedId]: quantity }));
+        setReconTimestamps(prev => ({ ...prev, [targetMedId]: new Date().toISOString() }));
+        toast.success("Count cached in reconciliation form.");
+        setIsLogOpen(false);
+        resetForm();
+        setIsSubmitting(false);
+        return;
+      }
 
       const previousStock = currentMed.currentStock;
       const amount = Number(quantity);
@@ -2011,7 +2023,7 @@ export default function App() {
             performedBy: user.uid,
             performedByName: performedByName,
             performedByTitle: performedByTitle,
-            timestamp: serverTimestamp(),
+            timestamp: reconTimestamps[targetMedId] ? new Date(reconTimestamps[targetMedId]) : serverTimestamp(),
             reason: `Reconciliation Discrepancy: ${reconReasons[s.id] || "Unexplained discrepancies"}`,
             referenceNumber: reconRef,
             signature,
@@ -2035,7 +2047,7 @@ export default function App() {
             performedBy: user.uid,
             performedByName: performedByName,
             performedByTitle: performedByTitle,
-            timestamp: serverTimestamp(),
+            timestamp: reconTimestamps[targetMedId] ? new Date(reconTimestamps[targetMedId]) : serverTimestamp(),
             reason: "Reconciliation Audit: perfect match verified",
             referenceNumber: reconRef,
             signature,
@@ -2078,6 +2090,7 @@ export default function App() {
 
       // Reset the reconciliation window inputs
       setReconCounts({});
+      setReconTimestamps({});
       setReconReasons({});
       setReconUser("");
       setReconWitness("");
@@ -3767,6 +3780,7 @@ export default function App() {
                     // Reset reconciliation forms
                     setReconScheduleFilter("C-II");
                     setReconCounts({});
+                    setReconTimestamps({});
                     setReconReasons({});
                     setReconUser("");
                     setReconWitness("");
