@@ -81,6 +81,7 @@ import { Substance, Transaction, Schedule, UserProfile, TransactionType } from "
 import { MASTER_ADMIN_EMAIL, SCHEDULES, APP_VERSION } from "./lib/constants";
 import SignatureCanvas from "react-signature-canvas";
 import { trimSignatureCanvas } from "./lib/signatureUtils";
+import { ChunkedBatch } from "./lib/chunkedBatch";
 import { 
   auth, 
   db, 
@@ -506,26 +507,145 @@ export default function App() {
     }
   }, [isNodeMigrationOpen]);
 
-  // Reconciliation states
-  const [isReconOpen, setIsReconOpen] = useState(false);
-  const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">("C-II");
+  // Reconciliation states with local caching
+  const [isReconOpen, setIsReconOpen] = useState(() => {
+    return localStorage.getItem("recon_isReconOpen") === "true";
+  });
+  const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">(() => {
+    return (localStorage.getItem("recon_reconScheduleFilter") as "ALL" | "C-II" | "C-III/C-IV/C-V") || "C-II";
+  });
 
-  const [reconCounts, setReconCounts] = useState<Record<string, string>>({});
-  const [reconTimestamps, setReconTimestamps] = useState<Record<string, string>>({});
-  const [reconReasons, setReconReasons] = useState<Record<string, string>>({});
-  const [reconUser, setReconUser] = useState("");
-  const [reconWitness, setReconWitness] = useState("");
+  const [reconCounts, setReconCounts] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem("recon_reconCounts");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [reconTimestamps, setReconTimestamps] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem("recon_reconTimestamps");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [reconReasons, setReconReasons] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem("recon_reconReasons");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [reconUser, setReconUser] = useState(() => {
+    return localStorage.getItem("recon_reconUser") || "";
+  });
+  const [reconWitness, setReconWitness] = useState(() => {
+    return localStorage.getItem("recon_reconWitness") || "";
+  });
   const [isReconSubmitting, setIsReconSubmitting] = useState(false);
   const [reconShowPreview, setReconShowPreview] = useState(false);
   const reconCanvasRef = useRef<any>(null);
-  const [reconSigData, setReconSigData] = useState<string | null>(null);
+  const [reconSigData, setReconSigData] = useState<string | null>(() => {
+    return localStorage.getItem("recon_reconSigData") || null;
+  });
   const picCanvasRef = useRef<any>(null);
-  const [picSigData, setPicSigData] = useState<string | null>(null);
+  const [picSigData, setPicSigData] = useState<string | null>(() => {
+    return localStorage.getItem("recon_picSigData") || null;
+  });
 
   // Added history/selection states
   const [reconViewMode, setReconViewMode] = useState<"form" | "history">("form");
   const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
   const [historicalReports, setHistoricalReports] = useState<any[]>([]);
+
+  // Synchronize reconciliation states to local storage
+  useEffect(() => {
+    localStorage.setItem("recon_isReconOpen", String(isReconOpen));
+  }, [isReconOpen]);
+
+  useEffect(() => {
+    localStorage.setItem("recon_reconScheduleFilter", reconScheduleFilter);
+  }, [reconScheduleFilter]);
+
+  useEffect(() => {
+    localStorage.setItem("recon_reconCounts", JSON.stringify(reconCounts));
+  }, [reconCounts]);
+
+  useEffect(() => {
+    localStorage.setItem("recon_reconTimestamps", JSON.stringify(reconTimestamps));
+  }, [reconTimestamps]);
+
+  useEffect(() => {
+    localStorage.setItem("recon_reconReasons", JSON.stringify(reconReasons));
+  }, [reconReasons]);
+
+  useEffect(() => {
+    localStorage.setItem("recon_reconUser", reconUser);
+  }, [reconUser]);
+
+  useEffect(() => {
+    localStorage.setItem("recon_reconWitness", reconWitness);
+  }, [reconWitness]);
+
+  useEffect(() => {
+    if (reconSigData) {
+      localStorage.setItem("recon_reconSigData", reconSigData);
+    } else {
+      localStorage.removeItem("recon_reconSigData");
+    }
+  }, [reconSigData]);
+
+  useEffect(() => {
+    if (picSigData) {
+      localStorage.setItem("recon_picSigData", picSigData);
+    } else {
+      localStorage.removeItem("recon_picSigData");
+    }
+  }, [picSigData]);
+
+  // Listen to browser storage events to synchronize reconciliation states in real-time across open tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (!e.key) return;
+      if (e.key.startsWith("recon_")) {
+        const val = e.newValue;
+        switch (e.key) {
+          case "recon_isReconOpen":
+            setIsReconOpen(val === "true");
+            break;
+          case "recon_reconScheduleFilter":
+            setReconScheduleFilter((val as any) || "C-II");
+            break;
+          case "recon_reconCounts":
+            try { setReconCounts(val ? JSON.parse(val) : {}); } catch {}
+            break;
+          case "recon_reconTimestamps":
+            try { setReconTimestamps(val ? JSON.parse(val) : {}); } catch {}
+            break;
+          case "recon_reconReasons":
+            try { setReconReasons(val ? JSON.parse(val) : {}); } catch {}
+            break;
+          case "recon_reconUser":
+            setReconUser(val || "");
+            break;
+          case "recon_reconWitness":
+            setReconWitness(val || "");
+            break;
+          case "recon_reconSigData":
+            setReconSigData(val || null);
+            break;
+          case "recon_picSigData":
+            setPicSigData(val || null);
+            break;
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const reconRef = useMemo(() => {
     const today = new Date();
@@ -583,11 +703,28 @@ export default function App() {
   useEffect(() => {
     if (isReconOpen) {
       setTimeout(() => {
-        reconCanvasRef.current?.clear();
-        picCanvasRef.current?.clear();
-      }, 50);
+        if (reconSigData && reconCanvasRef.current) {
+          try {
+            reconCanvasRef.current.fromDataURL(reconSigData);
+          } catch (e) {
+            console.warn("Failed to load recon signature:", e);
+          }
+        } else {
+          reconCanvasRef.current?.clear();
+        }
+
+        if (picSigData && picCanvasRef.current) {
+          try {
+            picCanvasRef.current.fromDataURL(picSigData);
+          } catch (e) {
+            console.warn("Failed to load PIC signature:", e);
+          }
+        } else {
+          picCanvasRef.current?.clear();
+        }
+      }, 150);
     }
-  }, [isReconOpen]);
+  }, [isReconOpen, reconSigData, picSigData]);
 
   const lastReport = useMemo(() => {
     const reconTxs = transactions.filter(t => {
@@ -1969,7 +2106,7 @@ export default function App() {
 
     try {
       setIsReconSubmitting(true);
-      const batch = writeBatch(db);
+      const batch = new ChunkedBatch(db);
       const transactionsRef = collection(db, "users", emailId, "transactions");
       
       const reconPerfBy = users.find(u => u.id === reconUser);
@@ -2098,6 +2235,14 @@ export default function App() {
       setPicSigData(null);
       reconCanvasRef.current?.clear();
       picCanvasRef.current?.clear();
+
+      localStorage.removeItem("recon_reconCounts");
+      localStorage.removeItem("recon_reconTimestamps");
+      localStorage.removeItem("recon_reconReasons");
+      localStorage.removeItem("recon_reconUser");
+      localStorage.removeItem("recon_reconWitness");
+      localStorage.removeItem("recon_reconSigData");
+      localStorage.removeItem("recon_picSigData");
     } catch (error: any) {
       toast.error(`System Error: ${error.message}`);
     } finally {
@@ -3777,15 +3922,6 @@ export default function App() {
                 <Button
                   type="button"
                   onClick={() => {
-                    // Reset reconciliation forms
-                    setReconScheduleFilter("C-II");
-                    setReconCounts({});
-                    setReconTimestamps({});
-                    setReconReasons({});
-                    setReconUser("");
-                    setReconWitness("");
-                    setReconSigData(null);
-                    setPicSigData(null);
                     setReconShowPreview(false);
                     setReconViewMode("form");
                     setSelectedHistoricalReport(null);
