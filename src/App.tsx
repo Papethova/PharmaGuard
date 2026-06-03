@@ -5222,7 +5222,7 @@ export default function App() {
                 onScroll={(e) => {
                   const target = e.currentTarget;
                   if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
-                    if (filteredTransactions.length >= syncLimit) {
+                    if (transactions.length >= syncLimit) {
                       setSyncLimit(prev => prev + 50);
                     }
                   }
