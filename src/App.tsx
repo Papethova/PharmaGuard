@@ -114,6 +114,7 @@ import {
   updateDoc,
   deleteDoc,
   limit,
+  where,
   initializeFirestore,
   memoryLocalCache
 } from "firebase/firestore";
@@ -409,6 +410,11 @@ export default function App() {
 
   // Database Sync limits for speed and low-reads
   const [syncLimit, setSyncLimit] = useState<number>(30);
+
+  // Medication-specific transactions listener state for high-performance and deep history
+  const [substanceTransactions, setSubstanceTransactions] = useState<Transaction[]>([]);
+  const [substanceHistoryLimit, setSubstanceHistoryLimit] = useState<number>(30);
+  const [isUsingFallback, setIsUsingFallback] = useState<boolean>(false);
 
   // Stub variables for hidden pagination compatibility
   const pageSize = 15;
@@ -1525,6 +1531,45 @@ export default function App() {
       unsubReports();
     };
   }, [user, userProfile?.status, syncLimit]);
+
+  // Medication-specific transactions listener for high-performance and deep historical records
+  useEffect(() => {
+    if (!user || !selectedSubstanceDetail) {
+      setSubstanceTransactions([]);
+      setSubstanceHistoryLimit(30);
+      setIsUsingFallback(false);
+      return;
+    }
+
+    const emailId = user.email || "";
+    if (!emailId) return;
+
+    const txRef = collection(db, "users", emailId, "transactions");
+    const q = query(
+      txRef,
+      where("substanceId", "==", selectedSubstanceDetail.id),
+      orderBy("timestamp", "desc"),
+      limit(substanceHistoryLimit)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      setSubstanceTransactions(items);
+      setIsUsingFallback(false);
+    }, (error) => {
+      // If composite index is missing, gracefully auto-fallback to client-filtered global transactions list
+      if (error.code === 'failed-precondition' || error.message?.includes('index')) {
+        console.warn("Firestore index needed for Medication History. Gracefully falling back to client-filtered global transactions list:", error);
+        setIsUsingFallback(true);
+      } else {
+        console.error("Substance transactions listener failed:", error);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, selectedSubstanceDetail, substanceHistoryLimit]);
 
   // Super Admin Listener
   useEffect(() => {
@@ -2813,6 +2858,23 @@ export default function App() {
         return dateB - dateA;
       }),
   [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
+
+  const medicationHistoryTransactions = useMemo(() => {
+    const rawTxs = isUsingFallback
+      ? transactions.filter(t => t.substanceId === selectedSubstanceDetail?.id)
+      : substanceTransactions;
+    
+    return rawTxs
+      .filter(t => {
+        if (!t.referenceNumber) return true;
+        return !t.referenceNumber.startsWith("REC-") && !t.referenceNumber.startsWith("RECON-") && !t.referenceNumber.includes("REC");
+      })
+      .sort((a, b) => {
+        const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+        const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+        return dateB - dateA;
+      });
+  }, [isUsingFallback, transactions, substanceTransactions, selectedSubstanceDetail?.id]);
 
   const lowStockItems = useMemo(() => {
     if (userProfile?.isAlertsEnabled === false) return [];
@@ -5223,7 +5285,7 @@ export default function App() {
                   const target = e.currentTarget;
                   if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
                     if (transactions.length >= syncLimit) {
-                      setSyncLimit(prev => prev + 50);
+                      setSyncLimit(prev => prev + 30);
                     }
                   }
                 }}
@@ -5529,7 +5591,23 @@ export default function App() {
         </div>
 
         <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface">
+          <div 
+            className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface"
+            onScroll={(e) => {
+              const target = e.currentTarget;
+              if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
+                if (isUsingFallback) {
+                  if (transactions.length >= syncLimit) {
+                    setSyncLimit(prev => prev + 30);
+                  }
+                } else {
+                  if (substanceTransactions.length >= substanceHistoryLimit) {
+                    setSubstanceHistoryLimit(prev => prev + 30);
+                  }
+                }
+              }
+            }}
+          >
             <table className="relative border-separate border-spacing-0 w-full text-sm">
               <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
                 <TableRow className="bg-brand-light-grey">
@@ -5543,21 +5621,14 @@ export default function App() {
                 </TableRow>
               </TableHeader>
               <TableBody className="text-brand-dark-grey">
-                {transactions.filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC")).length === 0 ? (
+                {medicationHistoryTransactions.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8 text-brand-dark-grey/50 italic">
                       No transaction history found for this item.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  transactions
-                    .filter(t => t.substanceId === selectedSubstanceDetail?.id && !t.referenceNumber?.includes("REC"))
-                    .sort((a, b) => {
-                      const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
-                      const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
-                      return dateB - dateA;
-                    })
-                    .map((t) => (
+                  medicationHistoryTransactions.map((t) => (
                       <TableRow key={t.id} className="text-xs h-10 hover:bg-brand-blue/5 transition-colors">
                         <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
                           {formatDateTime(t.timestamp)}
