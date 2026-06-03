@@ -410,10 +410,12 @@ export default function App() {
 
   // Database Sync limits for speed and low-reads
   const [syncLimit, setSyncLimit] = useState<number>(30);
+  const isIncrementingSyncLimitRef = useRef(false);
 
   // Medication-specific transactions listener state for high-performance and deep history
   const [substanceTransactions, setSubstanceTransactions] = useState<Transaction[]>([]);
   const [substanceHistoryLimit, setSubstanceHistoryLimit] = useState<number>(30);
+  const isIncrementingSubstanceLimitRef = useRef(false);
   const [isUsingFallback, setIsUsingFallback] = useState<boolean>(false);
 
   // Stub variables for hidden pagination compatibility
@@ -5343,8 +5345,12 @@ export default function App() {
                 onScroll={(e) => {
                   const target = e.currentTarget;
                   if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
-                    if (transactions.length >= syncLimit) {
+                    if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
+                      isIncrementingSyncLimitRef.current = true;
                       setSyncLimit(prev => prev + 30);
+                      setTimeout(() => {
+                        isIncrementingSyncLimitRef.current = false;
+                      }, 1000); // 1s lock allows data to load and render safely
                     }
                   }
                 }}
@@ -5656,12 +5662,20 @@ export default function App() {
               const target = e.currentTarget;
               if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
                 if (isUsingFallback) {
-                  if (transactions.length >= syncLimit) {
+                  if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
+                    isIncrementingSyncLimitRef.current = true;
                     setSyncLimit(prev => prev + 30);
+                    setTimeout(() => {
+                      isIncrementingSyncLimitRef.current = false;
+                    }, 1000);
                   }
                 } else {
-                  if (substanceTransactions.length >= substanceHistoryLimit) {
+                  if (substanceTransactions.length >= substanceHistoryLimit && !isIncrementingSubstanceLimitRef.current) {
+                    isIncrementingSubstanceLimitRef.current = true;
                     setSubstanceHistoryLimit(prev => prev + 30);
+                    setTimeout(() => {
+                      isIncrementingSubstanceLimitRef.current = false;
+                    }, 1000);
                   }
                 }
               }
