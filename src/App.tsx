@@ -6942,8 +6942,22 @@ export default function App() {
                           </td>
                           <td className="py-2 px-4 w-[20%] text-right">
                             {isAdminNode ? (
-                              <div className="flex justify-end pr-2 text-[9px] font-black text-brand-blue uppercase tracking-widest pointer-events-none select-none">
-                                ● SYSTEM ROOT
+                              <div className="flex justify-end items-center gap-2">
+                                <span className="text-[9px] font-black text-brand-blue uppercase tracking-widest pointer-events-none select-none">
+                                  ● SYSTEM ROOT
+                                </span>
+                                <Button 
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setNodeToReset(profile);
+                                    setIsResetConfirmOpen(true);
+                                  }}
+                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-yellow"
+                                  title="Clear User Data"
+                                >
+                                  <RefreshCcw className="h-3.5 w-3.5" />
+                                </Button>
                               </div>
                             ) : (
                               <div className="flex justify-end gap-1">
