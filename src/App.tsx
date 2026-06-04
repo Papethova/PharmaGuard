@@ -5703,21 +5703,27 @@ export default function App() {
                 ) : (
                   medicationHistoryTransactions.map((t) => {
                     const isNewSinceLastReport = (() => {
-                      if (!isReconOpen) return false;
-                      if (!historicalReports || historicalReports.length === 0) return false;
-                      
                       let maxReportTime = 0;
-                      historicalReports.forEach(r => {
-                        if (r.timestamp) {
-                          const ms = new Date(r.timestamp).getTime();
-                          if (ms > maxReportTime) {
-                            maxReportTime = ms;
+                      if (historicalReports && historicalReports.length > 0) {
+                        historicalReports.forEach(r => {
+                          if (r.timestamp) {
+                            const ms = new Date(r.timestamp).getTime();
+                            if (ms > maxReportTime) {
+                              maxReportTime = ms;
+                            }
                           }
-                        }
-                      });
+                        });
+                      }
                       
-                      if (maxReportTime === 0) return false;
-                      return getTimestampMs(t.timestamp) > maxReportTime;
+                      if (lastReport && lastReport.timestampMs && lastReport.timestampMs > maxReportTime) {
+                        maxReportTime = lastReport.timestampMs;
+                      }
+                      
+                      if (maxReportTime > 0) {
+                        return getTimestampMs(t.timestamp) > maxReportTime;
+                      }
+                      
+                      return true;
                     })();
 
                     return (
@@ -5725,7 +5731,7 @@ export default function App() {
                         key={t.id} 
                         className={`text-xs h-10 transition-colors ${
                           isNewSinceLastReport 
-                            ? "bg-brand-light-grey/80 hover:bg-brand-blue/10 font-medium" 
+                            ? "bg-brand-yellow/10 hover:bg-brand-yellow/20 font-semibold" 
                             : "bg-white hover:bg-brand-blue/5"
                         }`}
                       >
