@@ -1026,6 +1026,17 @@ export default function App() {
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [editingOrgName, setEditingOrgName] = useState("");
   const [currentTab, setCurrentTab] = useState<string>("inventory");
+  const [isTabVisible, setIsTabVisible] = useState(document.visibilityState === "visible");
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsTabVisible(document.visibilityState === "visible");
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   const isMasterAdmin = useMemo(() => {
     const email = user?.email?.toLowerCase();
@@ -1476,7 +1487,7 @@ export default function App() {
   // Real-time Data Listeners split to prevent redundant re-subscription reads of all collections
   // whenever any sub-limit or single sync property updates in real-time.
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isTabVisible) return;
 
     const emailId = user.email?.toLowerCase() || user.uid;
     const uid = user.uid;
@@ -1494,10 +1505,10 @@ export default function App() {
     });
 
     return () => unsubSubstances();
-  }, [user, userProfile?.status]);
+  }, [user, userProfile?.status, isTabVisible]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isTabVisible) return;
 
     const emailId = user.email?.toLowerCase() || user.uid;
     const uid = user.uid;
@@ -1536,10 +1547,10 @@ export default function App() {
     });
 
     return () => unsubStaff();
-  }, [user, userProfile?.status]);
+  }, [user, userProfile?.status, isTabVisible]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isTabVisible) return;
 
     const emailId = user.email?.toLowerCase() || user.uid;
     const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
@@ -1552,10 +1563,10 @@ export default function App() {
     });
 
     return () => unsubReports();
-  }, [user]);
+  }, [user, isTabVisible]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isTabVisible) return;
 
     const emailId = user.email?.toLowerCase() || user.uid;
     const uid = user.uid;
@@ -1573,13 +1584,15 @@ export default function App() {
     });
 
     return () => unsubTransactions();
-  }, [user, userProfile?.status, syncLimit]);
+  }, [user, userProfile?.status, syncLimit, isTabVisible]);
 
   // Medication-specific transactions listener for high-performance and deep historical records
   useEffect(() => {
-    if (!user || !selectedSubstanceDetail) {
+    if (!user || !selectedSubstanceDetail || !isTabVisible) {
       setSubstanceTransactions([]);
-      setSubstanceHistoryLimit(30);
+      if (!user || !selectedSubstanceDetail) {
+        setSubstanceHistoryLimit(30);
+      }
       setIsUsingFallback(false);
       return;
     }
@@ -1612,11 +1625,11 @@ export default function App() {
     return () => {
       unsubscribe();
     };
-  }, [user, selectedSubstanceDetail, substanceHistoryLimit]);
+  }, [user, selectedSubstanceDetail, substanceHistoryLimit, isTabVisible]);
 
   // Super Admin Listener
   useEffect(() => {
-    if (!user || !isMasterAdmin) {
+    if (!user || !isMasterAdmin || !isTabVisible) {
       setAllUserProfiles([]);
       return;
     }
@@ -1637,7 +1650,7 @@ export default function App() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, isTabVisible]);
 
   const handleGoogleLogin = async () => {
     setIsSubmitting(true);
