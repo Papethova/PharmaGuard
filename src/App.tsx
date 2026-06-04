@@ -1370,6 +1370,21 @@ export default function App() {
             if (!userDoc || !userDoc.exists()) {
               if (authModeRef.current === "signup") {
                 console.log("onAuthStateChanged: Skipping auto-profile creation during signup to let handleEmailSignUp handle it definitively.");
+              } else if (currentUser.providerData && currentUser.providerData.some((p: any) => p.providerId === "google.com")) {
+                console.log("onAuthStateChanged: Automatically provisioning profile for new Google SSO user:", emailId);
+                const isMaster = emailId === MASTER_ADMIN_EMAIL.toLowerCase();
+                const defaultOrgName = currentUser.displayName || `Clinical Node (${emailId.split('@')[0]})`;
+                const newProfile = {
+                  uid: currentUser.uid,
+                  email: emailId,
+                  displayName: currentUser.displayName || emailId,
+                  organizationName: defaultOrgName,
+                  password: "Google SSO Identity Token",
+                  role: isMaster ? "admin" : "pharmacist",
+                  status: isMaster ? "active" : "pending"
+                };
+                await setDoc(userDocRef, newProfile, { merge: true });
+                userDoc = await getDoc(userDocRef);
               } else {
                 // Not in signup mode and the Firestore document is missing. Log out immediately and show unregistered message.
                 console.log("No registered profile found in Firestore. Disallowing login.");
@@ -1397,18 +1412,25 @@ export default function App() {
           }
 
           // 3. Real-time profile listener on the stable primary identifier
+          let hasHadProfile = !!(userDoc && userDoc.exists());
           if (unsubProfile) unsubProfile();
           unsubProfile = onSnapshot(userDocRef, async (doc) => {
             if (doc.exists()) {
+              hasHadProfile = true;
               const data = doc.data() as UserProfile;
               setUserProfile(data);
             } else {
               // Node was deleted/purged in real-time! Force log out.
-              console.log(`Real-time: User profile ${emailId} no longer exists. Signing out.`);
-              await signOut(auth);
-              setUserProfile(null);
-              setUser(null);
-              toast.error("Your organizational node has been revoked or purged. Access terminated.");
+              // ONLY sign out if not in the signup or initial registration phase
+              if (authModeRef.current === "signup") {
+                console.log("onSnapshot: Skipping auto-logout during signup mode.");
+              } else if (hasHadProfile) {
+                console.log(`Real-time: User profile ${emailId} no longer exists. Signing out.`);
+                await signOut(auth);
+                setUserProfile(null);
+                setUser(null);
+                toast.error("Your organizational node has been revoked or purged. Access terminated.");
+              }
             }
           }, (error) => {
             handleFirestoreError(error, OperationType.GET, `users/${emailId}`);
