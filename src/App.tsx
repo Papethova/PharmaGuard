@@ -2811,10 +2811,6 @@ export default function App() {
     allUserProfiles.forEach(p => {
       const emailLower = (p.email || "").toLowerCase().trim();
       
-      // EXCLUSION: COMPLETELY hide any record belonging to the Master Admin
-      // This includes the unified node and any legacy UID nodes that share the email.
-      if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return;
-
       // Deduplication: If we have multiple entries for the same customer email
       if (emailLower && seenEmails.has(emailLower)) {
         // Prefer the one with an organization name or more complete data
@@ -2839,18 +2835,11 @@ export default function App() {
                (p.docId?.toLowerCase() || "").includes(term);
       })
       .sort((a: UserProfile, b: UserProfile) => {
-        // Priority: pharmacist > admin > technician
-        const getRolePriority = (role?: string) => {
-          if (role === 'pharmacist') return 1;
-          if (role === 'admin') return 2;
-          if (role === 'technician') return 3;
-          return 4;
-        };
+        const isMasterA = (a.email || "").toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim();
+        const isMasterB = (b.email || "").toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim();
 
-        const pA = getRolePriority(a.role);
-        const pB = getRolePriority(b.role);
-
-        if (pA !== pB) return pA - pB;
+        if (isMasterA && !isMasterB) return -1;
+        if (!isMasterA && isMasterB) return 1;
 
         const nameA = (a.organizationName || a.displayName || "").toLowerCase();
         const nameB = (b.organizationName || b.displayName || "").toLowerCase();
@@ -6815,7 +6804,7 @@ export default function App() {
                 <div className="flex flex-col">
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Registry Synchronization Status</span>
                   <span className="text-xs font-black text-brand-blue/80 tracking-tight">
-                    {filteredUserProfiles.length} Managed Customer Nodes Registered
+                    {filteredUserProfiles.filter(p => (p.email || "").toLowerCase().trim() !== MASTER_ADMIN_EMAIL.toLowerCase().trim()).length} Managed Customer Nodes Registered
                   </span>
                 </div>
               </div>
@@ -6887,90 +6876,106 @@ export default function App() {
               <table className="w-full table-fixed">
                 <tbody className="divide-y divide-brand-blue/5">
                   {filteredUserProfiles.length > 0 ? (
-                    filteredUserProfiles.map((profile) => (
-                      <tr key={profile.docId || profile.uid} className="hover:bg-brand-blue/5 transition-colors h-14">
-                        <td className="py-2 px-4 w-[80%]">
-                          <div className="flex flex-col gap-0.5 min-w-0">
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
-                                {escapeEmail(profile.organizationName || profile.displayName || "Unregistered Node")}
-                              </span>
-                              {profile.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && (
-                                <Badge className="bg-brand-blue text-white text-[7px] font-black px-1.5 h-3.5 rounded-sm uppercase tracking-tighter">
-                                  MASTER AUTHORITY
+                    filteredUserProfiles.map((profile) => {
+                      const isAdminNode = (profile.email || "").toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim();
+                      return (
+                        <tr 
+                          key={profile.docId || profile.uid} 
+                          className={`transition-colors h-14 border-b border-brand-blue/5 ${
+                            isAdminNode 
+                              ? 'bg-brand-blue/10 hover:bg-brand-blue/15 border-l-4 border-brand-yellow' 
+                              : 'hover:bg-brand-blue/5'
+                          }`}
+                        >
+                          <td className="py-2 px-4 w-[80%]">
+                            <div className="flex flex-col gap-0.5 min-w-0">
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
+                                  {escapeEmail(profile.organizationName || profile.displayName || "Unregistered Node")}
+                                </span>
+                                {profile.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && (
+                                  <Badge className="bg-brand-blue text-white text-[7px] font-black px-1.5 h-3.5 rounded-sm uppercase tracking-tighter animate-pulse">
+                                    MASTER AUTHORITY
+                                  </Badge>
+                                )}
+                                <Badge 
+                                  className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
+                                    profile.status === 'active' 
+                                      ? 'bg-green-50 text-green-700 border-green-200' 
+                                      : profile.status === 'pending'
+                                        ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
+                                        : 'bg-red-50 text-red-700 border-red-200'
+                                  }`}
+                                >
+                                  {profile.status === 'active' ? '● Active' : profile.status === 'pending' ? '● Pending' : '● Suspended'}
                                 </Badge>
-                              )}
-                              <Badge 
-                                className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
-                                  profile.status === 'active' 
-                                    ? 'bg-green-50 text-green-700 border-green-200' 
-                                    : profile.status === 'pending'
-                                      ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
-                                      : 'bg-red-50 text-red-700 border-red-200'
-                                }`}
-                              >
-                                {profile.status === 'active' ? '● Active' : profile.status === 'pending' ? '● Pending' : '● Suspended'}
-                              </Badge>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5 min-w-0">
-                               <span className="text-[10px] text-brand-grey font-medium break-all block no-interact">
-                                 <span className="cursor-default select-none no-underline flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                                   <span>{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
-                                   {profile.email && profile.password && profile.password.toLowerCase() !== "legacy account" && (
-                                     <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded select-all leading-none inline-flex items-center whitespace-nowrap">
-                                        PW: {profile.password}
-                                     </span>
-                                   )}
+                              </div>
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5 min-w-0">
+                                 <span className="text-[10px] text-brand-grey font-medium break-all block no-interact">
+                                   <span className="cursor-default select-none no-underline flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                                     <span>{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
+                                     {profile.email && profile.password && profile.password.toLowerCase() !== "legacy account" && (
+                                       <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded select-all leading-none inline-flex items-center whitespace-nowrap">
+                                          PW: {profile.password}
+                                       </span>
+                                     )}
+                                   </span>
                                  </span>
-                               </span>
-                               <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10 whitespace-nowrap">
-                                 UID: {profile.docId}
-                               </Badge>
+                                 <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10 whitespace-nowrap">
+                                   UID: {profile.docId}
+                                 </Badge>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-2 px-4 w-[20%] text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button 
-                              variant={profile.status === 'active' ? 'outline' : 'default'}
-                              size="sm"
-                              onClick={() => handleUpdateSubscription(profile.docId || profile.uid, profile.status)}
-                              className={`font-black uppercase tracking-tighter text-[9px] h-7 px-3 border transition-all shrink-0 ${
-                                profile.status === 'active' 
-                                  ? 'border-red-100 text-red-600 hover:bg-red-600 hover:text-white' 
-                                  : 'bg-brand-blue text-white hover:bg-brand-blue/90'
-                              }`}
-                            >
-                              {profile.status === 'active' ? 'Suspend' : profile.status === 'pending' ? 'Grant Access' : 'Restore'}
-                            </Button>
-                            <Button 
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setNodeToReset(profile);
-                                setIsResetConfirmOpen(true);
-                              }}
-                              className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-yellow"
-                              title="Clear User Data"
-                            >
-                              <RefreshCcw className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button 
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setNodeToDelete(profile);
-                                setIsDeleteConfirmOpen(true);
-                              }}
-                              className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                              title="Purge Node"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                          <td className="py-2 px-4 w-[20%] text-right">
+                            {isAdminNode ? (
+                              <div className="flex justify-end pr-2 text-[9px] font-black text-brand-blue uppercase tracking-widest pointer-events-none select-none">
+                                ● SYSTEM ROOT
+                              </div>
+                            ) : (
+                              <div className="flex justify-end gap-1">
+                                <Button 
+                                  variant={profile.status === 'active' ? 'outline' : 'default'}
+                                  size="sm"
+                                  onClick={() => handleUpdateSubscription(profile.docId || profile.uid, profile.status)}
+                                  className={`font-black uppercase tracking-tighter text-[9px] h-7 px-3 border transition-all shrink-0 ${
+                                    profile.status === 'active' 
+                                      ? 'border-red-100 text-red-600 hover:bg-red-600 hover:text-white' 
+                                      : 'bg-brand-blue text-white hover:bg-brand-blue/90'
+                                  }`}
+                                >
+                                  {profile.status === 'active' ? 'Suspend' : profile.status === 'pending' ? 'Grant Access' : 'Restore'}
+                                </Button>
+                                <Button 
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setNodeToReset(profile);
+                                    setIsResetConfirmOpen(true);
+                                  }}
+                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-yellow"
+                                  title="Clear User Data"
+                                >
+                                  <RefreshCcw className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button 
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setNodeToDelete(profile);
+                                    setIsDeleteConfirmOpen(true);
+                                  }}
+                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                  title="Purge Node"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
                       <td colSpan={2} className="py-12 border-none">
