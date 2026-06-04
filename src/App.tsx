@@ -5703,10 +5703,23 @@ export default function App() {
                 ) : (
                   medicationHistoryTransactions.map((t) => {
                     const isNewSinceLastReport = (() => {
+                      if (!isReconOpen) return false;
+                      if (!selectedSubstanceDetail) return false;
+
                       let maxReportTime = 0;
+                      
+                      // 1. Check historical reports that contain this specific medication
                       if (historicalReports && historicalReports.length > 0) {
                         historicalReports.forEach(r => {
-                          if (r.timestamp) {
+                          const hasMed = 
+                            (r.items && r.items.some((item: any) => item.substanceId === selectedSubstanceDetail.id)) ||
+                            (!r.items && (
+                              r.scheduleFilter === "ALL" || 
+                              r.scheduleFilter === selectedSubstanceDetail.schedule ||
+                              (r.scheduleFilter === "C-III/C-IV/C-V" && (selectedSubstanceDetail.schedule === "C-III" || selectedSubstanceDetail.schedule === "C-IV" || selectedSubstanceDetail.schedule === "C-V"))
+                            ));
+                          
+                          if (hasMed && r.timestamp) {
                             const ms = new Date(r.timestamp).getTime();
                             if (ms > maxReportTime) {
                               maxReportTime = ms;
@@ -5715,7 +5728,30 @@ export default function App() {
                         });
                       }
                       
-                      if (lastReport && lastReport.timestampMs && lastReport.timestampMs > maxReportTime) {
+                      // 2. Check general transaction logs for any previous reconciliation transactions of this specific medication
+                      const medReconTxs = transactions.filter(tx => 
+                        tx.substanceId === selectedSubstanceDetail.id &&
+                        tx.referenceNumber && 
+                        (tx.referenceNumber.startsWith("REC-") || tx.referenceNumber.startsWith("RECON-") || tx.referenceNumber.includes("REC")) &&
+                        tx.referenceNumber !== reconRef
+                      );
+                      
+                      if (medReconTxs.length > 0) {
+                        medReconTxs.forEach(tx => {
+                          const ms = getTimestampMs(tx.timestamp);
+                          if (ms > maxReportTime) {
+                            maxReportTime = ms;
+                          }
+                        });
+                      }
+
+                      // 3. Check lastReport if it belongs to this medication's schedule filter
+                      const isScheduleMatch = 
+                        reconScheduleFilter === "ALL" ||
+                        (reconScheduleFilter === "C-II" && selectedSubstanceDetail.schedule === "C-II") ||
+                        (reconScheduleFilter === "C-III/C-IV/C-V" && (selectedSubstanceDetail.schedule === "C-III" || selectedSubstanceDetail.schedule === "C-IV" || selectedSubstanceDetail.schedule === "C-V"));
+                        
+                      if (isScheduleMatch && lastReport && lastReport.timestampMs && lastReport.timestampMs > maxReportTime) {
                         maxReportTime = lastReport.timestampMs;
                       }
                       
