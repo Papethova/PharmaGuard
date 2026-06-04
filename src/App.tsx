@@ -6634,7 +6634,7 @@ export default function App() {
                     {allUserProfiles
                       .filter((p) => {
                         const emailLower = (p.email || "").toLowerCase().trim();
-                        if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
+                        // Allow MASTER_ADMIN_EMAIL (allen32) to be used as a source node so their legacy/test registry can be migrated or consolidated
                         const matchStr = migrationSourceSearch.toLowerCase().trim();
                         const orgName = (p.organizationName || "").toLowerCase();
                         const dispName = (p.displayName || "").toLowerCase();
@@ -6664,7 +6664,7 @@ export default function App() {
                       })}
                     {allUserProfiles.filter((p) => {
                       const emailLower = (p.email || "").toLowerCase().trim();
-                      if (emailLower === MASTER_ADMIN_EMAIL.toLowerCase().trim()) return false;
+                      // Allow MASTER_ADMIN_EMAIL (allen32) as a source node in match checking
                       const matchStr = migrationSourceSearch.toLowerCase().trim();
                       const orgName = (p.organizationName || "").toLowerCase();
                       const dispName = (p.displayName || "").toLowerCase();
