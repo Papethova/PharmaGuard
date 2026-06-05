@@ -139,14 +139,14 @@ const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
         <path 
           d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
           fill="none"
-          stroke="var(--color-brand-blue)"
+          stroke="var(--color-brand-blue, #1e68cf)"
           strokeWidth="4.5"
           strokeLinejoin="round"
         />
         {/* 3. Yellow shield fill with its own white outline */}
         <path 
           d="M12 24C12 24 23 19.5 23 12V5.5C23 5.5 19.5 3 12 1C4.5 3 1 5.5 1 5.5V12C1 19.5 12 24 12 24Z" 
-          fill="var(--color-brand-yellow)"
+          fill="var(--color-brand-yellow, #ffd700)"
           stroke="white"
           strokeWidth="0.75"
           strokeLinejoin="round"
@@ -156,7 +156,7 @@ const PharmaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
     <div className="relative z-10 flex items-center justify-center h-full w-full">
       <Pill 
         className="h-[55%] w-[55%] drop-shadow-sm" 
-        fill="var(--color-brand-blue)" 
+        fill="var(--color-brand-blue, #1e68cf)" 
         color="white" 
         strokeWidth={1.2} 
       />
@@ -3644,17 +3644,46 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
+              .print-watermark {
+                display: none !important;
+              }
+              @media print {
+                .print-watermark {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  bottom: 0 !important;
+                  width: 100vw !important;
+                  height: 100vh !important;
+                  align-items: center !important;
+                  justify-content: center !important;
+                  z-index: -10 !important;
+                  pointer-events: none !important;
+                  opacity: 0.045 !important;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
+              }
             }
           `}</style>
         )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "static pb-24 print:static print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           
-          {/* Faint Watermark background using PharmaLogo */}
-          <div className="absolute inset-x-0 top-0 bottom-0 pointer-events-none select-none z-0 overflow-hidden flex justify-center opacity-[0.035] print:fixed print:inset-0 print:flex print:items-center print:justify-center print:opacity-[0.035]">
-            <div className="sticky top-[35%] h-[380px] w-[380px] flex items-center justify-center print:relative print:top-0 print:h-auto print:w-auto">
+          {/* Faint Watermark background using PharmaLogo (Screen / In-app view) */}
+          {!isForPrint && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.045]">
               <PharmaLogo className="w-[380px] h-[380px]" />
             </div>
-          </div>
+          )}
+
+          {/* Centered Print Watermark (Repeated on every printed page via fixed centering) */}
+          {isForPrint && (
+            <div className="print-watermark hidden print:flex">
+              <PharmaLogo className="w-[380px] h-[380px]" />
+            </div>
+          )}
           
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
@@ -6375,6 +6404,23 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
+                                .print-watermark {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  top: 0 !important;
+                                  left: 0 !important;
+                                  right: 0 !important;
+                                  bottom: 0 !important;
+                                  width: 100vw !important;
+                                  height: 100vh !important;
+                                  align-items: center !important;
+                                  justify-content: center !important;
+                                  z-index: -10 !important;
+                                  pointer-events: none !important;
+                                  opacity: 0.045 !important;
+                                  -webkit-print-color-adjust: exact !important;
+                                  print-color-adjust: exact !important;
+                                }
                               </style>
                             </head>
                             <body class="bg-white">
@@ -6497,6 +6543,23 @@ export default function App() {
                 .break-inside-avoid {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
+                }
+                .print-watermark {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  bottom: 0 !important;
+                  width: 100vw !important;
+                  height: 100vh !important;
+                  align-items: center !important;
+                  justify-content: center !important;
+                  z-index: -10 !important;
+                  pointer-events: none !important;
+                  opacity: 0.045 !important;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
                 }
               }
             `}</style>
