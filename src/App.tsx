@@ -3650,11 +3650,11 @@ export default function App() {
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "static pb-24 print:static print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           
           {/* Faint Watermark background using PharmaLogo */}
-          {!isForPrint && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]">
+          <div className="absolute inset-x-0 top-0 bottom-0 pointer-events-none select-none z-0 overflow-hidden flex justify-center opacity-[0.035] print:fixed print:inset-0 print:flex print:items-center print:justify-center print:opacity-[0.035]">
+            <div className="sticky top-[35%] h-[380px] w-[380px] flex items-center justify-center print:relative print:top-0 print:h-auto print:w-auto">
               <PharmaLogo className="w-[380px] h-[380px]" />
             </div>
-          )}
+          </div>
           
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
