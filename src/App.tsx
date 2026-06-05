@@ -3631,6 +3631,11 @@ export default function App() {
               #reconciliation-printable-root * {
                 visibility: visible !important;
               }
+              table, tbody, thead, th, td {
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+                height: auto !important;
+              }
               tr {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
@@ -3645,9 +3650,11 @@ export default function App() {
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "static pb-24 print:static print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           
           {/* Faint Watermark background using PharmaLogo */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]">
-            <PharmaLogo className="w-[380px] h-[380px]" />
-          </div>
+          {!isForPrint && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.035]">
+              <PharmaLogo className="w-[380px] h-[380px]" />
+            </div>
+          )}
           
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
@@ -6355,6 +6362,11 @@ export default function App() {
                                   box-shadow: none !important;
                                   border: none !important;
                                 }
+                                table, tbody, thead, th, td {
+                                  page-break-inside: auto !important;
+                                  break-inside: auto !important;
+                                  height: auto !important;
+                                }
                                 tr {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
@@ -6472,6 +6484,11 @@ export default function App() {
                 }
                 #reconciliation-printable-root * {
                   visibility: visible !important;
+                }
+                table, tbody, thead, th, td {
+                  page-break-inside: auto !important;
+                  break-inside: auto !important;
+                  height: auto !important;
                 }
                 tr {
                   page-break-inside: avoid !important;
