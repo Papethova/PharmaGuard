@@ -6314,7 +6314,7 @@ export default function App() {
                                   size: landscape;
                                   margin: 10mm 15mm 10mm 15mm;
                                 }
-                                html, body {
+                                html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 0 !important;
