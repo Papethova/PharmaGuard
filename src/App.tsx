@@ -3644,46 +3644,15 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-              .print-watermark {
-                display: none !important;
-              }
-              @media print {
-                .print-watermark {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
-                  bottom: 0 !important;
-                  width: 100vw !important;
-                  height: 100vh !important;
-                  align-items: center !important;
-                  justify-content: center !important;
-                  z-index: -10 !important;
-                  pointer-events: none !important;
-                  opacity: 0.045 !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
-              }
             }
           `}</style>
         )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "static pb-24 print:static print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           
-          {/* Faint Watermark background using PharmaLogo (Screen / In-app view) */}
-          {!isForPrint && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden opacity-[0.045]">
-              <PharmaLogo className="w-[380px] h-[380px]" />
-            </div>
-          )}
-
-          {/* Centered Print Watermark (Repeated on every printed page via fixed centering) */}
-          {isForPrint && (
-            <div className="print-watermark hidden print:flex">
-              <PharmaLogo className="w-[380px] h-[380px]" />
-            </div>
-          )}
+          {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.035] print:opacity-[0.05] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
+            <PharmaLogo className="w-[380px] h-[380px]" />
+          </div>
           
           {/* Visual Official Letterhead */}
           <div className="flex justify-between items-end pb-0">
@@ -6404,23 +6373,7 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-                                .print-watermark {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  top: 0 !important;
-                                  left: 0 !important;
-                                  right: 0 !important;
-                                  bottom: 0 !important;
-                                  width: 100vw !important;
-                                  height: 100vh !important;
-                                  align-items: center !important;
-                                  justify-content: center !important;
-                                  z-index: -10 !important;
-                                  pointer-events: none !important;
-                                  opacity: 0.045 !important;
-                                  -webkit-print-color-adjust: exact !important;
-                                  print-color-adjust: exact !important;
-                                }
+
                               </style>
                             </head>
                             <body class="bg-white">
@@ -6544,23 +6497,7 @@ export default function App() {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
                 }
-                .print-watermark {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
-                  bottom: 0 !important;
-                  width: 100vw !important;
-                  height: 100vh !important;
-                  align-items: center !important;
-                  justify-content: center !important;
-                  z-index: -10 !important;
-                  pointer-events: none !important;
-                  opacity: 0.045 !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
+
               }
             `}</style>
         </div>
