@@ -4761,7 +4761,7 @@ export default function App() {
                     Cancel
                   </Button>
                   <Button 
-                    className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl order-1 sm:order-2 disabled:opacity-100"
+                    className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/20 transition-all active:scale-[0.98] rounded-xl order-1 sm:order-2 disabled:opacity-100"
                     onClick={handleLogTransaction}
                     disabled={isSubmitting}
                   >
@@ -5132,7 +5132,7 @@ export default function App() {
                       setIsUserManagementOpen(false);
                       setCurrentTab('inventory');
                     }} 
-                    className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
+                    className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-md shadow-brand-blue/10 rounded-lg transition-all"
                   >
                     Close User Management
                   </Button>
