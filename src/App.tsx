@@ -323,6 +323,11 @@ const parseCompoundStrength = (str: string): { first: number; second: number } =
   };
 };
 
+const isSafariOrIPad = typeof window !== "undefined" && (
+  /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
+  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh"))
+);
+
 const compareSubstances = (a: any, b: any): number => {
   const aName = a.name || a.substanceName || "";
   const bName = b.name || b.substanceName || "";
@@ -373,6 +378,12 @@ export default function App() {
     const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isVerificationBypassed, setIsVerificationBypassed] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isSafariOrIPad) {
+      document.documentElement.classList.add("is-safari");
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -3618,6 +3629,11 @@ export default function App() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
+              .is-safari, .is-safari body {
+                width: 297mm !important;
+                height: auto !important;
+                min-height: 210mm !important;
+              }
               body > *:not(#reconciliation-printable-root) {
                 display: none !important;
               }
@@ -3631,6 +3647,12 @@ export default function App() {
                 margin: 0 !important;
                 background: white !important;
               }
+              .is-safari #reconciliation-printable-root {
+                width: 297mm !important;
+                height: auto !important;
+                min-height: 210mm !important;
+                position: relative !important;
+              }
               #reconciliation-printable-invoice {
                 display: block !important;
                 position: relative !important;
@@ -3642,6 +3664,25 @@ export default function App() {
                 padding-bottom: 8mm !important;
                 box-shadow: none !important;
                 border: none !important;
+              }
+              .is-safari #reconciliation-printable-invoice {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 210mm !important;
+                position: relative !important;
+                box-sizing: border-box !important;
+              }
+              .is-safari #reconciliation-printable-invoice .print\\:fixed {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
               }
               #reconciliation-printable-root * {
                 visibility: visible !important;
@@ -3701,6 +3742,42 @@ export default function App() {
                   background: white !important;
                   text-transform: uppercase !important;
                 }
+              }
+              .is-safari .print-header {
+                display: flex !important;
+                position: fixed !important;
+                top: 5mm !important;
+                left: 15mm !important;
+                right: 15mm !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-bottom: 0.5px solid #e5e7eb !important;
+                padding-bottom: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
+              }
+              .is-safari .print-footer {
+                display: flex !important;
+                position: fixed !important;
+                bottom: 5mm !important;
+                left: 15mm !important;
+                right: 15mm !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-top: 0.5px solid #e5e7eb !important;
+                padding-top: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
               }
             }
           `}</style>
@@ -6385,7 +6462,7 @@ export default function App() {
                       if (printWindow) {
                         printWindow.document.write(`
                           <!DOCTYPE html>
-                          <html>
+                          <html class="${isSafariOrIPad ? 'is-safari' : ''}">
                             <head>
                               <title>PharmaGuard Reconciliation Report</title>
                               ${styleTags}
@@ -6436,6 +6513,11 @@ export default function App() {
                                   background: white !important;
                                   color: black !important;
                                 }
+                                .is-safari, .is-safari body {
+                                  width: 297mm !important;
+                                  height: auto !important;
+                                  min-height: 210mm !important;
+                                }
                                 body {
                                   margin: 0 !important;
                                   padding: 0 !important;
@@ -6456,6 +6538,12 @@ export default function App() {
                                   margin: 0 !important;
                                   background: white !important;
                                 }
+                                .is-safari #reconciliation-printable-root {
+                                  width: 297mm !important;
+                                  height: auto !important;
+                                  min-height: 210mm !important;
+                                  position: relative !important;
+                                }
                                 #reconciliation-printable-invoice {
                                   display: block !important;
                                   position: relative !important;
@@ -6468,6 +6556,25 @@ export default function App() {
                                   border: none !important;
                                   padding-top: 8mm !important;
                                   padding-bottom: 8mm !important;
+                                }
+                                .is-safari #reconciliation-printable-invoice {
+                                  width: 100% !important;
+                                  height: auto !important;
+                                  min-height: 210mm !important;
+                                  position: relative !important;
+                                  box-sizing: border-box !important;
+                                }
+                                .is-safari #reconciliation-printable-invoice .print\\:fixed {
+                                  position: absolute !important;
+                                  top: 0 !important;
+                                  left: 0 !important;
+                                  right: 0 !important;
+                                  bottom: 0 !important;
+                                  height: 100% !important;
+                                  width: 100% !important;
+                                  display: flex !important;
+                                  align-items: center !important;
+                                  justify-content: center !important;
                                 }
                                 table, tbody, thead, th, td {
                                   page-break-inside: auto !important;
@@ -6524,6 +6631,42 @@ export default function App() {
                                     background: white !important;
                                     text-transform: uppercase !important;
                                   }
+                                }
+                                .is-safari .print-header {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  top: 5mm !important;
+                                  left: 15mm !important;
+                                  right: 15mm !important;
+                                  justify-content: space-between !important;
+                                  align-items: center !important;
+                                  border-bottom: 0.5px solid #e5e7eb !important;
+                                  padding-bottom: 1.5mm !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-size: 8px !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
+                                  z-index: 9999 !important;
+                                  background: white !important;
+                                  text-transform: uppercase !important;
+                                }
+                                .is-safari .print-footer {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  bottom: 5mm !important;
+                                  left: 15mm !important;
+                                  right: 15mm !important;
+                                  justify-content: space-between !important;
+                                  align-items: center !important;
+                                  border-top: 0.5px solid #e5e7eb !important;
+                                  padding-top: 1.5mm !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-size: 8px !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
+                                  z-index: 9999 !important;
+                                  background: white !important;
+                                  text-transform: uppercase !important;
                                 }
                               </style>
                             </head>
@@ -6622,6 +6765,11 @@ export default function App() {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
+                .is-safari, .is-safari body {
+                  width: 297mm !important;
+                  height: auto !important;
+                  min-height: 210mm !important;
+                }
                 body > *:not(#reconciliation-printable-root) {
                   display: none !important;
                 }
@@ -6635,6 +6783,12 @@ export default function App() {
                   margin: 0 !important;
                   background: white !important;
                 }
+                .is-safari #reconciliation-printable-root {
+                  width: 297mm !important;
+                  height: auto !important;
+                  min-height: 210mm !important;
+                  position: relative !important;
+                }
                 #reconciliation-printable-invoice {
                   display: block !important;
                   position: relative !important;
@@ -6646,6 +6800,25 @@ export default function App() {
                   padding-bottom: 8mm !important;
                   box-shadow: none !important;
                   border: none !important;
+                }
+                .is-safari #reconciliation-printable-invoice {
+                  width: 100% !important;
+                  height: auto !important;
+                  min-height: 210mm !important;
+                  position: relative !important;
+                  box-sizing: border-box !important;
+                }
+                .is-safari #reconciliation-printable-invoice .print\\:fixed {
+                  position: absolute !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  bottom: 0 !important;
+                  height: 100% !important;
+                  width: 100% !important;
+                  display: flex !important;
+                  align-items: center !important;
+                  justify-content: center !important;
                 }
                 #reconciliation-printable-root * {
                   visibility: visible !important;
@@ -6705,6 +6878,42 @@ export default function App() {
                     background: white !important;
                     text-transform: uppercase !important;
                   }
+                }
+                .is-safari .print-header {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 5mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-bottom: 0.5px solid #e5e7eb !important;
+                  padding-bottom: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                }
+                .is-safari .print-footer {
+                  display: flex !important;
+                  position: fixed !important;
+                  bottom: 5mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-top: 0.5px solid #e5e7eb !important;
+                  padding-top: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
                 }
               }
             `}</style>
