@@ -3583,15 +3583,6 @@ export default function App() {
                 vertical-align: top;
                 padding-top: 2mm;
               }
-              @bottom-left {
-                content: "Generated With PharmaGuard";
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                font-size: 8px;
-                font-weight: bold;
-                color: #111827;
-                vertical-align: top;
-                padding-top: 2mm;
-              }
             }
             @media screen {
               #reconciliation-printable-root {
@@ -3638,6 +3629,10 @@ export default function App() {
                 height: auto !important;
                 overflow: visible !important;
                 max-height: none !important;
+                padding-top: 8mm !important;
+                padding-bottom: 8mm !important;
+                box-shadow: none !important;
+                border: none !important;
               }
               #reconciliation-printable-root * {
                 visibility: visible !important;
@@ -3655,8 +3650,59 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
+              .print-header {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-bottom: 0.5px solid #e5e7eb !important;
+                padding-bottom: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
+              }
+              .print-footer {
+                display: flex !important;
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-top: 0.5px solid #e5e7eb !important;
+                padding-top: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
+              }
             }
           `}</style>
+        )}
+        {isForPrint && (
+          <>
+            <div className="hidden print:flex print-header">
+              <span>PHARMAGUARD RECONCILIATION REPORT</span>
+              <span>{selectedHistoricalReport 
+                ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                : new Date().toLocaleDateString()
+              }</span>
+            </div>
+            <div className="hidden print:flex print-footer">
+              <span>GENERATED WITH PHARMAGUARD</span>
+              <span></span>
+            </div>
+          </>
         )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "static pb-24 print:static print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           
@@ -6346,15 +6392,6 @@ export default function App() {
                                     vertical-align: top;
                                     padding-top: 2mm;
                                   }
-                                  @bottom-left {
-                                    content: "Generated With PharmaGuard";
-                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                                    font-size: 8px;
-                                    font-weight: bold;
-                                    color: #111827;
-                                    vertical-align: top;
-                                    padding-top: 2mm;
-                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6403,6 +6440,8 @@ export default function App() {
                                   overflow: visible !important;
                                   box-shadow: none !important;
                                   border: none !important;
+                                  padding-top: 8mm !important;
+                                  padding-bottom: 8mm !important;
                                 }
                                 table, tbody, thead, th, td {
                                   page-break-inside: auto !important;
@@ -6417,7 +6456,42 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-
+                                .print-header {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  top: 0 !important;
+                                  left: 0 !important;
+                                  right: 0 !important;
+                                  justify-content: space-between !important;
+                                  align-items: center !important;
+                                  border-bottom: 0.5px solid #e5e7eb !important;
+                                  padding-bottom: 1.5mm !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-size: 8px !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
+                                  z-index: 9999 !important;
+                                  background: white !important;
+                                  text-transform: uppercase !important;
+                                }
+                                .print-footer {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  bottom: 0 !important;
+                                  left: 0 !important;
+                                  right: 0 !important;
+                                  justify-content: space-between !important;
+                                  align-items: center !important;
+                                  border-top: 0.5px solid #e5e7eb !important;
+                                  padding-top: 1.5mm !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-size: 8px !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
+                                  z-index: 9999 !important;
+                                  background: white !important;
+                                  text-transform: uppercase !important;
+                                }
                               </style>
                             </head>
                             <body class="bg-white">
@@ -6480,15 +6554,6 @@ export default function App() {
                   vertical-align: top;
                   padding-top: 2mm;
                 }
-                @bottom-left {
-                  content: "Generated With PharmaGuard";
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                  font-size: 8px;
-                  font-weight: bold;
-                  color: #111827;
-                  vertical-align: top;
-                  padding-top: 2mm;
-                }
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -6535,6 +6600,10 @@ export default function App() {
                   height: auto !important;
                   overflow: visible !important;
                   max-height: none !important;
+                  padding-top: 8mm !important;
+                  padding-bottom: 8mm !important;
+                  box-shadow: none !important;
+                  border: none !important;
                 }
                 #reconciliation-printable-root * {
                   visibility: visible !important;
@@ -6552,7 +6621,42 @@ export default function App() {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
                 }
-
+                .print-header {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-bottom: 0.5px solid #e5e7eb !important;
+                  padding-bottom: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                }
+                .print-footer {
+                  display: flex !important;
+                  position: fixed !important;
+                  bottom: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-top: 0.5px solid #e5e7eb !important;
+                  padding-top: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                }
               }
             `}</style>
         </div>
