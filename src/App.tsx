@@ -3566,6 +3566,13 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
+            }
+            @media print {
+              @page {
+                size: landscape;
+              }
+            }
+            @page {
               margin: 10mm 15mm 15mm 15mm;
               @bottom-right {
                 content: "page " counter(page) " of " counter(pages);
@@ -6322,6 +6329,13 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
+                                }
+                                @media print {
+                                  @page {
+                                    size: landscape;
+                                  }
+                                }
+                                @page {
                                   margin: 10mm 15mm 15mm 15mm;
                                   @bottom-right {
                                     content: "page " counter(page) " of " counter(pages);
@@ -6449,6 +6463,13 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
+              }
+              @media print {
+                @page {
+                  size: landscape;
+                }
+              }
+              @page {
                 margin: 10mm 15mm 15mm 15mm;
                 @bottom-right {
                   content: "page " counter(page) " of " counter(pages);
