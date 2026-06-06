@@ -5188,8 +5188,16 @@ export default function App() {
                           {item.ndc}
                         </button>
                       </TableCell>
-                      <TableCell className={`text-center font-normal text-sm py-1 ${item.currentStock <= item.minThreshold ? 'text-brand-yellow' : 'text-brand-dark-grey'}`}>
-                        {item.currentStock} {item.unit}
+                      <TableCell className="text-center font-normal text-sm py-1">
+                        {item.currentStock <= item.minThreshold ? (
+                          <span className="px-2.5 py-1 bg-brand-blue text-brand-yellow font-extrabold rounded-full text-xs shadow-sm shadow-brand-blue/10 inline-block">
+                            {item.currentStock} {item.unit}
+                          </span>
+                        ) : (
+                          <span className="text-brand-dark-grey">
+                            {item.currentStock} {item.unit}
+                          </span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
