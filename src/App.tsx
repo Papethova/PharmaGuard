@@ -3933,7 +3933,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-[100dvh] overflow-hidden overscroll-none bg-brand-surface font-sans text-brand-grey flex flex-col touch-none">
+    <div className="h-[100dvh] overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
       <header className={`shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="flex h-14 items-center gap-8">
@@ -5145,7 +5145,7 @@ export default function App() {
             </Dialog>
 
           <TabsContent value="inventory" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
-              <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-light-grey/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
+              <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
                 <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
                   <table className="w-full caption-bottom text-sm border-separate border-spacing-0">
                     <TableHeader className="sticky top-0 z-40 bg-brand-blue">
