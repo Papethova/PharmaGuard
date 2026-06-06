@@ -3566,13 +3566,15 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-              margin: 10mm 15mm 10mm 15mm;
+              margin: 10mm 15mm 15mm 15mm;
               @bottom-right {
                 content: "page " counter(page) " of " counter(pages);
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 font-size: 8px;
                 font-weight: bold;
                 color: #111827;
+                vertical-align: top;
+                padding-top: 2mm;
               }
               @bottom-left {
                 content: "Generated With PharmaGuard";
@@ -3580,6 +3582,8 @@ export default function App() {
                 font-size: 8px;
                 font-weight: bold;
                 color: #111827;
+                vertical-align: top;
+                padding-top: 2mm;
               }
             }
             @media screen {
@@ -4906,7 +4910,7 @@ export default function App() {
 
                 <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
-                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/20 rounded-xl"
+                    className="w-full h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/20 rounded-xl"
                     onClick={() => setViewingTransaction(null)}
                   >
                     Close Record
@@ -6310,7 +6314,25 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 10mm 15mm 10mm 15mm;
+                                  margin: 10mm 15mm 15mm 15mm;
+                                  @bottom-right {
+                                    content: "page " counter(page) " of " counter(pages);
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                                    font-size: 8px;
+                                    font-weight: bold;
+                                    color: #111827;
+                                    vertical-align: top;
+                                    padding-top: 2mm;
+                                  }
+                                  @bottom-left {
+                                    content: "Generated With PharmaGuard";
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                                    font-size: 8px;
+                                    font-weight: bold;
+                                    color: #111827;
+                                    vertical-align: top;
+                                    padding-top: 2mm;
+                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6419,13 +6441,15 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 10mm 15mm 10mm 15mm;
+                margin: 10mm 15mm 15mm 15mm;
                 @bottom-right {
                   content: "page " counter(page) " of " counter(pages);
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                   font-size: 8px;
                   font-weight: bold;
                   color: #111827;
+                  vertical-align: top;
+                  padding-top: 2mm;
                 }
                 @bottom-left {
                   content: "Generated With PharmaGuard";
@@ -6433,6 +6457,8 @@ export default function App() {
                   font-size: 8px;
                   font-weight: bold;
                   color: #111827;
+                  vertical-align: top;
+                  padding-top: 2mm;
                 }
               }
               @media screen {
