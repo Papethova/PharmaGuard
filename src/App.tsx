@@ -3583,6 +3583,15 @@ export default function App() {
                 vertical-align: top;
                 padding-top: 2mm;
               }
+              @bottom-left {
+                content: "Generated With PharmaGuard";
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 8px;
+                font-weight: bold;
+                color: #111827;
+                vertical-align: top;
+                padding-top: 2mm;
+              }
             }
             @media screen {
               #reconciliation-printable-root {
@@ -3650,41 +3659,48 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-              .print-header {
-                display: flex !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
+              /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+              .print-header, .print-footer {
+                display: none !important;
               }
-              .print-footer {
-                display: flex !important;
-                position: fixed !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
+              /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
+              @supports (-webkit-touch-callout: none) {
+                .print-header {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-bottom: 0.5px solid #e5e7eb !important;
+                  padding-bottom: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                }
+                .print-footer {
+                  display: flex !important;
+                  position: fixed !important;
+                  bottom: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-top: 0.5px solid #e5e7eb !important;
+                  padding-top: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                }
               }
             }
           `}</style>
@@ -6392,6 +6408,15 @@ export default function App() {
                                     vertical-align: top;
                                     padding-top: 2mm;
                                   }
+                                  @bottom-left {
+                                    content: "Generated With PharmaGuard";
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                                    font-size: 8px;
+                                    font-weight: bold;
+                                    color: #111827;
+                                    vertical-align: top;
+                                    padding-top: 2mm;
+                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6456,41 +6481,48 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-                                .print-header {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  top: 0 !important;
-                                  left: 0 !important;
-                                  right: 0 !important;
-                                  justify-content: space-between !important;
-                                  align-items: center !important;
-                                  border-bottom: 0.5px solid #e5e7eb !important;
-                                  padding-bottom: 1.5mm !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8px !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  z-index: 9999 !important;
-                                  background: white !important;
-                                  text-transform: uppercase !important;
+                                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+                                .print-header, .print-footer {
+                                  display: none !important;
                                 }
-                                .print-footer {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  bottom: 0 !important;
-                                  left: 0 !important;
-                                  right: 0 !important;
-                                  justify-content: space-between !important;
-                                  align-items: center !important;
-                                  border-top: 0.5px solid #e5e7eb !important;
-                                  padding-top: 1.5mm !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8px !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  z-index: 9999 !important;
-                                  background: white !important;
-                                  text-transform: uppercase !important;
+                                /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
+                                @supports (-webkit-touch-callout: none) {
+                                  .print-header {
+                                    display: flex !important;
+                                    position: fixed !important;
+                                    top: 0 !important;
+                                    left: 0 !important;
+                                    right: 0 !important;
+                                    justify-content: space-between !important;
+                                    align-items: center !important;
+                                    border-bottom: 0.5px solid #e5e7eb !important;
+                                    padding-bottom: 1.5mm !important;
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                    font-size: 8px !important;
+                                    font-weight: bold !important;
+                                    color: #111827 !important;
+                                    z-index: 9999 !important;
+                                    background: white !important;
+                                    text-transform: uppercase !important;
+                                  }
+                                  .print-footer {
+                                    display: flex !important;
+                                    position: fixed !important;
+                                    bottom: 0 !important;
+                                    left: 0 !important;
+                                    right: 0 !important;
+                                    justify-content: space-between !important;
+                                    align-items: center !important;
+                                    border-top: 0.5px solid #e5e7eb !important;
+                                    padding-top: 1.5mm !important;
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                    font-size: 8px !important;
+                                    font-weight: bold !important;
+                                    color: #111827 !important;
+                                    z-index: 9999 !important;
+                                    background: white !important;
+                                    text-transform: uppercase !important;
+                                  }
                                 }
                               </style>
                             </head>
@@ -6547,6 +6579,15 @@ export default function App() {
                 margin: 10mm 15mm 15mm 15mm;
                 @bottom-right {
                   content: "page " counter(page) " of " counter(pages);
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                  font-size: 8px;
+                  font-weight: bold;
+                  color: #111827;
+                  vertical-align: top;
+                  padding-top: 2mm;
+                }
+                @bottom-left {
+                  content: "Generated With PharmaGuard";
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                   font-size: 8px;
                   font-weight: bold;
@@ -6621,41 +6662,48 @@ export default function App() {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
                 }
-                .print-header {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
+                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+                .print-header, .print-footer {
+                  display: none !important;
                 }
-                .print-footer {
-                  display: flex !important;
-                  position: fixed !important;
-                  bottom: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
+                /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
+                @supports (-webkit-touch-callout: none) {
+                  .print-header {
+                    display: flex !important;
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    border-bottom: 0.5px solid #e5e7eb !important;
+                    padding-bottom: 1.5mm !important;
+                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                    font-size: 8px !important;
+                    font-weight: bold !important;
+                    color: #111827 !important;
+                    z-index: 9999 !important;
+                    background: white !important;
+                    text-transform: uppercase !important;
+                  }
+                  .print-footer {
+                    display: flex !important;
+                    position: fixed !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    border-top: 0.5px solid #e5e7eb !important;
+                    padding-top: 1.5mm !important;
+                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                    font-size: 8px !important;
+                    font-weight: bold !important;
+                    color: #111827 !important;
+                    z-index: 9999 !important;
+                    background: white !important;
+                    text-transform: uppercase !important;
+                  }
                 }
               }
             `}</style>
