@@ -3561,7 +3561,7 @@ export default function App() {
     const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
     return (
-      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "max-w-[1000px] mx-auto p-4" : ""}>
+      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative"}>
         {isForPrint && (
           <style>{`
             @page {
@@ -3633,7 +3633,7 @@ export default function App() {
               }
               #reconciliation-printable-invoice {
                 display: block !important;
-                position: static !important;
+                position: relative !important;
                 width: 100% !important;
                 height: auto !important;
                 overflow: visible !important;
@@ -3705,22 +3705,15 @@ export default function App() {
             }
           `}</style>
         )}
-        {isForPrint && (
-          <>
-            <div className="hidden print:flex print-header">
-              <span>PHARMAGUARD RECONCILIATION REPORT</span>
-              <span>{selectedHistoricalReport 
-                ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                : new Date().toLocaleDateString()
-              }</span>
-            </div>
-            <div className="hidden print:flex print-footer">
-              <span>GENERATED WITH PHARMAGUARD</span>
-              <span></span>
-            </div>
-          </>
-        )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "static pb-24 print:static print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-24 print:relative print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
+          {/* Header element visible on screen preview, or as hidden print overlay */}
+          <div className={isForPrint ? "hidden print:flex print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+            <span>PHARMAGUARD RECONCILIATION REPORT</span>
+            <span>{selectedHistoricalReport 
+              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+              : new Date().toLocaleDateString()
+            }</span>
+          </div>
           
           {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
           <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.08] print:opacity-[0.10] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
@@ -3994,6 +3987,12 @@ export default function App() {
                 <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
               </div>
             )}
+          </div>
+
+          {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
+          <div className={isForPrint ? "hidden print:flex print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+            <span>GENERATED WITH PHARMAGUARD</span>
+            <span className="text-right">PAGE 1 OF 1</span>
           </div>
 
         </div>
@@ -6351,11 +6350,13 @@ export default function App() {
             </div>
         </div>
 
-        <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''}`}>
-          {/* Print Report Review Page (Gorgeously Styled) */}
-          <ScrollArea className="flex-1 overflow-y-auto">
-            {renderReconciliationReportContent(false)}
-          </ScrollArea>
+        <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''} bg-[#f1f5f9]`}>
+          {/* Print Report Review Page (Forced Landscape Frame for iPad / Standard Screen Verification) */}
+          <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-start md:justify-center items-start">
+            <div className="w-[1120px] min-w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
+              {renderReconciliationReportContent(false)}
+            </div>
+          </div>
 
             <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
               <Button
@@ -6457,7 +6458,7 @@ export default function App() {
                                 }
                                 #reconciliation-printable-invoice {
                                   display: block !important;
-                                  position: static !important;
+                                  position: relative !important;
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 0 !important;
@@ -6636,7 +6637,7 @@ export default function App() {
                 }
                 #reconciliation-printable-invoice {
                   display: block !important;
-                  position: static !important;
+                  position: relative !important;
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
