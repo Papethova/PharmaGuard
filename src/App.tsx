@@ -6588,7 +6588,7 @@ export default function App() {
               onClick={() => {
                 setReconViewMode("form");
               }}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue hover:brightness-110 text-white rounded-xl h-12 shadow-lg shadow-brand-blue/20 px-6 border-none transition-all flex items-center justify-center"
             >
               Back to Form
             </Button>
