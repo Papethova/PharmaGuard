@@ -4906,7 +4906,7 @@ export default function App() {
 
                 <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
                   <Button 
-                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl"
+                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/20 rounded-xl"
                     onClick={() => setViewingTransaction(null)}
                   >
                     Close Record
