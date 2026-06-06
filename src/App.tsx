@@ -4756,12 +4756,12 @@ export default function App() {
                       setCapturedPhoto(null);
                       setUseSignatureFallback(false);
                     }} 
-                    className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl order-2 sm:order-1"
+                    className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl order-2 sm:order-1"
                   >
                     Cancel
                   </Button>
                   <Button 
-                    className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl order-1 sm:order-2 disabled:opacity-100"
+                    className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl order-1 sm:order-2 disabled:opacity-100"
                     onClick={handleLogTransaction}
                     disabled={isSubmitting}
                   >
@@ -7276,12 +7276,12 @@ export default function App() {
         <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => setIsEditMinThresholdOpen(false)} 
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
           >
             Cancel
           </Button>
           <Button 
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
             onClick={handleUpdateMinThreshold}
             disabled={isSubmitting}
           >
@@ -7415,12 +7415,12 @@ export default function App() {
         <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3 shrink-0">
           <Button 
             onClick={() => setIsEditMedDetailsOpen(false)} 
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
           >
             Cancel
           </Button>
           <Button 
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
             onClick={handleUpdateMedDetails}
             disabled={isSubmitting}
           >
