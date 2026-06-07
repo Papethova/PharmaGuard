@@ -4209,7 +4209,7 @@ export default function App() {
               </div>
               <Button 
                 onClick={() => { resetForm(); setTransactionType("OUT"); setIsLogOpen(true); }}
-                className="bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
                   <ArrowDown className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -4218,7 +4218,7 @@ export default function App() {
               </Button>
               <Button 
                 onClick={() => { resetForm(); setTransactionType("IN"); setIsLogOpen(true); }}
-                className="bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
                   <Plus className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -4227,7 +4227,7 @@ export default function App() {
               </Button>
               <Button 
                 onClick={() => { resetForm(); setTransactionType("ADJUST"); setIsLogOpen(true); }}
-                className="bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
                   <RefreshCcw className="h-4 w-4 text-brand-blue" strokeWidth={3} />
