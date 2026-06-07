@@ -6180,11 +6180,9 @@ export default function App() {
                     setSelectedHistoricalReport(null);
                     setReconShowPreview(false);
                   }}
-                  className="text-[10px] font-black uppercase tracking-widest bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/15 rounded-xl h-12 px-5 border border-brand-blue/10 transition-all flex items-center gap-2"
+                  className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 shadow-lg shadow-brand-blue/15 border border-brand-yellow/30 rounded-xl h-12 px-5 transition-all flex items-center gap-2.5"
                 >
-                  <div className="h-6 w-6 rounded-full bg-brand-blue flex items-center justify-center shrink-0 text-white shadow-sm">
-                    <Folder className="h-3 w-3 text-white" strokeWidth={3} />
-                  </div>
+                  <div className="h-2.5 w-2.5 rounded-full bg-brand-yellow shrink-0 shadow-sm" />
                   Report Registry
                 </Button>
               </div>
