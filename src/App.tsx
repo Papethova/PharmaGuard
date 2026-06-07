@@ -527,20 +527,12 @@ export default function App() {
   }, [isNodeMigrationOpen]);
 
   // Tab State
-  const [currentTab, setCurrentTab] = useState<string>(() => {
-    return localStorage.getItem("recon_isReconOpen") === "true" ? "recon" : "inventory";
-  });
+  const [currentTab, setCurrentTab] = useState<string>("inventory");
 
-  // Reconciliation states with local caching derived from tab
-  const isReconOpen = currentTab === "recon";
-  const setIsReconOpen = (open: boolean) => {
-    if (open) {
-      setCurrentTab("recon");
-      setIsUserManagementOpen(false);
-    } else {
-      setCurrentTab("inventory");
-    }
-  };
+  // Reconciliation states with local caching
+  const [isReconOpen, setIsReconOpen] = useState(() => {
+    return localStorage.getItem("recon_isReconOpen") === "true";
+  });
   const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">(() => {
     return (localStorage.getItem("recon_reconScheduleFilter") as "ALL" | "C-II" | "C-III/C-IV/C-V") || "C-II";
   });
@@ -4262,39 +4254,37 @@ export default function App() {
                   <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
  
-                <TabsTrigger 
-                  value="recon" 
+                <Button 
+                  type="button" 
                   onClick={() => {
                     setReconShowPreview(false);
                     setReconViewMode("form");
                     setSelectedHistoricalReport(null);
-                    setCurrentTab("recon");
-                    setIsUserManagementOpen(false);
+                    setIsReconOpen(true);
                   }}
-                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none hover:shadow-none text-base text-brand-blue font-normal flex items-center"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Clipboard className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'recon' && reconViewMode === 'form' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Report Generator</span>
-                </TabsTrigger>
+                  <span className={`whitespace-nowrap leading-none ${(isReconOpen && reconViewMode === 'form' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Report Generator</span>
+                </Button>
 
-                <TabsTrigger 
-                  value="recon" 
+                <Button 
+                  type="button" 
                   onClick={() => {
                     setReconShowPreview(false);
                     setReconViewMode("history");
                     setSelectedHistoricalReport(null);
-                    setCurrentTab("recon");
-                    setIsUserManagementOpen(false);
+                    setIsReconOpen(true);
                   }}
-                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none hover:shadow-none text-base text-brand-blue font-normal flex items-center"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Folder className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'recon' && reconViewMode === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Report Registry</span>
-                </TabsTrigger>
+                  <span className={`whitespace-nowrap leading-none ${(isReconOpen && reconViewMode === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Report Registry</span>
+                </Button>
                 <TabsTrigger 
                   value="alerts" 
                   className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
@@ -5798,9 +5788,9 @@ export default function App() {
           </TabsContent>
 
 {/* Reconciliation Report Dialog */}
-          <TabsContent value="recon" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
-            <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0 select-text">
-        <div className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0 rounded-t-xl">
+    <Dialog open={isReconOpen} onOpenChange={setIsReconOpen} modal="trap-focus">
+      <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] h-[90vh] max-h-[90vh] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col select-text">
+        <DialogHeader className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0">
           <div className="flex items-center justify-between relative z-10 w-full">
             <div className="flex items-center gap-4 text-left">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
@@ -5811,18 +5801,18 @@ export default function App() {
                 )}
               </div>
               <div>
-                <h2 className="text-xl font-black tracking-tight text-white leading-none">
+                <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                   {reconViewMode === "history" ? "Controlled Substance Reconciliation Report Registry" : "Controlled Substance Reconciliation"}
-                </h2>
-                <p className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
+                </DialogTitle>
+                <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
                   VERIFY PHYSICAL HOLDINGS AGAINST DIGITAL LEDGER LOGS TO MAINTAIN ACTIVE COMPLIANCE
-                </p>
+                </DialogDescription>
               </div>
             </div>
 
-            {/* History button in the top header on the far right */}
-            {reconViewMode !== "history" && (
-              <div className="flex items-center gap-2">
+            {/* History button and close button in the top header on the far right */}
+            <div className="flex items-center gap-2">
+              {reconViewMode !== "history" && (
                 <Button
                   id="recon-history-button"
                   type="button"
@@ -5839,10 +5829,19 @@ export default function App() {
                   </div>
                   Report Registry
                 </Button>
-              </div>
-            )}
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsReconOpen(false)}
+                className="h-10 w-10 p-0 rounded-xl text-white hover:bg-white/10 flex items-center justify-center transition-all shrink-0 ml-1"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" strokeWidth={3} />
+              </Button>
+            </div>
           </div>
-        </div>
+        </DialogHeader>
 
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
@@ -6195,7 +6194,6 @@ export default function App() {
                 type="button"
                 onClick={() => {
                   setIsReconOpen(false);
-                  setCurrentTab("inventory");
                 }}
                 className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
               >
@@ -6786,6 +6784,15 @@ export default function App() {
 
           <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
             <Button
+              type="button"
+              onClick={() => {
+                setIsReconOpen(false);
+              }}
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
+            >
+              Close Registry
+            </Button>
+            <Button
               id="recon-history-close"
               type="button"
               onClick={() => {
@@ -6798,8 +6805,8 @@ export default function App() {
           </div>
         </div>
 
-            </Card>
-          </TabsContent>
+      </DialogContent>
+    </Dialog>
         </div>
       </Tabs>
     </main>
