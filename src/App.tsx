@@ -4390,7 +4390,10 @@ export default function App() {
                          "Verify Inventory Count"}
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
-                        AUDIT LOG ACTIVE
+                        {transactionType === "OUT" ? "log outgoing medications" : 
+                         transactionType === "IN" ? "log incoming medications" : 
+                         transactionType === "ADJUST" ? "log adjustments to inventory" : 
+                         "AUDIT LOG ACTIVE"}
                       </DialogDescription>
                     </div>
                   </div>
