@@ -3936,8 +3936,10 @@ export default function App() {
                   </th>
                 </tr>
                 <tr className="border-b-2 border-gray-900">
-                  <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans" style={{ paddingTop: '0px', paddingBottom: '1px', verticalAlign: 'top' }}>
-                    SINCE LAST REPORT ON {headerPrevReportDate}
+                  <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans px-1" style={{ paddingTop: '2px', paddingBottom: '3px', verticalAlign: 'middle' }}>
+                    <span className="inline-block px-2 py-0.5 rounded-full bg-gray-900/10 text-gray-900 text-[8px] font-black uppercase tracking-wider border border-gray-900/15">
+                      SINCE LAST REPORT ON {headerPrevReportDate}
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -5812,19 +5814,6 @@ export default function App() {
                 </DialogDescription>
               </div>
             </div>
-
-            {/* Close button in the top header on the far right */}
-            <div className="flex items-center justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setIsReconOpen(false)}
-                className="h-10 w-10 p-0 rounded-xl text-white hover:bg-white/10 flex items-center justify-center transition-all shrink-0"
-                aria-label="Close"
-              >
-                <X className="h-5 w-5" strokeWidth={3} />
-              </Button>
-            </div>
           </div>
         </DialogHeader>
 
@@ -5895,8 +5884,10 @@ export default function App() {
                           <th rowSpan={2} className="font-semibold text-xs tracking-wider text-white text-center w-[120px] bg-brand-blue border-b border-brand-blue/10 sticky top-0 z-30 h-12 py-0" style={{ top: 0, verticalAlign: 'middle', lineHeight: 'normal' }}>Variance</th>
                         </tr>
                         <tr className="border-none" style={{ border: 'none' }}>
-                          <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-[#e9f0fa] sticky z-30 h-6 py-0" style={{ top: '24px', verticalAlign: 'top', paddingTop: '0px', lineHeight: 'normal', border: 'none' }}>
-                            SINCE LAST REPORT ON {lastReport.date}
+                          <th colSpan={3} className="font-semibold text-xs tracking-wider text-brand-blue text-center bg-[#e9f0fa] sticky z-30 h-6 py-0 px-2" style={{ top: '24px', verticalAlign: 'middle', paddingTop: '0px', lineHeight: 'normal', border: 'none' }}>
+                            <span className="inline-block px-2.5 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue text-[9px] font-black uppercase tracking-widest border border-brand-blue/15">
+                              SINCE LAST REPORT ON {lastReport.date}
+                            </span>
                           </th>
                         </tr>
                       </thead>
