@@ -5486,7 +5486,7 @@ export default function App() {
                          historyTypeFilter === "VERIFY" ? "Verified" : historyTypeFilter}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="bg-brand-surface border-brand-blue/10" align="end">
+                    <SelectContent className="bg-brand-surface border-brand-blue/10 min-w-0" align="start">
                       <SelectItem value="All">All</SelectItem>
                       <SelectItem value="OUT">Dispensed</SelectItem>
                       <SelectItem value="IN">Added</SelectItem>
