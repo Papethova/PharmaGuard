@@ -3837,7 +3837,7 @@ export default function App() {
           </div>
           
           {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.14] print:opacity-[0.16] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.24] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
             <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
@@ -4194,7 +4194,7 @@ export default function App() {
           className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-[256px_minmax(0,1fr)] lg:grid-rows-1 gap-10 items-stretch w-full relative overflow-hidden"
         >
           {/* Background Watermark moved here for stability */}
-          <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.06] overflow-hidden z-0">
+          <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.10] overflow-hidden z-0">
             <PharmaLogo className="h-[800px] w-[800px]" />
           </div>
           <aside className="w-full lg:w-[256px] lg:min-w-[256px] lg:max-w-[256px] flex flex-col gap-9 shrink-0 overflow-visible self-start touch-none lg:pt-[10px]">
