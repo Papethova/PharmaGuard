@@ -5810,31 +5810,13 @@ export default function App() {
               </div>
             </div>
 
-            {/* History button and close button in the top header on the far right */}
-            <div className="flex items-center gap-2">
-              {reconViewMode !== "history" && (
-                <Button
-                  id="recon-history-button"
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setReconViewMode("history");
-                    setSelectedHistoricalReport(null);
-                    setReconShowPreview(false);
-                  }}
-                  className="h-10 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-brand-yellow border border-brand-yellow/30 hover:bg-white/10 flex items-center gap-2 transition-all"
-                >
-                  <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
-                    <Folder className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
-                  </div>
-                  Report Registry
-                </Button>
-              )}
+            {/* Close button in the top header on the far right */}
+            <div className="flex items-center justify-end">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsReconOpen(false)}
-                className="h-10 w-10 p-0 rounded-xl text-white hover:bg-white/10 flex items-center justify-center transition-all shrink-0 ml-1"
+                className="h-10 w-10 p-0 rounded-xl text-white hover:bg-white/10 flex items-center justify-center transition-all shrink-0"
                 aria-label="Close"
               >
                 <X className="h-5 w-5" strokeWidth={3} />
@@ -6188,26 +6170,45 @@ export default function App() {
 
           </div>
 
-            <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
-              <Button
-                id="recon-cancel-button"
-                type="button"
-                onClick={() => {
-                  setIsReconOpen(false);
-                }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
-              >
-                Cancel
-              </Button>
-              <Button
-                id="recon-generate-report-button"
-                type="button"
-                onClick={handleReconciliationSubmit}
-                disabled={isReconSubmitting}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
-              >
-                {isReconSubmitting ? "Generating..." : "Generate Report"}
-              </Button>
+            <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-between items-center shrink-0 rounded-b-2xl">
+              <div>
+                <Button
+                  id="recon-history-button"
+                  type="button"
+                  onClick={() => {
+                    setReconViewMode("history");
+                    setSelectedHistoricalReport(null);
+                    setReconShowPreview(false);
+                  }}
+                  className="text-[10px] font-black uppercase tracking-widest bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/15 rounded-xl h-12 px-5 border border-brand-blue/10 transition-all flex items-center gap-2"
+                >
+                  <div className="h-6 w-6 rounded-full bg-brand-blue flex items-center justify-center shrink-0 text-white shadow-sm">
+                    <Folder className="h-3 w-3 text-white" strokeWidth={3} />
+                  </div>
+                  Report Registry
+                </Button>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  id="recon-cancel-button"
+                  type="button"
+                  onClick={() => {
+                    setIsReconOpen(false);
+                  }}
+                  className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  id="recon-generate-report-button"
+                  type="button"
+                  onClick={handleReconciliationSubmit}
+                  disabled={isReconSubmitting}
+                  className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
+                >
+                  {isReconSubmitting ? "Generating..." : "Generate Report"}
+                </Button>
+              </div>
             </div>
         </div>
 
