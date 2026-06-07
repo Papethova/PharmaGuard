@@ -4190,7 +4190,6 @@ export default function App() {
             } else {
               if (val === 'recon') {
                 setReconShowPreview(false);
-                setReconViewMode("form");
                 setSelectedHistoricalReport(null);
               }
               setCurrentTab(val); 
@@ -4265,12 +4264,36 @@ export default function App() {
  
                 <TabsTrigger 
                   value="recon" 
+                  onClick={() => {
+                    setReconShowPreview(false);
+                    setReconViewMode("form");
+                    setSelectedHistoricalReport(null);
+                    setCurrentTab("recon");
+                    setIsUserManagementOpen(false);
+                  }}
                   className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Clipboard className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'recon' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Reconciliations</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'recon' && reconViewMode === 'form' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Report Generator</span>
+                </TabsTrigger>
+
+                <TabsTrigger 
+                  value="recon" 
+                  onClick={() => {
+                    setReconShowPreview(false);
+                    setReconViewMode("history");
+                    setSelectedHistoricalReport(null);
+                    setCurrentTab("recon");
+                    setIsUserManagementOpen(false);
+                  }}
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
+                >
+                  <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
+                    <Folder className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
+                  </div>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'recon' && reconViewMode === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Report Registry</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="alerts" 
