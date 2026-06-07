@@ -6186,7 +6186,9 @@ export default function App() {
                   }}
                   className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 shadow-lg shadow-brand-blue/15 border border-brand-yellow/30 rounded-xl h-12 px-5 transition-all flex items-center gap-2.5"
                 >
-                  <div className="h-2.5 w-2.5 rounded-full bg-brand-yellow shrink-0 shadow-sm" />
+                  <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
+                    <Folder className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+                  </div>
                   Report Registry
                 </Button>
               </div>
