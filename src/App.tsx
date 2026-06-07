@@ -580,6 +580,7 @@ export default function App() {
 
   // Added history/selection states
   const [reconViewMode, setReconViewMode] = useState<"form" | "history">("form");
+  const [reconOpenedFrom, setReconOpenedFrom] = useState<"footer" | "submenu">("submenu");
   const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
   const [historicalReports, setHistoricalReports] = useState<any[]>([]);
 
@@ -4259,6 +4260,7 @@ export default function App() {
                   onClick={() => {
                     setReconShowPreview(false);
                     setReconViewMode("form");
+                    setReconOpenedFrom("submenu");
                     setSelectedHistoricalReport(null);
                     setIsReconOpen(true);
                   }}
@@ -4275,6 +4277,7 @@ export default function App() {
                   onClick={() => {
                     setReconShowPreview(false);
                     setReconViewMode("history");
+                    setReconOpenedFrom("submenu");
                     setSelectedHistoricalReport(null);
                     setIsReconOpen(true);
                   }}
@@ -6177,6 +6180,7 @@ export default function App() {
                   type="button"
                   onClick={() => {
                     setReconViewMode("history");
+                    setReconOpenedFrom("footer");
                     setSelectedHistoricalReport(null);
                     setReconShowPreview(false);
                   }}
@@ -6782,25 +6786,29 @@ export default function App() {
           </div>
 
           <div className="py-3 px-6 bg-brand-blue/5 border-t border-brand-blue/10 flex justify-end items-center gap-3 shrink-0 rounded-b-2xl">
-            <Button
-              type="button"
-              onClick={() => {
-                setIsReconOpen(false);
-              }}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
-            >
-              Close Registry
-            </Button>
-            <Button
-              id="recon-history-close"
-              type="button"
-              onClick={() => {
-                setReconViewMode("form");
-              }}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
-            >
-              Back to Form
-            </Button>
+            {reconOpenedFrom === "submenu" && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setIsReconOpen(false);
+                }}
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
+              >
+                Close Registry
+              </Button>
+            )}
+            {reconOpenedFrom === "footer" && (
+              <Button
+                id="recon-history-close"
+                type="button"
+                onClick={() => {
+                  setReconViewMode("form");
+                }}
+                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
+              >
+                Back to Form
+              </Button>
+            )}
           </div>
         </div>
 
