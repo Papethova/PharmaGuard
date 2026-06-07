@@ -2012,9 +2012,50 @@ export default function App() {
         const mm = (now.getMonth() + 1).toString().padStart(2, '0');
         const dd = now.getDate().toString().padStart(2, '0');
         const yy = now.getFullYear().toString().slice(-2);
-        // Include minutes/seconds as a suffix to maintain uniqueness while preserving the requested format
-        const suffix = `${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
-        finalRef = `VER-${mm}${dd}${yy}-${suffix}`;
+        const prefix = `VER-${mm}${dd}${yy}-`;
+        
+        let nextNum = 1;
+        try {
+          const emailId = user.email?.toLowerCase() || user.uid;
+          const transactionsRef = collection(db, "users", emailId, "transactions");
+          const q = query(
+            transactionsRef,
+            where("referenceNumber", ">=", prefix),
+            where("referenceNumber", "<=", prefix + "\uf8ff")
+          );
+          const snapshot = await getDocs(q);
+          let maxSeq = 0;
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const ref = data.referenceNumber;
+            if (ref && ref.startsWith(prefix)) {
+              const parts = ref.split("-");
+              const seqStr = parts[parts.length - 1];
+              const seq = parseInt(seqStr, 10);
+              if (!isNaN(seq) && seq > maxSeq) {
+                maxSeq = seq;
+              }
+            }
+          });
+          nextNum = maxSeq + 1;
+        } catch (err) {
+          console.error("Error looking up VER sequence:", err);
+          let maxSeq = 0;
+          transactions.forEach((t) => {
+            if (t.referenceNumber && t.referenceNumber.startsWith(prefix)) {
+              const parts = t.referenceNumber.split("-");
+              const seqStr = parts[parts.length - 1];
+              const seq = parseInt(seqStr, 10);
+              if (!isNaN(seq) && seq > maxSeq) {
+                maxSeq = seq;
+              }
+            }
+          });
+          nextNum = maxSeq + 1;
+        }
+        
+        const suffix = nextNum.toString().padStart(2, '0');
+        finalRef = `${prefix}${suffix}`;
       }
 
       if (!finalRef || (transactionType === "OUT" && finalRef === "RX-") || (transactionType === "IN" && finalRef === "INV-")) {
@@ -5362,7 +5403,7 @@ export default function App() {
                     type="date" 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 custom-clean-date-input ${startDate ? "has-value" : ""}`}
                   />
                 </div>
                 <div className="grid gap-1.5 w-[110px] shrink-0">
@@ -5372,7 +5413,7 @@ export default function App() {
                     type="date" 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0"
+                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 custom-clean-date-input ${endDate ? "has-value" : ""}`}
                   />
                 </div>
 
@@ -5445,7 +5486,7 @@ export default function App() {
                          historyTypeFilter === "VERIFY" ? "Verified" : historyTypeFilter}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="bg-brand-surface border-brand-blue/10" align="start">
+                    <SelectContent className="bg-brand-surface border-brand-blue/10" align="end">
                       <SelectItem value="All">All</SelectItem>
                       <SelectItem value="OUT">Dispensed</SelectItem>
                       <SelectItem value="IN">Added</SelectItem>
