@@ -5571,7 +5571,7 @@ export default function App() {
                       <TableCell className="text-xs font-normal text-center py-1">
                         <button 
                           onClick={() => handleNDCClick(t.ndc)}
-                          className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
+                          className="text-brand-blue hover:underline font-normal transition-colors"
                         >
                           {t.ndc}
                         </button>
@@ -5950,7 +5950,7 @@ export default function App() {
                         <TableCell className="text-[10px] text-center py-1">
                           <button 
                             onClick={() => handleNDCClick(t.ndc)}
-                            className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
+                            className="text-brand-blue hover:underline font-normal transition-colors"
                           >
                             {t.ndc}
                           </button>
