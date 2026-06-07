@@ -33,12 +33,14 @@ const app = initializeApp(validConfig);
 export const auth = getAuth(app);
 
 // Initialize Firestore with standard settings. 
-// Using long polling and in-memory cache to stay resilient in restricted Chrome/Safari iframe environments.
+// Using long polling and persistent local cache to stay resilient and save reads.
 // Respect the custom workspace firestore Database ID defined in firebase-applet-config.json
 const firestoreDatabaseId = validConfig.firestoreDatabaseId || "(default)";
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
-  localCache: memoryLocalCache()
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  })
 }, firestoreDatabaseId);
 
 export const googleProvider = new GoogleAuthProvider();
