@@ -5053,9 +5053,9 @@ export default function App() {
                   </div>
                 </ScrollArea>
 
-                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex justify-end">
                   <Button 
-                    className="w-full h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/20 rounded-xl"
+                    className="w-1/2 h-10 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all"
                     onClick={() => setViewingTransaction(null)}
                   >
                     Close Record
@@ -5281,7 +5281,7 @@ export default function App() {
                       setIsUserManagementOpen(false);
                       setCurrentTab('inventory');
                     }} 
-                    className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-md shadow-brand-blue/10 rounded-lg transition-all"
+                    className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
                   >
                     Close User Management
                   </Button>
@@ -7005,7 +7005,7 @@ export default function App() {
               onClick={() => {
                 setReconViewMode("form");
               }}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue hover:brightness-110 text-white rounded-xl h-12 shadow-lg shadow-brand-blue/20 px-6 border-none transition-all flex items-center justify-center"
+              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
             >
               Back to Form
             </Button>
