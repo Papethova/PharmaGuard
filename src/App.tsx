@@ -4389,7 +4389,7 @@ export default function App() {
                          transactionType === "ADJUST" ? "Adjust Inventory" : 
                          "Verify Inventory Count"}
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] uppercase tracking-widest mt-1">
                         {transactionType === "OUT" ? "log outgoing medications" : 
                          transactionType === "IN" ? "log incoming medications" : 
                          transactionType === "ADJUST" ? "log adjustments to inventory" : 
@@ -5008,7 +5008,7 @@ export default function App() {
                       <DialogTitle className="text-xl font-black tracking-tight text-white uppercase leading-none">
                         Transaction Details
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] uppercase tracking-widest mt-1">
                         FULL AUDIT RECORD FOR REFERENCE # {formatRefForDisplay(viewingTransaction?.referenceNumber)}
                       </DialogDescription>
                     </div>
@@ -5158,7 +5158,7 @@ export default function App() {
                       <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                         User Management
                       </DialogTitle>
-                      <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase">
+                      <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1 uppercase">
                         Terminal Access Control
                       </DialogDescription>
                     </div>
@@ -5812,7 +5812,7 @@ export default function App() {
                 <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                   {reconViewMode === "history" ? "Controlled Substance Reconciliation Report Registry" : "Controlled Substance Reconciliation"}
                 </DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
+                <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1 uppercase leading-tight">
                   VERIFY PHYSICAL HOLDINGS AGAINST DIGITAL LEDGER LOGS TO MAINTAIN ACTIVE COMPLIANCE
                 </DialogDescription>
               </div>
@@ -6842,7 +6842,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                 Transaction History: {selectedSubstanceDetail?.name}&nbsp;{selectedSubstanceDetail?.strength}
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/80 font-bold text-[10px] tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/80 font-bold text-[11px] tracking-widest mt-1">
                 NDC: {selectedSubstanceDetail?.ndc}
               </DialogDescription>
             </div>
@@ -7101,7 +7101,7 @@ export default function App() {
             </div>
             <div>
               <DialogTitle className="text-base font-black uppercase tracking-wider text-white">Node Registry Migration</DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1 uppercase leading-tight">
                 RELOCATE ALL SUBSTANCE INVENTORY AND AUDIT LEDGERS BETWEEN NODES.
               </DialogDescription>
             </div>
@@ -7295,7 +7295,7 @@ export default function App() {
               </div>
               <div className="flex-1 min-w-0">
                 <DialogTitle className="text-xl font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1 leading-tight truncate">
+                <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1 leading-tight truncate">
                   REAL-TIME REGISTRY MANAGEMENT AND GLOBAL SUBSCRIPTION AUTHORITY TERMINAL.
                 </DialogDescription>
               </div>
@@ -7570,7 +7570,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tighter text-white leading-none">
                 Confirm Purge
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1">
                 AUTHORIZED NODE REVOCATION PROCESS
               </DialogDescription>
             </div>
@@ -7631,7 +7631,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tighter text-white leading-none">
                 Remove User
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1">
                 CREDENTIAL REVOCATION
               </DialogDescription>
             </div>
@@ -7676,7 +7676,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                 Sign Out Confirmation
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1">
                 AUTHENTICATION SESSION END
               </DialogDescription>
             </div>
@@ -7728,7 +7728,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
                 Edit Minimum Threshold
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1">
                 UPDATE THE LOW-STOCK ALERT THRESHOLD FOR THIS MEDICATION.
               </DialogDescription>
             </div>
@@ -7794,7 +7794,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tight text-white uppercase leading-none">
                 Edit Medication Details
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] uppercase tracking-widest mt-1">
                 UPDATE THE PERMANENT RECORDS FOR THIS MEDICATION.
               </DialogDescription>
             </div>
@@ -7938,7 +7938,7 @@ export default function App() {
             </div>
             <div className="flex flex-col">
               <DialogTitle className="text-xl font-black tracking-tight leading-none text-white">Profile Identity</DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] uppercase tracking-widest mt-1">
                 ESTABLISH ORGANIZATIONAL AUTHORITY
               </DialogDescription>
             </div>
@@ -8001,7 +8001,7 @@ export default function App() {
               <DialogTitle className="text-xl font-black tracking-tighter text-white leading-none">
                 Reset Node Data
               </DialogTitle>
-              <DialogDescription className="text-brand-yellow/70 font-bold text-[10px] uppercase tracking-widest mt-1">
+              <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] uppercase tracking-widest mt-1">
                 AUTHORIZED INDIVIDUAL DATA PURGE
               </DialogDescription>
             </div>
