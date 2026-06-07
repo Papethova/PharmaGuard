@@ -6175,7 +6175,7 @@ export default function App() {
                     setSelectedHistoricalReport(null);
                     setReconShowPreview(false);
                   }}
-                  className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 shadow-lg shadow-brand-blue/15 border border-brand-yellow/30 rounded-xl h-12 px-5 transition-all flex items-center gap-2.5"
+                  className="text-xs font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-110 shadow-lg shadow-brand-blue/15 border border-brand-yellow/30 rounded-xl h-12 px-5 transition-all flex items-center gap-2.5"
                 >
                   <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm text-brand-blue">
                     <Folder className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
@@ -6190,7 +6190,7 @@ export default function App() {
                   onClick={() => {
                     setIsReconOpen(false);
                   }}
-                  className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
+                  className="text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
                 >
                   Cancel
                 </Button>
@@ -6199,7 +6199,7 @@ export default function App() {
                   type="button"
                   onClick={handleReconciliationSubmit}
                   disabled={isReconSubmitting}
-                  className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
+                  className="text-xs font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
                 >
                   {isReconSubmitting ? "Generating..." : "Generate Report"}
                 </Button>
@@ -6222,7 +6222,7 @@ export default function App() {
                   setReconShowPreview(false);
                   setSelectedHistoricalReport(null);
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
+                className="text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl h-12 px-6 border-none transition-all flex items-center justify-center"
               >
                 {selectedHistoricalReport ? "Return to Registry" : "Return to Editing"}
               </Button>
@@ -6482,7 +6482,7 @@ export default function App() {
                     window.print();
                   }
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center justify-center"
+                className="text-xs font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center justify-center"
               >
                 <Printer className="h-4 w-4" />
                 PRINT REPORT
@@ -6785,7 +6785,7 @@ export default function App() {
                 onClick={() => {
                   setIsReconOpen(false);
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
+                className="text-xs font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
               >
                 Close Registry
               </Button>
@@ -6797,7 +6797,7 @@ export default function App() {
                 onClick={() => {
                   setReconViewMode("form");
                 }}
-                className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
+                className="text-xs font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex items-center justify-center"
               >
                 Back to Form
               </Button>
@@ -7078,7 +7078,7 @@ export default function App() {
         <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto flex justify-end">
           <Button 
             onClick={() => setSelectedSubstanceDetail(null)} 
-            className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
+            className="h-9 px-6 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
           >
             Close History Log
           </Button>
@@ -7263,14 +7263,14 @@ export default function App() {
               setIsNodeMigrationOpen(false);
             }}
             disabled={isMigrating}
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
           >
             Cancel
           </Button>
           <Button
             onClick={handleNodeDataMigration}
             disabled={isMigrating || !migrationSourceNode || !migrationDestNode}
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl disabled:opacity-50 transition-all"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl disabled:opacity-50 transition-all"
           >
             Execute Migration
           </Button>
@@ -7535,7 +7535,7 @@ export default function App() {
               variant="default" 
               title="migration"
               onClick={() => setIsNodeMigrationOpen(true)}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-115 px-4 h-9 rounded-lg transition-all flex gap-2 items-center shadow-md shadow-brand-blue/20"
+              className="text-xs font-black uppercase tracking-widest bg-brand-blue text-brand-yellow hover:brightness-115 px-4 h-9 rounded-lg transition-all flex gap-2 items-center shadow-md shadow-brand-blue/20"
             >
               <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 border border-brand-yellow/20 shadow-sm">
                 <OneSidedArrowLeftRight className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
@@ -7545,7 +7545,7 @@ export default function App() {
             <Button 
               variant="default" 
               onClick={() => setIsSuperAdminOpen(false)}
-              className="text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 px-6 h-9 rounded-lg transition-all shadow-md shadow-brand-yellow/10"
+              className="text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 px-6 h-9 rounded-lg transition-all shadow-md shadow-brand-yellow/10"
             >
               Disconnect Terminal
             </Button>
@@ -7601,13 +7601,13 @@ export default function App() {
         <DialogFooter className="flex flex-col sm:flex-row gap-2 px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10">
           <Button 
             onClick={() => setIsDeleteConfirmOpen(false)} 
-            className="bg-brand-blue text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-xl flex-1 transition-all hover:brightness-110 shadow-lg shadow-brand-blue/10"
+            className="bg-brand-blue text-white font-black uppercase tracking-widest text-xs h-12 px-8 rounded-xl flex-1 transition-all hover:brightness-110 shadow-lg shadow-brand-blue/10"
           >
             Cancel
           </Button>
           <Button 
             onClick={() => nodeToDelete && handleDeleteUserProfile(nodeToDelete.docId || nodeToDelete.uid)} 
-            className="bg-brand-yellow hover:brightness-110 text-brand-blue font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-xl shadow-lg shadow-brand-yellow/20 flex-1 border-none transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-brand-yellow hover:brightness-110 text-brand-blue font-black uppercase tracking-widest text-xs h-12 px-8 rounded-xl shadow-lg shadow-brand-yellow/20 flex-1 border-none transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             Purge Node
           </Button>
@@ -7645,11 +7645,11 @@ export default function App() {
         </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2 px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10">
-          <Button variant="default" onClick={() => setUserToDeleteConfirm(null)} className="flex-1 bg-brand-blue text-white hover:bg-brand-blue/90 font-black uppercase tracking-widest text-[10px] h-11 border-none shadow-lg shadow-brand-blue/10">
+          <Button variant="default" onClick={() => setUserToDeleteConfirm(null)} className="flex-1 bg-brand-blue text-white hover:bg-brand-blue/90 font-black uppercase tracking-widest text-xs h-11 border-none shadow-lg shadow-brand-blue/10">
             Keep User
           </Button>
           <Button 
-            className="flex-1 bg-brand-yellow text-brand-blue hover:brightness-110 font-black uppercase tracking-widest text-[10px] h-11 shadow-lg shadow-brand-yellow/20 border-none"
+            className="flex-1 bg-brand-yellow text-brand-blue hover:brightness-110 font-black uppercase tracking-widest text-xs h-11 shadow-lg shadow-brand-yellow/20 border-none"
             onClick={() => {
               if (userToDeleteConfirm) handleDeleteUser(userToDeleteConfirm.id);
               setUserToDeleteConfirm(null);
@@ -7692,7 +7692,7 @@ export default function App() {
         <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => setIsLogoutConfirmOpen(false)} 
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
           >
             Stay Signed In
           </Button>
@@ -7701,7 +7701,7 @@ export default function App() {
               setIsLogoutConfirmOpen(false);
               handleLogout();
             }}
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
           >
             Sign Out
           </Button>
@@ -7971,7 +7971,7 @@ export default function App() {
           {userProfile?.organizationName && (
             <Button 
               onClick={() => setIsProfileEditOpen(false)}
-              className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
+              className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
             >
               Cancel
             </Button>
@@ -7979,7 +7979,7 @@ export default function App() {
           <Button 
             onClick={handleUpdateOrgProfile}
             disabled={isSubmitting}
-            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
+            className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl disabled:opacity-100"
           >
             {isSubmitting ? "Synchronizing..." : "Update Identity"}
           </Button>
@@ -8012,13 +8012,13 @@ export default function App() {
           </div>
         </div>
         <DialogFooter className="flex flex-col sm:flex-row gap-2 px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10">
-          <Button onClick={() => setIsResetConfirmOpen(false)} className="bg-brand-blue text-white font-black uppercase tracking-widest text-[10px] h-12 flex-1 rounded-xl">
+          <Button onClick={() => setIsResetConfirmOpen(false)} className="bg-brand-blue text-white font-black uppercase tracking-widest text-xs h-12 flex-1 rounded-xl">
             Cancel
           </Button>
           <Button 
             onClick={() => nodeToReset && handleClearNodeData(nodeToReset.docId || nodeToReset.uid)} 
             disabled={isActionPending}
-            className="bg-brand-yellow text-brand-blue font-black uppercase tracking-widest text-[10px] h-12 flex-1 rounded-xl shadow-lg shadow-brand-yellow/20"
+            className="bg-brand-yellow text-brand-blue font-black uppercase tracking-widest text-xs h-12 flex-1 rounded-xl shadow-lg shadow-brand-yellow/20"
           >
             {isActionPending ? 'Purging...' : 'Confirm Reset'}
           </Button>
