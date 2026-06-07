@@ -526,10 +526,21 @@ export default function App() {
     }
   }, [isNodeMigrationOpen]);
 
-  // Reconciliation states with local caching
-  const [isReconOpen, setIsReconOpen] = useState(() => {
-    return localStorage.getItem("recon_isReconOpen") === "true";
+  // Tab State
+  const [currentTab, setCurrentTab] = useState<string>(() => {
+    return localStorage.getItem("recon_isReconOpen") === "true" ? "recon" : "inventory";
   });
+
+  // Reconciliation states with local caching derived from tab
+  const isReconOpen = currentTab === "recon";
+  const setIsReconOpen = (open: boolean) => {
+    if (open) {
+      setCurrentTab("recon");
+      setIsUserManagementOpen(false);
+    } else {
+      setCurrentTab("inventory");
+    }
+  };
   const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">(() => {
     return (localStorage.getItem("recon_reconScheduleFilter") as "ALL" | "C-II" | "C-III/C-IV/C-V") || "C-II";
   });
@@ -1036,7 +1047,6 @@ export default function App() {
   const [bootTimeout, setBootTimeout] = useState(false);
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [editingOrgName, setEditingOrgName] = useState("");
-  const [currentTab, setCurrentTab] = useState<string>("inventory");
 
   const isMasterAdmin = useMemo(() => {
     const email = user?.email?.toLowerCase();
@@ -4178,6 +4188,11 @@ export default function App() {
             if (val === 'users') {
               setIsUserManagementOpen(true);
             } else {
+              if (val === 'recon') {
+                setReconShowPreview(false);
+                setReconViewMode("form");
+                setSelectedHistoricalReport(null);
+              }
               setCurrentTab(val); 
               setIsUserManagementOpen(false); 
             }
@@ -4236,7 +4251,7 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Pill className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'inventory' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Inventory View</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
@@ -4245,24 +4260,18 @@ export default function App() {
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Search className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'history' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Audit Log</span>
                 </TabsTrigger>
  
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setReconShowPreview(false);
-                    setReconViewMode("form");
-                    setSelectedHistoricalReport(null);
-                    setIsReconOpen(true);
-                  }}
-                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl bg-transparent hover:bg-brand-blue/5 border border-transparent shadow-none transition-all text-base text-brand-blue font-normal"
+                <TabsTrigger 
+                  value="recon" 
+                  className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
                 >
                   <div className="h-8 w-8 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20 transition-all">
                     <Clipboard className="h-4 w-4 text-brand-blue transition-all" strokeWidth={3} />
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${isReconOpen ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Reconciliations</span>
-                </Button>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'recon' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Reconciliations</span>
+                </TabsTrigger>
                 <TabsTrigger 
                   value="alerts" 
                   className="w-full justify-start gap-4 h-11 px-4 rounded-xl data-active:!bg-transparent data-active:!shadow-none data-active:after:!hidden text-brand-blue/50 hover:bg-brand-blue/5 border border-transparent text-base group"
@@ -4272,7 +4281,7 @@ export default function App() {
                       <AlertTriangle className="h-5 w-5 text-brand-blue transition-all" strokeWidth={3} />
                     </div>
                   </div>
-                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen && !isReconOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
+                  <span className={`whitespace-nowrap leading-none ${(currentTab === 'alerts' && !isUserManagementOpen) ? 'font-black text-brand-blue' : 'font-medium text-brand-blue/50'}`}>Alerts</span>
                   {lowStockItems.length > 0 && (
                     <div className="ml-auto relative flex items-center justify-center h-5 w-5">
                       <span className="absolute inset-0 rounded-full bg-brand-yellow opacity-75 animate-ping" style={{ transform: 'translateZ(0)' }} />
@@ -5764,289 +5773,11 @@ export default function App() {
               </div>
             </div>
           </TabsContent>
-        </div>
-      </Tabs>
-    </main>
-    {createPortal(
-      <Toaster 
-        position="bottom-right"
-        theme="light"
-        expand={true}
-        richColors={true}
-        toastOptions={{
-          className: "sonner-industrial",
-        }}
-      />,
-      document.body
-    )}
-    {reconShowPreview && createPortal(
-      renderReconciliationReportContent(true),
-      document.body
-    )}
 
-    {/* Transaction History Dialog (Globally available helper) */}
-    <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col h-[80vh] max-h-[80vh] touch-none">
-        <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto">
-          <div className="flex items-center gap-4 relative z-10 text-left">
-            <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-              <History className="h-5 w-5 text-brand-blue" />
-            </div>
-            <div className="flex flex-col gap-0">
-              <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
-                Transaction History: {selectedSubstanceDetail?.name}&nbsp;{selectedSubstanceDetail?.strength}
-              </DialogTitle>
-              <DialogDescription className="text-brand-yellow/80 font-bold text-[10px] tracking-widest mt-1">
-                NDC: {selectedSubstanceDetail?.ndc}
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-        
-        <div className="p-4 shrink-0">
-          <div className="flex flex-wrap items-center gap-3">
-            <Button 
-              size="sm"
-              onClick={() => {
-                if (selectedSubstanceDetail) {
-                  resetForm();
-                  setSelectedSubstance(selectedSubstanceDetail.id);
-                  setSubstanceSearch(selectedSubstanceDetail.name);
-                  setTransactionType("VERIFY");
-                  setReferenceNumber("");
-                  setReason("");
-                  setIsLogOpen(true);
-                }
-              }}
-              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
-            >
-              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-                <Check className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
-              </div>
-              Confirm Count
-            </Button>
-            <Button 
-              onClick={() => {
-                if (selectedSubstanceDetail) {
-                  setEditingMed({
-                    ...selectedSubstanceDetail,
-                    minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
-                    packageSize: selectedSubstanceDetail.packageSize.toString() as any
-                  });
-                }
-                setIsEditMinThresholdOpen(true);
-              }}
-              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
-            >
-              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-                <div className="relative h-4 w-4 flex items-center justify-center">
-                  <svg className="h-full w-full absolute text-brand-blue overflow-visible" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="2 7 8.5 11.5 13.5 8.5 22 17" />
-                    <line x1="0" y1="15.25" x2="24" y2="15.25" strokeWidth="2" />
-                  </svg>
-                </div>
-              </div>
-              Edit Threshold
-            </Button>
-            <Button 
-              onClick={() => {
-                if (selectedSubstanceDetail) {
-                  setEditingMed({
-                    ...selectedSubstanceDetail,
-                    minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
-                    packageSize: selectedSubstanceDetail.packageSize.toString() as any
-                  });
-                  setIsEditMedDetailsOpen(true);
-                }
-              }}
-              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
-            >
-              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
-                <Edit className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
-              </div>
-              Edit Details
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col overflow-hidden">
-          <div 
-            className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface"
-            onScroll={(e) => {
-              const target = e.currentTarget;
-              if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
-                if (isUsingFallback) {
-                  if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
-                    isIncrementingSyncLimitRef.current = true;
-                    setSyncLimit(prev => prev + 30);
-                    setTimeout(() => {
-                      isIncrementingSyncLimitRef.current = false;
-                    }, 1000);
-                  }
-                } else {
-                  if (substanceTransactions.length >= substanceHistoryLimit && !isIncrementingSubstanceLimitRef.current) {
-                    isIncrementingSubstanceLimitRef.current = true;
-                    setSubstanceHistoryLimit(prev => prev + 30);
-                    setTimeout(() => {
-                      isIncrementingSubstanceLimitRef.current = false;
-                    }, 1000);
-                  }
-                }
-              }
-            }}
-          >
-            <table className="relative border-separate border-spacing-0 w-full text-sm">
-              <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
-                <TableRow className="bg-brand-light-grey">
-                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
-                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
-                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
-                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
-                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
-                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
-                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="text-brand-dark-grey">
-                {medicationHistoryTransactions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-brand-dark-grey/50 italic">
-                      No transaction history found for this item.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  medicationHistoryTransactions.map((t) => {
-                    const isNewSinceLastReport = (() => {
-                      if (!isReconOpen) return false;
-                      if (!selectedSubstanceDetail) return false;
-
-                      let maxReportTime = 0;
-                      
-                      // 1. Check historical reports that contain this specific medication
-                      if (historicalReports && historicalReports.length > 0) {
-                        historicalReports.forEach(r => {
-                          const hasMed = 
-                            (r.items && r.items.some((item: any) => item.substanceId === selectedSubstanceDetail.id)) ||
-                            (!r.items && (
-                              r.scheduleFilter === "ALL" || 
-                              r.scheduleFilter === selectedSubstanceDetail.schedule ||
-                              (r.scheduleFilter === "C-III/C-IV/C-V" && (selectedSubstanceDetail.schedule === "C-III" || selectedSubstanceDetail.schedule === "C-IV" || selectedSubstanceDetail.schedule === "C-V"))
-                            ));
-                          
-                          if (hasMed && r.timestamp) {
-                            const ms = new Date(r.timestamp).getTime();
-                            if (ms > maxReportTime) {
-                              maxReportTime = ms;
-                            }
-                          }
-                        });
-                      }
-                      
-                      // 2. Check general transaction logs for any previous reconciliation transactions of this specific medication
-                      const medReconTxs = transactions.filter(tx => 
-                        tx.substanceId === selectedSubstanceDetail.id &&
-                        tx.referenceNumber && 
-                        (tx.referenceNumber.startsWith("REC-") || tx.referenceNumber.startsWith("RECON-") || tx.referenceNumber.includes("REC")) &&
-                        tx.referenceNumber !== reconRef
-                      );
-                      
-                      if (medReconTxs.length > 0) {
-                        medReconTxs.forEach(tx => {
-                          const ms = getTimestampMs(tx.timestamp);
-                          if (ms > maxReportTime) {
-                            maxReportTime = ms;
-                          }
-                        });
-                      }
-
-                      // 3. Check lastReport if it belongs to this medication's schedule filter
-                      const isScheduleMatch = 
-                        reconScheduleFilter === "ALL" ||
-                        (reconScheduleFilter === "C-II" && selectedSubstanceDetail.schedule === "C-II") ||
-                        (reconScheduleFilter === "C-III/C-IV/C-V" && (selectedSubstanceDetail.schedule === "C-III" || selectedSubstanceDetail.schedule === "C-IV" || selectedSubstanceDetail.schedule === "C-V"));
-                        
-                      if (isScheduleMatch && lastReport && lastReport.timestampMs && lastReport.timestampMs > maxReportTime) {
-                        maxReportTime = lastReport.timestampMs;
-                      }
-                      
-                      if (maxReportTime > 0) {
-                        return getTimestampMs(t.timestamp) > maxReportTime;
-                      }
-                      
-                      return true;
-                    })();
-
-                    return (
-                      <TableRow 
-                        key={t.id} 
-                        className={`text-xs h-10 transition-colors group ${
-                          isNewSinceLastReport 
-                            ? "bg-brand-yellow/10 hover:bg-brand-yellow/20 font-semibold" 
-                            : "bg-white hover:bg-brand-blue/5"
-                        }`}
-                      >
-                        <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
-                          {formatDateTime(t.timestamp)}
-                        </TableCell>
-                        <TableCell className="text-[10px] text-center py-1">
-                          <button 
-                            onClick={() => handleNDCClick(t.ndc)}
-                            className="text-brand-blue hover:underline font-normal transition-colors"
-                          >
-                            {t.ndc}
-                          </button>
-                        </TableCell>
-                        <TableCell className="text-center py-1">
-                          {t.referenceNumber ? (
-                            <button 
-                              onClick={() => setViewingTransaction(t)}
-                              className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
-                            >
-                              {formatRefForDisplay(t.referenceNumber)}
-                            </button>
-                          ) : (
-                            <span className="text-brand-dark-grey/40 italic">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="py-1 text-center">
-                          <TransactionBadge type={t.type} size="sm" />
-                        </TableCell>
-                        <TableCell className="text-center text-brand-dark-grey text-sm py-1">
-                          {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
-                        </TableCell>
-                        <TableCell className="text-center font-normal text-brand-dark-grey text-sm py-1">{t.newStock}</TableCell>
-                        <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact py-1">
-                          {escapeEmail(t.performedByName)}
-                          {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
-                            <span className="ml-1 text-brand-dark-grey">
-                              ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
-                            </span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </table>
-          </div>
-        </div>
-        
-        <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto flex justify-end">
-          <Button 
-            onClick={() => setSelectedSubstanceDetail(null)} 
-            className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
-          >
-            Close History Log
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    {/* Reconciliation Report Dialog */}
-    <Dialog open={isReconOpen} onOpenChange={(open) => { setIsReconOpen(open); if (!open) { setCurrentTab('inventory'); } }} modal="trap-focus">
-      <DialogContent showCloseButton={false} className="sm:max-w-[1100px] w-[95vw] h-[90vh] max-h-[90vh] bg-brand-surface border-brand-blue/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col">
-        <DialogHeader className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0">
+{/* Reconciliation Report Dialog */}
+          <TabsContent value="recon" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
+            <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0 select-text">
+        <div className="py-2.5 px-5 bg-brand-blue text-white relative shrink-0 rounded-t-xl">
           <div className="flex items-center justify-between relative z-10 w-full">
             <div className="flex items-center gap-4 text-left">
               <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg border border-brand-yellow/20">
@@ -6057,12 +5788,12 @@ export default function App() {
                 )}
               </div>
               <div>
-                <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+                <h2 className="text-xl font-black tracking-tight text-white leading-none">
                   {reconViewMode === "history" ? "Controlled Substance Reconciliation Report Registry" : "Controlled Substance Reconciliation"}
-                </DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
+                </h2>
+                <p className="text-brand-yellow/70 font-bold text-[9px] tracking-widest mt-1 uppercase leading-tight">
                   VERIFY PHYSICAL HOLDINGS AGAINST DIGITAL LEDGER LOGS TO MAINTAIN ACTIVE COMPLIANCE
-                </DialogDescription>
+                </p>
               </div>
             </div>
 
@@ -6088,7 +5819,7 @@ export default function App() {
               </div>
             )}
           </div>
-        </DialogHeader>
+        </div>
 
         <div className={`flex flex-col flex-1 min-h-0 ${(reconShowPreview || reconViewMode !== "form") ? 'hidden' : ''}`}>
           {/* Form Editing View */}
@@ -7044,8 +6775,288 @@ export default function App() {
           </div>
         </div>
 
+            </Card>
+          </TabsContent>
+        </div>
+      </Tabs>
+    </main>
+    {createPortal(
+      <Toaster 
+        position="bottom-right"
+        theme="light"
+        expand={true}
+        richColors={true}
+        toastOptions={{
+          className: "sonner-industrial",
+        }}
+      />,
+      document.body
+    )}
+    {reconShowPreview && createPortal(
+      renderReconciliationReportContent(true),
+      document.body
+    )}
+
+    {/* Transaction History Dialog (Globally available helper) */}
+    <Dialog open={!!selectedSubstanceDetail} onOpenChange={(open) => !open && setSelectedSubstanceDetail(null)}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[1000px] bg-brand-surface border-brand-grey/20 shadow-2xl p-0 gap-0 overflow-hidden rounded-2xl flex flex-col h-[80vh] max-h-[80vh] touch-none">
+        <DialogHeader className="px-6 py-4 bg-brand-blue text-white relative shrink-0 touch-auto">
+          <div className="flex items-center gap-4 relative z-10 text-left">
+            <div className="h-10 w-10 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
+              <History className="h-5 w-5 text-brand-blue" />
+            </div>
+            <div className="flex flex-col gap-0">
+              <DialogTitle className="text-xl font-black tracking-tight text-white leading-none">
+                Transaction History: {selectedSubstanceDetail?.name}&nbsp;{selectedSubstanceDetail?.strength}
+              </DialogTitle>
+              <DialogDescription className="text-brand-yellow/80 font-bold text-[10px] tracking-widest mt-1">
+                NDC: {selectedSubstanceDetail?.ndc}
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+        
+        <div className="p-4 shrink-0">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button 
+              size="sm"
+              onClick={() => {
+                if (selectedSubstanceDetail) {
+                  resetForm();
+                  setSelectedSubstance(selectedSubstanceDetail.id);
+                  setSubstanceSearch(selectedSubstanceDetail.name);
+                  setTransactionType("VERIFY");
+                  setReferenceNumber("");
+                  setReason("");
+                  setIsLogOpen(true);
+                }
+              }}
+              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
+            >
+              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+                <Check className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+              </div>
+              Confirm Count
+            </Button>
+            <Button 
+              onClick={() => {
+                if (selectedSubstanceDetail) {
+                  setEditingMed({
+                    ...selectedSubstanceDetail,
+                    minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
+                    packageSize: selectedSubstanceDetail.packageSize.toString() as any
+                  });
+                }
+                setIsEditMinThresholdOpen(true);
+              }}
+              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
+            >
+              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+                <div className="relative h-4 w-4 flex items-center justify-center">
+                  <svg className="h-full w-full absolute text-brand-blue overflow-visible" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="2 7 8.5 11.5 13.5 8.5 22 17" />
+                    <line x1="0" y1="15.25" x2="24" y2="15.25" strokeWidth="2" />
+                  </svg>
+                </div>
+              </div>
+              Edit Threshold
+            </Button>
+            <Button 
+              onClick={() => {
+                if (selectedSubstanceDetail) {
+                  setEditingMed({
+                    ...selectedSubstanceDetail,
+                    minThreshold: selectedSubstanceDetail.minThreshold.toString() as any,
+                    packageSize: selectedSubstanceDetail.packageSize.toString() as any
+                  });
+                  setIsEditMedDetailsOpen(true);
+                }
+              }}
+              className="bg-brand-blue hover:brightness-110 text-white gap-2 shadow-lg shadow-brand-blue/20 h-10 px-4 font-extrabold rounded-xl transition-all flex items-center"
+            >
+              <div className="h-6 w-6 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
+                <Edit className="h-3.5 w-3.5 text-brand-blue" strokeWidth={3} />
+              </div>
+              Edit Details
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 px-4 pb-4 flex flex-col overflow-hidden">
+          <div 
+            className="flex-1 overflow-x-auto overflow-y-auto rounded-md border border-brand-grey/10 scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto bg-brand-surface"
+            onScroll={(e) => {
+              const target = e.currentTarget;
+              if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
+                if (isUsingFallback) {
+                  if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
+                    isIncrementingSyncLimitRef.current = true;
+                    setSyncLimit(prev => prev + 30);
+                    setTimeout(() => {
+                      isIncrementingSyncLimitRef.current = false;
+                    }, 1000);
+                  }
+                } else {
+                  if (substanceTransactions.length >= substanceHistoryLimit && !isIncrementingSubstanceLimitRef.current) {
+                    isIncrementingSubstanceLimitRef.current = true;
+                    setSubstanceHistoryLimit(prev => prev + 30);
+                    setTimeout(() => {
+                      isIncrementingSubstanceLimitRef.current = false;
+                    }, 1000);
+                  }
+                }
+              }
+            }}
+          >
+            <table className="relative border-separate border-spacing-0 w-full text-sm">
+              <TableHeader className="sticky top-0 z-40 bg-brand-light-grey">
+                <TableRow className="bg-brand-light-grey">
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Date</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>NDC</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Reference #</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Action</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Qty</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>Balance</TableHead>
+                  <TableHead className={`${tableHeadClass} sticky top-0 z-30 bg-brand-light-grey border-b border-brand-grey/10 h-11 text-xs`}>User</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="text-brand-dark-grey">
+                {medicationHistoryTransactions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-brand-dark-grey/50 italic">
+                      No transaction history found for this item.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  medicationHistoryTransactions.map((t) => {
+                    const isNewSinceLastReport = (() => {
+                      if (!isReconOpen) return false;
+                      if (!selectedSubstanceDetail) return false;
+
+                      let maxReportTime = 0;
+                      
+                      // 1. Check historical reports that contain this specific medication
+                      if (historicalReports && historicalReports.length > 0) {
+                        historicalReports.forEach(r => {
+                          const hasMed = 
+                            (r.items && r.items.some((item: any) => item.substanceId === selectedSubstanceDetail.id)) ||
+                            (!r.items && (
+                              r.scheduleFilter === "ALL" || 
+                              r.scheduleFilter === selectedSubstanceDetail.schedule ||
+                              (r.scheduleFilter === "C-III/C-IV/C-V" && (selectedSubstanceDetail.schedule === "C-III" || selectedSubstanceDetail.schedule === "C-IV" || selectedSubstanceDetail.schedule === "C-V"))
+                            ));
+                          
+                          if (hasMed && r.timestamp) {
+                            const ms = new Date(r.timestamp).getTime();
+                            if (ms > maxReportTime) {
+                              maxReportTime = ms;
+                            }
+                          }
+                        });
+                      }
+                      
+                      // 2. Check general transaction logs for any previous reconciliation transactions of this specific medication
+                      const medReconTxs = transactions.filter(tx => 
+                        tx.substanceId === selectedSubstanceDetail.id &&
+                        tx.referenceNumber && 
+                        (tx.referenceNumber.startsWith("REC-") || tx.referenceNumber.startsWith("RECON-") || tx.referenceNumber.includes("REC")) &&
+                        tx.referenceNumber !== reconRef
+                      );
+                      
+                      if (medReconTxs.length > 0) {
+                        medReconTxs.forEach(tx => {
+                          const ms = getTimestampMs(tx.timestamp);
+                          if (ms > maxReportTime) {
+                            maxReportTime = ms;
+                          }
+                        });
+                      }
+
+                      // 3. Check lastReport if it belongs to this medication's schedule filter
+                      const isScheduleMatch = 
+                        reconScheduleFilter === "ALL" ||
+                        (reconScheduleFilter === "C-II" && selectedSubstanceDetail.schedule === "C-II") ||
+                        (reconScheduleFilter === "C-III/C-IV/C-V" && (selectedSubstanceDetail.schedule === "C-III" || selectedSubstanceDetail.schedule === "C-IV" || selectedSubstanceDetail.schedule === "C-V"));
+                        
+                      if (isScheduleMatch && lastReport && lastReport.timestampMs && lastReport.timestampMs > maxReportTime) {
+                        maxReportTime = lastReport.timestampMs;
+                      }
+                      
+                      if (maxReportTime > 0) {
+                        return getTimestampMs(t.timestamp) > maxReportTime;
+                      }
+                      
+                      return true;
+                    })();
+
+                    return (
+                      <TableRow 
+                        key={t.id} 
+                        className={`text-xs h-10 transition-colors group ${
+                          isNewSinceLastReport 
+                            ? "bg-brand-yellow/10 hover:bg-brand-yellow/20 font-semibold" 
+                            : "bg-white hover:bg-brand-blue/5"
+                        }`}
+                      >
+                        <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
+                          {formatDateTime(t.timestamp)}
+                        </TableCell>
+                        <TableCell className="text-[10px] text-center py-1">
+                          <button 
+                            onClick={() => handleNDCClick(t.ndc)}
+                            className="text-brand-blue hover:underline font-normal transition-colors"
+                          >
+                            {t.ndc}
+                          </button>
+                        </TableCell>
+                        <TableCell className="text-center py-1">
+                          {t.referenceNumber ? (
+                            <button 
+                              onClick={() => setViewingTransaction(t)}
+                              className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
+                            >
+                              {formatRefForDisplay(t.referenceNumber)}
+                            </button>
+                          ) : (
+                            <span className="text-brand-dark-grey/40 italic">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="py-1 text-center">
+                          <TransactionBadge type={t.type} size="sm" />
+                        </TableCell>
+                        <TableCell className="text-center text-brand-dark-grey text-sm py-1">
+                          {t.type === 'VERIFY' ? '=' : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : ''))}{t.quantity}
+                        </TableCell>
+                        <TableCell className="text-center font-normal text-brand-dark-grey text-sm py-1">{t.newStock}</TableCell>
+                        <TableCell className="text-brand-dark-grey text-[10px] text-center no-interact py-1">
+                          {escapeEmail(t.performedByName)}
+                          {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
+                            <span className="ml-1 text-brand-dark-grey">
+                              ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
+                            </span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </table>
+          </div>
+        </div>
+        
+        <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 touch-auto flex justify-end">
+          <Button 
+            onClick={() => setSelectedSubstanceDetail(null)} 
+            className="h-9 px-6 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-md shadow-brand-yellow/10 rounded-lg transition-all"
+          >
+            Close History Log
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    
 
     {/* Node Migration Dialog */}
     <Dialog open={isNodeMigrationOpen} onOpenChange={setIsNodeMigrationOpen}>
