@@ -4958,7 +4958,7 @@ export default function App() {
                             <div>
                               <button 
                                 onClick={() => handleNDCClick(viewingTransaction.ndc)}
-                                className="text-lg text-brand-blue hover:underline font-black transition-colors"
+                                className="text-lg text-brand-blue hover:text-brand-yellow font-black transition-colors"
                               >
                                 {viewingTransaction.ndc}
                               </button>
@@ -5328,7 +5328,7 @@ export default function App() {
                       <TableCell className="font-normal text-sm text-center py-1">
                         <button 
                            onClick={(e) => { e.stopPropagation(); handleNDCClick(item.ndc); }}
-                          className="text-brand-blue hover:underline font-normal transition-colors"
+                          className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
                         >
                           {item.ndc}
                         </button>
@@ -5549,7 +5549,7 @@ export default function App() {
                         </TableCell>
                       </TableRow>
                     ) : filteredTransactions.map((t) => (
-                    <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors">
+                    <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors group">
                       <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center py-1">
                         {formatDateTime(t.timestamp)}
                       </TableCell>
@@ -5557,7 +5557,7 @@ export default function App() {
                         {t.referenceNumber ? (
                           <button 
                             onClick={() => setViewingTransaction(t)}
-                            className="text-xs font-normal text-brand-blue hover:underline"
+                            className="text-xs font-normal text-brand-blue group-hover:text-brand-yellow transition-colors"
                           >
                             {t.referenceNumber}
                           </button>
@@ -5571,7 +5571,7 @@ export default function App() {
                       <TableCell className="text-xs font-normal text-center py-1">
                         <button 
                           onClick={() => handleNDCClick(t.ndc)}
-                          className="text-brand-blue hover:underline font-normal transition-colors"
+                          className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
                         >
                           {t.ndc}
                         </button>
@@ -5703,7 +5703,7 @@ export default function App() {
                               <span className="text-brand-dark-grey/60">NDC:</span>
                               <button 
                                 onClick={() => handleNDCClick(item.ndc)}
-                                className="text-brand-blue hover:underline font-bold transition-colors"
+                                className="text-brand-blue hover:text-brand-yellow font-bold transition-colors"
                               >
                                 {item.ndc}
                               </button>
@@ -5938,7 +5938,7 @@ export default function App() {
                     return (
                       <TableRow 
                         key={t.id} 
-                        className={`text-xs h-10 transition-colors ${
+                        className={`text-xs h-10 transition-colors group ${
                           isNewSinceLastReport 
                             ? "bg-brand-yellow/10 hover:bg-brand-yellow/20 font-semibold" 
                             : "bg-white hover:bg-brand-blue/5"
@@ -5950,7 +5950,7 @@ export default function App() {
                         <TableCell className="text-[10px] text-center py-1">
                           <button 
                             onClick={() => handleNDCClick(t.ndc)}
-                            className="text-brand-blue hover:underline font-normal transition-colors"
+                            className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
                           >
                             {t.ndc}
                           </button>
@@ -5959,7 +5959,7 @@ export default function App() {
                           {t.referenceNumber ? (
                             <button 
                               onClick={() => setViewingTransaction(t)}
-                              className="text-brand-blue hover:underline font-normal"
+                              className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
                             >
                               {formatRefForDisplay(t.referenceNumber)}
                             </button>
@@ -6137,60 +6137,51 @@ export default function App() {
                             
                             return (
                               <Fragment key={sub.id}>
-                                <tr className="hover:bg-brand-blue/5 border-b border-brand-blue/10">
+                                <tr 
+                                  key={sub.id}
+                                  onClick={() => setSelectedSubstanceDetail(sub)}
+                                  className="hover:bg-brand-blue/5 border-b border-brand-blue/10 cursor-pointer group transition-all duration-150"
+                                  title="Click to view transaction history"
+                                >
                                   <td 
-                                    className="text-center font-semibold border-b border-brand-blue/10 py-1.5 cursor-pointer hover:bg-brand-blue/10 transition-colors group" 
+                                    className="text-center font-semibold border-b border-brand-blue/10 py-1.5" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
-                                    <span className="font-bold text-black group-hover:text-brand-blue group-hover:underline text-xs">{sub.name} {sub.strength}</span>
+                                    <span className="font-bold text-black text-xs">{sub.name} {sub.strength}</span>
                                   </td>
                                   <td 
-                                    className="text-center border-b border-brand-blue/10 py-1.5 cursor-pointer hover:bg-brand-blue/10 transition-colors group" 
+                                    className="text-center border-b border-brand-blue/10 py-1.5" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
-                                    <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 group-hover:underline leading-none shrink-0">{sub.ndc}</span>
+                                    <span className="text-xs text-brand-blue font-sans font-bold px-1.5 py-0.5 bg-brand-blue/5 rounded border border-brand-blue/10 group-hover:text-brand-yellow font-black transition-colors leading-none shrink-0">{sub.ndc}</span>
                                   </td>
                                   <td 
-                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80 bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-dark-grey/80 bg-brand-blue/5" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
                                     {metrics.lastClosingCount}
                                   </td>
                                   <td 
-                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
                                     +{metrics.purchases}
                                   </td>
                                   <td 
-                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
                                     -{metrics.dispensed}
                                   </td>
                                   <td 
-                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5 cursor-pointer hover:bg-brand-blue/10 hover:text-brand-blue transition-all" 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-grey bg-brand-blue/5" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
                                     {metrics.adjustments >= 0 ? `+${metrics.adjustments}` : metrics.adjustments}
                                   </td>
                                   <td 
-                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue cursor-pointer hover:bg-brand-blue/10 hover:underline transition-all" 
+                                    className="text-center border-b border-brand-blue/10 py-1.5 text-xs font-black text-brand-blue" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
                                     {metrics.expected}
                                   </td>
@@ -6200,7 +6191,8 @@ export default function App() {
                                         <button
                                           type="button"
                                           className="flex items-center gap-1.5 px-3 py-1 bg-brand-blue/5 border border-brand-blue/10 rounded-lg text-brand-blue font-black text-xs h-8 hover:bg-brand-blue/10 hover:border-brand-blue/20 transition-all cursor-pointer shadow-sm select-none"
-                                          onClick={() => {
+                                          onClick={(e) => {
+                                            e.stopPropagation();
                                             resetForm();
                                             setSelectedSubstance(sub.id);
                                             setSubstanceSearch(sub.name);
@@ -6219,7 +6211,8 @@ export default function App() {
                                           size="sm"
                                           variant="outline"
                                           className="h-8 text-[10px] font-black uppercase tracking-wider text-brand-blue border-brand-blue/15 hover:bg-brand-blue/5 rounded-xl shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1 bg-brand-surface font-sans px-2.5"
-                                          onClick={() => {
+                                          onClick={(e) => {
+                                            e.stopPropagation();
                                             resetForm();
                                             setSelectedSubstance(sub.id);
                                             setSubstanceSearch(sub.name);
@@ -6236,10 +6229,8 @@ export default function App() {
                                     </div>
                                   </td>
                                   <td 
-                                    className="text-center border-b border-brand-blue/10 py-1.5 cursor-pointer hover:bg-brand-blue/10 transition-colors" 
+                                    className="text-center border-b border-brand-blue/10 py-1.5" 
                                     style={{ verticalAlign: 'middle' }}
-                                    onClick={() => setSelectedSubstanceDetail(sub)}
-                                    title="Click to view transaction history"
                                   >
                                     <div className="flex justify-center items-center">
                                       {counted === undefined ? (
