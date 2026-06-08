@@ -3340,7 +3340,7 @@ export default function App() {
                 <PharmaLogo className="h-16 w-16" />
               </div>
               <h1 className="text-3xl font-black text-white tracking-tighter">PharmaGuard</h1>
-              <p className="text-brand-yellow font-bold text-[8px] uppercase tracking-[0.15em] mt-1">
+              <p className="text-brand-yellow font-bold text-[10px] uppercase tracking-[0.15em] mt-1">
                 SECURE CONTROLLED SUBSTANCE PERPETUAL INVENTORY SYSTEM
               </p>
             </div>
