@@ -5886,7 +5886,8 @@ export default function App() {
                           {filteredTransactions.slice(txStartIndex, txEndIndex).map((t) => (
                             <TableRow 
                               key={t.id} 
-                              className={`h-10 transition-colors group animate-fade-in ${
+                              onClick={() => setViewingTransaction(t)}
+                              className={`h-10 transition-colors cursor-pointer group animate-fade-in ${
                                 viewingTransaction?.id === t.id 
                                   ? "bg-brand-blue/10" 
                                   : "hover:bg-brand-blue/5"
@@ -5897,8 +5898,7 @@ export default function App() {
                               </TableCell>
                               <TableCell className="text-center py-1 h-10">
                                 {t.referenceNumber ? (
-                                  <button 
-                                    onClick={() => setViewingTransaction(t)}
+                                  <span 
                                     className={`text-xs font-normal transition-colors ${
                                       viewingTransaction?.id === t.id 
                                         ? "text-brand-yellow font-bold" 
@@ -5906,7 +5906,7 @@ export default function App() {
                                     }`}
                                   >
                                     {t.referenceNumber}
-                                  </button>
+                                  </span>
                                 ) : (
                                   <span className="text-brand-dark-grey/40 italic">-</span>
                                 )}
@@ -5915,12 +5915,13 @@ export default function App() {
                                 <div className="text-sm font-normal text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                               </TableCell>
                               <TableCell className="text-xs font-normal text-center py-1 h-10">
-                                <button 
-                                  onClick={() => handleNDCClick(t.ndc)}
-                                  className="text-brand-blue hover:underline font-normal transition-colors"
-                                >
+                                <span className={`text-brand-blue font-normal transition-colors ${
+                                  viewingTransaction?.id === t.id 
+                                    ? "text-brand-yellow font-semibold" 
+                                    : "group-hover:text-brand-yellow"
+                                }`}>
                                   {t.ndc}
-                                </button>
+                                </span>
                               </TableCell>
                               <TableCell className="py-1 text-center h-10">
                                 <TransactionBadge type={t.type} />
