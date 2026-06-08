@@ -375,6 +375,8 @@ export default function App() {
 
     const sigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
+  const userUid = user?.uid;
+  const userEmail = user?.email;
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isVerificationBypassed, setIsVerificationBypassed] = useState<boolean>(false);
 
@@ -385,12 +387,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      setIsVerificationBypassed(localStorage.getItem(`bypass_verification_${user.uid}`) === "true");
+    if (userUid) {
+      setIsVerificationBypassed(localStorage.getItem(`bypass_verification_${userUid}`) === "true");
     } else {
       setIsVerificationBypassed(false);
     }
-  }, [user]);
+  }, [userUid]);
 
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [inventory, setInventory] = useState<Substance[]>([]);
@@ -484,8 +486,8 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (!user) return;
-    const emailId = user.email?.toLowerCase() || user.uid;
+    if (!userUid) return;
+    const emailId = userEmail?.toLowerCase() || userUid;
     if (isInitializing) return;
 
     const timer = setTimeout(() => {
@@ -493,18 +495,18 @@ export default function App() {
     }, 4000); // 4 seconds idle background write pooling/debouncing (Option 2)
 
     return () => clearTimeout(timer);
-  }, [user, inventory.length, users.length, transactions.length, isInitializing]);
+  }, [userUid, userEmail, inventory.length, users.length, transactions.length, isInitializing]);
 
   useEffect(() => {
-    if (!user) return;
-    const emailId = user.email?.toLowerCase() || user.uid;
+    if (!userUid) return;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const metricsRef = doc(db, "users", emailId, "metadata", "metrics");
     return onSnapshot(metricsRef, (snap) => {
       if (snap.exists()) {
         setGlobalMetrics(snap.data());
       }
     });
-  }, [user]);
+  }, [userUid, userEmail]);
 
   // Lock background scroll when user management is open
   useEffect(() => {
@@ -1099,13 +1101,13 @@ export default function App() {
   const [editingOrgName, setEditingOrgName] = useState("");
 
   const isMasterAdmin = useMemo(() => {
-    const email = user?.email?.toLowerCase();
-    const isMaster = email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
-    if (user) {
+    const email = userEmail?.toLowerCase();
+    const isMaster = email === MASTER_ADMIN_EMAIL.toLowerCase();
+    if (userUid) {
       console.log(`Identity Check: ${email} | Master: ${isMaster}`);
     }
     return isMaster;
-  }, [user]);
+  }, [userUid, userEmail]);
 
   // Email Auth State
   const [authMode, setAuthMode] = useState<"google" | "login" | "signup" | "forgot">("google");
@@ -1236,8 +1238,8 @@ export default function App() {
   const pendingProfileUpdatesRef = useRef<Partial<UserProfile>>({});
 
   const debouncedUpdateProfile = useCallback((updates: Partial<UserProfile>) => {
-    if (!user || !user.email) return;
-    const userEmail = user.email.toLowerCase();
+    if (!userUid || !userEmail) return;
+    const userEmailLower = userEmail.toLowerCase();
 
     // Option A: Skip redundant writes check
     const currentProfileData = userProfile || {};
@@ -1281,7 +1283,7 @@ export default function App() {
 
       console.log("Option B - Saving debounced profile updates to Firestore (2.5s Idle):", finalUpdates);
       try {
-        const userDocRef = doc(db, "users", userEmail);
+        const userDocRef = doc(db, "users", userEmailLower);
         await updateDoc(userDocRef, {
           ...finalUpdates,
           updatedAt: serverTimestamp()
@@ -1290,10 +1292,10 @@ export default function App() {
         console.log("Firestore state successfully synchronized.");
       } catch (error) {
         console.error("Debounced Firestore sync failed:", error);
-        handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
+        handleFirestoreError(error, OperationType.UPDATE, `users/${userEmailLower}`);
       }
     }, 2500); // 2.5 seconds idle time for Option B
-  }, [user, userProfile]);
+  }, [userUid, userEmail, userProfile]);
 
   useEffect(() => {
     return () => {
@@ -1542,15 +1544,14 @@ export default function App() {
       setReconTimestamps({});
       setReconReasons({});
     }
-  }, [user]);
+  }, [userUid]);
 
   // Real-time Data Listeners split to prevent redundant re-subscription reads of all collections
   // whenever any sub-limit or single sync property updates in real-time.
   useEffect(() => {
-    if (!user) return;
+    if (!userUid) return;
 
-    const emailId = user.email?.toLowerCase() || user.uid;
-    const uid = user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const substancesRef = collection(db, "users", emailId, "substances");
 
     const unsubSubstances = onSnapshot(substancesRef, (snapshot) => {
@@ -1558,19 +1559,19 @@ export default function App() {
       setInventory(items);
     }, (error) => {
       if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/substances`);
+        handleFirestoreError(error, OperationType.LIST, `users/${userUid}/substances`);
       } else {
         console.warn("Substances listener failed - likely pending approval:", error);
       }
     });
 
     return () => unsubSubstances();
-  }, [user, userProfile?.status]);
+  }, [userUid, userEmail, userProfile?.status]);
 
   const fetchStaff = useCallback(async (forceServer = false) => {
-    if (!user) return;
+    if (!userUid) return;
     setIsLoadingStaff(true);
-    const emailId = user.email?.toLowerCase() || user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const staffRef = collection(db, "users", emailId, "staff");
     
     try {
@@ -1681,19 +1682,19 @@ export default function App() {
       }
     } catch (err: any) {
       if (userProfile?.status === 'active') {
-        handleFirestoreError(err, OperationType.LIST, `users/${user.uid}/staff`);
+        handleFirestoreError(err, OperationType.LIST, `users/${userUid}/staff`);
       } else {
         console.warn("Staff list fetch failed - likely pending approval:", err);
       }
     } finally {
       setIsLoadingStaff(false);
     }
-  }, [user, userProfile?.status]);
+  }, [userUid, userEmail, userProfile?.status]);
 
   const fetchHistoricalReports = useCallback(async (forceServer = false) => {
-    if (!user) return;
+    if (!userUid) return;
     setIsLoadingHistoricalReports(true);
-    const emailId = user.email?.toLowerCase() || user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
     
     try {
@@ -1723,15 +1724,15 @@ export default function App() {
     } finally {
       setIsLoadingHistoricalReports(false);
     }
-  }, [user]);
+  }, [userUid, userEmail]);
 
   const fetchSubstanceTransactions = useCallback(async (limitCount = 30) => {
-    if (!user || !selectedSubstanceDetail) {
+    if (!userUid || !selectedSubstanceDetail?.id) {
       setSubstanceTransactions([]);
       return;
     }
     setIsLoadingSubstanceTransactions(true);
-    const emailId = user.email || "";
+    const emailId = userEmail || "";
     if (!emailId) return;
 
     const txRef = collection(db, "users", emailId, "transactions");
@@ -1770,15 +1771,15 @@ export default function App() {
     } finally {
       setIsLoadingSubstanceTransactions(false);
     }
-  }, [user, selectedSubstanceDetail]);
+  }, [userUid, userEmail, selectedSubstanceDetail?.id]);
 
   // Initial loads and tab-based trigger effects
   useEffect(() => {
-    if (user) {
+    if (userUid) {
       fetchStaff(false);
       fetchHistoricalReports(false);
     }
-  }, [user, fetchStaff, fetchHistoricalReports]);
+  }, [userUid, fetchStaff, fetchHistoricalReports]);
 
   useEffect(() => {
     if (isUserManagementOpen) {
@@ -1793,20 +1794,19 @@ export default function App() {
   }, [reconViewMode, fetchHistoricalReports]);
 
   useEffect(() => {
-    if (!user || !selectedSubstanceDetail) {
+    if (!userUid || !selectedSubstanceDetail?.id) {
       setSubstanceTransactions([]);
       setSubstanceHistoryLimit(30);
       setIsUsingFallback(false);
       return;
     }
     fetchSubstanceTransactions(substanceHistoryLimit);
-  }, [user, selectedSubstanceDetail, substanceHistoryLimit, fetchSubstanceTransactions]);
+  }, [userUid, selectedSubstanceDetail?.id, substanceHistoryLimit, fetchSubstanceTransactions]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!userUid) return;
 
-    const emailId = user.email?.toLowerCase() || user.uid;
-    const uid = user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const transactionsRef = collection(db, "users", emailId, "transactions");
 
     const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(syncLimit)), (snapshot) => {
@@ -1814,18 +1814,18 @@ export default function App() {
       setTransactions(items);
     }, (error) => {
       if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/transactions`);
+        handleFirestoreError(error, OperationType.LIST, `users/${userUid}/transactions`);
       } else {
         console.warn("Transactions listener failed - likely pending approval:", error);
       }
     });
 
     return () => unsubTransactions();
-  }, [user, userProfile?.status, syncLimit]);
+  }, [userUid, userEmail, userProfile?.status, syncLimit]);
 
   // Super Admin Listener
   useEffect(() => {
-    if (!user || !isMasterAdmin) {
+    if (!userUid || !isMasterAdmin) {
       setAllUserProfiles([]);
       return;
     }
@@ -1846,7 +1846,7 @@ export default function App() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [userUid, isMasterAdmin]);
 
   const handleGoogleLogin = async () => {
     setIsSubmitting(true);
