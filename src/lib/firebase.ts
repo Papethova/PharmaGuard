@@ -10,7 +10,10 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { 
-  getFirestore
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -28,7 +31,28 @@ const validConfig = firebaseConfig && firebaseConfig.apiKey ? firebaseConfig : {
 const app = initializeApp(validConfig);
 export const auth = getAuth(app);
 
-export const db = getFirestore(app, validConfig.firestoreDatabaseId);
+// Option 3: Robust Fallback Offline Caching
+// IFrame Compatibility & Graceful Recovery: Initializing specific Firestore persistence 
+// try-catch routines to automatically transition to client-side in-memory management 
+// when third-party sandboxed iframes block IndexedDB operations.
+let initializedDb;
+try {
+  initializedDb = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  }, validConfig.firestoreDatabaseId);
+  console.log("Option 3 Active: Firestore initialized successfully with robust multi-tab offline local cache persistence.");
+} catch (error) {
+  console.warn(
+    "Option 3 Fallback: Sandbox iframe or browser blocked IndexedDB/storage. " +
+    "Transitioning gracefully to client-side in-memory management.", 
+    error
+  );
+  initializedDb = getFirestore(app, validConfig.firestoreDatabaseId);
+}
+
+export const db = initializedDb;
 
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
