@@ -3906,10 +3906,13 @@ export default function App() {
                 position: relative !important;
               }
               #reconciliation-printable-invoice {
-                display: block !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important;
                 position: relative !important;
                 width: 100% !important;
                 height: auto !important;
+                min-height: 175mm !important;
                 overflow: visible !important;
                 max-height: none !important;
                 padding-top: 8mm !important;
@@ -3920,7 +3923,7 @@ export default function App() {
               .is-safari #reconciliation-printable-invoice {
                 width: 100% !important;
                 height: auto !important;
-                min-height: 210mm !important;
+                min-height: 175mm !important;
                 position: relative !important;
                 box-sizing: border-box !important;
               }
@@ -4034,7 +4037,7 @@ export default function App() {
             }
           `}</style>
         )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-24 print:relative print:pb-24" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:pb-10" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           {/* Header element visible on screen preview, or as hidden print overlay */}
           <div className={isForPrint ? "hidden print:flex print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
             <span>PHARMAGUARD RECONCILIATION REPORT</span>
@@ -4265,6 +4268,9 @@ export default function App() {
               </tbody>
             </table>
           </div>
+
+          {/* Flexible Spacer to push signatures to the bottom of the page */}
+          <div className="flex-grow flex-1 min-h-[16px]" />
 
           {/* Signature box info */}
           <div className="space-y-1 pt-1.5 border-t border-gray-100 break-inside-avoid">
@@ -5878,7 +5884,14 @@ export default function App() {
                             </TableRow>
                           )}
                           {filteredTransactions.slice(txStartIndex, txEndIndex).map((t) => (
-                            <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors group animate-fade-in">
+                            <TableRow 
+                              key={t.id} 
+                              className={`h-10 transition-colors group animate-fade-in ${
+                                viewingTransaction?.id === t.id 
+                                  ? "bg-brand-blue/10" 
+                                  : "hover:bg-brand-blue/5"
+                              }`}
+                            >
                               <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center py-1 h-10">
                                 {formatDateTime(t.timestamp)}
                               </TableCell>
@@ -5886,7 +5899,11 @@ export default function App() {
                                 {t.referenceNumber ? (
                                   <button 
                                     onClick={() => setViewingTransaction(t)}
-                                    className="text-xs font-normal text-brand-blue group-hover:text-brand-yellow transition-colors"
+                                    className={`text-xs font-normal transition-colors ${
+                                      viewingTransaction?.id === t.id 
+                                        ? "text-brand-yellow font-bold" 
+                                        : "text-brand-blue group-hover:text-brand-yellow"
+                                    }`}
                                   >
                                     {t.referenceNumber}
                                   </button>
@@ -6594,11 +6611,13 @@ export default function App() {
                                   position: relative !important;
                                 }
                                 #reconciliation-printable-invoice {
-                                  display: block !important;
+                                  display: flex !important;
+                                  flex-direction: column !important;
+                                  justify-content: flex-start !important;
                                   position: relative !important;
                                   width: 100% !important;
                                   height: auto !important;
-                                  min-height: 0 !important;
+                                  min-height: 175mm !important;
                                   max-height: none !important;
                                   overflow: visible !important;
                                   box-shadow: none !important;
@@ -6609,7 +6628,7 @@ export default function App() {
                                 .is-safari #reconciliation-printable-invoice {
                                   width: 100% !important;
                                   height: auto !important;
-                                  min-height: 210mm !important;
+                                  min-height: 175mm !important;
                                   position: relative !important;
                                   box-sizing: border-box !important;
                                 }
@@ -6839,10 +6858,13 @@ export default function App() {
                   position: relative !important;
                 }
                 #reconciliation-printable-invoice {
-                  display: block !important;
+                  display: flex !important;
+                  flex-direction: column !important;
+                  justify-content: flex-start !important;
                   position: relative !important;
                   width: 100% !important;
                   height: auto !important;
+                  min-height: 175mm !important;
                   overflow: visible !important;
                   max-height: none !important;
                   padding-top: 8mm !important;
@@ -6853,7 +6875,7 @@ export default function App() {
                 .is-safari #reconciliation-printable-invoice {
                   width: 100% !important;
                   height: auto !important;
-                  min-height: 210mm !important;
+                  min-height: 175mm !important;
                   position: relative !important;
                   box-sizing: border-box !important;
                 }
@@ -6978,17 +7000,6 @@ export default function App() {
               <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
                 Select any report from the registry below to retrieve and print certified historical snapshots.
               </p>
-            </div>
-            <div className="flex shrink-0">
-              <Button
-                size="sm"
-                onClick={() => fetchHistoricalReports(true)}
-                disabled={isLoadingHistoricalReports}
-                className="bg-white hover:bg-brand-blue/5 text-brand-blue border border-brand-blue/20 font-extrabold rounded-lg gap-2 shadow-sm transition-all text-xs h-9 px-3 flex items-center"
-              >
-                <RefreshCcw className={`h-3.5 w-3.5 text-brand-blue ${isLoadingHistoricalReports ? 'animate-spin' : ''}`} />
-                {isLoadingHistoricalReports ? "Pulling..." : "Pull Latest"}
-              </Button>
             </div>
           </div>
 
@@ -7306,9 +7317,11 @@ export default function App() {
                         key={t.id} 
                         onClick={() => setViewingTransaction(t)}
                         className={`text-xs h-10 transition-colors cursor-pointer group ${
-                          isNewSinceLastReport 
-                            ? "bg-brand-yellow/10 hover:bg-brand-yellow/20 font-semibold" 
-                            : "bg-white hover:bg-brand-blue/5"
+                          viewingTransaction?.id === t.id
+                            ? "bg-brand-blue/10 font-semibold"
+                            : isNewSinceLastReport 
+                              ? "bg-brand-yellow/10 hover:bg-brand-yellow/20 font-semibold" 
+                              : "bg-white hover:bg-brand-blue/5"
                         }`}
                       >
                         <TableCell className="whitespace-nowrap text-brand-dark-grey/70 text-center py-1">
@@ -7321,7 +7334,11 @@ export default function App() {
                         </TableCell>
                         <TableCell className="text-center py-1">
                           {t.referenceNumber ? (
-                            <span className="text-brand-blue font-normal">
+                            <span className={`transition-colors ${
+                              viewingTransaction?.id === t.id 
+                                ? "text-brand-yellow font-bold" 
+                                : "text-brand-blue font-normal group-hover:text-brand-yellow"
+                            }`}>
                               {formatRefForDisplay(t.referenceNumber)}
                             </span>
                           ) : (
