@@ -7297,7 +7297,8 @@ export default function App() {
                     return (
                       <TableRow 
                         key={t.id} 
-                        className={`text-xs h-10 transition-colors group ${
+                        onClick={() => setViewingTransaction(t)}
+                        className={`text-xs h-10 transition-colors cursor-pointer group ${
                           isNewSinceLastReport 
                             ? "bg-brand-yellow/10 hover:bg-brand-yellow/20 font-semibold" 
                             : "bg-white hover:bg-brand-blue/5"
@@ -7308,8 +7309,8 @@ export default function App() {
                         </TableCell>
                         <TableCell className="text-[10px] text-center py-1">
                           <button 
-                            onClick={() => handleNDCClick(t.ndc)}
-                            className="text-brand-blue hover:underline font-normal transition-colors"
+                            onClick={(e) => { e.stopPropagation(); handleNDCClick(t.ndc); }}
+                            className="text-brand-blue font-normal transition-colors hover:no-underline no-underline"
                           >
                             {t.ndc}
                           </button>
@@ -7317,7 +7318,7 @@ export default function App() {
                         <TableCell className="text-center py-1">
                           {t.referenceNumber ? (
                             <button 
-                              onClick={() => setViewingTransaction(t)}
+                              onClick={(e) => { e.stopPropagation(); setViewingTransaction(t); }}
                               className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
                             >
                               {formatRefForDisplay(t.referenceNumber)}
