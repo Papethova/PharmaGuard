@@ -115,8 +115,6 @@ import {
   deleteDoc,
   limit,
   where,
-  initializeFirestore,
-  memoryLocalCache,
   getDocsFromCache
 } from "firebase/firestore";
 
@@ -639,6 +637,9 @@ export default function App() {
   const [reconOpenedFrom, setReconOpenedFrom] = useState<"footer" | "submenu">("submenu");
   const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
   const [historicalReports, setHistoricalReports] = useState<any[]>([]);
+  const [isLoadingHistoricalReports, setIsLoadingHistoricalReports] = useState<boolean>(false);
+  const [isLoadingStaff, setIsLoadingStaff] = useState<boolean>(false);
+  const [isLoadingSubstanceTransactions, setIsLoadingSubstanceTransactions] = useState<boolean>(false);
 
   // Synchronize reconciliation states to local storage
   useEffect(() => {
@@ -1566,73 +1567,240 @@ export default function App() {
     return () => unsubSubstances();
   }, [user, userProfile?.status]);
 
-  useEffect(() => {
+  const fetchStaff = useCallback(async (forceServer = false) => {
     if (!user) return;
-
+    setIsLoadingStaff(true);
     const emailId = user.email?.toLowerCase() || user.uid;
-    const uid = user.uid;
     const staffRef = collection(db, "users", emailId, "staff");
-
-    const unsubStaff = onSnapshot(staffRef, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ 
-        id: doc.id, 
-        name: doc.data().name as string,
-        title: doc.data().title as string
-      }));
-      
-      items.sort((a, b) => {
-        const getPriority = (title: string = "") => {
-          const t = title.toUpperCase();
-          if (t === "PIC") return 1;
-          if (t === "RPH") return 2;
-          if (t === "TECH") return 4;
-          return 3; 
-        };
+    
+    try {
+      if (forceServer) {
+        const snap = await getDocs(staffRef);
+        const items = snap.docs.map(doc => ({ 
+          id: doc.id, 
+          name: doc.data().name as string,
+          title: doc.data().title as string
+        }));
         
-        const pA = getPriority(a.title);
-        const pB = getPriority(b.title);
+        items.sort((a, b) => {
+          const getPriority = (title: string = "") => {
+            const t = title.toUpperCase();
+            if (t === "PIC") return 1;
+            if (t === "RPH") return 2;
+            if (t === "TECH") return 4;
+            return 3; 
+          };
+          
+          const pA = getPriority(a.title);
+          const pB = getPriority(b.title);
+          
+          if (pA !== pB) return pA - pB;
+          return a.name.localeCompare(b.name);
+        });
         
-        if (pA !== pB) return pA - pB;
-        return a.name.localeCompare(b.name);
-      });
-
-      setUsers(items);
-    }, (error) => {
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/staff`);
+        setUsers(items);
       } else {
-        console.warn("Staff listener failed - likely pending approval:", error);
+        try {
+          const snap = await getDocsFromCache(staffRef);
+          if (!snap.empty) {
+            const items = snap.docs.map(doc => ({ 
+              id: doc.id, 
+              name: doc.data().name as string,
+              title: doc.data().title as string
+            }));
+            
+            items.sort((a, b) => {
+              const getPriority = (title: string = "") => {
+                const t = title.toUpperCase();
+                if (t === "PIC") return 1;
+                if (t === "RPH") return 2;
+                if (t === "TECH") return 4;
+                return 3; 
+              };
+              
+              const pA = getPriority(a.title);
+              const pB = getPriority(b.title);
+              
+              if (pA !== pB) return pA - pB;
+              return a.name.localeCompare(b.name);
+            });
+            
+            setUsers(items);
+          } else {
+            const serverSnap = await getDocs(staffRef);
+            const items = serverSnap.docs.map(doc => ({ 
+              id: doc.id, 
+              name: doc.data().name as string,
+              title: doc.data().title as string
+            }));
+            
+            items.sort((a, b) => {
+              const getPriority = (title: string = "") => {
+                const t = title.toUpperCase();
+                if (t === "PIC") return 1;
+                if (t === "RPH") return 2;
+                if (t === "TECH") return 4;
+                return 3; 
+              };
+              
+              const pA = getPriority(a.title);
+              const pB = getPriority(b.title);
+              
+              if (pA !== pB) return pA - pB;
+              return a.name.localeCompare(b.name);
+            });
+            
+            setUsers(items);
+          }
+        } catch (cacheErr) {
+          const serverSnap = await getDocs(staffRef);
+          const items = serverSnap.docs.map(doc => ({ 
+            id: doc.id, 
+            name: doc.data().name as string,
+            title: doc.data().title as string
+          }));
+          
+          items.sort((a, b) => {
+            const getPriority = (title: string = "") => {
+              const t = title.toUpperCase();
+              if (t === "PIC") return 1;
+              if (t === "RPH") return 2;
+              if (t === "TECH") return 4;
+              return 3; 
+            };
+            
+            const pA = getPriority(a.title);
+            const pB = getPriority(b.title);
+            
+            if (pA !== pB) return pA - pB;
+            return a.name.localeCompare(b.name);
+          });
+          
+          setUsers(items);
+        }
       }
-    });
-
-    return () => unsubStaff();
+    } catch (err: any) {
+      if (userProfile?.status === 'active') {
+        handleFirestoreError(err, OperationType.LIST, `users/${user.uid}/staff`);
+      } else {
+        console.warn("Staff list fetch failed - likely pending approval:", err);
+      }
+    } finally {
+      setIsLoadingStaff(false);
+    }
   }, [user, userProfile?.status]);
 
-  useEffect(() => {
+  const fetchHistoricalReports = useCallback(async (forceServer = false) => {
     if (!user) return;
-
+    setIsLoadingHistoricalReports(true);
     const emailId = user.email?.toLowerCase() || user.uid;
     const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
-
-    // Option 4: Rapid Cache-first retrieval for historical reports directory
-    getDocsFromCache(reportsRef).then((snapshot) => {
-      if (!snapshot.empty) {
+    
+    try {
+      if (forceServer) {
+        const snapshot = await getDocs(reportsRef);
         const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setHistoricalReports(items);
+      } else {
+        try {
+          const snapshot = await getDocsFromCache(reportsRef);
+          if (!snapshot.empty) {
+            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setHistoricalReports(items);
+          } else {
+            const snapshotServer = await getDocs(reportsRef);
+            const items = snapshotServer.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setHistoricalReports(items);
+          }
+        } catch (cacheError) {
+          const snapshotServer = await getDocs(reportsRef);
+          const items = snapshotServer.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setHistoricalReports(items);
+        }
       }
-    }).catch(() => {
-      // Gracefully ignore cache misses or offline warnings
-    });
-
-    const unsubReports = onSnapshot(reportsRef, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setHistoricalReports(items);
-    }, (error) => {
-      console.warn("Reports listener failed:", error);
-    });
-
-    return () => unsubReports();
+    } catch (err) {
+      console.error("Failed to fetch reconciliation reports:", err);
+    } finally {
+      setIsLoadingHistoricalReports(false);
+    }
   }, [user]);
+
+  const fetchSubstanceTransactions = useCallback(async (limitCount = 30) => {
+    if (!user || !selectedSubstanceDetail) {
+      setSubstanceTransactions([]);
+      return;
+    }
+    setIsLoadingSubstanceTransactions(true);
+    const emailId = user.email || "";
+    if (!emailId) return;
+
+    const txRef = collection(db, "users", emailId, "transactions");
+    const q = query(
+      txRef,
+      where("substanceId", "==", selectedSubstanceDetail.id),
+      orderBy("timestamp", "desc"),
+      limit(limitCount)
+    );
+
+    try {
+      try {
+        const snapshot = await getDocsFromCache(q);
+        if (!snapshot.empty) {
+          const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+          setSubstanceTransactions(items);
+          setIsUsingFallback(false);
+          setIsLoadingSubstanceTransactions(false);
+          return;
+        }
+      } catch (cacheErr) {
+        // Fall through
+      }
+
+      const snapshotServer = await getDocs(q);
+      const items = snapshotServer.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      setSubstanceTransactions(items);
+      setIsUsingFallback(false);
+    } catch (error: any) {
+      if (error.code === 'failed-precondition' || error.message?.includes('index')) {
+        console.warn("Firestore index needed for Medication History. Gracefully falling back to client-filtered global transactions list:", error);
+        setIsUsingFallback(true);
+      } else {
+        console.error("Substance transactions fetch failed:", error);
+      }
+    } finally {
+      setIsLoadingSubstanceTransactions(false);
+    }
+  }, [user, selectedSubstanceDetail]);
+
+  // Initial loads and tab-based trigger effects
+  useEffect(() => {
+    if (user) {
+      fetchStaff(false);
+      fetchHistoricalReports(false);
+    }
+  }, [user, fetchStaff, fetchHistoricalReports]);
+
+  useEffect(() => {
+    if (isUserManagementOpen) {
+      fetchStaff(false);
+    }
+  }, [isUserManagementOpen, fetchStaff]);
+
+  useEffect(() => {
+    if (reconViewMode === "history") {
+      fetchHistoricalReports(false);
+    }
+  }, [reconViewMode, fetchHistoricalReports]);
+
+  useEffect(() => {
+    if (!user || !selectedSubstanceDetail) {
+      setSubstanceTransactions([]);
+      setSubstanceHistoryLimit(30);
+      setIsUsingFallback(false);
+      return;
+    }
+    fetchSubstanceTransactions(substanceHistoryLimit);
+  }, [user, selectedSubstanceDetail, substanceHistoryLimit, fetchSubstanceTransactions]);
 
   useEffect(() => {
     if (!user) return;
@@ -1654,55 +1822,6 @@ export default function App() {
 
     return () => unsubTransactions();
   }, [user, userProfile?.status, syncLimit]);
-
-  // Medication-specific transactions listener for high-performance and deep historical records
-  useEffect(() => {
-    if (!user || !selectedSubstanceDetail) {
-      setSubstanceTransactions([]);
-      setSubstanceHistoryLimit(30);
-      setIsUsingFallback(false);
-      return;
-    }
-
-    const emailId = user.email || "";
-    if (!emailId) return;
-
-    const txRef = collection(db, "users", emailId, "transactions");
-    const q = query(
-      txRef,
-      where("substanceId", "==", selectedSubstanceDetail.id),
-      orderBy("timestamp", "desc"),
-      limit(substanceHistoryLimit)
-    );
-
-    // Option 4: Rapid Cache-first retrieval for in-depth specific Medication History dialogue
-    getDocsFromCache(q).then((snapshot) => {
-      if (!snapshot.empty) {
-        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-        setSubstanceTransactions(items);
-      }
-    }).catch(() => {
-      // Gracefully ignore cache misses or offline warnings
-    });
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-      setSubstanceTransactions(items);
-      setIsUsingFallback(false);
-    }, (error) => {
-      // If composite index is missing, gracefully auto-fallback to client-filtered global transactions list
-      if (error.code === 'failed-precondition' || error.message?.includes('index')) {
-        console.warn("Firestore index needed for Medication History. Gracefully falling back to client-filtered global transactions list:", error);
-        setIsUsingFallback(true);
-      } else {
-        console.error("Substance transactions listener failed:", error);
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [user, selectedSubstanceDetail, substanceHistoryLimit]);
 
   // Super Admin Listener
   useEffect(() => {
@@ -2440,6 +2559,7 @@ export default function App() {
       batch.set(reportDocRef, reportPayload);
 
       await batch.commit();
+      await fetchHistoricalReports(true);
       toast.success("Reconciliation Report finalized and saved to registry logs!");
       
       // Update local states to view newly created report
@@ -2861,6 +2981,7 @@ export default function App() {
         name: newUserName.trim(),
         title: newUserTitle 
       });
+      await fetchStaff(true);
       toast.success("User Record Secured");
       setNewUserName("");
       setNewUserTitle("");
@@ -2893,6 +3014,7 @@ export default function App() {
         name: editingUser.name.trim(),
         title: editingUser.title 
       });
+      await fetchStaff(true);
       toast.success("User Record Modified");
       setEditingUser(null);
     } catch (error: any) {
@@ -2908,6 +3030,7 @@ export default function App() {
     const emailId = user.email?.toLowerCase() || user.uid;
     try {
       await deleteDoc(doc(db, "users", emailId, "staff", id));
+      await fetchStaff(true);
       toast.success("User Record Revoked");
       if (selectedUser === id) setSelectedUser("");
     } catch (error: any) {
@@ -6840,13 +6963,26 @@ export default function App() {
 
         {/* Report History View */}
         <div className={`flex flex-col flex-1 min-h-0 ${(reconViewMode !== "history" || reconShowPreview) ? 'hidden' : ''}`}>
-          <div className="p-6 pb-2 border-b border-brand-blue/10 bg-brand-blue/5">
-            <h3 className="text-sm font-black uppercase tracking-wider text-brand-blue flex items-center gap-2 text-left">
-              ARCHIVED RECONCILIATION REPORTS ({historicalReports.length})
-            </h3>
-            <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
-              Select any report from the registry below to retrieve and print certified historical snapshots.
-            </p>
+          <div className="p-6 pb-2 border-b border-brand-blue/10 bg-brand-blue/5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-wider text-brand-blue flex items-center gap-2 text-left">
+                ARCHIVED RECONCILIATION REPORTS ({historicalReports.length})
+              </h3>
+              <p className="text-xs text-brand-dark-grey/60 mt-1 text-left">
+                Select any report from the registry below to retrieve and print certified historical snapshots.
+              </p>
+            </div>
+            <div className="flex shrink-0">
+              <Button
+                size="sm"
+                onClick={() => fetchHistoricalReports(true)}
+                disabled={isLoadingHistoricalReports}
+                className="bg-white hover:bg-brand-blue/5 text-brand-blue border border-brand-blue/20 font-extrabold rounded-lg gap-2 shadow-sm transition-all text-xs h-9 px-3 flex items-center"
+              >
+                <RefreshCcw className={`h-3.5 w-3.5 text-brand-blue ${isLoadingHistoricalReports ? 'animate-spin' : ''}`} />
+                {isLoadingHistoricalReports ? "Pulling..." : "Pull Latest"}
+              </Button>
+            </div>
           </div>
 
           <div className="flex-1 min-h-0 p-6 flex flex-col">
