@@ -5915,11 +5915,7 @@ export default function App() {
                                 <div className="text-sm font-normal text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                               </TableCell>
                               <TableCell className="text-xs font-normal text-center py-1 h-10">
-                                <span className={`text-brand-blue font-normal transition-colors ${
-                                  viewingTransaction?.id === t.id 
-                                    ? "text-brand-yellow font-semibold" 
-                                    : "group-hover:text-brand-yellow"
-                                }`}>
+                                <span className="text-brand-blue font-normal">
                                   {t.ndc}
                                 </span>
                               </TableCell>
