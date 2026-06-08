@@ -7308,21 +7308,15 @@ export default function App() {
                           {formatDateTime(t.timestamp)}
                         </TableCell>
                         <TableCell className="text-[10px] text-center py-1">
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); handleNDCClick(t.ndc); }}
-                            className="text-brand-blue font-normal transition-colors hover:no-underline no-underline"
-                          >
+                          <span className="text-brand-blue font-normal">
                             {t.ndc}
-                          </button>
+                          </span>
                         </TableCell>
                         <TableCell className="text-center py-1">
                           {t.referenceNumber ? (
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); setViewingTransaction(t); }}
-                              className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
-                            >
+                            <span className="text-brand-blue font-normal">
                               {formatRefForDisplay(t.referenceNumber)}
-                            </button>
+                            </span>
                           ) : (
                             <span className="text-brand-dark-grey/40 italic">-</span>
                           )}
