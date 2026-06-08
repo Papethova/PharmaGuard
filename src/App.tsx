@@ -2111,6 +2111,9 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
+      setEmail("");
+      setPassword("");
+      setOrgName("");
       await signOut(auth);
       toast.success("Signed out successfully");
     } catch (error) {
@@ -3361,6 +3364,7 @@ export default function App() {
                           placeholder=""
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
+                          autoComplete="off"
                           className={`h-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm transition-colors duration-200 ${
                             isUserDoesNotExistOpen 
                               ? "bg-brand-yellow/30 border-brand-yellow/50" 
@@ -3389,6 +3393,7 @@ export default function App() {
                             placeholder=""
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            autoComplete="new-password"
                             className={`h-10 pr-10 border-brand-blue/10 focus-visible:ring-brand-blue text-sm transition-colors duration-200 ${
                               isUserDoesNotExistOpen 
                                 ? "bg-brand-yellow/30 border-brand-yellow/50" 
@@ -3481,6 +3486,7 @@ export default function App() {
                         placeholder="e.g. drsmith@ucla.edu"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="off"
                         className={`h-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm transition-colors duration-200 ${
                           isAlreadyRegisteredOpen 
                             ? "bg-brand-yellow/30 border-brand-yellow/50" 
@@ -3497,6 +3503,7 @@ export default function App() {
                           placeholder="Choose a compliant password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          autoComplete="new-password"
                           className={`h-10 pr-10 border-brand-blue/10 placeholder:text-brand-dark-grey/30 text-sm transition-colors duration-200 ${
                             isAlreadyRegisteredOpen 
                               ? "bg-brand-yellow/30 border-brand-yellow/50" 
