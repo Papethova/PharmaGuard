@@ -36,12 +36,26 @@ export const auth = getAuth(app);
 // Using long polling and persistent local cache to stay resilient and save reads.
 // Respect the custom workspace firestore Database ID defined in firebase-applet-config.json
 const firestoreDatabaseId = validConfig.firestoreDatabaseId || "(default)";
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager()
-  })
-}, firestoreDatabaseId);
+
+// Option 3: Safe Initialization fallback that catches IndexedDB storage permission failures in sandboxed iframes
+let dbInstance;
+try {
+  dbInstance = initializeFirestore(app, {
+    experimentalForceLongPolling: true,
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  }, firestoreDatabaseId);
+  console.log("Firestore initialized successfully with persistent local cache.");
+} catch (error) {
+  console.warn("Firestore persistent cache block failed (likely sandbox or iframe storage restrictions). Falling back to memoryLocalCache:", error);
+  dbInstance = initializeFirestore(app, {
+    experimentalForceLongPolling: true,
+    localCache: memoryLocalCache()
+  }, firestoreDatabaseId);
+}
+
+export const db = dbInstance;
 
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({

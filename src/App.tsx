@@ -116,7 +116,8 @@ import {
   limit,
   where,
   initializeFirestore,
-  memoryLocalCache
+  memoryLocalCache,
+  getDocsFromCache
 } from "firebase/firestore";
 
 
@@ -417,6 +418,18 @@ export default function App() {
   const [historyMedicationFilter, setHistoryMedicationFilter] = useState("");
   const [historyMedicationSearch, setHistoryMedicationSearch] = useState("");
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
+
+  // Option 2 & Virtual Scroll Lists: Local view-state to virtualization and metrics document caching
+  const [inventoryScrollTop, setInventoryScrollTop] = useState(0);
+  const [auditScrollTop, setAuditScrollTop] = useState(0);
+  const [globalMetrics, setGlobalMetrics] = useState<{
+    totalSubstances?: number;
+    totalTransactions?: number;
+    totalStaff?: number;
+    lowStockCount?: number;
+    lastUpdated?: string;
+  } | null>(null);
+
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>("All");
 
   // Database Sync limits for speed and low-reads
@@ -451,6 +464,49 @@ export default function App() {
   const [cameraPermissionError, setCameraPermissionError] = useState(false);
   const [users, setUsers] = useState<{id: string, name: string, title?: string}[]>([]);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+
+  const syncGlobalMetrics = async (
+    targetEmail: string,
+    currentSubs?: Substance[],
+    currentStaff?: {id: string, name: string, title?: string}[],
+    currentTxs?: Transaction[]
+  ) => {
+    try {
+      const emailLower = targetEmail.toLowerCase();
+      const metricsRef = doc(db, "users", emailLower, "metadata", "metrics");
+      await setDoc(metricsRef, {
+        totalSubstances: currentSubs ? currentSubs.length : inventory.length,
+        totalStaff: currentStaff ? currentStaff.length : users.length,
+        totalTransactions: currentTxs ? currentTxs.length : transactions.length,
+        lastUpdated: new Date().toISOString()
+      }, { merge: true });
+    } catch (err) {
+      console.warn("Failed to sync global metrics doc:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    const emailId = user.email?.toLowerCase() || user.uid;
+    if (isInitializing) return;
+
+    const timer = setTimeout(() => {
+      syncGlobalMetrics(emailId);
+    }, 4000); // 4 seconds idle background write pooling/debouncing (Option 2)
+
+    return () => clearTimeout(timer);
+  }, [user, inventory.length, users.length, transactions.length, isInitializing]);
+
+  useEffect(() => {
+    if (!user) return;
+    const emailId = user.email?.toLowerCase() || user.uid;
+    const metricsRef = doc(db, "users", emailId, "metadata", "metrics");
+    return onSnapshot(metricsRef, (snap) => {
+      if (snap.exists()) {
+        setGlobalMetrics(snap.data());
+      }
+    });
+  }, [user]);
 
   // Lock background scroll when user management is open
   useEffect(() => {
@@ -1558,6 +1614,16 @@ export default function App() {
     const emailId = user.email?.toLowerCase() || user.uid;
     const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
 
+    // Option 4: Rapid Cache-first retrieval for historical reports directory
+    getDocsFromCache(reportsRef).then((snapshot) => {
+      if (!snapshot.empty) {
+        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setHistoricalReports(items);
+      }
+    }).catch(() => {
+      // Gracefully ignore cache misses or offline warnings
+    });
+
     const unsubReports = onSnapshot(reportsRef, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setHistoricalReports(items);
@@ -1608,6 +1674,16 @@ export default function App() {
       orderBy("timestamp", "desc"),
       limit(substanceHistoryLimit)
     );
+
+    // Option 4: Rapid Cache-first retrieval for in-depth specific Medication History dialogue
+    getDocsFromCache(q).then((snapshot) => {
+      if (!snapshot.empty) {
+        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+        setSubstanceTransactions(items);
+      }
+    }).catch(() => {
+      // Gracefully ignore cache misses or offline warnings
+    });
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
@@ -2092,9 +2168,21 @@ export default function App() {
         signature = trimmedCanvas ? trimmedCanvas.toDataURL("image/png") : (canvas ? canvas.toDataURL("image/png") : "");
       }
       
-      let currentMed = inventory.find(s => s.id === medId);
       let targetMedId = medId;
 
+      // If caching count in reconciliation dialog, bypass database transaction locks
+      if (isReconOpen && transactionType === "VERIFY") {
+        setReconCounts(prev => ({ ...prev, [targetMedId]: quantity }));
+        setReconTimestamps(prev => ({ ...prev, [targetMedId]: new Date().toISOString() }));
+        toast.success("Count cached in reconciliation form.");
+        setIsLogOpen(false);
+        resetForm();
+        setIsSubmitting(false);
+        return;
+      }
+
+      let currentMed = inventory.find(s => s.id === medId);
+      
       if (transactionType === "IN" && !targetMedId) {
         const substancesRef = collection(db, "users", emailId, "substances");
         const newMedDoc = doc(substancesRef);
@@ -2106,21 +2194,11 @@ export default function App() {
           minThreshold: Number(newMed.minThreshold), 
           currentStock: 0, 
           lastUpdated: serverTimestamp() 
-        };
+        } as Substance;
         batch.set(newMedDoc, currentMed);
       }
 
       if (!currentMed) throw new Error("Medication not discovered in node");
-
-      if (isReconOpen && transactionType === "VERIFY") {
-        setReconCounts(prev => ({ ...prev, [targetMedId]: quantity }));
-        setReconTimestamps(prev => ({ ...prev, [targetMedId]: new Date().toISOString() }));
-        toast.success("Count cached in reconciliation form.");
-        setIsLogOpen(false);
-        resetForm();
-        setIsSubmitting(false);
-        return;
-      }
 
       const previousStock = currentMed.currentStock;
       const amount = Number(quantity);
@@ -5362,7 +5440,15 @@ export default function App() {
 
           <TabsContent value="inventory" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
               <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
-                <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto">
+                <div 
+                  className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto"
+                  onScroll={(e) => {
+                    const roundedScrollTop = Math.floor(e.currentTarget.scrollTop / 10) * 10;
+                    if (inventoryScrollTop !== roundedScrollTop) {
+                      setInventoryScrollTop(roundedScrollTop);
+                    }
+                  }}
+                >
                   <table className="w-full caption-bottom text-sm border-separate border-spacing-0">
                     <TableHeader className="sticky top-0 z-40 bg-brand-blue">
                       <TableRow className="bg-brand-blue">
@@ -5381,45 +5467,68 @@ export default function App() {
                         <TableRow>
                           <TableCell colSpan={5} className="text-center py-8 text-brand-dark-grey/50">No entries found.</TableCell>
                         </TableRow>
-                      ) : filteredInventory.map((item) => (
-                    <TableRow 
-                      key={item.id} 
-                      className="hover:bg-brand-blue/5 transition-colors cursor-pointer group h-10"
-                      onClick={() => setSelectedSubstanceDetail(item)}
-                    >
-                      <TableCell className="text-sm text-brand-dark-grey text-center py-1">
-                        <span className="font-normal">{item.name}</span>{" "}
-                        <span className="text-sm text-brand-dark-grey/80">{item.strength}</span>
-                      </TableCell>
-                      <TableCell className="text-center py-1">
-                        <Badge variant="outline" className={`border-brand-blue/20 text-brand-blue bg-brand-blue/5 text-[10px] px-2 py-0.5 mx-auto`}>
-                          {item.schedule}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-normal text-sm text-center py-1">
-                        <button 
-                           onClick={(e) => { e.stopPropagation(); handleNDCClick(item.ndc); }}
-                          className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
-                        >
-                          {item.ndc}
-                        </button>
-                      </TableCell>
-                      <TableCell className="text-center font-normal text-sm py-1">
-                        {item.currentStock <= item.minThreshold ? (
-                          <span className="px-2.5 py-1 bg-brand-blue text-brand-yellow font-extrabold rounded-full text-xs shadow-sm shadow-brand-blue/10 inline-block">
-                            {item.currentStock} {item.unit}
-                          </span>
-                        ) : (
-                          <span className="text-brand-dark-grey">
-                            {item.currentStock} {item.unit}
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </table>
-            </div>
+                      ) : (() => {
+                        const invItemHeight = 40;
+                        const invVisibleCount = 18;
+                        const invStartIndex = Math.max(0, Math.floor(inventoryScrollTop / invItemHeight) - 4);
+                        const invEndIndex = Math.min(filteredInventory.length, invStartIndex + invVisibleCount + 8);
+                        const invSpaceTop = invStartIndex * invItemHeight;
+                        const invSpaceBottom = Math.max(0, (filteredInventory.length - invEndIndex) * invItemHeight);
+
+                        return (
+                          <>
+                            {invSpaceTop > 0 && (
+                              <TableRow style={{ height: `${invSpaceTop}px` }} className="hover:bg-transparent pointer-events-none">
+                                <TableCell colSpan={4} className="py-0" />
+                              </TableRow>
+                            )}
+                            {filteredInventory.slice(invStartIndex, invEndIndex).map((item) => (
+                              <TableRow 
+                                key={item.id} 
+                                className="hover:bg-brand-blue/5 transition-colors cursor-pointer group h-10 animate-fade-in"
+                                onClick={() => setSelectedSubstanceDetail(item)}
+                              >
+                                <TableCell className="text-sm text-brand-dark-grey text-center py-1 h-10">
+                                  <span className="font-normal">{item.name}</span>{" "}
+                                  <span className="text-sm text-brand-dark-grey/80">{item.strength}</span>
+                                </TableCell>
+                                <TableCell className="text-center py-1 h-10">
+                                  <Badge variant="outline" className="border-brand-blue/20 text-brand-blue bg-brand-blue/5 text-[10px] px-2 py-0.5 mx-auto">
+                                    {item.schedule}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="font-normal text-sm text-center py-1 h-10">
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); handleNDCClick(item.ndc); }}
+                                    className="text-brand-blue group-hover:text-brand-yellow font-normal transition-colors"
+                                  >
+                                    {item.ndc}
+                                  </button>
+                                </TableCell>
+                                <TableCell className="text-center font-normal text-sm py-1 h-10">
+                                  {item.currentStock <= item.minThreshold ? (
+                                    <span className="px-2.5 py-1 bg-brand-blue text-brand-yellow font-extrabold rounded-full text-xs shadow-sm shadow-brand-blue/10 inline-block">
+                                      {item.currentStock} {item.unit}
+                                    </span>
+                                  ) : (
+                                    <span className="text-brand-dark-grey">
+                                      {item.currentStock} {item.unit}
+                                    </span>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {invSpaceBottom > 0 && (
+                              <TableRow style={{ height: `${invSpaceBottom}px` }} className="hover:bg-transparent pointer-events-none">
+                                <TableCell colSpan={4} className="py-0" />
+                              </TableRow>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </TableBody>
+                  </table>
+                </div>
           </Card>
         </TabsContent>
 
@@ -5588,6 +5697,10 @@ export default function App() {
                 className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto"
                 onScroll={(e) => {
                   const target = e.currentTarget;
+                  const roundedScrollTop = Math.floor(target.scrollTop / 10) * 10;
+                  if (auditScrollTop !== roundedScrollTop) {
+                    setAuditScrollTop(roundedScrollTop);
+                  }
                   if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
                     if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
                       isIncrementingSyncLimitRef.current = true;
@@ -5619,53 +5732,76 @@ export default function App() {
                           <p>No transactions found for this schedule.</p>
                         </TableCell>
                       </TableRow>
-                    ) : filteredTransactions.map((t) => (
-                    <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors group">
-                      <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center py-1">
-                        {formatDateTime(t.timestamp)}
-                      </TableCell>
-                      <TableCell className="text-center py-1">
-                        {t.referenceNumber ? (
-                          <button 
-                            onClick={() => setViewingTransaction(t)}
-                            className="text-xs font-normal text-brand-blue group-hover:text-brand-yellow transition-colors"
-                          >
-                            {t.referenceNumber}
-                          </button>
-                        ) : (
-                          <span className="text-brand-dark-grey/40 italic">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center py-1">
-                        <div className="text-sm font-normal text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
-                      </TableCell>
-                      <TableCell className="text-xs font-normal text-center py-1">
-                        <button 
-                          onClick={() => handleNDCClick(t.ndc)}
-                          className="text-brand-blue hover:underline font-normal transition-colors"
-                        >
-                          {t.ndc}
-                        </button>
-                      </TableCell>
-                      <TableCell className="py-1 text-center">
-                        <TransactionBadge type={t.type} />
-                      </TableCell>
-                      <TableCell className="text-center font-normal text-sm text-brand-dark-grey py-1">
-                        {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
-                      </TableCell>
-                      <TableCell className="text-xs text-brand-dark-grey text-center no-interact py-1">
-                        {escapeEmail(t.performedByName)}
-                        {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
-                          <span className="ml-1 text-brand-dark-grey">
-                            ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </table>
-            </div>
+                    ) : (() => {
+                      const txItemHeight = 40;
+                      const txVisibleCount = 18;
+                      const txStartIndex = Math.max(0, Math.floor(auditScrollTop / txItemHeight) - 4);
+                      const txEndIndex = Math.min(filteredTransactions.length, txStartIndex + txVisibleCount + 8);
+                      const txSpaceTop = txStartIndex * txItemHeight;
+                      const txSpaceBottom = Math.max(0, (filteredTransactions.length - txEndIndex) * txItemHeight);
+
+                      return (
+                        <>
+                          {txSpaceTop > 0 && (
+                            <TableRow style={{ height: `${txSpaceTop}px` }} className="hover:bg-transparent pointer-events-none">
+                              <TableCell colSpan={7} className="py-0" />
+                            </TableRow>
+                          )}
+                          {filteredTransactions.slice(txStartIndex, txEndIndex).map((t) => (
+                            <TableRow key={t.id} className="h-10 hover:bg-brand-blue/5 transition-colors group animate-fade-in">
+                              <TableCell className="text-xs font-sans text-brand-dark-grey/70 whitespace-nowrap text-center py-1 h-10">
+                                {formatDateTime(t.timestamp)}
+                              </TableCell>
+                              <TableCell className="text-center py-1 h-10">
+                                {t.referenceNumber ? (
+                                  <button 
+                                    onClick={() => setViewingTransaction(t)}
+                                    className="text-xs font-normal text-brand-blue group-hover:text-brand-yellow transition-colors"
+                                  >
+                                    {t.referenceNumber}
+                                  </button>
+                                ) : (
+                                  <span className="text-brand-dark-grey/40 italic">-</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-center py-1 h-10">
+                                <div className="text-sm font-normal text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
+                              </TableCell>
+                              <TableCell className="text-xs font-normal text-center py-1 h-10">
+                                <button 
+                                  onClick={() => handleNDCClick(t.ndc)}
+                                  className="text-brand-blue hover:underline font-normal transition-colors"
+                                >
+                                  {t.ndc}
+                                </button>
+                              </TableCell>
+                              <TableCell className="py-1 text-center h-10">
+                                <TransactionBadge type={t.type} />
+                              </TableCell>
+                              <TableCell className="text-center font-normal text-sm text-brand-dark-grey py-1 h-10">
+                                {t.type === 'VERIFY' ? `=${t.quantity}` : (t.type === 'IN' ? '+' : t.type === 'OUT' ? '-' : (t.type === 'ADJUST' && t.quantity > 0 ? '+' : '')) + t.quantity}
+                              </TableCell>
+                              <TableCell className="text-xs text-brand-dark-grey text-center no-interact py-1 h-10">
+                                {escapeEmail(t.performedByName)}
+                                {(t.performedByTitle || users.find(u => u.name === t.performedByName)?.title) && (
+                                  <span className="ml-1 text-brand-dark-grey">
+                                    ({t.performedByTitle || users.find(u => u.name === t.performedByName)?.title})
+                                  </span>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          {txSpaceBottom > 0 && (
+                            <TableRow style={{ height: `${txSpaceBottom}px` }} className="hover:bg-transparent pointer-events-none">
+                              <TableCell colSpan={7} className="py-0" />
+                            </TableRow>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </TableBody>
+                </table>
+              </div>
             {/* Pagination Footer */}
             {false && filteredTransactions.length > 0 && (
               <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t border-brand-grey/10 bg-brand-surface/40 select-none shrink-0 gap-4">
