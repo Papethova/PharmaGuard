@@ -4185,36 +4185,19 @@ export default function App() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
-              /* Desktop Safari: supports standard landscape @page but benefits from static overrides */
-              .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
+              /* Support clean layout overrides for Safari and iOS Safari */
+              .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
                 width: 100% !important;
                 height: auto !important;
                 min-height: 0 !important;
                 position: static !important;
                 overflow: visible !important;
               }
-              .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
+              .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
                 width: 100% !important;
                 height: auto !important;
                 position: static !important;
                 transform: none !important;
-                overflow: visible !important;
-              }
-              /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
-              .is-ios-safari, .is-ios-safari body {
-                width: 210mm !important;
-                height: 297mm !important;
-                overflow: visible !important;
-                position: relative !important;
-              }
-              .is-ios-safari #reconciliation-printable-root {
-                width: 297mm !important;
-                height: 210mm !important;
-                transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
-                transform-origin: 0 0 !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
                 overflow: visible !important;
               }
               body > *:not(#reconciliation-printable-root) {
@@ -6839,6 +6822,15 @@ export default function App() {
         </div>
 
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''} bg-[#f1f5f9]`}>
+          {isIOSOrIPadSafari && (
+            <div className="bg-amber-50 border-b border-amber-200/60 px-6 py-3.5 flex items-start gap-3 shrink-0">
+              <span className="text-amber-600 text-lg">💡</span>
+              <div className="text-xs text-amber-900 leading-normal">
+                <strong className="font-semibold block mb-0.5 text-amber-950">iPad / iOS Landscape Setup Required:</strong>
+                iOS Safari ignores automatic printing orientations. After clicking <span className="font-black uppercase tracking-wider text-[10px] bg-brand-yellow text-brand-blue px-1.5 py-0.5 rounded">Print Report</span>, tap <strong className="font-semibold underline">Options</strong> in your printer settings dialog and set the orientation to <strong className="font-semibold">Landscape</strong> for perfect table alignment.
+              </div>
+            </div>
+          )}
           {/* Print Report Review Page (Forced Landscape Frame for iPad / Standard Screen Verification) */}
           <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-start md:justify-center items-start">
             <div className="w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
@@ -6899,21 +6891,15 @@ export default function App() {
                                   background: white !important;
                                   color: black !important;
                                 }
-                                /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
-                                .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
+                                /* Support clean layout overrides for Safari and iOS Safari */
+                                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 0 !important;
                                   position: static !important;
                                   overflow: visible !important;
                                 }
-                                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
-                                .is-ios-safari, .is-ios-safari body {
-                                  width: 210mm !important;
-                                  height: 297mm !important;
-                                  overflow: visible !important;
-                                  position: relative !important;
-                                }
+                                /* iOS Safari body layout uses standard margins */
                                 body {
                                   margin: 0 !important;
                                   padding: 0 !important;
@@ -6935,16 +6921,7 @@ export default function App() {
                                   background: white !important;
                                 }
 
-                                .is-ios-safari #reconciliation-printable-root {
-                                  width: 297mm !important;
-                                  height: 210mm !important;
-                                  transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
-                                  transform-origin: 0 0 !important;
-                                  position: absolute !important;
-                                  top: 0 !important;
-                                  left: 0 !important;
-                                  overflow: visible !important;
-                                }
+
                                 #reconciliation-printable-invoice {
                                   display: flex !important;
                                   flex-direction: column !important;
@@ -7156,36 +7133,19 @@ export default function App() {
                   margin: 0 !important;
                   background: white !important;
                 }
-                /* Desktop Safari: supports standard landscape @page but benefits from static overrides */
-                .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
+                /* Support clean layout overrides for Safari and iOS Safari */
+                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
                   width: 100% !important;
                   height: auto !important;
                   min-height: 0 !important;
                   position: static !important;
                   overflow: visible !important;
                 }
-                .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
+                .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
                   width: 100% !important;
                   height: auto !important;
                   position: static !important;
                   transform: none !important;
-                  overflow: visible !important;
-                }
-                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
-                .is-ios-safari, .is-ios-safari body {
-                  width: 210mm !important;
-                  height: 297mm !important;
-                  overflow: visible !important;
-                  position: relative !important;
-                }
-                .is-ios-safari #reconciliation-printable-root {
-                  width: 297mm !important;
-                  height: 210mm !important;
-                  transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
-                  transform-origin: 0 0 !important;
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
                   overflow: visible !important;
                 }
                 #reconciliation-printable-invoice {
