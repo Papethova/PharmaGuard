@@ -4185,19 +4185,36 @@ export default function App() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
-              /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
-              .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+              /* Desktop Safari: supports standard landscape @page but benefits from static overrides */
+              .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
                 width: 100% !important;
                 height: auto !important;
                 min-height: 0 !important;
                 position: static !important;
                 overflow: visible !important;
               }
-              .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
+              .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
                 width: 100% !important;
                 height: auto !important;
                 position: static !important;
                 transform: none !important;
+                overflow: visible !important;
+              }
+              /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
+              .is-ios-safari, .is-ios-safari body {
+                width: 210mm !important;
+                height: 297mm !important;
+                overflow: visible !important;
+                position: relative !important;
+              }
+              .is-ios-safari #reconciliation-printable-root {
+                width: 297mm !important;
+                height: 210mm !important;
+                transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
+                transform-origin: 0 0 !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
                 overflow: visible !important;
               }
               body > *:not(#reconciliation-printable-root) {
@@ -6883,12 +6900,19 @@ export default function App() {
                                   color: black !important;
                                 }
                                 /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
-                                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                                .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 0 !important;
                                   position: static !important;
                                   overflow: visible !important;
+                                }
+                                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
+                                .is-ios-safari, .is-ios-safari body {
+                                  width: 210mm !important;
+                                  height: 297mm !important;
+                                  overflow: visible !important;
+                                  position: relative !important;
                                 }
                                 body {
                                   margin: 0 !important;
@@ -6912,10 +6936,13 @@ export default function App() {
                                 }
 
                                 .is-ios-safari #reconciliation-printable-root {
-                                  width: 100% !important;
-                                  height: auto !important;
-                                  position: static !important;
-                                  transform: none !important;
+                                  width: 297mm !important;
+                                  height: 210mm !important;
+                                  transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
+                                  transform-origin: 0 0 !important;
+                                  position: absolute !important;
+                                  top: 0 !important;
+                                  left: 0 !important;
                                   overflow: visible !important;
                                 }
                                 #reconciliation-printable-invoice {
@@ -7129,19 +7156,36 @@ export default function App() {
                   margin: 0 !important;
                   background: white !important;
                 }
-                /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
-                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                /* Desktop Safari: supports standard landscape @page but benefits from static overrides */
+                .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
                   width: 100% !important;
                   height: auto !important;
                   min-height: 0 !important;
                   position: static !important;
                   overflow: visible !important;
                 }
-                .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
+                .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
                   width: 100% !important;
                   height: auto !important;
                   position: static !important;
                   transform: none !important;
+                  overflow: visible !important;
+                }
+                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
+                .is-ios-safari, .is-ios-safari body {
+                  width: 210mm !important;
+                  height: 297mm !important;
+                  overflow: visible !important;
+                  position: relative !important;
+                }
+                .is-ios-safari #reconciliation-printable-root {
+                  width: 297mm !important;
+                  height: 210mm !important;
+                  transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
+                  transform-origin: 0 0 !important;
+                  position: absolute !important;
+                  top: 0 !important;
+                  left: 0 !important;
                   overflow: visible !important;
                 }
                 #reconciliation-printable-invoice {

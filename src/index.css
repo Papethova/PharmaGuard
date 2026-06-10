@@ -284,6 +284,41 @@
     display: none !important;
   }
 
+  .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    position: static !important;
+    overflow: visible !important;
+  }
+
+  .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+    transform: none !important;
+    overflow: visible !important;
+  }
+
+  /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
+  .is-ios-safari, .is-ios-safari body {
+    width: 210mm !important;
+    height: 297mm !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  .is-ios-safari #reconciliation-printable-root {
+    width: 297mm !important;
+    height: 210mm !important;
+    transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
+    transform-origin: 0 0 !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    overflow: visible !important;
+  }
+
   #reconciliation-printable-root {
     display: block !important;
     position: static !important;
