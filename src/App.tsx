@@ -443,8 +443,8 @@ export default function App() {
     return `${year}-${month}-${day}`;
   };
 
-  const [startDate, setStartDate] = useState(() => getNDaysAgoDateString(7));
-  const [endDate, setEndDate] = useState(() => getTodayDateString());
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [historyMedicationFilter, setHistoryMedicationFilter] = useState("");
   const [historyMedicationSearch, setHistoryMedicationSearch] = useState("");
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
@@ -3422,8 +3422,22 @@ export default function App() {
         const matchesSchedule = activeSchedule === "ALL" || 
           inventory.find(s => s.id === t.substanceId)?.schedule === activeSchedule;
         const transactionDate = t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
-        const matchesStartDate = !startDate || transactionDate >= new Date(startDate);
-        const matchesEndDate = !endDate || transactionDate <= new Date(endDate + "T23:59:59");
+        let matchesStartDate = true;
+        let matchesEndDate = true;
+
+        if (startDate) {
+          matchesStartDate = transactionDate >= new Date(startDate);
+        } else if (!endDate) {
+          // Default to last 7 days if BOTH start and end dates are empty (not filled out)
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          sevenDaysAgo.setHours(0, 0, 0, 0);
+          matchesStartDate = transactionDate >= sevenDaysAgo;
+        }
+
+        if (endDate) {
+          matchesEndDate = transactionDate <= new Date(endDate + "T23:59:59");
+        }
         const cleanQuery = historyMedicationSearch
           ? historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase()
           : "";
@@ -6107,8 +6121,8 @@ export default function App() {
                 <Button 
                   variant="outline" 
                   onClick={() => { 
-                    setStartDate(getNDaysAgoDateString(7)); 
-                    setEndDate(getTodayDateString()); 
+                    setStartDate(""); 
+                    setEndDate(""); 
                     setHistoryMedicationFilter("");
                     setHistoryMedicationSearch("");
                     setHistoryTypeFilter("All");
@@ -6129,7 +6143,7 @@ export default function App() {
                       Searching deep history...
                     </span>
                   ) : (
-                    `Showing ${searchedTransactions !== null && searchedTransactionsCount !== null ? searchedTransactionsCount : filteredTransactions.length} transactions`
+                    `Showing ${searchedTransactions !== null && searchedTransactionsCount !== null ? searchedTransactionsCount : filteredTransactions.length} transactions${(!startDate && !endDate) ? " (Last 7 Days)" : ""}`
                   )}
                 </div>
               </div>
