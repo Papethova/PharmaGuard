@@ -4158,32 +4158,7 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-            }
-            @media print {
-              @page {
-                size: landscape;
-              }
-            }
-            @page {
               margin: 10mm 15mm 15mm 15mm;
-              @bottom-right {
-                content: "page " counter(page) " of " counter(pages);
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                font-size: 8px;
-                font-weight: bold;
-                color: #111827;
-                vertical-align: top;
-                padding-top: 2mm;
-              }
-              @bottom-left {
-                content: "Generated With PharmaGuard";
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                font-size: 8px;
-                font-weight: bold;
-                color: #111827;
-                vertical-align: top;
-                padding-top: 2mm;
-              }
             }
             @media screen {
               #reconciliation-printable-root {
@@ -6888,32 +6863,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                }
-                                @media print {
-                                  @page {
-                                    size: landscape;
-                                  }
-                                }
-                                @page {
                                   margin: 10mm 15mm 15mm 15mm;
-                                  @bottom-right {
-                                    content: "page " counter(page) " of " counter(pages);
-                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                                    font-size: 8px;
-                                    font-weight: bold;
-                                    color: #111827;
-                                    vertical-align: top;
-                                    padding-top: 2mm;
-                                  }
-                                  @bottom-left {
-                                    content: "Generated With PharmaGuard";
-                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                                    font-size: 8px;
-                                    font-weight: bold;
-                                    color: #111827;
-                                    vertical-align: top;
-                                    padding-top: 2mm;
-                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -7139,32 +7089,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-              }
-              @media print {
-                @page {
-                  size: landscape;
-                }
-              }
-              @page {
                 margin: 10mm 15mm 15mm 15mm;
-                @bottom-right {
-                  content: "page " counter(page) " of " counter(pages);
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                  font-size: 8px;
-                  font-weight: bold;
-                  color: #111827;
-                  vertical-align: top;
-                  padding-top: 2mm;
-                }
-                @bottom-left {
-                  content: "Generated With PharmaGuard";
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                  font-size: 8px;
-                  font-weight: bold;
-                  color: #111827;
-                  vertical-align: top;
-                  padding-top: 2mm;
-                }
               }
               @media screen {
                 #reconciliation-printable-root {
