@@ -4203,15 +4203,15 @@ export default function App() {
               }
               @media print and (orientation: portrait) {
                 .is-safari, .is-safari body {
-                  width: 297mm !important;
-                  height: 210mm !important;
+                  width: 210mm !important;
+                  height: 297mm !important;
                   overflow: visible !important;
                   position: relative !important;
                 }
                 .is-safari #reconciliation-printable-root {
                   width: 297mm !important;
                   height: 210mm !important;
-                  transform: rotate(90deg) translateY(-100%) !important;
+                  transform: rotate(90deg) translate(0, -210mm) !important;
                   transform-origin: 0 0 !important;
                   position: absolute !important;
                   top: 0 !important;
@@ -6945,6 +6945,7 @@ export default function App() {
                                     width: 210mm !important;
                                     height: 297mm !important;
                                     overflow: visible !important;
+                                    position: relative !important;
                                   }
                                 }
                                 @media print and (orientation: landscape) {
@@ -6978,7 +6979,7 @@ export default function App() {
                                   .is-safari #reconciliation-printable-root {
                                     width: 297mm !important;
                                     height: 210mm !important;
-                                    transform: rotate(90deg) translateY(-100%) !important;
+                                    transform: rotate(90deg) translate(0, -210mm) !important;
                                     transform-origin: 0 0 !important;
                                     position: absolute !important;
                                     top: 0 !important;
@@ -7147,8 +7148,8 @@ export default function App() {
                           <style>
                             @media print and (orientation: portrait) {
                               .is-safari, .is-safari body {
-                                width: 297mm !important;
-                                height: 210mm !important;
+                                width: 210mm !important;
+                                height: 297mm !important;
                                 overflow: visible !important;
                                 position: relative !important;
                               }
@@ -7232,8 +7233,8 @@ export default function App() {
                 }
                 @media print and (orientation: portrait) {
                   .is-safari, .is-safari body {
-                    width: 297mm !important;
-                    height: 210mm !important;
+                    width: 210mm !important;
+                    height: 297mm !important;
                     overflow: visible !important;
                     position: relative !important;
                   }
@@ -7262,7 +7263,7 @@ export default function App() {
                   .is-safari #reconciliation-printable-root {
                     width: 297mm !important;
                     height: 210mm !important;
-                    transform: rotate(90deg) translateY(-100%) !important;
+                    transform: rotate(90deg) translate(0, -210mm) !important;
                     transform-origin: 0 0 !important;
                     position: absolute !important;
                     top: 0 !important;
