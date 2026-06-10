@@ -6010,7 +6010,7 @@ export default function App() {
                   />
                 </div>
 
-                <div className="grid gap-1.5 flex-1 min-w-[130px] max-w-[220px] relative">
+                <div className="grid gap-1.5 flex-1 min-w-[130px] max-w-[340px] relative">
                   <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
                   <div className="relative w-full">
                     <Input
