@@ -4217,7 +4217,7 @@ export default function App() {
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: flex-start !important;
-                position: relative !important;
+                position: static !important;
                 width: 100% !important;
                 height: auto !important;
                 min-height: 175mm !important;
@@ -4232,7 +4232,7 @@ export default function App() {
                 width: 100% !important;
                 height: auto !important;
                 min-height: 175mm !important;
-                position: relative !important;
+                position: static !important;
                 box-sizing: border-box !important;
               }
               .is-safari #reconciliation-printable-invoice .print\\:fixed {
@@ -4318,8 +4318,8 @@ export default function App() {
               }
               /* Overlap and cut-off clear padding for landscape print */
               #reconciliation-printable-invoice {
-                padding-top: 15mm !important;
-                padding-bottom: 15mm !important;
+                padding-top: 6mm !important;
+                padding-bottom: 6mm !important;
                 box-sizing: border-box !important;
               }
             }
@@ -6898,7 +6898,7 @@ export default function App() {
                                   display: flex !important;
                                   flex-direction: column !important;
                                   justify-content: flex-start !important;
-                                  position: relative !important;
+                                  position: static !important;
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 175mm !important;
@@ -6913,7 +6913,7 @@ export default function App() {
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 175mm !important;
-                                  position: relative !important;
+                                  position: static !important;
                                   box-sizing: border-box !important;
                                 }
                                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
@@ -6996,8 +6996,8 @@ export default function App() {
                                 }
                                 /* Overlap and cut-off clear padding for landscape print */
                                 #reconciliation-printable-invoice {
-                                  padding-top: 15mm !important;
-                                  padding-bottom: 15mm !important;
+                                  padding-top: 6mm !important;
+                                  padding-bottom: 6mm !important;
                                   box-sizing: border-box !important;
                                 }
                               </style>
@@ -7104,7 +7104,7 @@ export default function App() {
                   display: flex !important;
                   flex-direction: column !important;
                   justify-content: flex-start !important;
-                  position: relative !important;
+                  position: static !important;
                   width: 100% !important;
                   height: auto !important;
                   min-height: 175mm !important;
@@ -7119,7 +7119,7 @@ export default function App() {
                   width: 100% !important;
                   height: auto !important;
                   min-height: 175mm !important;
-                  position: relative !important;
+                  position: static !important;
                   box-sizing: border-box !important;
                 }
                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
@@ -7205,8 +7205,8 @@ export default function App() {
                 }
                 /* Overlap and cut-off clear padding for landscape print */
                 #reconciliation-printable-invoice {
-                  padding-top: 15mm !important;
-                  padding-bottom: 15mm !important;
+                  padding-top: 6mm !important;
+                  padding-bottom: 6mm !important;
                   box-sizing: border-box !important;
                 }
               }
