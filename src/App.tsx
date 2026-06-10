@@ -5960,7 +5960,7 @@ export default function App() {
                                   </button>
                                 </TableCell>
                                 <TableCell className="text-center font-normal text-sm py-1 h-10">
-                                  {item.currentStock <= item.minThreshold ? (
+                                  {item.currentStock <= item.minThreshold && userProfile?.isAlertsEnabled !== false ? (
                                     <span className="px-2.5 py-1 bg-brand-blue text-brand-yellow font-extrabold rounded-full text-xs shadow-sm shadow-brand-blue/10 inline-block">
                                       {item.currentStock} {item.unit}
                                     </span>
