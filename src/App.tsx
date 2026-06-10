@@ -4158,7 +4158,7 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-              margin: 10mm 15mm 15mm 15mm;
+              margin: 8mm 15mm 12mm 15mm;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4223,10 +4223,11 @@ export default function App() {
                 min-height: 175mm !important;
                 overflow: visible !important;
                 max-height: none !important;
-                padding-top: 8mm !important;
-                padding-bottom: 8mm !important;
+                padding-top: 15mm !important;
+                padding-bottom: 12mm !important;
                 box-shadow: none !important;
                 border: none !important;
+                box-sizing: border-box !important;
               }
               .is-safari #reconciliation-printable-invoice {
                 width: 100% !important;
@@ -4234,6 +4235,8 @@ export default function App() {
                 min-height: 175mm !important;
                 position: static !important;
                 box-sizing: border-box !important;
+                padding-top: 15mm !important;
+                padding-bottom: 12mm !important;
               }
               .is-safari #reconciliation-printable-invoice .print\\:fixed {
                 position: absolute !important;
@@ -4267,10 +4270,10 @@ export default function App() {
               .print-header {
                 display: flex !important;
                 position: fixed !important;
-                top: 5mm !important;
+                top: 4mm !important;
                 left: 15mm !important;
                 right: 15mm !important;
-                height: 8mm !important;
+                height: 6mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-bottom: 0.5px solid #e5e7eb !important;
@@ -4288,10 +4291,10 @@ export default function App() {
               .print-footer {
                 display: flex !important;
                 position: fixed !important;
-                bottom: 5mm !important;
+                bottom: 4mm !important;
                 left: 15mm !important;
                 right: 15mm !important;
-                height: 8mm !important;
+                height: 6mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-top: 0.5px solid #e5e7eb !important;
@@ -4316,18 +4319,28 @@ export default function App() {
                 font-weight: bold !important;
                 color: #111827 !important;
               }
-              /* Overlap and cut-off clear padding for landscape print */
-              #reconciliation-printable-invoice {
-                padding-top: 6mm !important;
-                padding-bottom: 6mm !important;
-                box-sizing: border-box !important;
+              .print-watermark {
+                display: none !important;
+              }
+              .print-watermark {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: -1000 !important;
+                pointer-events: none !important;
+                opacity: 0.14 !important;
               }
             }
           `}</style>
         )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:pb-10" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           {/* Header element visible on screen preview, or as hidden print overlay */}
-          <div className={isForPrint ? "hidden print:flex print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+          <div className={isForPrint ? "print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
             <span>PHARMAGUARD RECONCILIATION REPORT</span>
             <span>{selectedHistoricalReport 
               ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
@@ -4336,7 +4349,7 @@ export default function App() {
           </div>
           
           {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.14] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
+          <div className={isForPrint ? "print-watermark" : "absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20]"}>
             <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
@@ -4615,7 +4628,7 @@ export default function App() {
           </div>
 
           {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
-          <div className={isForPrint ? "hidden print:flex print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+          <div className={isForPrint ? "print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
             <span>GENERATED WITH PHARMAGUARD</span>
             <span className="text-right print-page-number">PAGE 1 OF 1</span>
           </div>
@@ -6844,7 +6857,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 10mm 15mm 15mm 15mm;
+                                  margin: 8mm 15mm 12mm 15mm;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6906,8 +6919,9 @@ export default function App() {
                                   overflow: visible !important;
                                   box-shadow: none !important;
                                   border: none !important;
-                                  padding-top: 8mm !important;
-                                  padding-bottom: 8mm !important;
+                                  padding-top: 15mm !important;
+                                  padding-bottom: 12mm !important;
+                                  box-sizing: border-box !important;
                                 }
                                 .is-safari #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6915,6 +6929,8 @@ export default function App() {
                                   min-height: 175mm !important;
                                   position: static !important;
                                   box-sizing: border-box !important;
+                                  padding-top: 15mm !important;
+                                  padding-bottom: 12mm !important;
                                 }
                                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
                                   position: absolute !important;
@@ -6945,10 +6961,10 @@ export default function App() {
                                 .print-header {
                                   display: flex !important;
                                   position: fixed !important;
-                                  top: 5mm !important;
+                                  top: 4mm !important;
                                   left: 15mm !important;
                                   right: 15mm !important;
-                                  height: 8mm !important;
+                                  height: 6mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-bottom: 0.5px solid #e5e7eb !important;
@@ -6966,10 +6982,10 @@ export default function App() {
                                 .print-footer {
                                   display: flex !important;
                                   position: fixed !important;
-                                  bottom: 5mm !important;
+                                  bottom: 4mm !important;
                                   left: 15mm !important;
                                   right: 15mm !important;
-                                  height: 8mm !important;
+                                  height: 6mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-top: 0.5px solid #e5e7eb !important;
@@ -6994,11 +7010,21 @@ export default function App() {
                                   font-weight: bold !important;
                                   color: #111827 !important;
                                 }
-                                /* Overlap and cut-off clear padding for landscape print */
-                                #reconciliation-printable-invoice {
-                                  padding-top: 6mm !important;
-                                  padding-bottom: 6mm !important;
-                                  box-sizing: border-box !important;
+                                .print-watermark {
+                                  display: none !important;
+                                }
+                                .print-watermark {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  top: 0 !important;
+                                  left: 0 !important;
+                                  width: 100% !important;
+                                  height: 100% !important;
+                                  align-items: center !important;
+                                  justify-content: center !important;
+                                  z-index: -1000 !important;
+                                  pointer-events: none !important;
+                                  opacity: 0.14 !important;
                                 }
                               </style>
                             </head>
@@ -7045,7 +7071,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 10mm 15mm 15mm 15mm;
+                margin: 8mm 15mm 12mm 15mm;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -7110,10 +7136,11 @@ export default function App() {
                   min-height: 175mm !important;
                   overflow: visible !important;
                   max-height: none !important;
-                  padding-top: 8mm !important;
-                  padding-bottom: 8mm !important;
+                  padding-top: 15mm !important;
+                  padding-bottom: 12mm !important;
                   box-shadow: none !important;
                   border: none !important;
+                  box-sizing: border-box !important;
                 }
                 .is-safari #reconciliation-printable-invoice {
                   width: 100% !important;
@@ -7121,6 +7148,8 @@ export default function App() {
                   min-height: 175mm !important;
                   position: static !important;
                   box-sizing: border-box !important;
+                  padding-top: 15mm !important;
+                  padding-bottom: 12mm !important;
                 }
                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
                   position: absolute !important;
@@ -7154,10 +7183,10 @@ export default function App() {
                 .print-header {
                   display: flex !important;
                   position: fixed !important;
-                  top: 5mm !important;
+                  top: 4mm !important;
                   left: 15mm !important;
                   right: 15mm !important;
-                  height: 8mm !important;
+                  height: 6mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-bottom: 0.5px solid #e5e7eb !important;
@@ -7175,10 +7204,10 @@ export default function App() {
                 .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 5mm !important;
+                  bottom: 4mm !important;
                   left: 15mm !important;
                   right: 15mm !important;
-                  height: 8mm !important;
+                  height: 6mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-top: 0.5px solid #e5e7eb !important;
@@ -7203,11 +7232,21 @@ export default function App() {
                   font-weight: bold !important;
                   color: #111827 !important;
                 }
-                /* Overlap and cut-off clear padding for landscape print */
-                #reconciliation-printable-invoice {
-                  padding-top: 6mm !important;
-                  padding-bottom: 6mm !important;
-                  box-sizing: border-box !important;
+                .print-watermark {
+                  display: none !important;
+                }
+                .print-watermark {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  width: 100% !important;
+                  height: 100% !important;
+                  align-items: center !important;
+                  justify-content: center !important;
+                  z-index: -1000 !important;
+                  pointer-events: none !important;
+                  opacity: 0.14 !important;
                 }
               }
             `}</style>
