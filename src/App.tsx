@@ -4161,13 +4161,297 @@ export default function App() {
     const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
     const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
+    const invoiceInnerBody = (
+      <>
+        {/* Visual Official Letterhead */}
+        <div className="flex justify-between items-end pb-0">
+          <div className="flex flex-col space-y-1 min-w-0 flex-1">
+            <h1 className="text-xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
+            <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
+              const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
+              return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
+            })()}</p>
+            <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+          </div>
+          <div className="text-right flex flex-col items-end justify-end space-y-1 shrink-0 whitespace-nowrap ml-4">
+            <p className="text-xs font-bold font-sans text-gray-900 leading-none whitespace-nowrap">
+              COMPLETED BY: {
+                selectedHistoricalReport
+                  ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
+                  : (() => {
+                      const selectedUserObj = users.find(u => u.id === reconUser);
+                      return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
+                    })()
+              }
+            </p>
+            <p className="text-xs font-normal font-sans text-gray-900 leading-none whitespace-nowrap font-medium">DATE EXECUTED: {
+              selectedHistoricalReport 
+                ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                : new Date().toLocaleDateString()
+            }</p>
+          </div>
+        </div>
+
+        {/* Audit Grid/Table */}
+        <div className="!mt-1">
+          <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
+            <colgroup>
+              <col className="w-[33%]" />
+              <col className="w-[11%]" />
+              <col className="w-[11%]" />
+              <col className="w-[8%]" />
+              <col className="w-[8%]" />
+              <col className="w-[8%]" />
+              <col className="w-[7%]" />
+              <col className="w-[7%]" />
+              <col className="w-[7%]" />
+            </colgroup>
+            <thead>
+              <tr className="border-t-2 border-gray-900">
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>MEDICATION</span>
+                  </div>
+                </th>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>NDC</span>
+                  </div>
+                </th>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>LAST REPORT</span>
+                    <span className="mt-0.5">COUNT</span>
+                  </div>
+                </th>
+                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>PURCHASED</span>
+                  </div>
+                </th>
+                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>DISPENSED</span>
+                  </div>
+                </th>
+                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>ADJUSTED</span>
+                  </div>
+                </th>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>EXPECTED</span>
+                    <span className="mt-0.5">COUNT</span>
+                  </div>
+                </th>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>PHYSICAL</span>
+                    <span className="mt-0.5">COUNT</span>
+                  </div>
+                </th>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                  <div className="flex flex-col items-center justify-center leading-none">
+                    <span>VARIANCE</span>
+                  </div>
+                </th>
+              </tr>
+              <tr className="border-b-2 border-gray-900">
+                <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans px-1" style={{ paddingTop: '2px', paddingBottom: '3px', verticalAlign: 'middle' }}>
+                  <span className="inline-block px-2 py-0.5 rounded-full bg-gray-900/10 text-gray-900 text-[8px] font-black uppercase tracking-wider border border-gray-900/15">
+                    SINCE LAST REPORT ON {headerPrevReportDate}
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {selectedHistoricalReport ? (
+                [...selectedHistoricalReport.items].sort(compareSubstances).map(item => {
+                  const variance = item.variance;
+                  return (
+                    <Fragment key={item.substanceId}>
+                      <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
+                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                          <div 
+                            onClick={() => {
+                              if (!isForPrint) {
+                                const invItem = inventory.find(i => i.id === item.substanceId);
+                                if (invItem) setSelectedSubstanceDetail(invItem);
+                              }
+                            }}
+                            className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                            title={`${item.substanceName} ${item.strength} - Click to view transaction history`}
+                          >
+                            {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
+                          </div>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                          <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                          <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                          <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{item.expected || 0}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{item.physical || 0}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                          <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                        </td>
+                      </tr>
+                      {variance !== 0 && (
+                        <tr className="bg-gray-50/50">
+                          <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans border-t border-b border-gray-100">
+                            Discrepancy Reason: {item.reason || "State reason omitted"}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })
+              ) : (
+                [...substancesToReconcile].sort(compareSubstances).map(sub => {
+                  const metrics = getSubstanceHistoryMetrics(sub.id);
+                  const counted = getReconPhysicalCount(sub.id) ?? 0;
+                  const variance = counted - metrics.expected;
+                  const reason = reconReasons[sub.id] || "";
+                  
+                  return (
+                    <Fragment key={sub.id}>
+                      <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
+                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                          <div 
+                            onClick={() => !isForPrint && setSelectedSubstanceDetail(sub)}
+                            className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                            title={`${sub.name} ${sub.strength} - Click to view transaction history`}
+                          >
+                            {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
+                          </div>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                          <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                          <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                          <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{metrics.expected}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                          <span className="text-[10px] leading-none">{counted}</span>
+                        </td>
+                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                          <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                        </td>
+                      </tr>
+                      {variance !== 0 && (
+                        <tr className="bg-gray-50/50">
+                          <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans border-t border-b border-gray-100">
+                            Discrepancy Reason: {reason || "State reason omitted"}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Flexible Spacer to push signatures to the bottom of the page */}
+        <div className="flex-grow flex-1 min-h-[16px]" />
+
+        {/* Signature box info */}
+        <div className="space-y-1 pt-1.5 border-t border-gray-100 break-inside-avoid">
+          {/* Moved disclaimer above signature fields in historical report block */}
+          <p className="text-[10px] text-gray-900 font-normal leading-normal text-left">
+            By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+          </p>
+          {isSigRequired ? (
+            <div className="grid grid-cols-2 gap-4 pt-1">
+              {/* Left signature field */}
+              <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                <div className="flex items-center gap-1.5 pb-1">
+                  <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
+                  <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                    {perfName}
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                  {userSig ? (
+                    <img src={userSig} className="max-h-12 object-contain font-medium" alt="Performed by signature" />
+                  ) : (
+                    <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                      No signature captured
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Right signature field */}
+              <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                <div className="flex items-center gap-1.5 pb-1">
+                  <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
+                  <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                    {picName}
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                  {picSig ? (
+                    <img src={picSig} className="max-h-12 object-contain font-medium" alt="PIC signature" />
+                  ) : (
+                    <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                      No signature captured
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
+              <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
+              <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom watermark footer, visible on screen preview, but hidden during print */}
+        <div className="flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
+          <span>GENERATED WITH PHARMAGUARD</span>
+          <span className="text-right">PAGE 1 OF 1</span>
+        </div>
+      </>
+    );
+
     return (
-      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative"}>
+      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative bg-transparent"}>
         {isForPrint && (
           <style>{`
             @page {
               size: landscape;
-              margin: 22mm 20mm 22mm 20mm !important;
+              margin: 18mm 20mm 18mm 20mm !important;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4194,21 +4478,6 @@ export default function App() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
-              /* Support clean layout overrides for Safari and iOS Safari */
-              .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
-                width: 100% !important;
-                height: auto !important;
-                min-height: 0 !important;
-                position: static !important;
-                overflow: visible !important;
-              }
-              .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
-                width: 100% !important;
-                height: auto !important;
-                position: static !important;
-                transform: none !important;
-                overflow: visible !important;
-              }
               body > *:not(#reconciliation-printable-root) {
                 display: none !important;
               }
@@ -4223,13 +4492,10 @@ export default function App() {
                 background: transparent !important;
               }
               #reconciliation-printable-invoice {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-start !important;
+                display: block !important;
                 position: static !important;
                 width: 100% !important;
                 height: auto !important;
-                min-height: 170mm !important;
                 overflow: visible !important;
                 max-height: none !important;
                 padding: 0 !important;
@@ -4238,17 +4504,49 @@ export default function App() {
                 background: transparent !important;
                 box-sizing: border-box !important;
               }
-              .is-safari #reconciliation-printable-invoice {
-                width: 100% !important;
-                height: auto !important;
-                min-height: 170mm !important;
-                position: static !important;
-                box-sizing: border-box !important;
-                padding: 0 !important;
+              /* Center the watermark on every page cleanly on Safari and Chrome */
+              .print-watermark {
+                display: flex !important;
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                width: 380px !important;
+                height: 380px !important;
+                transform: translate(-50%, -50%) !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: -10 !important;
+                pointer-events: none !important;
+                opacity: 0.11 !important;
                 background: transparent !important;
               }
-              #reconciliation-printable-root * {
-                visibility: visible !important;
+              /* Use table layout for perfectly aligned repeating header/footer spacers and prevent overlap */
+              .print-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                background: transparent !important;
+                margin: 0 !important;
+                padding: 0 !important;
+              }
+              .print-thead {
+                display: table-header-group !important;
+              }
+              .print-tfoot {
+                display: table-footer-group !important;
+              }
+              .print-page-number {
+                font-size: 0 !important;
+              }
+              .print-page-number::after {
+                font-size: 8.5px !important;
+                content: "PAGE " counter(page);
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+              }
+              #reconciliation-printable-invoice, 
+              #reconciliation-printable-invoice * {
+                background-color: transparent !important;
               }
               table, tbody, thead, th, td {
                 page-break-inside: auto !important;
@@ -4263,388 +4561,69 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-
-              /* Fixed Position running headers and footers printed on every landscape page */
-              .print-header {
-                display: flex !important;
-                position: fixed !important;
-                top: 8mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
-                height: 8mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8.5px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
-                box-sizing: border-box !important;
-              }
-              .print-footer {
-                display: flex !important;
-                position: fixed !important;
-                bottom: 8mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
-                height: 8mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8.5px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
-                box-sizing: border-box !important;
-              }
-              .print-page-number {
-                font-size: 0 !important;
-              }
-              .print-page-number::after {
-                font-size: 8.5px !important;
-                content: "PAGE " counter(page);
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-              }
-              .print-watermark {
-                display: flex !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                align-items: center !important;
-                justify-content: center !important;
-                z-index: -1 !important;
-                pointer-events: none !important;
-                opacity: 0.14 !important;
-              }
             }
           `}</style>
         )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
-          {isForPrint && (
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none bg-transparent" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl bg-white"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 text-gray-900 font-sans`}>
+          {isForPrint ? (
             <>
-              <div className="print-header hidden print:flex">
+              {/* Repeating watermarks positioned cleanly */}
+              <div className="print-watermark hidden print:flex">
+                <PharmaLogo className="w-[380px] h-[380px]" />
+              </div>
+
+              <table className="print-table w-full border-none border-collapse bg-transparent p-0 m-0">
+                <thead className="print-thead hidden print:table-header-group">
+                  <tr>
+                    <td className="p-0 border-none">
+                      <div className="flex justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase border-b border-gray-100 pb-1.5 mb-4 font-sans">
+                        <span>PHARMAGUARD RECONCILIATION REPORT</span>
+                        <span>{selectedHistoricalReport 
+                          ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                          : new Date().toLocaleDateString()
+                        }</span>
+                      </div>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="p-0 border-none">
+                      {invoiceInnerBody}
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot className="print-tfoot hidden print:table-footer-group">
+                  <tr>
+                    <td className="p-0 border-none">
+                      <div className="flex justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase border-t border-gray-100 pt-1.5 mt-4 font-sans">
+                        <span>GENERATED WITH PHARMAGUARD</span>
+                        <span className="print-page-number">PAGE 1</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </>
+          ) : (
+            <>
+              {/* Header element visible on screen preview, but hidden during actual printing */}
+              <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
                 <span>PHARMAGUARD RECONCILIATION REPORT</span>
                 <span>{selectedHistoricalReport 
                   ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                   : new Date().toLocaleDateString()
                 }</span>
               </div>
-              <div className="print-watermark hidden print:flex">
+              
+              {/* Centered Watermark for Screen, hidden during printing */}
+              <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:hidden">
                 <PharmaLogo className="w-[380px] h-[380px]" />
               </div>
-              <div className="print-footer hidden print:flex">
-                <span>GENERATED WITH PHARMAGUARD</span>
-                <span className="print-page-number">PAGE 1</span>
-              </div>
+
+              {invoiceInnerBody}
             </>
           )}
-
-          {/* Header element visible on screen preview, but hidden during actual printing */}
-          <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
-            <span>PHARMAGUARD RECONCILIATION REPORT</span>
-            <span>{selectedHistoricalReport 
-              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-              : new Date().toLocaleDateString()
-            }</span>
-          </div>
-          
-          {/* Centered Watermark for Screen, hidden during printing */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:hidden">
-            <PharmaLogo className="w-[380px] h-[380px]" />
-          </div>
-          
-          {/* Visual Official Letterhead */}
-          <div className="flex justify-between items-end pb-0">
-            <div className="flex flex-col space-y-1 min-w-0 flex-1">
-              <h1 className="text-xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
-              <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
-                const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
-                return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
-              })()}</p>
-              <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
-            </div>
-            <div className="text-right flex flex-col items-end justify-end space-y-1 shrink-0 whitespace-nowrap ml-4">
-              <p className="text-xs font-bold font-sans text-gray-900 leading-none whitespace-nowrap">
-                COMPLETED BY: {
-                  selectedHistoricalReport
-                    ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
-                    : (() => {
-                        const selectedUserObj = users.find(u => u.id === reconUser);
-                        return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
-                      })()
-                }
-              </p>
-              <p className="text-xs font-normal font-sans text-gray-900 leading-none whitespace-nowrap">DATE EXECUTED: {
-                selectedHistoricalReport 
-                  ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                  : new Date().toLocaleDateString()
-              }</p>
-            </div>
-          </div>
-
-          {/* Audit Grid/Table */}
-          <div className="!mt-1">
-            <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
-              <colgroup>
-                <col className="w-[33%]" />
-                <col className="w-[11%]" />
-                <col className="w-[11%]" />
-                <col className="w-[8%]" />
-                <col className="w-[8%]" />
-                <col className="w-[8%]" />
-                <col className="w-[7%]" />
-                <col className="w-[7%]" />
-                <col className="w-[7%]" />
-              </colgroup>
-              <thead>
-                <tr className="border-t-2 border-gray-900">
-                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>MEDICATION</span>
-                    </div>
-                  </th>
-                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>NDC</span>
-                    </div>
-                  </th>
-                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>LAST REPORT</span>
-                      <span className="mt-0.5">COUNT</span>
-                    </div>
-                  </th>
-                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>PURCHASED</span>
-                    </div>
-                  </th>
-                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>DISPENSED</span>
-                    </div>
-                  </th>
-                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>ADJUSTED</span>
-                    </div>
-                  </th>
-                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>EXPECTED</span>
-                      <span className="mt-0.5">COUNT</span>
-                    </div>
-                  </th>
-                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>PHYSICAL</span>
-                      <span className="mt-0.5">COUNT</span>
-                    </div>
-                  </th>
-                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                    <div className="flex flex-col items-center justify-center leading-none">
-                      <span>VARIANCE</span>
-                    </div>
-                  </th>
-                </tr>
-                <tr className="border-b-2 border-gray-900">
-                  <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans px-1" style={{ paddingTop: '2px', paddingBottom: '3px', verticalAlign: 'middle' }}>
-                    <span className="inline-block px-2 py-0.5 rounded-full bg-gray-900/10 text-gray-900 text-[8px] font-black uppercase tracking-wider border border-gray-900/15">
-                      SINCE LAST REPORT ON {headerPrevReportDate}
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {selectedHistoricalReport ? (
-                  [...selectedHistoricalReport.items].sort(compareSubstances).map(item => {
-                    const variance = item.variance;
-                    return (
-                      <Fragment key={item.substanceId}>
-                        <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <div 
-                              onClick={() => {
-                                if (!isForPrint) {
-                                  const invItem = inventory.find(i => i.id === item.substanceId);
-                                  if (invItem) setSelectedSubstanceDetail(invItem);
-                                }
-                              }}
-                              className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
-                              title={`${item.substanceName} ${item.strength} - Click to view transaction history`}
-                            >
-                              {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
-                            </div>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                            <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{item.expected || 0}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{item.physical || 0}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                            <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
-                          </td>
-                        </tr>
-                        {variance !== 0 && (
-                          <tr className="bg-gray-50/50">
-                            <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
-                              Discrepancy Reason: {item.reason || "State reason omitted"}
-                            </td>
-                          </tr>
-                        )}
-                      </Fragment>
-                    );
-                  })
-                ) : (
-                  [...substancesToReconcile].sort(compareSubstances).map(sub => {
-                    const metrics = getSubstanceHistoryMetrics(sub.id);
-                    const counted = getReconPhysicalCount(sub.id) ?? 0;
-                    const variance = counted - metrics.expected;
-                    const reason = reconReasons[sub.id] || "";
-                    
-                    return (
-                      <Fragment key={sub.id}>
-                        <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <div 
-                              onClick={() => !isForPrint && setSelectedSubstanceDetail(sub)}
-                              className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
-                              title={`${sub.name} ${sub.strength} - Click to view transaction history`}
-                            >
-                              {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
-                            </div>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                            <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                            <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{metrics.expected}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                            <span className="text-[10px] leading-none">{counted}</span>
-                          </td>
-                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                            <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
-                          </td>
-                        </tr>
-                        {variance !== 0 && (
-                          <tr className="bg-gray-50/50">
-                            <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
-                              Discrepancy Reason: {reason || "State reason omitted"}
-                            </td>
-                          </tr>
-                        )}
-                      </Fragment>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Flexible Spacer to push signatures to the bottom of the page */}
-          <div className="flex-grow flex-1 min-h-[16px]" />
-
-          {/* Signature box info */}
-          <div className="space-y-1 pt-1.5 border-t border-gray-100 break-inside-avoid">
-            {/* Moved disclaimer above signature fields in historical report block */}
-            <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
-              By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
-            </p>
-            {isSigRequired ? (
-              <div className="grid grid-cols-2 gap-4 pt-1">
-                {/* Left signature field */}
-                <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
-                  <div className="flex items-center gap-1.5 pb-1">
-                    <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
-                    <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                      {perfName}
-                    </span>
-                  </div>
-                  <div className="flex-1 flex items-center justify-center">
-                    {userSig ? (
-                      <img src={userSig} className="max-h-12 object-contain" alt="Performed by signature" />
-                    ) : (
-                      <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                        No signature captured
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right signature field */}
-                <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
-                  <div className="flex items-center gap-1.5 pb-1">
-                    <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
-                    <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                      {picName}
-                    </span>
-                  </div>
-                  <div className="flex-1 flex items-center justify-center">
-                    {picSig ? (
-                      <img src={picSig} className="max-h-12 object-contain" alt="PIC signature" />
-                    ) : (
-                      <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                        No signature captured
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
-                <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
-                <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
-              </div>
-            )}
-          </div>
-
-          {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
-          <div className="flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none">
-            <span>GENERATED WITH PHARMAGUARD</span>
-            <span className="text-right">PAGE 1 OF 1</span>
-          </div>
-
         </div>
       </div>
     );
