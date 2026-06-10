@@ -4263,41 +4263,72 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-              /* Unified print headers and footers for safe landscape layouts across all systems (iPad/Windows/macOS) */
-              .print-header {
+              /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+              .print-header, .print-footer {
+                display: none !important;
+              }
+              /* Define fixed position headers specifically on WebKit/Safari where @page margin boxes are unsupported */
+              .is-safari .print-header,
+              .is-ios-safari .print-header {
                 display: flex !important;
-                flex-direction: row !important;
+                position: fixed !important;
+                top: 5mm !important;
+                left: 15mm !important;
+                right: 15mm !important;
+                height: 8mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 2mm !important;
-                margin-bottom: 4mm !important;
+                padding-bottom: 1.5mm !important;
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                 font-size: 8.5px !important;
                 font-weight: bold !important;
                 color: #111827 !important;
+                z-index: 9999 !important;
                 background: white !important;
                 text-transform: uppercase !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
                 box-sizing: border-box !important;
               }
-              .print-footer {
+              /* Define fixed position footers specifically on WebKit/Safari where @page margin boxes are unsupported */
+              .is-safari .print-footer,
+              .is-ios-safari .print-footer {
                 display: flex !important;
-                flex-direction: row !important;
+                position: fixed !important;
+                bottom: 5mm !important;
+                left: 15mm !important;
+                right: 15mm !important;
+                height: 8mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 2mm !important;
-                margin-top: auto !important; /* Push footer cleanly to bottom of landscape printable container */
+                padding-top: 1.5mm !important;
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                 font-size: 8.5px !important;
                 font-weight: bold !important;
                 color: #111827 !important;
+                z-index: 9999 !important;
                 background: white !important;
                 text-transform: uppercase !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
+                box-sizing: border-box !important;
+              }
+              /* Dynamic counter page numbers for Safari print layout */
+              .is-safari .print-page-number,
+              .is-ios-safari .print-page-number {
+                font-size: 0 !important;
+              }
+              .is-safari .print-page-number::after,
+              .is-ios-safari .print-page-number::after {
+                font-size: 8.5px !important;
+                content: "PAGE " counter(page);
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+              }
+              /* Overlap and cut-off clear padding for Safari/iPad landscape */
+              .is-safari #reconciliation-printable-invoice,
+              .is-ios-safari #reconciliation-printable-invoice {
+                padding-top: 15mm !important;
+                padding-bottom: 15mm !important;
                 box-sizing: border-box !important;
               }
             }
@@ -4595,7 +4626,7 @@ export default function App() {
           {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
           <div className={isForPrint ? "hidden print:flex print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
             <span>GENERATED WITH PHARMAGUARD</span>
-            <span className="text-right">PAGE 1 OF 1</span>
+            <span className="text-right print-page-number">PAGE 1 OF 1</span>
           </div>
 
         </div>
@@ -6780,15 +6811,7 @@ export default function App() {
         </div>
 
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''} bg-[#f1f5f9]`}>
-          {isIOSOrIPadSafari && (
-            <div className="bg-amber-50 border-b border-amber-200/60 px-6 py-3.5 flex items-start gap-3 shrink-0">
-              <span className="text-amber-600 text-lg">💡</span>
-              <div className="text-xs text-amber-900 leading-normal">
-                <strong className="font-semibold block mb-0.5 text-amber-950">iPad / iOS Landscape Setup Required:</strong>
-                iOS Safari ignores automatic printing orientations. After clicking <span className="font-black uppercase tracking-wider text-[10px] bg-brand-yellow text-brand-blue px-1.5 py-0.5 rounded">Print Report</span>, tap <strong className="font-semibold underline">Options</strong> in your printer settings dialog and set the orientation to <strong className="font-semibold">Landscape</strong> for perfect table alignment.
-              </div>
-            </div>
-          )}
+
           {/* Print Report Review Page (Forced Landscape Frame for iPad / Standard Screen Verification) */}
           <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-start md:justify-center items-start">
             <div className="w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
@@ -6927,41 +6950,72 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-                                /* Unified print headers and footers for safe landscape layouts across all systems (iPad/Windows/macOS) */
-                                .print-header {
+                                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+                                .print-header, .print-footer {
+                                  display: none !important;
+                                }
+                                /* Define fixed position headers specifically on WebKit/Safari where @page margin boxes are unsupported */
+                                .is-safari .print-header,
+                                .is-ios-safari .print-header {
                                   display: flex !important;
-                                  flex-direction: row !important;
+                                  position: fixed !important;
+                                  top: 5mm !important;
+                                  left: 15mm !important;
+                                  right: 15mm !important;
+                                  height: 8mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-bottom: 0.5px solid #e5e7eb !important;
-                                  padding-bottom: 2mm !important;
-                                  margin-bottom: 4mm !important;
+                                  padding-bottom: 1.5mm !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-size: 8.5px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
+                                  z-index: 9999 !important;
                                   background: white !important;
                                   text-transform: uppercase !important;
-                                  min-width: 100% !important;
-                                  max-width: 100% !important;
                                   box-sizing: border-box !important;
                                 }
-                                .print-footer {
+                                /* Define fixed position footers specifically on WebKit/Safari where @page margin boxes are unsupported */
+                                .is-safari .print-footer,
+                                .is-ios-safari .print-footer {
                                   display: flex !important;
-                                  flex-direction: row !important;
+                                  position: fixed !important;
+                                  bottom: 5mm !important;
+                                  left: 15mm !important;
+                                  right: 15mm !important;
+                                  height: 8mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-top: 0.5px solid #e5e7eb !important;
-                                  padding-top: 2mm !important;
-                                  margin-top: auto !important; /* Push footer cleanly to bottom of landscape printable container */
+                                  padding-top: 1.5mm !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-size: 8.5px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
+                                  z-index: 9999 !important;
                                   background: white !important;
                                   text-transform: uppercase !important;
-                                  min-width: 100% !important;
-                                  max-width: 100% !important;
+                                  box-sizing: border-box !important;
+                                }
+                                /* Dynamic counter page numbers for Safari print layout */
+                                .is-safari .print-page-number,
+                                .is-ios-safari .print-page-number {
+                                  font-size: 0 !important;
+                                }
+                                .is-safari .print-page-number::after,
+                                .is-ios-safari .print-page-number::after {
+                                  font-size: 8.5px !important;
+                                  content: "PAGE " counter(page);
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
+                                }
+                                /* Overlap and cut-off clear padding for Safari/iPad landscape */
+                                .is-safari #reconciliation-printable-invoice,
+                                .is-ios-safari #reconciliation-printable-invoice {
+                                  padding-top: 15mm !important;
+                                  padding-bottom: 15mm !important;
                                   box-sizing: border-box !important;
                                 }
                               </style>
@@ -7114,41 +7168,72 @@ export default function App() {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
                 }
-                /* Unified print headers and footers for safe landscape layouts across all systems (iPad/Windows/macOS) */
-                .print-header {
+                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+                .print-header, .print-footer {
+                  display: none !important;
+                }
+                /* Define fixed position headers specifically on WebKit/Safari where @page margin boxes are unsupported */
+                .is-safari .print-header,
+                .is-ios-safari .print-header {
                   display: flex !important;
-                  flex-direction: row !important;
+                  position: fixed !important;
+                  top: 5mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
+                  height: 8mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 2mm !important;
-                  margin-bottom: 4mm !important;
+                  padding-bottom: 1.5mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-size: 8.5px !important;
                   font-weight: bold !important;
                   color: #111827 !important;
+                  z-index: 9999 !important;
                   background: white !important;
                   text-transform: uppercase !important;
-                  min-width: 100% !important;
-                  max-width: 100% !important;
                   box-sizing: border-box !important;
                 }
-                .print-footer {
+                /* Define fixed position footers specifically on WebKit/Safari where @page margin boxes are unsupported */
+                .is-safari .print-footer,
+                .is-ios-safari .print-footer {
                   display: flex !important;
-                  flex-direction: row !important;
+                  position: fixed !important;
+                  bottom: 5mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
+                  height: 8mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 2mm !important;
-                  margin-top: auto !important; /* Push footer cleanly to bottom of landscape printable container */
+                  padding-top: 1.5mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-size: 8.5px !important;
                   font-weight: bold !important;
                   color: #111827 !important;
+                  z-index: 9999 !important;
                   background: white !important;
                   text-transform: uppercase !important;
-                  min-width: 100% !important;
-                  max-width: 100% !important;
+                  box-sizing: border-box !important;
+                }
+                /* Dynamic counter page numbers for Safari print layout */
+                .is-safari .print-page-number,
+                .is-ios-safari .print-page-number {
+                  font-size: 0 !important;
+                }
+                .is-safari .print-page-number::after,
+                .is-ios-safari .print-page-number::after {
+                  font-size: 8.5px !important;
+                  content: "PAGE " counter(page);
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                }
+                /* Overlap and cut-off clear padding for Safari/iPad landscape */
+                .is-safari #reconciliation-printable-invoice,
+                .is-ios-safari #reconciliation-printable-invoice {
+                  padding-top: 15mm !important;
+                  padding-bottom: 15mm !important;
                   box-sizing: border-box !important;
                 }
               }
