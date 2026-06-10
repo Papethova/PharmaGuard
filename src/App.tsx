@@ -4263,13 +4263,8 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-              /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
-              .print-header, .print-footer {
-                display: none !important;
-              }
-              /* Define fixed position headers specifically on WebKit/Safari where @page margin boxes are unsupported */
-              .is-safari .print-header,
-              .is-ios-safari .print-header {
+              /* Define fixed position headers across all systems during print */
+              .print-header {
                 display: flex !important;
                 position: fixed !important;
                 top: 5mm !important;
@@ -4289,9 +4284,8 @@ export default function App() {
                 text-transform: uppercase !important;
                 box-sizing: border-box !important;
               }
-              /* Define fixed position footers specifically on WebKit/Safari where @page margin boxes are unsupported */
-              .is-safari .print-footer,
-              .is-ios-safari .print-footer {
+              /* Define fixed position footers across all systems during print */
+              .print-footer {
                 display: flex !important;
                 position: fixed !important;
                 bottom: 5mm !important;
@@ -4311,22 +4305,19 @@ export default function App() {
                 text-transform: uppercase !important;
                 box-sizing: border-box !important;
               }
-              /* Dynamic counter page numbers for Safari print layout */
-              .is-safari .print-page-number,
-              .is-ios-safari .print-page-number {
+              /* Dynamic counter page numbers across all systems for landscape print layout */
+              .print-page-number {
                 font-size: 0 !important;
               }
-              .is-safari .print-page-number::after,
-              .is-ios-safari .print-page-number::after {
+              .print-page-number::after {
                 font-size: 8.5px !important;
                 content: "PAGE " counter(page);
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                 font-weight: bold !important;
                 color: #111827 !important;
               }
-              /* Overlap and cut-off clear padding for Safari/iPad landscape */
-              .is-safari #reconciliation-printable-invoice,
-              .is-ios-safari #reconciliation-printable-invoice {
+              /* Overlap and cut-off clear padding for landscape print */
+              #reconciliation-printable-invoice {
                 padding-top: 15mm !important;
                 padding-bottom: 15mm !important;
                 box-sizing: border-box !important;
@@ -6950,13 +6941,8 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-                                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
-                                .print-header, .print-footer {
-                                  display: none !important;
-                                }
-                                /* Define fixed position headers specifically on WebKit/Safari where @page margin boxes are unsupported */
-                                .is-safari .print-header,
-                                .is-ios-safari .print-header {
+                                /* Define fixed position headers across all systems during print */
+                                .print-header {
                                   display: flex !important;
                                   position: fixed !important;
                                   top: 5mm !important;
@@ -6976,9 +6962,8 @@ export default function App() {
                                   text-transform: uppercase !important;
                                   box-sizing: border-box !important;
                                 }
-                                /* Define fixed position footers specifically on WebKit/Safari where @page margin boxes are unsupported */
-                                .is-safari .print-footer,
-                                .is-ios-safari .print-footer {
+                                /* Define fixed position footers across all systems during print */
+                                .print-footer {
                                   display: flex !important;
                                   position: fixed !important;
                                   bottom: 5mm !important;
@@ -6998,22 +6983,19 @@ export default function App() {
                                   text-transform: uppercase !important;
                                   box-sizing: border-box !important;
                                 }
-                                /* Dynamic counter page numbers for Safari print layout */
-                                .is-safari .print-page-number,
-                                .is-ios-safari .print-page-number {
+                                /* Dynamic counter page numbers across all systems for landscape print layout */
+                                .print-page-number {
                                   font-size: 0 !important;
                                 }
-                                .is-safari .print-page-number::after,
-                                .is-ios-safari .print-page-number::after {
+                                .print-page-number::after {
                                   font-size: 8.5px !important;
                                   content: "PAGE " counter(page);
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
                                 }
-                                /* Overlap and cut-off clear padding for Safari/iPad landscape */
-                                .is-safari #reconciliation-printable-invoice,
-                                .is-ios-safari #reconciliation-printable-invoice {
+                                /* Overlap and cut-off clear padding for landscape print */
+                                #reconciliation-printable-invoice {
                                   padding-top: 15mm !important;
                                   padding-bottom: 15mm !important;
                                   box-sizing: border-box !important;
@@ -7168,13 +7150,8 @@ export default function App() {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
                 }
-                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
-                .print-header, .print-footer {
-                  display: none !important;
-                }
-                /* Define fixed position headers specifically on WebKit/Safari where @page margin boxes are unsupported */
-                .is-safari .print-header,
-                .is-ios-safari .print-header {
+                /* Define fixed position headers across all systems during print */
+                .print-header {
                   display: flex !important;
                   position: fixed !important;
                   top: 5mm !important;
@@ -7194,9 +7171,8 @@ export default function App() {
                   text-transform: uppercase !important;
                   box-sizing: border-box !important;
                 }
-                /* Define fixed position footers specifically on WebKit/Safari where @page margin boxes are unsupported */
-                .is-safari .print-footer,
-                .is-ios-safari .print-footer {
+                /* Define fixed position footers across all systems during print */
+                .print-footer {
                   display: flex !important;
                   position: fixed !important;
                   bottom: 5mm !important;
@@ -7216,22 +7192,19 @@ export default function App() {
                   text-transform: uppercase !important;
                   box-sizing: border-box !important;
                 }
-                /* Dynamic counter page numbers for Safari print layout */
-                .is-safari .print-page-number,
-                .is-ios-safari .print-page-number {
+                /* Dynamic counter page numbers across all systems for landscape print layout */
+                .print-page-number {
                   font-size: 0 !important;
                 }
-                .is-safari .print-page-number::after,
-                .is-ios-safari .print-page-number::after {
+                .print-page-number::after {
                   font-size: 8.5px !important;
                   content: "PAGE " counter(page);
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-weight: bold !important;
                   color: #111827 !important;
                 }
-                /* Overlap and cut-off clear padding for Safari/iPad landscape */
-                .is-safari #reconciliation-printable-invoice,
-                .is-ios-safari #reconciliation-printable-invoice {
+                /* Overlap and cut-off clear padding for landscape print */
+                #reconciliation-printable-invoice {
                   padding-top: 15mm !important;
                   padding-bottom: 15mm !important;
                   box-sizing: border-box !important;
