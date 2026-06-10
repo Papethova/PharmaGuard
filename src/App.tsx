@@ -4263,84 +4263,42 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-              /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
-              .print-header, .print-footer {
-                display: none !important;
-              }
-              /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
-              @supports (-webkit-touch-callout: none) {
-                .print-header {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
-                }
-                .print-footer {
-                  display: flex !important;
-                  position: fixed !important;
-                  bottom: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
-                }
-              }
-              .is-safari .print-header {
+              /* Unified print headers and footers for safe landscape layouts across all systems (iPad/Windows/macOS) */
+              .print-header {
                 display: flex !important;
-                position: fixed !important;
-                top: 5mm !important;
-                left: 15mm !important;
-                right: 15mm !important;
+                flex-direction: row !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 1.5mm !important;
+                padding-bottom: 2mm !important;
+                margin-bottom: 4mm !important;
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8px !important;
+                font-size: 8.5px !important;
                 font-weight: bold !important;
                 color: #111827 !important;
-                z-index: 9999 !important;
                 background: white !important;
                 text-transform: uppercase !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
               }
-              .is-safari .print-footer {
+              .print-footer {
                 display: flex !important;
-                position: fixed !important;
-                bottom: 5mm !important;
-                left: 15mm !important;
-                right: 15mm !important;
+                flex-direction: row !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 1.5mm !important;
+                padding-top: 2mm !important;
+                margin-top: auto !important; /* Push footer cleanly to bottom of landscape printable container */
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8px !important;
+                font-size: 8.5px !important;
                 font-weight: bold !important;
                 color: #111827 !important;
-                z-index: 9999 !important;
                 background: white !important;
                 text-transform: uppercase !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
               }
             }
           `}</style>
@@ -6969,84 +6927,42 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-                                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
-                                .print-header, .print-footer {
-                                  display: none !important;
-                                }
-                                /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
-                                @supports (-webkit-touch-callout: none) {
-                                  .print-header {
-                                    display: flex !important;
-                                    position: fixed !important;
-                                    top: 0 !important;
-                                    left: 0 !important;
-                                    right: 0 !important;
-                                    justify-content: space-between !important;
-                                    align-items: center !important;
-                                    border-bottom: 0.5px solid #e5e7eb !important;
-                                    padding-bottom: 1.5mm !important;
-                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                    font-size: 8px !important;
-                                    font-weight: bold !important;
-                                    color: #111827 !important;
-                                    z-index: 9999 !important;
-                                    background: white !important;
-                                    text-transform: uppercase !important;
-                                  }
-                                  .print-footer {
-                                    display: flex !important;
-                                    position: fixed !important;
-                                    bottom: 0 !important;
-                                    left: 0 !important;
-                                    right: 0 !important;
-                                    justify-content: space-between !important;
-                                    align-items: center !important;
-                                    border-top: 0.5px solid #e5e7eb !important;
-                                    padding-top: 1.5mm !important;
-                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                    font-size: 8px !important;
-                                    font-weight: bold !important;
-                                    color: #111827 !important;
-                                    z-index: 9999 !important;
-                                    background: white !important;
-                                    text-transform: uppercase !important;
-                                  }
-                                }
-                                .is-safari .print-header {
+                                /* Unified print headers and footers for safe landscape layouts across all systems (iPad/Windows/macOS) */
+                                .print-header {
                                   display: flex !important;
-                                  position: fixed !important;
-                                  top: 5mm !important;
-                                  left: 15mm !important;
-                                  right: 15mm !important;
+                                  flex-direction: row !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-bottom: 0.5px solid #e5e7eb !important;
-                                  padding-bottom: 1.5mm !important;
+                                  padding-bottom: 2mm !important;
+                                  margin-bottom: 4mm !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8px !important;
+                                  font-size: 8.5px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
-                                  z-index: 9999 !important;
                                   background: white !important;
                                   text-transform: uppercase !important;
+                                  min-width: 100% !important;
+                                  max-width: 100% !important;
+                                  box-sizing: border-box !important;
                                 }
-                                .is-safari .print-footer {
+                                .print-footer {
                                   display: flex !important;
-                                  position: fixed !important;
-                                  bottom: 5mm !important;
-                                  left: 15mm !important;
-                                  right: 15mm !important;
+                                  flex-direction: row !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-top: 0.5px solid #e5e7eb !important;
-                                  padding-top: 1.5mm !important;
+                                  padding-top: 2mm !important;
+                                  margin-top: auto !important; /* Push footer cleanly to bottom of landscape printable container */
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8px !important;
+                                  font-size: 8.5px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
-                                  z-index: 9999 !important;
                                   background: white !important;
                                   text-transform: uppercase !important;
+                                  min-width: 100% !important;
+                                  max-width: 100% !important;
+                                  box-sizing: border-box !important;
                                 }
                               </style>
                             </head>
@@ -7198,84 +7114,42 @@ export default function App() {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
                 }
-                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
-                .print-header, .print-footer {
-                  display: none !important;
-                }
-                /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
-                @supports (-webkit-touch-callout: none) {
-                  .print-header {
-                    display: flex !important;
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    justify-content: space-between !important;
-                    align-items: center !important;
-                    border-bottom: 0.5px solid #e5e7eb !important;
-                    padding-bottom: 1.5mm !important;
-                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                    font-size: 8px !important;
-                    font-weight: bold !important;
-                    color: #111827 !important;
-                    z-index: 9999 !important;
-                    background: white !important;
-                    text-transform: uppercase !important;
-                  }
-                  .print-footer {
-                    display: flex !important;
-                    position: fixed !important;
-                    bottom: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    justify-content: space-between !important;
-                    align-items: center !important;
-                    border-top: 0.5px solid #e5e7eb !important;
-                    padding-top: 1.5mm !important;
-                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                    font-size: 8px !important;
-                    font-weight: bold !important;
-                    color: #111827 !important;
-                    z-index: 9999 !important;
-                    background: white !important;
-                    text-transform: uppercase !important;
-                  }
-                }
-                .is-safari .print-header {
+                /* Unified print headers and footers for safe landscape layouts across all systems (iPad/Windows/macOS) */
+                .print-header {
                   display: flex !important;
-                  position: fixed !important;
-                  top: 5mm !important;
-                  left: 15mm !important;
-                  right: 15mm !important;
+                  flex-direction: row !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
+                  padding-bottom: 2mm !important;
+                  margin-bottom: 4mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
+                  font-size: 8.5px !important;
                   font-weight: bold !important;
                   color: #111827 !important;
-                  z-index: 9999 !important;
                   background: white !important;
                   text-transform: uppercase !important;
+                  min-width: 100% !important;
+                  max-width: 100% !important;
+                  box-sizing: border-box !important;
                 }
-                .is-safari .print-footer {
+                .print-footer {
                   display: flex !important;
-                  position: fixed !important;
-                  bottom: 5mm !important;
-                  left: 15mm !important;
-                  right: 15mm !important;
+                  flex-direction: row !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
+                  padding-top: 2mm !important;
+                  margin-top: auto !important; /* Push footer cleanly to bottom of landscape printable container */
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
+                  font-size: 8.5px !important;
                   font-weight: bold !important;
                   color: #111827 !important;
-                  z-index: 9999 !important;
                   background: white !important;
                   text-transform: uppercase !important;
+                  min-width: 100% !important;
+                  max-width: 100% !important;
+                  box-sizing: border-box !important;
                 }
               }
             `}</style>
