@@ -6824,7 +6824,7 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''} bg-[#f1f5f9]`}>
           {/* Print Report Review Page (Forced Landscape Frame for iPad / Standard Screen Verification) */}
           <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-start md:justify-center items-start">
-            <div className="w-full max-w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
+            <div className="w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
               {renderReconciliationReportContent(false)}
             </div>
           </div>
