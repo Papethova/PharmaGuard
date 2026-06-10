@@ -4210,55 +4210,19 @@ export default function App() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
-              /* macOS Safari: Adaptive orientation rotation */
-              @media print and (orientation: portrait) {
-                .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
-                  width: 210mm !important;
-                  height: 297mm !important;
-                  overflow: visible !important;
-                  position: relative !important;
-                }
-                .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
-                  width: 297mm !important;
-                  height: 210mm !important;
-                  transform: rotate(90deg) translate(0, -210mm) !important;
-                  transform-origin: 0 0 !important;
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  overflow: visible !important;
-                }
-              }
-              @media print and (orientation: landscape) {
-                .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
-                  width: 297mm !important;
-                  height: auto !important;
-                  min-height: 210mm !important;
-                }
-                .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
-                  width: 297mm !important;
-                  height: auto !important;
-                  min-height: 210mm !important;
-                  position: relative !important;
-                  transform: none !important;
-                }
-              }
-
-              /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
-              .is-ios-safari, .is-ios-safari body {
-                width: 210mm !important;
-                height: 297mm !important;
+              /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
+              .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                position: static !important;
                 overflow: visible !important;
-                position: relative !important;
               }
-              .is-ios-safari #reconciliation-printable-root {
-                width: 297mm !important;
-                height: 210mm !important;
-                transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
-                transform-origin: 0 0 !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
+              .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                transform: none !important;
                 overflow: visible !important;
               }
               body > *:not(#reconciliation-printable-root) {
@@ -6968,21 +6932,13 @@ export default function App() {
                                   background: white !important;
                                   color: black !important;
                                 }
-                                /* macOS Safari: Adaptive orientation rotation */
-                                @media print and (orientation: portrait) {
-                                  .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
-                                    width: 210mm !important;
-                                    height: 297mm !important;
-                                    overflow: visible !important;
-                                    position: relative !important;
-                                  }
-                                }
-                                @media print and (orientation: landscape) {
-                                  .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
-                                    width: 297mm !important;
-                                    height: auto !important;
-                                    min-height: 210mm !important;
-                                  }
+                                /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
+                                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                                  width: 100% !important;
+                                  height: auto !important;
+                                  min-height: 0 !important;
+                                  position: static !important;
+                                  overflow: visible !important;
                                 }
                                 body {
                                   margin: 0 !important;
@@ -7004,43 +6960,12 @@ export default function App() {
                                   margin: 0 !important;
                                   background: white !important;
                                 }
-                                @media print and (orientation: portrait) {
-                                  .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
-                                    width: 297mm !important;
-                                    height: 210mm !important;
-                                    transform: rotate(90deg) translate(0, -210mm) !important;
-                                    transform-origin: 0 0 !important;
-                                    position: absolute !important;
-                                    top: 0 !important;
-                                    left: 0 !important;
-                                    overflow: visible !important;
-                                  }
-                                }
-                                @media print and (orientation: landscape) {
-                                  .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
-                                    width: 297mm !important;
-                                    height: auto !important;
-                                    min-height: 210mm !important;
-                                    position: relative !important;
-                                    transform: none !important;
-                                  }
-                                }
 
-                                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
-                                .is-ios-safari, .is-ios-safari body {
-                                  width: 210mm !important;
-                                  height: 297mm !important;
-                                  overflow: visible !important;
-                                  position: relative !important;
-                                }
                                 .is-ios-safari #reconciliation-printable-root {
-                                  width: 297mm !important;
-                                  height: 210mm !important;
-                                  transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
-                                  transform-origin: 0 0 !important;
-                                  position: absolute !important;
-                                  top: 0 !important;
-                                  left: 0 !important;
+                                  width: 100% !important;
+                                  height: auto !important;
+                                  position: static !important;
+                                  transform: none !important;
                                   overflow: visible !important;
                                 }
                                 #reconciliation-printable-invoice {
@@ -7266,22 +7191,6 @@ export default function App() {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
-                /* macOS Safari: Adaptive orientation rotation */
-                @media print and (orientation: portrait) {
-                  .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
-                    width: 210mm !important;
-                    height: 297mm !important;
-                    overflow: visible !important;
-                    position: relative !important;
-                  }
-                }
-                @media print and (orientation: landscape) {
-                  .is-safari:not(.is-ios-safari), .is-safari:not(.is-ios-safari) body {
-                    width: 297mm !important;
-                    height: auto !important;
-                    min-height: 210mm !important;
-                  }
-                }
                 body > *:not(#reconciliation-printable-root) {
                   display: none !important;
                 }
@@ -7295,43 +7204,19 @@ export default function App() {
                   margin: 0 !important;
                   background: white !important;
                 }
-                @media print and (orientation: portrait) {
-                  .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
-                    width: 297mm !important;
-                    height: 210mm !important;
-                    transform: rotate(90deg) translate(0, -210mm) !important;
-                    transform-origin: 0 0 !important;
-                    position: absolute !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    overflow: visible !important;
-                  }
-                }
-                @media print and (orientation: landscape) {
-                  .is-safari:not(.is-ios-safari) #reconciliation-printable-root {
-                    width: 297mm !important;
-                    height: auto !important;
-                    min-height: 210mm !important;
-                    position: relative !important;
-                    transform: none !important;
-                  }
-                }
-
-                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page */
-                .is-ios-safari, .is-ios-safari body {
-                  width: 210mm !important;
-                  height: 297mm !important;
+                /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
+                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                  width: 100% !important;
+                  height: auto !important;
+                  min-height: 0 !important;
+                  position: static !important;
                   overflow: visible !important;
-                  position: relative !important;
                 }
-                .is-ios-safari #reconciliation-printable-root {
-                  width: 297mm !important;
-                  height: 210mm !important;
-                  transform: rotate(90deg) translate(0, -210mm) !important;
-                  transform-origin: 0 0 !important;
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
+                .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
+                  width: 100% !important;
+                  height: auto !important;
+                  position: static !important;
+                  transform: none !important;
                   overflow: visible !important;
                 }
                 #reconciliation-printable-invoice {
