@@ -5988,29 +5988,29 @@ export default function App() {
 
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="shrink-0 flex flex-col gap-3 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
-              <div className="flex flex-row flex-wrap items-end gap-3.5 w-full">
-                <div className="grid gap-1.5 w-[110px] shrink-0">
+              <div className="flex flex-row flex-wrap items-end gap-2 md:gap-2.5 w-full">
+                <div className="grid gap-1.5 w-[100px] shrink-0">
                   <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
                   <Input 
                     id="start-date"
                     type="date" 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 custom-clean-date-input ${startDate ? "has-value" : ""}`}
+                    className={`w-[100px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1 py-0 custom-clean-date-input ${startDate ? "has-value" : ""}`}
                   />
                 </div>
-                <div className="grid gap-1.5 w-[110px] shrink-0">
+                <div className="grid gap-1.5 w-[100px] shrink-0">
                   <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
                   <Input 
                     id="end-date"
                     type="date" 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)}
-                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 custom-clean-date-input ${endDate ? "has-value" : ""}`}
+                    className={`w-[100px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1 py-0 custom-clean-date-input ${endDate ? "has-value" : ""}`}
                   />
                 </div>
 
-                <div className="grid gap-1.5 w-[260px] shrink-0 relative">
+                <div className="grid gap-1.5 flex-1 min-w-[130px] max-w-[220px] relative">
                   <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
                   <div className="relative w-full">
                     <Input
@@ -6075,7 +6075,7 @@ export default function App() {
                   )}
                 </div>
 
-                <div className="grid gap-1.5 w-[125px] shrink-0">
+                <div className="grid gap-1.5 w-[115px] shrink-0">
                   <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center whitespace-nowrap">Transaction Type</Label>
                   <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
                     <SelectTrigger id="history-type-filter" className="w-full !h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5 px-2">
@@ -6131,7 +6131,7 @@ export default function App() {
                     setLastSearchedDoc(null);
                     setHasMoreSearchDocs(true);
                   }}
-                  className="!h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[90px] shrink-0 flex items-center justify-center p-0"
+                  className="!h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[85px] shrink-0 flex items-center justify-center p-0"
                 >
                   Clear Filter
                 </Button>
