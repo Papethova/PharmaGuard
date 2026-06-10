@@ -1952,14 +1952,20 @@ export default function App() {
     let qBase = query(transactionsRef);
 
     if (filterId) {
+      const selectedDrug = inventory.find(s => s.id === filterId);
+      const isCorrectSchedule = activeSchedule === "ALL" || (selectedDrug && selectedDrug.schedule === activeSchedule);
+      if (!isCorrectSchedule) {
+        return null;
+      }
       qBase = query(qBase, where("substanceId", "==", filterId));
     } else {
       const queryTerm = searchTerm.split(" - ")[0].split(" (")[0].trim().toLowerCase();
       
       const matched = inventory.filter(s => 
-        s.name.toLowerCase().includes(queryTerm) ||
-        s.ndc.toLowerCase().includes(queryTerm) ||
-        (s.strength && s.strength.toLowerCase().includes(queryTerm))
+        (activeSchedule === "ALL" || s.schedule === activeSchedule) &&
+        (s.name.toLowerCase().startsWith(queryTerm) ||
+         s.ndc.toLowerCase().startsWith(queryTerm) ||
+         (s.strength && s.strength.toLowerCase().startsWith(queryTerm)))
       );
 
       if (matched.length > 0) {
@@ -1977,7 +1983,7 @@ export default function App() {
     }
 
     return qBase;
-  }, [userUid, userEmail, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, inventory]);
+  }, [userUid, userEmail, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, inventory, activeSchedule]);
 
   // Execute deep searching strictly upon choosing/typing and pressing search.
   // Pulls the first page of up to 30 items and resolves total document count instantly via getCountFromServer
@@ -3448,6 +3454,16 @@ export default function App() {
       }
     }
   }, [transactions.length, syncLimit, filteredTransactions.length]);
+
+  // Dynamically page and fetch deeper results from the database if the active client-side filters (dates, types)
+  // filter out most fetched items and prevent scrollbars from displaying.
+  useEffect(() => {
+    if (searchedTransactions !== null && hasMoreSearchDocs && !isSearchingMore) {
+      if (filteredTransactions.length < 15) {
+        handleLoadMoreSearch();
+      }
+    }
+  }, [searchedTransactions, hasMoreSearchDocs, isSearchingMore, filteredTransactions.length, handleLoadMoreSearch]);
 
   // Auto-fill logic for Substance Detail History dialog, debounced to stop runaway queries costing unnecessary reads
   useEffect(() => {
@@ -5964,7 +5980,7 @@ export default function App() {
 
                 <div className="grid gap-1.5 w-[260px] shrink-0 relative">
                   <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
-                  <div className="flex items-center gap-1 w-full relative">
+                  <div className="relative w-full">
                     <Input
                       id="history-med-search"
                       placeholder="Type medication name..."
@@ -5985,25 +6001,15 @@ export default function App() {
                           handleTransactionSearch();
                         }
                       }}
-                      className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-3 flex-1 min-w-0"
+                      className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-3 w-full"
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setIsHistorySearchFocused(false);
-                        handleTransactionSearch();
-                      }}
-                      className="h-9 w-9 px-0 border-brand-grey/20 focus:ring-brand-blue bg-brand-surface hover:bg-brand-blue/5 text-brand-blue shrink-0 flex items-center justify-center p-0"
-                      title="Search complete history"
-                    >
-                      <Search className="h-4 w-4" />
-                    </Button>
                   </div>
                   {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
                     <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
                       {inventory
                         .filter(s => {
+                          const isCorrectSchedule = activeSchedule === "ALL" || s.schedule === activeSchedule;
+                          if (!isCorrectSchedule) return false;
                           const query = historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase();
                           return s.name.toLowerCase().startsWith(query) || 
                                  s.ndc.toLowerCase().startsWith(query) ||
