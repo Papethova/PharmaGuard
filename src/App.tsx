@@ -4158,7 +4158,7 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-              margin: 8mm 15mm 12mm 15mm;
+              margin: 0 !important;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4211,7 +4211,7 @@ export default function App() {
                 overflow: visible !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                background: white !important;
+                background: transparent !important;
               }
               #reconciliation-printable-invoice {
                 display: flex !important;
@@ -4223,10 +4223,13 @@ export default function App() {
                 min-height: 175mm !important;
                 overflow: visible !important;
                 max-height: none !important;
-                padding-top: 15mm !important;
-                padding-bottom: 12mm !important;
+                padding-top: 20mm !important;
+                padding-bottom: 20mm !important;
+                padding-left: 20mm !important;
+                padding-right: 20mm !important;
                 box-shadow: none !important;
                 border: none !important;
+                background: transparent !important;
                 box-sizing: border-box !important;
               }
               .is-safari #reconciliation-printable-invoice {
@@ -4235,8 +4238,11 @@ export default function App() {
                 min-height: 175mm !important;
                 position: static !important;
                 box-sizing: border-box !important;
-                padding-top: 15mm !important;
-                padding-bottom: 12mm !important;
+                padding-top: 20mm !important;
+                padding-bottom: 20mm !important;
+                padding-left: 20mm !important;
+                padding-right: 20mm !important;
+                background: transparent !important;
               }
               .is-safari #reconciliation-printable-invoice .print\\:fixed {
                 position: absolute !important;
@@ -4270,10 +4276,10 @@ export default function App() {
               .print-header {
                 display: flex !important;
                 position: fixed !important;
-                top: 4mm !important;
-                left: 15mm !important;
-                right: 15mm !important;
-                height: 6mm !important;
+                top: 10mm !important;
+                left: 20mm !important;
+                right: 20mm !important;
+                height: 8mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-bottom: 0.5px solid #e5e7eb !important;
@@ -4291,10 +4297,10 @@ export default function App() {
               .print-footer {
                 display: flex !important;
                 position: fixed !important;
-                bottom: 4mm !important;
-                left: 15mm !important;
-                right: 15mm !important;
-                height: 6mm !important;
+                bottom: 10mm !important;
+                left: 20mm !important;
+                right: 20mm !important;
+                height: 8mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-top: 0.5px solid #e5e7eb !important;
@@ -4331,14 +4337,14 @@ export default function App() {
                 height: 100% !important;
                 align-items: center !important;
                 justify-content: center !important;
-                z-index: -1000 !important;
+                z-index: -1 !important;
                 pointer-events: none !important;
                 opacity: 0.14 !important;
               }
             }
           `}</style>
         )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:pb-10" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           {/* Header element visible on screen preview, or as hidden print overlay */}
           <div className={isForPrint ? "print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
             <span>PHARMAGUARD RECONCILIATION REPORT</span>
@@ -6857,7 +6863,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 8mm 15mm 12mm 15mm;
+                                  margin: 0 !important;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6903,7 +6909,7 @@ export default function App() {
                                   overflow: visible !important;
                                   padding: 0 !important;
                                   margin: 0 !important;
-                                  background: white !important;
+                                  background: transparent !important;
                                 }
 
 
@@ -6919,8 +6925,11 @@ export default function App() {
                                   overflow: visible !important;
                                   box-shadow: none !important;
                                   border: none !important;
-                                  padding-top: 15mm !important;
-                                  padding-bottom: 12mm !important;
+                                  padding-top: 20mm !important;
+                                  padding-bottom: 20mm !important;
+                                  padding-left: 20mm !important;
+                                  padding-right: 20mm !important;
+                                  background: transparent !important;
                                   box-sizing: border-box !important;
                                 }
                                 .is-safari #reconciliation-printable-invoice {
@@ -6929,8 +6938,11 @@ export default function App() {
                                   min-height: 175mm !important;
                                   position: static !important;
                                   box-sizing: border-box !important;
-                                  padding-top: 15mm !important;
-                                  padding-bottom: 12mm !important;
+                                  padding-top: 20mm !important;
+                                  padding-bottom: 20mm !important;
+                                  padding-left: 20mm !important;
+                                  padding-right: 20mm !important;
+                                  background: transparent !important;
                                 }
                                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
                                   position: absolute !important;
@@ -6961,10 +6973,10 @@ export default function App() {
                                 .print-header {
                                   display: flex !important;
                                   position: fixed !important;
-                                  top: 4mm !important;
-                                  left: 15mm !important;
-                                  right: 15mm !important;
-                                  height: 6mm !important;
+                                  top: 10mm !important;
+                                  left: 20mm !important;
+                                  right: 20mm !important;
+                                  height: 8mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-bottom: 0.5px solid #e5e7eb !important;
@@ -6982,10 +6994,10 @@ export default function App() {
                                 .print-footer {
                                   display: flex !important;
                                   position: fixed !important;
-                                  bottom: 4mm !important;
-                                  left: 15mm !important;
-                                  right: 15mm !important;
-                                  height: 6mm !important;
+                                  bottom: 10mm !important;
+                                  left: 20mm !important;
+                                  right: 20mm !important;
+                                  height: 8mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-top: 0.5px solid #e5e7eb !important;
@@ -7009,7 +7021,7 @@ export default function App() {
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
-                                }
+                                  }
                                 .print-watermark {
                                   display: none !important;
                                 }
@@ -7022,7 +7034,7 @@ export default function App() {
                                   height: 100% !important;
                                   align-items: center !important;
                                   justify-content: center !important;
-                                  z-index: -1000 !important;
+                                  z-index: -1 !important;
                                   pointer-events: none !important;
                                   opacity: 0.14 !important;
                                 }
@@ -7071,7 +7083,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 8mm 15mm 12mm 15mm;
+                margin: 0 !important;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -7109,7 +7121,7 @@ export default function App() {
                   overflow: visible !important;
                   padding: 0 !important;
                   margin: 0 !important;
-                  background: white !important;
+                  background: transparent !important;
                 }
                 /* Support clean layout overrides for Safari and iOS Safari */
                 .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
@@ -7136,10 +7148,13 @@ export default function App() {
                   min-height: 175mm !important;
                   overflow: visible !important;
                   max-height: none !important;
-                  padding-top: 15mm !important;
-                  padding-bottom: 12mm !important;
+                  padding-top: 20mm !important;
+                  padding-bottom: 20mm !important;
+                  padding-left: 20mm !important;
+                  padding-right: 20mm !important;
                   box-shadow: none !important;
                   border: none !important;
+                  background: transparent !important;
                   box-sizing: border-box !important;
                 }
                 .is-safari #reconciliation-printable-invoice {
@@ -7148,8 +7163,11 @@ export default function App() {
                   min-height: 175mm !important;
                   position: static !important;
                   box-sizing: border-box !important;
-                  padding-top: 15mm !important;
-                  padding-bottom: 12mm !important;
+                  padding-top: 20mm !important;
+                  padding-bottom: 20mm !important;
+                  padding-left: 20mm !important;
+                  padding-right: 20mm !important;
+                  background: transparent !important;
                 }
                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
                   position: absolute !important;
@@ -7183,10 +7201,10 @@ export default function App() {
                 .print-header {
                   display: flex !important;
                   position: fixed !important;
-                  top: 4mm !important;
-                  left: 15mm !important;
-                  right: 15mm !important;
-                  height: 6mm !important;
+                  top: 10mm !important;
+                  left: 20mm !important;
+                  right: 20mm !important;
+                  height: 8mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-bottom: 0.5px solid #e5e7eb !important;
@@ -7204,10 +7222,10 @@ export default function App() {
                 .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 4mm !important;
-                  left: 15mm !important;
-                  right: 15mm !important;
-                  height: 6mm !important;
+                  bottom: 10mm !important;
+                  left: 20mm !important;
+                  right: 20mm !important;
+                  height: 8mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-top: 0.5px solid #e5e7eb !important;
@@ -7244,7 +7262,7 @@ export default function App() {
                   height: 100% !important;
                   align-items: center !important;
                   justify-content: center !important;
-                  z-index: -1000 !important;
+                  z-index: -1 !important;
                   pointer-events: none !important;
                   opacity: 0.14 !important;
                 }
