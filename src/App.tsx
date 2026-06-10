@@ -4199,10 +4199,36 @@ export default function App() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
-              .is-safari, .is-safari body {
-                width: 297mm !important;
-                height: auto !important;
-                min-height: 210mm !important;
+              @media print and (orientation: portrait) {
+                .is-safari, .is-safari body {
+                  width: 210mm !important;
+                  height: 297mm !important;
+                  overflow: visible !important;
+                }
+                .is-safari #reconciliation-printable-root {
+                  width: 297mm !important;
+                  height: 210mm !important;
+                  transform: rotate(90deg) translateY(-100%) !important;
+                  transform-origin: 0 0 !important;
+                  position: absolute !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  overflow: visible !important;
+                }
+              }
+              @media print and (orientation: landscape) {
+                .is-safari, .is-safari body {
+                  width: 297mm !important;
+                  height: auto !important;
+                  min-height: 210mm !important;
+                }
+                .is-safari #reconciliation-printable-root {
+                  width: 297mm !important;
+                  height: auto !important;
+                  min-height: 210mm !important;
+                  position: relative !important;
+                  transform: none !important;
+                }
               }
               body > *:not(#reconciliation-printable-root) {
                 display: none !important;
@@ -4216,12 +4242,6 @@ export default function App() {
                 padding: 0 !important;
                 margin: 0 !important;
                 background: white !important;
-              }
-              .is-safari #reconciliation-printable-root {
-                width: 297mm !important;
-                height: auto !important;
-                min-height: 210mm !important;
-                position: relative !important;
               }
               #reconciliation-printable-invoice {
                 display: flex !important;
@@ -6917,10 +6937,19 @@ export default function App() {
                                   background: white !important;
                                   color: black !important;
                                 }
-                                .is-safari, .is-safari body {
-                                  width: 297mm !important;
-                                  height: auto !important;
-                                  min-height: 210mm !important;
+                                @media print and (orientation: portrait) {
+                                  .is-safari, .is-safari body {
+                                    width: 210mm !important;
+                                    height: 297mm !important;
+                                    overflow: visible !important;
+                                  }
+                                }
+                                @media print and (orientation: landscape) {
+                                  .is-safari, .is-safari body {
+                                    width: 297mm !important;
+                                    height: auto !important;
+                                    min-height: 210mm !important;
+                                  }
                                 }
                                 body {
                                   margin: 0 !important;
@@ -6942,11 +6971,26 @@ export default function App() {
                                   margin: 0 !important;
                                   background: white !important;
                                 }
-                                .is-safari #reconciliation-printable-root {
-                                  width: 297mm !important;
-                                  height: auto !important;
-                                  min-height: 210mm !important;
-                                  position: relative !important;
+                                @media print and (orientation: portrait) {
+                                  .is-safari #reconciliation-printable-root {
+                                    width: 297mm !important;
+                                    height: 210mm !important;
+                                    transform: rotate(90deg) translateY(-100%) !important;
+                                    transform-origin: 0 0 !important;
+                                    position: absolute !important;
+                                    top: 0 !important;
+                                    left: 0 !important;
+                                    overflow: visible !important;
+                                  }
+                                }
+                                @media print and (orientation: landscape) {
+                                  .is-safari #reconciliation-printable-root {
+                                    width: 297mm !important;
+                                    height: auto !important;
+                                    min-height: 210mm !important;
+                                    position: relative !important;
+                                    transform: none !important;
+                                  }
                                 }
                                 #reconciliation-printable-invoice {
                                   display: flex !important;
@@ -7171,10 +7215,19 @@ export default function App() {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
-                .is-safari, .is-safari body {
-                  width: 297mm !important;
-                  height: auto !important;
-                  min-height: 210mm !important;
+                @media print and (orientation: portrait) {
+                  .is-safari, .is-safari body {
+                    width: 210mm !important;
+                    height: 297mm !important;
+                    overflow: visible !important;
+                  }
+                }
+                @media print and (orientation: landscape) {
+                  .is-safari, .is-safari body {
+                    width: 297mm !important;
+                    height: auto !important;
+                    min-height: 210mm !important;
+                  }
                 }
                 body > *:not(#reconciliation-printable-root) {
                   display: none !important;
@@ -7189,11 +7242,26 @@ export default function App() {
                   margin: 0 !important;
                   background: white !important;
                 }
-                .is-safari #reconciliation-printable-root {
-                  width: 297mm !important;
-                  height: auto !important;
-                  min-height: 210mm !important;
-                  position: relative !important;
+                @media print and (orientation: portrait) {
+                  .is-safari #reconciliation-printable-root {
+                    width: 297mm !important;
+                    height: 210mm !important;
+                    transform: rotate(90deg) translateY(-100%) !important;
+                    transform-origin: 0 0 !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    overflow: visible !important;
+                  }
+                }
+                @media print and (orientation: landscape) {
+                  .is-safari #reconciliation-printable-root {
+                    width: 297mm !important;
+                    height: auto !important;
+                    min-height: 210mm !important;
+                    position: relative !important;
+                    transform: none !important;
+                  }
                 }
                 #reconciliation-printable-invoice {
                   display: flex !important;
