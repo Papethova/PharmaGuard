@@ -1384,17 +1384,25 @@ export default function App() {
     testConnection();
 
     let unsubProfile: (() => void) | undefined;
+    let pendingUnauthTimeout: NodeJS.Timeout | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
+      if (pendingUnauthTimeout) {
+        clearTimeout(pendingUnauthTimeout);
+        pendingUnauthTimeout = undefined;
+      }
+
       if (!currentUser) {
-        setUser(null);
-        setUserProfile(null);
-        if (unsubProfile) unsubProfile();
-        setIsAuthReady(true);
-        setIsInitializing(false);
-        setEmail("");
-        setPassword("");
-        setOrgName("");
+        pendingUnauthTimeout = setTimeout(() => {
+          setUser(null);
+          setUserProfile(null);
+          if (unsubProfile) unsubProfile();
+          setIsAuthReady(true);
+          setIsInitializing(false);
+          setEmail("");
+          setPassword("");
+          setOrgName("");
+        }, 450); // 450ms debounce helps prevent intermediate login screen flashing during user reload/refresh
         return;
       }
       
@@ -1573,6 +1581,7 @@ export default function App() {
     return () => {
       clearTimeout(delayTimer);
       clearTimeout(bypassTimer);
+      if (pendingUnauthTimeout) clearTimeout(pendingUnauthTimeout);
       unsubAuth();
       if (unsubProfile) unsubProfile();
     };
@@ -4158,7 +4167,7 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-              margin: 12mm 15mm 12mm 15mm !important;
+              margin: 22mm 20mm 22mm 20mm !important;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4220,7 +4229,7 @@ export default function App() {
                 position: static !important;
                 width: 100% !important;
                 height: auto !important;
-                min-height: 175mm !important;
+                min-height: 170mm !important;
                 overflow: visible !important;
                 max-height: none !important;
                 padding: 0 !important;
@@ -4232,7 +4241,7 @@ export default function App() {
               .is-safari #reconciliation-printable-invoice {
                 width: 100% !important;
                 height: auto !important;
-                min-height: 175mm !important;
+                min-height: 170mm !important;
                 position: static !important;
                 box-sizing: border-box !important;
                 padding: 0 !important;
@@ -4254,12 +4263,96 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
+
+              /* Fixed Position running headers and footers printed on every landscape page */
+              .print-header {
+                display: flex !important;
+                position: fixed !important;
+                top: 8mm !important;
+                left: 20mm !important;
+                right: 20mm !important;
+                height: 8mm !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-bottom: 0.5px solid #e5e7eb !important;
+                padding-bottom: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8.5px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
+                box-sizing: border-box !important;
+              }
+              .print-footer {
+                display: flex !important;
+                position: fixed !important;
+                bottom: 8mm !important;
+                left: 20mm !important;
+                right: 20mm !important;
+                height: 8mm !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-top: 0.5px solid #e5e7eb !important;
+                padding-top: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8.5px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
+                box-sizing: border-box !important;
+              }
+              .print-page-number {
+                font-size: 0 !important;
+              }
+              .print-page-number::after {
+                font-size: 8.5px !important;
+                content: "PAGE " counter(page);
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+              }
+              .print-watermark {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: -1 !important;
+                pointer-events: none !important;
+                opacity: 0.14 !important;
+              }
             }
           `}</style>
         )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
-          {/* Header element visible on screen preview, or as hidden print overlay */}
-          <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none">
+          {isForPrint && (
+            <>
+              <div className="print-header hidden print:flex">
+                <span>PHARMAGUARD RECONCILIATION REPORT</span>
+                <span>{selectedHistoricalReport 
+                  ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                  : new Date().toLocaleDateString()
+                }</span>
+              </div>
+              <div className="print-watermark hidden print:flex">
+                <PharmaLogo className="w-[380px] h-[380px]" />
+              </div>
+              <div className="print-footer hidden print:flex">
+                <span>GENERATED WITH PHARMAGUARD</span>
+                <span className="print-page-number">PAGE 1</span>
+              </div>
+            </>
+          )}
+
+          {/* Header element visible on screen preview, but hidden during actual printing */}
+          <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
             <span>PHARMAGUARD RECONCILIATION REPORT</span>
             <span>{selectedHistoricalReport 
               ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
@@ -4267,8 +4360,8 @@ export default function App() {
             }</span>
           </div>
           
-          {/* Centered Watermark for Screen and Print */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.14]">
+          {/* Centered Watermark for Screen, hidden during printing */}
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:hidden">
             <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
@@ -6776,7 +6869,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 12mm 15mm 12mm 15mm !important;
+                                  margin: 22mm 20mm 22mm 20mm !important;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6907,7 +7000,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 12mm 15mm 12mm 15mm !important;
+                margin: 22mm 20mm 22mm 20mm !important;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -6969,7 +7062,7 @@ export default function App() {
                   position: static !important;
                   width: 100% !important;
                   height: auto !important;
-                  min-height: 175mm !important;
+                  min-height: 170mm !important;
                   overflow: visible !important;
                   max-height: none !important;
                   padding: 0 !important;
@@ -6981,7 +7074,7 @@ export default function App() {
                 .is-safari #reconciliation-printable-invoice {
                   width: 100% !important;
                   height: auto !important;
-                  min-height: 175mm !important;
+                  min-height: 170mm !important;
                   position: static !important;
                   box-sizing: border-box !important;
                   padding: 0 !important;
@@ -7002,6 +7095,71 @@ export default function App() {
                 .break-inside-avoid {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
+                }
+
+                /* Fixed Position running headers and footers printed on every landscape page */
+                .print-header {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 8mm !important;
+                  left: 20mm !important;
+                  right: 20mm !important;
+                  height: 8mm !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-bottom: 0.5px solid #e5e7eb !important;
+                  padding-bottom: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8.5px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                  box-sizing: border-box !important;
+                }
+                .print-footer {
+                  display: flex !important;
+                  position: fixed !important;
+                  bottom: 8mm !important;
+                  left: 20mm !important;
+                  right: 20mm !important;
+                  height: 8mm !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-top: 0.5px solid #e5e7eb !important;
+                  padding-top: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8.5px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                  box-sizing: border-box !important;
+                }
+                .print-page-number {
+                  font-size: 0 !important;
+                }
+                .print-page-number::after {
+                  font-size: 8.5px !important;
+                  content: "PAGE " counter(page);
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                }
+                .print-watermark {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  width: 100% !important;
+                  height: 100% !important;
+                  align-items: center !important;
+                  justify-content: center !important;
+                  z-index: -1 !important;
+                  pointer-events: none !important;
+                  opacity: 0.14 !important;
                 }
               }
             `}</style>
