@@ -4158,7 +4158,7 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-              margin: 0 !important;
+              margin: 12mm 15mm 12mm 15mm !important;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4223,10 +4223,7 @@ export default function App() {
                 min-height: 175mm !important;
                 overflow: visible !important;
                 max-height: none !important;
-                padding-top: 20mm !important;
-                padding-bottom: 20mm !important;
-                padding-left: 20mm !important;
-                padding-right: 20mm !important;
+                padding: 0 !important;
                 box-shadow: none !important;
                 border: none !important;
                 background: transparent !important;
@@ -4238,23 +4235,8 @@ export default function App() {
                 min-height: 175mm !important;
                 position: static !important;
                 box-sizing: border-box !important;
-                padding-top: 20mm !important;
-                padding-bottom: 20mm !important;
-                padding-left: 20mm !important;
-                padding-right: 20mm !important;
+                padding: 0 !important;
                 background: transparent !important;
-              }
-              .is-safari #reconciliation-printable-invoice .print\\:fixed {
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                height: 100% !important;
-                width: 100% !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
               }
               #reconciliation-printable-root * {
                 visibility: visible !important;
@@ -4272,81 +4254,12 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-              /* Define fixed position headers across all systems during print */
-              .print-header {
-                display: flex !important;
-                position: fixed !important;
-                top: 10mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
-                height: 8mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8.5px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
-                box-sizing: border-box !important;
-              }
-              /* Define fixed position footers across all systems during print */
-              .print-footer {
-                display: flex !important;
-                position: fixed !important;
-                bottom: 10mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
-                height: 8mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8.5px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
-                box-sizing: border-box !important;
-              }
-              /* Dynamic counter page numbers across all systems for landscape print layout */
-              .print-page-number {
-                font-size: 0 !important;
-              }
-              .print-page-number::after {
-                font-size: 8.5px !important;
-                content: "PAGE " counter(page);
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-              }
-              .print-watermark {
-                display: none !important;
-              }
-              .print-watermark {
-                display: flex !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                align-items: center !important;
-                justify-content: center !important;
-                z-index: -1 !important;
-                pointer-events: none !important;
-                opacity: 0.14 !important;
-              }
             }
           `}</style>
         )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           {/* Header element visible on screen preview, or as hidden print overlay */}
-          <div className={isForPrint ? "print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+          <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none">
             <span>PHARMAGUARD RECONCILIATION REPORT</span>
             <span>{selectedHistoricalReport 
               ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
@@ -4354,8 +4267,8 @@ export default function App() {
             }</span>
           </div>
           
-          {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
-          <div className={isForPrint ? "print-watermark" : "absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20]"}>
+          {/* Centered Watermark for Screen and Print */}
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.14]">
             <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
@@ -4634,9 +4547,9 @@ export default function App() {
           </div>
 
           {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
-          <div className={isForPrint ? "print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+          <div className="flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none">
             <span>GENERATED WITH PHARMAGUARD</span>
-            <span className="text-right print-page-number">PAGE 1 OF 1</span>
+            <span className="text-right">PAGE 1 OF 1</span>
           </div>
 
         </div>
@@ -6863,7 +6776,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 0 !important;
+                                  margin: 12mm 15mm 12mm 15mm !important;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6911,8 +6824,6 @@ export default function App() {
                                   margin: 0 !important;
                                   background: transparent !important;
                                 }
-
-
                                 #reconciliation-printable-invoice {
                                   display: flex !important;
                                   flex-direction: column !important;
@@ -6925,10 +6836,7 @@ export default function App() {
                                   overflow: visible !important;
                                   box-shadow: none !important;
                                   border: none !important;
-                                  padding-top: 20mm !important;
-                                  padding-bottom: 20mm !important;
-                                  padding-left: 20mm !important;
-                                  padding-right: 20mm !important;
+                                  padding: 0 !important;
                                   background: transparent !important;
                                   box-sizing: border-box !important;
                                 }
@@ -6938,23 +6846,8 @@ export default function App() {
                                   min-height: 175mm !important;
                                   position: static !important;
                                   box-sizing: border-box !important;
-                                  padding-top: 20mm !important;
-                                  padding-bottom: 20mm !important;
-                                  padding-left: 20mm !important;
-                                  padding-right: 20mm !important;
+                                  padding: 0 !important;
                                   background: transparent !important;
-                                }
-                                .is-safari #reconciliation-printable-invoice .print\\:fixed {
-                                  position: absolute !important;
-                                  top: 0 !important;
-                                  left: 0 !important;
-                                  right: 0 !important;
-                                  bottom: 0 !important;
-                                  height: 100% !important;
-                                  width: 100% !important;
-                                  display: flex !important;
-                                  align-items: center !important;
-                                  justify-content: center !important;
                                 }
                                 table, tbody, thead, th, td {
                                   page-break-inside: auto !important;
@@ -6968,75 +6861,6 @@ export default function App() {
                                 .break-inside-avoid {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
-                                }
-                                /* Define fixed position headers across all systems during print */
-                                .print-header {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  top: 10mm !important;
-                                  left: 20mm !important;
-                                  right: 20mm !important;
-                                  height: 8mm !important;
-                                  justify-content: space-between !important;
-                                  align-items: center !important;
-                                  border-bottom: 0.5px solid #e5e7eb !important;
-                                  padding-bottom: 1.5mm !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8.5px !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  z-index: 9999 !important;
-                                  background: white !important;
-                                  text-transform: uppercase !important;
-                                  box-sizing: border-box !important;
-                                }
-                                /* Define fixed position footers across all systems during print */
-                                .print-footer {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  bottom: 10mm !important;
-                                  left: 20mm !important;
-                                  right: 20mm !important;
-                                  height: 8mm !important;
-                                  justify-content: space-between !important;
-                                  align-items: center !important;
-                                  border-top: 0.5px solid #e5e7eb !important;
-                                  padding-top: 1.5mm !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8.5px !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  z-index: 9999 !important;
-                                  background: white !important;
-                                  text-transform: uppercase !important;
-                                  box-sizing: border-box !important;
-                                }
-                                /* Dynamic counter page numbers across all systems for landscape print layout */
-                                .print-page-number {
-                                  font-size: 0 !important;
-                                }
-                                .print-page-number::after {
-                                  font-size: 8.5px !important;
-                                  content: "PAGE " counter(page);
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  }
-                                .print-watermark {
-                                  display: none !important;
-                                }
-                                .print-watermark {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  top: 0 !important;
-                                  left: 0 !important;
-                                  width: 100% !important;
-                                  height: 100% !important;
-                                  align-items: center !important;
-                                  justify-content: center !important;
-                                  z-index: -1 !important;
-                                  pointer-events: none !important;
-                                  opacity: 0.14 !important;
                                 }
                               </style>
                             </head>
@@ -7083,7 +6907,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 0 !important;
+                margin: 12mm 15mm 12mm 15mm !important;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -7148,10 +6972,7 @@ export default function App() {
                   min-height: 175mm !important;
                   overflow: visible !important;
                   max-height: none !important;
-                  padding-top: 20mm !important;
-                  padding-bottom: 20mm !important;
-                  padding-left: 20mm !important;
-                  padding-right: 20mm !important;
+                  padding: 0 !important;
                   box-shadow: none !important;
                   border: none !important;
                   background: transparent !important;
@@ -7163,23 +6984,8 @@ export default function App() {
                   min-height: 175mm !important;
                   position: static !important;
                   box-sizing: border-box !important;
-                  padding-top: 20mm !important;
-                  padding-bottom: 20mm !important;
-                  padding-left: 20mm !important;
-                  padding-right: 20mm !important;
+                  padding: 0 !important;
                   background: transparent !important;
-                }
-                .is-safari #reconciliation-printable-invoice .print\\:fixed {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
-                  bottom: 0 !important;
-                  height: 100% !important;
-                  width: 100% !important;
-                  display: flex !important;
-                  align-items: center !important;
-                  justify-content: center !important;
                 }
                 #reconciliation-printable-root * {
                   visibility: visible !important;
@@ -7196,75 +7002,6 @@ export default function App() {
                 .break-inside-avoid {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
-                }
-                /* Define fixed position headers across all systems during print */
-                .print-header {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 10mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
-                  height: 8mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8.5px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
-                  box-sizing: border-box !important;
-                }
-                /* Define fixed position footers across all systems during print */
-                .print-footer {
-                  display: flex !important;
-                  position: fixed !important;
-                  bottom: 10mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
-                  height: 8mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8.5px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
-                  box-sizing: border-box !important;
-                }
-                /* Dynamic counter page numbers across all systems for landscape print layout */
-                .print-page-number {
-                  font-size: 0 !important;
-                }
-                .print-page-number::after {
-                  font-size: 8.5px !important;
-                  content: "PAGE " counter(page);
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                }
-                .print-watermark {
-                  display: none !important;
-                }
-                .print-watermark {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  align-items: center !important;
-                  justify-content: center !important;
-                  z-index: -1 !important;
-                  pointer-events: none !important;
-                  opacity: 0.14 !important;
                 }
               }
             `}</style>
