@@ -115,7 +115,9 @@ import {
   deleteDoc,
   limit,
   where,
-  getDocsFromCache
+  getDocsFromCache,
+  startAfter,
+  getCountFromServer
 } from "firebase/firestore";
 
 
@@ -397,6 +399,16 @@ export default function App() {
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [inventory, setInventory] = useState<Substance[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [searchedTransactions, setSearchedTransactions] = useState<Transaction[] | null>(null);
+  const [isSearchingDb, setIsSearchingDb] = useState(false);
+  const [searchedTransactionsCount, setSearchedTransactionsCount] = useState<number | null>(null);
+  const [lastSearchedDoc, setLastSearchedDoc] = useState<any | null>(null);
+  const [hasMoreSearchDocs, setHasMoreSearchDocs] = useState(true);
+  const [isSearchingMore, setIsSearchingMore] = useState(false);
+  const transactionsRefVal = useRef<Transaction[]>([]);
+  useEffect(() => {
+    transactionsRefVal.current = transactions;
+  }, [transactions]);
   const [isLogOpen, setIsLogOpen] = useState(false);
   
   // Reset form when dialog closes or on initialization
@@ -438,6 +450,10 @@ export default function App() {
 
   // Medication-specific transactions listener state for high-performance and deep history
   const [substanceTransactions, setSubstanceTransactions] = useState<Transaction[]>([]);
+  const substanceTransactionsRef = useRef<Transaction[]>([]);
+  useEffect(() => {
+    substanceTransactionsRef.current = substanceTransactions;
+  }, [substanceTransactions]);
   const [substanceHistoryLimit, setSubstanceHistoryLimit] = useState<number>(30);
   const isIncrementingSubstanceLimitRef = useRef(false);
   const [isUsingFallback, setIsUsingFallback] = useState<boolean>(false);
@@ -1736,30 +1752,53 @@ export default function App() {
     if (!emailId) return;
 
     const txRef = collection(db, "users", emailId, "transactions");
-    const q = query(
-      txRef,
-      where("substanceId", "==", selectedSubstanceDetail.id),
-      orderBy("timestamp", "desc"),
-      limit(limitCount)
-    );
+    
+    // Check if we are loading more/next page for the currently selected substance
+    const existing = substanceTransactionsRef.current;
+    const hasExisting = existing.length > 0 && existing[0].substanceId === selectedSubstanceDetail.id;
+    const isFetchingMore = hasExisting && limitCount > existing.length;
+
+    let q;
+    if (isFetchingMore) {
+      const lastTx = existing[existing.length - 1];
+      q = query(
+        txRef,
+        where("substanceId", "==", selectedSubstanceDetail.id),
+        orderBy("timestamp", "desc"),
+        startAfter(lastTx.timestamp),
+        limit(30)
+      );
+    } else {
+      q = query(
+        txRef,
+        where("substanceId", "==", selectedSubstanceDetail.id),
+        orderBy("timestamp", "desc"),
+        limit(limitCount)
+      );
+    }
 
     try {
+      let snapshot;
       try {
-        const snapshot = await getDocsFromCache(q);
-        if (!snapshot.empty) {
-          const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-          setSubstanceTransactions(items);
-          setIsUsingFallback(false);
-          setIsLoadingSubstanceTransactions(false);
-          return;
+        snapshot = await getDocsFromCache(q);
+        if (snapshot.empty && !isFetchingMore) {
+          snapshot = await getDocs(q);
         }
       } catch (cacheErr) {
-        // Fall through
+        snapshot = await getDocs(q);
       }
 
-      const snapshotServer = await getDocs(q);
-      const items = snapshotServer.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-      setSubstanceTransactions(items);
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      
+      if (isFetchingMore) {
+        setSubstanceTransactions(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const filteredNew = items.filter(n => !existingIds.has(n.id));
+          return [...prev, ...filteredNew];
+        });
+      } else {
+        setSubstanceTransactions(items);
+      }
       setIsUsingFallback(false);
     } catch (error: any) {
       if (error.code === 'failed-precondition' || error.message?.includes('index')) {
@@ -1803,15 +1842,36 @@ export default function App() {
     fetchSubstanceTransactions(substanceHistoryLimit);
   }, [userUid, selectedSubstanceDetail?.id, substanceHistoryLimit, fetchSubstanceTransactions]);
 
+  // Main live transactions listener - permanently capped at 30 items for high efficiency, merging new entries into historical state
   useEffect(() => {
     if (!userUid) return;
 
     const emailId = userEmail?.toLowerCase() || userUid;
     const transactionsRef = collection(db, "users", emailId, "transactions");
 
-    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(syncLimit)), (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-      setTransactions(items);
+    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(30)), (snapshot) => {
+      setTransactions((prev) => {
+        const liveItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+        if (liveItems.length === 0) return [];
+        
+        const oldestLiveTimestamp = liveItems[liveItems.length - 1].timestamp;
+        const oldestTime = oldestLiveTimestamp?.toDate 
+          ? oldestLiveTimestamp.toDate().getTime() 
+          : new Date(oldestLiveTimestamp).getTime();
+
+        const liveIds = new Set(liveItems.map(l => l.id));
+        const historicalItems = prev.filter(p => {
+          if (liveIds.has(p.id)) return false;
+          const pTime = p.timestamp?.toDate ? p.timestamp.toDate().getTime() : new Date(p.timestamp).getTime();
+          return pTime < oldestTime;
+        });
+
+        return [...liveItems, ...historicalItems].sort((a, b) => {
+          const tA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+          const tB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+          return tB - tA;
+        });
+      });
     }, (error) => {
       if (userProfile?.status === 'active') {
         handleFirestoreError(error, OperationType.LIST, `users/${userUid}/transactions`);
@@ -1821,7 +1881,216 @@ export default function App() {
     });
 
     return () => unsubTransactions();
-  }, [userUid, userEmail, userProfile?.status, syncLimit]);
+  }, [userUid, userEmail, userProfile?.status]);
+
+  // Lazy loading incremental pages for older historical records as the user scrolls
+  const lastFetchedLimitRef = useRef(30);
+  useEffect(() => {
+    if (!userUid) return;
+    
+    if (syncLimit <= 30) {
+      lastFetchedLimitRef.current = 30;
+      return;
+    }
+
+    if (syncLimit <= lastFetchedLimitRef.current) return;
+    lastFetchedLimitRef.current = syncLimit;
+
+    const fetchMore = async () => {
+      try {
+        const emailId = userEmail?.toLowerCase() || userUid;
+        const transactionsRef = collection(db, "users", emailId, "transactions");
+        
+        const currentList = transactionsRefVal.current;
+        if (currentList.length === 0) return;
+        
+        const lastTx = currentList[currentList.length - 1];
+        const lastTimestamp = lastTx.timestamp;
+
+        const q = query(
+          transactionsRef,
+          orderBy("timestamp", "desc"),
+          startAfter(lastTimestamp),
+          limit(30)
+        );
+
+        const snap = await getDocs(q);
+        const newItems = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+
+        if (newItems.length > 0) {
+          setTransactions(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const filteredNew = newItems.filter(n => !existingIds.has(n.id));
+            return [...prev, ...filteredNew].sort((a, b) => {
+              const tA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+              const tB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+              return tB - tA;
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching more transactions:", err);
+      }
+    };
+
+    fetchMore();
+  }, [syncLimit, userUid, userEmail]);
+
+  // Helper to compile the active base query for transaction search
+  const getSearchBaseQuery = useCallback((selectedSubstanceId?: string) => {
+    if (!userUid) return null;
+    const emailId = userEmail?.toLowerCase() || userUid;
+    const transactionsRef = collection(db, "users", emailId, "transactions");
+
+    const filterId = selectedSubstanceId || historyMedicationFilter;
+    const searchTerm = historyMedicationSearch.trim();
+
+    if (!filterId && !searchTerm) {
+      return null;
+    }
+
+    let qBase = query(transactionsRef);
+
+    if (filterId) {
+      qBase = query(qBase, where("substanceId", "==", filterId));
+    } else {
+      const queryTerm = searchTerm.split(" - ")[0].split(" (")[0].trim().toLowerCase();
+      
+      const matched = inventory.filter(s => 
+        s.name.toLowerCase().includes(queryTerm) ||
+        s.ndc.toLowerCase().includes(queryTerm) ||
+        (s.strength && s.strength.toLowerCase().includes(queryTerm))
+      );
+
+      if (matched.length > 0) {
+        const matchedIds = matched.map(s => s.id);
+        const sliceIds = matchedIds.slice(0, 30); // limit for IN operator list
+        qBase = query(qBase, where("substanceId", "in", sliceIds));
+      } else {
+        // Fallback search that matches nothing directly
+        return null;
+      }
+    }
+
+    if (historyTypeFilter !== "All") {
+      qBase = query(qBase, where("type", "==", historyTypeFilter));
+    }
+
+    return qBase;
+  }, [userUid, userEmail, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, inventory]);
+
+  // Execute deep searching strictly upon choosing/typing and pressing search.
+  // Pulls the first page of up to 30 items and resolves total document count instantly via getCountFromServer
+  const handleTransactionSearch = useCallback(async (selectedSubstanceId?: string) => {
+    if (!userUid) return;
+    setIsSearchingDb(true);
+    setSearchedTransactionsCount(null);
+
+    try {
+      const qBase = getSearchBaseQuery(selectedSubstanceId);
+      if (!qBase) {
+        setSearchedTransactions([]);
+        setSearchedTransactionsCount(0);
+        setLastSearchedDoc(null);
+        setHasMoreSearchDocs(false);
+        setIsSearchingDb(false);
+        return;
+      }
+
+      // 1. Fetch count from firestore server metadata (extremely optimized / cheap)
+      try {
+        const countSnap = await getCountFromServer(qBase);
+        setSearchedTransactionsCount(countSnap.data().count);
+      } catch (countErr) {
+        console.error("Error executing database matches count:", countErr);
+        setSearchedTransactionsCount(null);
+      }
+
+      // 2. Fetch first 30 documents
+      let snap;
+      try {
+        const qSorted = query(qBase, orderBy("timestamp", "desc"), limit(30));
+        snap = await getDocs(qSorted);
+      } catch (sortErr) {
+        console.warn("Index not found or sorting failed, falling back to unsorted fetch + client sort:", sortErr);
+        const qUnsorted = query(qBase, limit(30)); 
+        snap = await getDocs(qUnsorted);
+      }
+
+      const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      const sortedItems = [...items].sort((a, b) => {
+        const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+        const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+        return dateB - dateA;
+      });
+
+      setSearchedTransactions(sortedItems);
+      setLastSearchedDoc(snap.docs[snap.docs.length - 1] || null);
+      setHasMoreSearchDocs(snap.docs.length >= 30);
+    } catch (err) {
+      console.error("Error conducting paginated transaction search:", err);
+      setSearchedTransactions([]);
+    } finally {
+      setIsSearchingDb(false);
+    }
+  }, [userUid, getSearchBaseQuery]);
+
+  // Support lazy loading next pages (of 30 docs) on scroll of searchedTransactions list
+  const handleLoadMoreSearch = useCallback(async () => {
+    if (isSearchingMore || !hasMoreSearchDocs || !lastSearchedDoc || !userUid) return;
+    setIsSearchingMore(true);
+
+    try {
+      const qBase = getSearchBaseQuery();
+      if (!qBase) {
+        setIsSearchingMore(false);
+        return;
+      }
+
+      let snap;
+      try {
+        const qSorted = query(qBase, orderBy("timestamp", "desc"), startAfter(lastSearchedDoc), limit(30));
+        snap = await getDocs(qSorted);
+      } catch (sortErr) {
+        console.warn("Index not found or sorting failed for next page, falling back to unsorted next page:", sortErr);
+        const qUnsorted = query(qBase, startAfter(lastSearchedDoc), limit(30));
+        snap = await getDocs(qUnsorted);
+      }
+
+      const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      if (items.length > 0) {
+        setSearchedTransactions(prev => {
+          const combined = prev ? [...prev, ...items] : items;
+          const seen = new Set();
+          return combined.filter(t => {
+            if (seen.has(t.id)) return false;
+            seen.add(t.id);
+            return true;
+          }).sort((a, b) => {
+            const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+            const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+            return dateB - dateA;
+          });
+        });
+        setLastSearchedDoc(snap.docs[snap.docs.length - 1] || null);
+      }
+      setHasMoreSearchDocs(snap.docs.length >= 30);
+    } catch (err) {
+      console.error("Error pagination loading more search transactions:", err);
+    } finally {
+      setIsSearchingMore(false);
+    }
+  }, [userUid, isSearchingMore, hasMoreSearchDocs, lastSearchedDoc, getSearchBaseQuery]);
+
+  // Instantly restore standard live scroll stream when search inputs are fully cleared
+  useEffect(() => {
+    if (!historyMedicationFilter && !historyMedicationSearch.trim()) {
+      setSearchedTransactions(null);
+      setSearchedTransactionsCount(null);
+      setLastSearchedDoc(null);
+      setHasMoreSearchDocs(true);
+    }
+  }, [historyMedicationFilter, historyMedicationSearch]);
 
   // Super Admin Listener
   useEffect(() => {
@@ -3117,8 +3386,9 @@ export default function App() {
       .sort(compareSubstances),
   [inventory, activeSchedule]);
 
-  const filteredTransactions = useMemo(() => 
-    transactions
+  const filteredTransactions = useMemo(() => {
+    const list = searchedTransactions !== null ? searchedTransactions : transactions;
+    return list
       .filter(t => {
         // Exclude all reconciliation report transactions (reference starting with REC- or RECON-)
         if (t.referenceNumber && (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))) {
@@ -3147,8 +3417,8 @@ export default function App() {
         const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
         const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
         return dateB - dateA;
-      }),
-  [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
+      });
+  }, [transactions, searchedTransactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
 
   const medicationHistoryTransactions = useMemo(() => {
     const rawTxs = isUsingFallback
@@ -5692,29 +5962,44 @@ export default function App() {
                   />
                 </div>
 
-                <div className="grid gap-1.5 w-[240px] shrink-0 relative">
+                <div className="grid gap-1.5 w-[260px] shrink-0 relative">
                   <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
-                  <Input
-                    id="history-med-search"
-                    placeholder="Search medication..."
-                    value={historyMedicationSearch}
-                    onChange={(e) => {
-                      setHistoryMedicationSearch(e.target.value);
-                      setHistoryMedicationFilter(""); 
-                      setIsHistorySearchFocused(true);
-                    }}
-                    onFocus={() => setIsHistorySearchFocused(true)}
-                    onBlur={() => {
-                      // Small delay to allow clicking on list items
-                      setTimeout(() => setIsHistorySearchFocused(false), 200);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                  <div className="flex items-center gap-1 w-full relative">
+                    <Input
+                      id="history-med-search"
+                      placeholder="Type medication name..."
+                      value={historyMedicationSearch}
+                      onChange={(e) => {
+                        setHistoryMedicationSearch(e.target.value);
+                        setHistoryMedicationFilter(""); 
+                        setIsHistorySearchFocused(true);
+                      }}
+                      onFocus={() => setIsHistorySearchFocused(true)}
+                      onBlur={() => {
+                        // Small delay to allow clicking on list items
+                        setTimeout(() => setIsHistorySearchFocused(false), 200);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          setIsHistorySearchFocused(false);
+                          handleTransactionSearch();
+                        }
+                      }}
+                      className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-3 flex-1 min-w-0"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
                         setIsHistorySearchFocused(false);
-                      }
-                    }}
-                    className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4 w-full"
-                  />
+                        handleTransactionSearch();
+                      }}
+                      className="h-9 w-9 px-0 border-brand-grey/20 focus:ring-brand-blue bg-brand-surface hover:bg-brand-blue/5 text-brand-blue shrink-0 flex items-center justify-center p-0"
+                      title="Search complete history"
+                    >
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </div>
                   {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
                     <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
                       {inventory
@@ -5730,7 +6015,10 @@ export default function App() {
                             className="px-3 py-2 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group"
                             onClick={() => {
                               setHistoryMedicationFilter(s.id);
-                              setHistoryMedicationSearch(s.name);
+                              const fullText = s.strength ? `${s.name} ${s.strength}` : s.name;
+                              setHistoryMedicationSearch(fullText);
+                              setIsHistorySearchFocused(false);
+                              handleTransactionSearch(s.id);
                             }}
                           >
                             <div className="flex flex-col">
@@ -5800,6 +6088,10 @@ export default function App() {
                     setHistoryMedicationFilter("");
                     setHistoryMedicationSearch("");
                     setHistoryTypeFilter("All");
+                    setSearchedTransactions(null);
+                    setSearchedTransactionsCount(null);
+                    setLastSearchedDoc(null);
+                    setHasMoreSearchDocs(true);
                   }}
                   className="!h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[90px] shrink-0 flex items-center justify-center p-0"
                 >
@@ -5807,7 +6099,14 @@ export default function App() {
                 </Button>
 
                 <div className="ml-auto shrink-0 h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap px-1">
-                  Showing {filteredTransactions.length} transactions
+                  {isSearchingDb ? (
+                    <span className="flex items-center gap-1.5 animate-pulse text-brand-blue font-semibold">
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-blue animate-ping" />
+                      Searching deep history...
+                    </span>
+                  ) : (
+                    `Showing ${searchedTransactions !== null && searchedTransactionsCount !== null ? searchedTransactionsCount : filteredTransactions.length} transactions`
+                  )}
                 </div>
               </div>
 
@@ -5838,7 +6137,11 @@ export default function App() {
                     setAuditScrollTop(roundedScrollTop);
                   }
                   if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
-                    if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
+                    if (searchedTransactions !== null) {
+                      if (hasMoreSearchDocs && !isSearchingMore) {
+                        handleLoadMoreSearch();
+                      }
+                    } else if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
                       isIncrementingSyncLimitRef.current = true;
                       setSyncLimit(prev => prev + 30);
                       setTimeout(() => {
