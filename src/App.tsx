@@ -425,8 +425,26 @@ export default function App() {
   const [selectedSubstanceDetail, setSelectedSubstanceDetail] = useState<Substance | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  // Local date helper functions for default range initialization (7 days)
+  const getNDaysAgoDateString = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [startDate, setStartDate] = useState(() => getNDaysAgoDateString(7));
+  const [endDate, setEndDate] = useState(() => getTodayDateString());
   const [historyMedicationFilter, setHistoryMedicationFilter] = useState("");
   const [historyMedicationSearch, setHistoryMedicationSearch] = useState("");
   const [isHistorySearchFocused, setIsHistorySearchFocused] = useState(false);
@@ -6089,8 +6107,8 @@ export default function App() {
                 <Button 
                   variant="outline" 
                   onClick={() => { 
-                    setStartDate(""); 
-                    setEndDate(""); 
+                    setStartDate(getNDaysAgoDateString(7)); 
+                    setEndDate(getTodayDateString()); 
                     setHistoryMedicationFilter("");
                     setHistoryMedicationSearch("");
                     setHistoryTypeFilter("All");
