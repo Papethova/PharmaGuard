@@ -4366,7 +4366,7 @@ export default function App() {
           </div>
           
           {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.24] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.14] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
             <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
