@@ -4244,7 +4244,7 @@ export default function App() {
                 }
               }
 
-              /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page */
+              /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
               .is-ios-safari, .is-ios-safari body {
                 width: 210mm !important;
                 height: 297mm !important;
@@ -4254,7 +4254,7 @@ export default function App() {
               .is-ios-safari #reconciliation-printable-root {
                 width: 297mm !important;
                 height: 210mm !important;
-                transform: rotate(90deg) translate(0, -210mm) !important;
+                transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
                 transform-origin: 0 0 !important;
                 position: absolute !important;
                 top: 0 !important;
@@ -7026,7 +7026,7 @@ export default function App() {
                                   }
                                 }
 
-                                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page */
+                                /* iOS / iPadOS Safari: ALWAYS force landscape rotation on portrait page with perfect scaling to fit boundaries and margins precisely */
                                 .is-ios-safari, .is-ios-safari body {
                                   width: 210mm !important;
                                   height: 297mm !important;
@@ -7036,7 +7036,7 @@ export default function App() {
                                 .is-ios-safari #reconciliation-printable-root {
                                   width: 297mm !important;
                                   height: 210mm !important;
-                                  transform: rotate(90deg) translate(0, -210mm) !important;
+                                  transform: rotate(90deg) translate(26.73mm, -191.1mm) scale(0.82) !important;
                                   transform-origin: 0 0 !important;
                                   position: absolute !important;
                                   top: 0 !important;
