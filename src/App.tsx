@@ -326,7 +326,9 @@ const parseCompoundStrength = (str: string): { first: number; second: number } =
 
 const isSafariOrIPad = typeof window !== "undefined" && (
   /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
-  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh"))
+  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh")) ||
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  /CriOS|FxiOS/.test(navigator.userAgent)
 );
 
 const compareSubstances = (a: any, b: any): number => {
@@ -4201,9 +4203,10 @@ export default function App() {
               }
               @media print and (orientation: portrait) {
                 .is-safari, .is-safari body {
-                  width: 210mm !important;
-                  height: 297mm !important;
+                  width: 297mm !important;
+                  height: 210mm !important;
                   overflow: visible !important;
+                  position: relative !important;
                 }
                 .is-safari #reconciliation-printable-root {
                   width: 297mm !important;
@@ -7140,6 +7143,18 @@ export default function App() {
                             </body>
                           </html>
                         `);
+                        printWindow.document.write(`
+                          <style>
+                            @media print and (orientation: portrait) {
+                              .is-safari, .is-safari body {
+                                width: 297mm !important;
+                                height: 210mm !important;
+                                overflow: visible !important;
+                                position: relative !important;
+                              }
+                            }
+                          </style>
+                        `);
                         printWindow.document.close();
                         printedViaPopup = true;
                       }
@@ -7217,9 +7232,10 @@ export default function App() {
                 }
                 @media print and (orientation: portrait) {
                   .is-safari, .is-safari body {
-                    width: 210mm !important;
-                    height: 297mm !important;
+                    width: 297mm !important;
+                    height: 210mm !important;
                     overflow: visible !important;
+                    position: relative !important;
                   }
                 }
                 @media print and (orientation: landscape) {
