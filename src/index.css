@@ -247,7 +247,7 @@
 @media print {
   @page {
     size: landscape;
-    margin: 10mm 15mm 15mm 15mm;
+    margin: 18mm 20mm 18mm 20mm !important;
   }
   html, body {
     position: static !important;
@@ -320,7 +320,7 @@
     position: static !important;
     width: 100% !important;
     height: auto !important;
-    min-height: 175mm !important;
+    min-height: 145mm !important;
     max-height: none !important;
     overflow: visible !important;
     padding: 0 !important;
