@@ -4166,15 +4166,15 @@ export default function App() {
         {/* Visual Official Letterhead */}
         <div className="flex justify-between items-end pb-0">
           <div className="flex flex-col space-y-1 min-w-0 flex-1">
-            <h1 className={`${isForPrint ? "text-[22px]" : "text-xl"} font-extrabold tracking-tight uppercase leading-none whitespace-nowrap`}>{getReportTitle().toUpperCase()}</h1>
-            <p className={`${isForPrint ? "text-[12px]" : "text-xs"} text-gray-900 font-sans leading-none whitespace-nowrap`}>REPORT #: {(() => {
+            <h1 className="text-xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
+            <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
               const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
               return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
             })()}</p>
-            <p className={`${isForPrint ? "text-[12px]" : "text-xs"} text-gray-900 font-sans leading-none whitespace-nowrap`}>REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+            <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
           </div>
           <div className="text-right flex flex-col items-end justify-end space-y-1 shrink-0 whitespace-nowrap ml-4">
-            <p className={`${isForPrint ? "text-[12px]" : "text-xs"} font-bold font-sans text-gray-900 leading-none whitespace-nowrap`}>
+            <p className="text-xs font-bold font-sans text-gray-900 leading-none whitespace-nowrap">
               COMPLETED BY: {
                 selectedHistoricalReport
                   ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
@@ -4184,7 +4184,7 @@ export default function App() {
                     })()
               }
             </p>
-            <p className={`${isForPrint ? "text-[12px]" : "text-xs"} font-normal font-sans text-gray-900 leading-none whitespace-nowrap font-medium`}>DATE EXECUTED: {
+            <p className="text-xs font-normal font-sans text-gray-900 leading-none whitespace-nowrap font-medium">DATE EXECUTED: {
               selectedHistoricalReport 
                 ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                 : new Date().toLocaleDateString()
@@ -4193,7 +4193,7 @@ export default function App() {
         </div>
 
         {/* Audit Grid/Table */}
-        <div className={isForPrint ? "mt-5" : "!mt-1"}>
+        <div className="!mt-1">
           <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
             <colgroup>
               <col className="w-[33%]" />
@@ -4208,58 +4208,58 @@ export default function App() {
             </colgroup>
             <thead>
               <tr className="border-t-2 border-gray-900">
-                <th rowSpan={2} className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>MEDICATION</span>
                   </div>
                 </th>
-                <th rowSpan={2} className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>NDC</span>
                   </div>
                 </th>
-                <th rowSpan={2} className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>LAST REPORT</span>
                     <span className="mt-0.5">COUNT</span>
                   </div>
                 </th>
-                <th className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>PURCHASED</span>
                   </div>
                 </th>
-                <th className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>DISPENSED</span>
                   </div>
                 </th>
-                <th className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>ADJUSTED</span>
                   </div>
                 </th>
-                <th rowSpan={2} className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>EXPECTED</span>
                     <span className="mt-0.5">COUNT</span>
                   </div>
                 </th>
-                <th rowSpan={2} className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>PHYSICAL</span>
                     <span className="mt-0.5">COUNT</span>
                   </div>
                 </th>
-                <th rowSpan={2} className={`text-center font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} font-sans`} style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
                   <div className="flex flex-col items-center justify-center leading-none">
                     <span>VARIANCE</span>
                   </div>
                 </th>
               </tr>
               <tr className="border-b-2 border-gray-900">
-                <th colSpan={3} className={`text-center font-bold ${isForPrint ? 'text-[10.5px]' : 'text-[9px]'} text-gray-900 font-sans px-1`} style={{ paddingTop: '2px', paddingBottom: '3px', verticalAlign: 'middle' }}>
-                  <span className={`inline-block px-2 py-0.5 rounded-full bg-gray-900/10 text-gray-900 ${isForPrint ? 'text-[9.5px]' : 'text-[8px]'} font-black uppercase tracking-wider border border-gray-900/15`}>
+                <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans px-1" style={{ paddingTop: '2px', paddingBottom: '3px', verticalAlign: 'middle' }}>
+                  <span className="inline-block px-2 py-0.5 rounded-full bg-gray-900/10 text-gray-900 text-[8px] font-black uppercase tracking-wider border border-gray-900/15">
                     SINCE LAST REPORT ON {headerPrevReportDate}
                   </span>
                 </th>
@@ -4271,7 +4271,7 @@ export default function App() {
                   const variance = item.variance;
                   return (
                     <Fragment key={item.substanceId}>
-                      <tr className="text-center text-gray-900 font-sans" style={{ height: isForPrint ? '52px' : '40px' }}>
+                      <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
                         <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
                           <div 
                             onClick={() => {
@@ -4280,40 +4280,40 @@ export default function App() {
                                 if (invItem) setSelectedSubstanceDetail(invItem);
                               }
                             }}
-                            className={`font-bold text-gray-900 ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                            className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
                             title={`${item.substanceName} ${item.strength} - Click to view transaction history`}
                           >
                             {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
                           </div>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <span className={`font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 font-sans leading-none`}>{item.ndc}</span>
+                          <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <div className={`font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 leading-none`}>{item.lastClosingCount || 0}</div>
+                          <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
+                          <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
+                          <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
                         </td>
                         <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
+                          <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{item.expected || 0}</span>
+                          <span className="text-[10px] leading-none">{item.expected || 0}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{item.physical || 0}</span>
+                          <span className="text-[10px] leading-none">{item.physical || 0}</span>
                         </td>
                         <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                          <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
                         </td>
                       </tr>
                       {variance !== 0 && (
                         <tr className="bg-gray-50/50">
-                          <td colSpan={9} className={`py-2 pl-4 text-left border-l-2 border-gray-900 ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 italic font-sans border-t border-b border-gray-100`}>
+                          <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans border-t border-b border-gray-100">
                             Discrepancy Reason: {item.reason || "State reason omitted"}
                           </td>
                         </tr>
@@ -4330,44 +4330,44 @@ export default function App() {
                   
                   return (
                     <Fragment key={sub.id}>
-                      <tr className="text-center text-gray-900 font-sans" style={{ height: isForPrint ? '52px' : '40px' }}>
+                      <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
                         <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
                           <div 
                             onClick={() => !isForPrint && setSelectedSubstanceDetail(sub)}
-                            className={`font-bold text-gray-900 ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                            className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
                             title={`${sub.name} ${sub.strength} - Click to view transaction history`}
                           >
                             {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
                           </div>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <span className={`font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 font-sans leading-none`}>{sub.ndc}</span>
+                          <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <div className={`font-bold ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 leading-none`}>{metrics.lastClosingCount}</div>
+                          <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
+                          <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
+                          <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
                         </td>
                         <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
+                          <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{metrics.expected}</span>
+                          <span className="text-[10px] leading-none">{metrics.expected}</span>
                         </td>
                         <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{counted}</span>
+                          <span className="text-[10px] leading-none">{counted}</span>
                         </td>
                         <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} leading-none`}>{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                          <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
                         </td>
                       </tr>
                       {variance !== 0 && (
                         <tr className="bg-gray-50/50">
-                          <td colSpan={9} className={`py-2 pl-4 text-left border-l-2 border-gray-900 ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 italic font-sans border-t border-b border-gray-100`}>
+                          <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans border-t border-b border-gray-100">
                             Discrepancy Reason: {reason || "State reason omitted"}
                           </td>
                         </tr>
@@ -4386,22 +4386,22 @@ export default function App() {
         {/* Signature box info */}
         <div className="space-y-1 pt-1.5 border-t border-gray-100 break-inside-avoid">
           {/* Moved disclaimer above signature fields in historical report block */}
-          <p className={`${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 font-normal leading-normal text-left`}>
+          <p className="text-[10px] text-gray-900 font-normal leading-normal text-left">
             By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
           </p>
           {isSigRequired ? (
             <div className="grid grid-cols-2 gap-4 pt-1">
               {/* Left signature field */}
-              <div className={`border border-black p-2.5 rounded-lg relative ${isForPrint ? 'h-[90px]' : 'h-20'} flex flex-col justify-between bg-gray-50/20`}>
+              <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
                 <div className="flex items-center gap-1.5 pb-1">
-                  <span className={`${isForPrint ? 'text-[11px]' : 'text-[10px]'} text-gray-900 font-sans uppercase font-black tracking-wider`}>COMPLETED BY:</span>
-                  <span className={`${isForPrint ? 'text-[11px]' : 'text-[10px]'} text-gray-900 font-sans font-bold truncate`}>
+                  <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
+                  <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                     {perfName}
                   </span>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
                   {userSig ? (
-                    <img src={userSig} className={`max-h-12 object-contain font-medium ${isForPrint ? 'scale-[1.1]' : ''}`} alt="Performed by signature" />
+                    <img src={userSig} className="max-h-12 object-contain font-medium" alt="Performed by signature" />
                   ) : (
                     <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
                       No signature captured
@@ -4411,16 +4411,16 @@ export default function App() {
               </div>
 
               {/* Right signature field */}
-              <div className={`border border-black p-2.5 rounded-lg relative ${isForPrint ? 'h-[90px]' : 'h-20'} flex flex-col justify-between bg-gray-50/20`}>
+              <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
                 <div className="flex items-center gap-1.5 pb-1">
-                  <span className={`${isForPrint ? 'text-[11px]' : 'text-[10px]'} text-gray-900 font-sans uppercase font-black tracking-wider`}>PIC:</span>
-                  <span className={`${isForPrint ? 'text-[11px]' : 'text-[10px]'} text-gray-900 font-sans font-bold truncate`}>
+                  <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
+                  <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
                     {picName}
                   </span>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
                   {picSig ? (
-                    <img src={picSig} className={`max-h-12 object-contain font-medium ${isForPrint ? 'scale-[1.1]' : ''}`} alt="PIC signature" />
+                    <img src={picSig} className="max-h-12 object-contain font-medium" alt="PIC signature" />
                   ) : (
                     <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
                       No signature captured
@@ -4430,7 +4430,7 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <div className={`pt-1.5 flex flex-col sm:flex-row justify-between ${isForPrint ? 'text-[11.5px]' : 'text-[10px]'} text-gray-900 font-sans font-bold uppercase gap-2`}>
+            <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
               <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
               <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
             </div>
@@ -4452,7 +4452,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 18mm 20mm 18mm 20mm !important;
+                margin: 0 !important;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -4488,7 +4488,7 @@ export default function App() {
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
-                  padding: 0 !important;
+                  padding: 18mm 20mm 18mm 20mm !important;
                   margin: 0 !important;
                   background: transparent !important;
                   box-sizing: border-box !important;
@@ -4516,7 +4516,7 @@ export default function App() {
                   z-index: 10 !important;
                   width: 100% !important;
                   height: auto !important;
-                  min-height: 145mm !important;
+                  min-height: 175mm !important;
                   overflow: visible !important;
                   max-height: none !important;
                   padding: 0 !important;
@@ -4528,7 +4528,7 @@ export default function App() {
                 .is-safari #reconciliation-printable-invoice {
                   width: 100% !important;
                   height: auto !important;
-                  min-height: 145mm !important;
+                  min-height: 175mm !important;
                   position: relative !important;
                   box-sizing: border-box !important;
                   padding: 0 !important;
@@ -4558,7 +4558,7 @@ export default function App() {
                 .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 6mm !important;
+                  bottom: 12mm !important;
                   left: 20mm !important;
                   right: 20mm !important;
                   height: 8mm !important;
@@ -4580,7 +4580,7 @@ export default function App() {
                 }
                 .print-page-number::after {
                   font-size: 8.5px !important;
-                  content: " " counter(page) " OF " counter(pages) !important;
+                  content: " OF 1" !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-weight: bold !important;
                   color: #111827 !important;
@@ -4607,7 +4607,7 @@ export default function App() {
             </div>
             <div className="print-footer">
               <span>GENERATED USING PHARMAGUARD</span>
-              <span className="print-page-number">PAGE</span>
+              <span className="print-page-number">PAGE 1</span>
             </div>
           </>
         )}
@@ -6859,7 +6859,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 18mm 20mm 18mm 20mm !important;
+                                  margin: 0 !important;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6903,7 +6903,7 @@ export default function App() {
                                   min-height: 0 !important;
                                   max-height: none !important;
                                   overflow: visible !important;
-                                  padding: 0 !important;
+                                  padding: 18mm 20mm 18mm 20mm !important;
                                   margin: 0 !important;
                                   background: transparent !important;
                                   box-sizing: border-box !important;
@@ -6916,7 +6916,7 @@ export default function App() {
                                   z-index: 10 !important;
                                   width: 100% !important;
                                   height: auto !important;
-                                  min-height: 170mm !important;
+                                  min-height: 175mm !important;
                                   overflow: visible !important;
                                   max-height: none !important;
                                   padding: 0 !important;
@@ -6945,7 +6945,7 @@ export default function App() {
                                 .print-footer {
                                   display: flex !important;
                                   position: fixed !important;
-                                  bottom: 6mm !important;
+                                  bottom: 12mm !important;
                                   left: 20mm !important;
                                   right: 20mm !important;
                                   height: 8mm !important;
@@ -6967,7 +6967,7 @@ export default function App() {
                                 }
                                 .print-page-number::after {
                                   font-size: 8.5px !important;
-                                  content: " " counter(page) " OF " counter(pages) !important;
+                                  content: " OF 1" !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
@@ -7032,7 +7032,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 18mm 20mm 18mm 20mm !important;
+                margin: 0 !important;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -7068,7 +7068,7 @@ export default function App() {
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
-                  padding: 0 !important;
+                  padding: 18mm 20mm 18mm 20mm !important;
                   margin: 0 !important;
                   background: transparent !important;
                 }
@@ -7080,7 +7080,7 @@ export default function App() {
                   z-index: 10 !important;
                   width: 100% !important;
                   height: auto !important;
-                  min-height: 145mm !important;
+                  min-height: 175mm !important;
                   overflow: visible !important;
                   max-height: none !important;
                   padding: 0 !important;
@@ -7106,7 +7106,7 @@ export default function App() {
                 .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 6mm !important;
+                  bottom: 12mm !important;
                   left: 20mm !important;
                   right: 20mm !important;
                   height: 8mm !important;
@@ -7128,7 +7128,7 @@ export default function App() {
                 }
                 .print-page-number::after {
                   font-size: 8.5px !important;
-                  content: " " counter(page) " OF " counter(pages) !important;
+                  content: " OF 1" !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-weight: bold !important;
                   color: #111827 !important;
