@@ -4446,12 +4446,12 @@ export default function App() {
     );
 
     return (
-      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative"}>
+      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative bg-transparent"}>
         {isForPrint && (
           <style>{`
             @page {
               size: landscape;
-              margin: 22mm 20mm 22mm 20mm !important;
+              margin: 18mm 20mm 18mm 20mm !important;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4491,48 +4491,61 @@ export default function App() {
                 margin: 0 !important;
                 background: transparent !important;
               }
-              /* Support clean layout overrides for Safari and iOS Safari */
-              .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
-                width: 100% !important;
-                height: auto !important;
-                min-height: 0 !important;
-                position: static !important;
-                overflow: visible !important;
-              }
-              .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
-                width: 100% !important;
-                height: auto !important;
-                position: static !important;
-                transform: none !important;
-                overflow: visible !important;
-              }
               #reconciliation-printable-invoice {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-start !important;
+                display: block !important;
                 position: static !important;
                 width: 100% !important;
                 height: auto !important;
-                min-height: 170mm !important;
                 overflow: visible !important;
                 max-height: none !important;
                 padding: 0 !important;
-                box-shadow: none !important;
                 border: none !important;
                 background: transparent !important;
                 box-sizing: border-box !important;
               }
-              .is-safari #reconciliation-printable-invoice {
-                width: 100% !important;
-                height: auto !important;
-                min-height: 170mm !important;
-                position: static !important;
-                box-sizing: border-box !important;
-                padding: 0 !important;
+              /* Center the watermark on every page cleanly on Safari and Chrome */
+              .print-watermark {
+                display: flex !important;
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                width: 380px !important;
+                height: 380px !important;
+                transform: translate(-50%, -50%) !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: -10 !important;
+                pointer-events: none !important;
+                opacity: 0.11 !important;
                 background: transparent !important;
               }
-              #reconciliation-printable-root * {
-                visibility: visible !important;
+              /* Use table layout for perfectly aligned repeating header/footer spacers and prevent overlap */
+              .print-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                background: transparent !important;
+                margin: 0 !important;
+                padding: 0 !important;
+              }
+              .print-thead {
+                display: table-header-group !important;
+              }
+              .print-tfoot {
+                display: table-footer-group !important;
+              }
+              .print-page-number {
+                font-size: 0 !important;
+              }
+              .print-page-number::after {
+                font-size: 8.5px !important;
+                content: "PAGE " counter(page) " OF " counter(pages) !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+              }
+              #reconciliation-printable-invoice, 
+              #reconciliation-printable-invoice * {
+                background-color: transparent !important;
               }
               table, tbody, thead, th, td {
                 page-break-inside: auto !important;
@@ -4547,109 +4560,69 @@ export default function App() {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
               }
-
-              /* Fixed Position running headers and footers printed on every landscape page */
-              .print-header {
-                display: flex !important;
-                position: fixed !important;
-                top: 8mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
-                height: 8mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8.5px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
-                box-sizing: border-box !important;
-              }
-              .print-footer {
-                display: flex !important;
-                position: fixed !important;
-                bottom: 8mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
-                height: 8mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8.5px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
-                box-sizing: border-box !important;
-              }
-              .print-page-number {
-                font-size: 0 !important;
-              }
-              .print-page-number::after {
-                font-size: 8.5px !important;
-                content: "PAGE " counter(page);
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-              }
-              .print-watermark {
-                display: flex !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                align-items: center !important;
-                justify-content: center !important;
-                z-index: -1 !important;
-                pointer-events: none !important;
-                opacity: 0.14 !important;
-              }
             }
           `}</style>
         )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl bg-white"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 text-gray-900 font-sans`}>
-          {isForPrint && (
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none bg-transparent" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl bg-white"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 text-gray-900 font-sans`}>
+          {isForPrint ? (
             <>
-              <div className="print-header hidden print:flex">
+              {/* Repeating watermarks positioned cleanly */}
+              <div className="print-watermark hidden print:flex">
+                <PharmaLogo className="w-[380px] h-[380px]" />
+              </div>
+
+              <table className="print-table w-full border-none border-collapse bg-transparent p-0 m-0">
+                <thead className="print-thead hidden print:table-header-group">
+                  <tr>
+                    <td className="p-0 border-none">
+                      <div className="flex justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase border-b border-gray-100 pb-1.5 mb-4 font-sans">
+                        <span>PHARMAGUARD RECONCILIATION REPORT</span>
+                        <span>{selectedHistoricalReport 
+                          ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                          : new Date().toLocaleDateString()
+                        }</span>
+                      </div>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="p-0 border-none">
+                      {invoiceInnerBody}
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot className="print-tfoot hidden print:table-footer-group">
+                  <tr>
+                    <td className="p-0 border-none">
+                      <div className="flex justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase border-t border-gray-100 pt-1.5 mt-4 font-sans">
+                        <span>GENERATED WITH PHARMAGUARD</span>
+                        <span className="print-page-number">PAGE 1</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </>
+          ) : (
+            <>
+              {/* Header element visible on screen preview, but hidden during actual printing */}
+              <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
                 <span>PHARMAGUARD RECONCILIATION REPORT</span>
                 <span>{selectedHistoricalReport 
                   ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                   : new Date().toLocaleDateString()
                 }</span>
               </div>
-              <div className="print-watermark hidden print:flex">
+              
+              {/* Centered Watermark for Screen, hidden during printing */}
+              <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:hidden">
                 <PharmaLogo className="w-[380px] h-[380px]" />
               </div>
-              <div className="print-footer hidden print:flex">
-                <span>GENERATED WITH PHARMAGUARD</span>
-                <span className="print-page-number">PAGE 1</span>
-              </div>
+
+              {invoiceInnerBody}
             </>
           )}
-
-          {/* Header element visible on screen preview, but hidden during actual printing */}
-          <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
-            <span>PHARMAGUARD RECONCILIATION REPORT</span>
-            <span>{selectedHistoricalReport 
-              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-              : new Date().toLocaleDateString()
-            }</span>
-          </div>
-          
-          {/* Centered Watermark for Screen, hidden during printing */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:hidden">
-            <PharmaLogo className="w-[380px] h-[380px]" />
-          </div>
-
-          {invoiceInnerBody}
         </div>
       </div>
     );
@@ -6874,7 +6847,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 22mm 20mm 22mm 20mm !important;
+                                  margin: 18mm 20mm 18mm 20mm !important;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6923,29 +6896,56 @@ export default function App() {
                                   background: transparent !important;
                                 }
                                 #reconciliation-printable-invoice {
-                                  display: flex !important;
-                                  flex-direction: column !important;
-                                  justify-content: flex-start !important;
+                                  display: block !important;
                                   position: static !important;
                                   width: 100% !important;
                                   height: auto !important;
-                                  min-height: 175mm !important;
-                                  max-height: none !important;
                                   overflow: visible !important;
-                                  box-shadow: none !important;
-                                  border: none !important;
+                                  max-height: none !important;
                                   padding: 0 !important;
+                                  border: none !important;
                                   background: transparent !important;
                                   box-sizing: border-box !important;
                                 }
-                                .is-safari #reconciliation-printable-invoice {
-                                  width: 100% !important;
-                                  height: auto !important;
-                                  min-height: 175mm !important;
-                                  position: static !important;
-                                  box-sizing: border-box !important;
-                                  padding: 0 !important;
+                                /* Center the watermark on every page cleanly */
+                                .print-watermark {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  top: 50% !important;
+                                  left: 50% !important;
+                                  width: 380px !important;
+                                  height: 380px !important;
+                                  transform: translate(-50%, -50%) !important;
+                                  align-items: center !important;
+                                  justify-content: center !important;
+                                  z-index: -10 !important;
+                                  pointer-events: none !important;
+                                  opacity: 0.11 !important;
                                   background: transparent !important;
+                                }
+                                /* Use table layout for perfectly aligned repeating header/footer spacers and prevent overlap */
+                                .print-table {
+                                  width: 100% !important;
+                                  border-collapse: collapse !important;
+                                  background: transparent !important;
+                                  margin: 0 !important;
+                                  padding: 0 !important;
+                                }
+                                .print-thead {
+                                  display: table-header-group !important;
+                                }
+                                .print-tfoot {
+                                  display: table-footer-group !important;
+                                }
+                                .print-page-number {
+                                  font-size: 0 !important;
+                                }
+                                .print-page-number::after {
+                                  font-size: 8.5px !important;
+                                  content: "PAGE " counter(page) " OF " counter(pages) !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
                                 }
                                 table, tbody, thead, th, td {
                                   page-break-inside: auto !important;
@@ -7005,7 +7005,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 22mm 20mm 22mm 20mm !important;
+                margin: 18mm 20mm 18mm 20mm !important;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -7045,48 +7045,61 @@ export default function App() {
                   margin: 0 !important;
                   background: transparent !important;
                 }
-                /* Support clean layout overrides for Safari and iOS Safari */
-                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
-                  width: 100% !important;
-                  height: auto !important;
-                  min-height: 0 !important;
-                  position: static !important;
-                  overflow: visible !important;
-                }
-                .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
-                  width: 100% !important;
-                  height: auto !important;
-                  position: static !important;
-                  transform: none !important;
-                  overflow: visible !important;
-                }
                 #reconciliation-printable-invoice {
-                  display: flex !important;
-                  flex-direction: column !important;
-                  justify-content: flex-start !important;
+                  display: block !important;
                   position: static !important;
                   width: 100% !important;
                   height: auto !important;
-                  min-height: 170mm !important;
                   overflow: visible !important;
                   max-height: none !important;
                   padding: 0 !important;
-                  box-shadow: none !important;
                   border: none !important;
                   background: transparent !important;
                   box-sizing: border-box !important;
                 }
-                .is-safari #reconciliation-printable-invoice {
-                  width: 100% !important;
-                  height: auto !important;
-                  min-height: 170mm !important;
-                  position: static !important;
-                  box-sizing: border-box !important;
-                  padding: 0 !important;
+                /* Center the watermark on every page cleanly on Safari and Chrome */
+                .print-watermark {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 50% !important;
+                  left: 50% !important;
+                  width: 380px !important;
+                  height: 380px !important;
+                  transform: translate(-50%, -50%) !important;
+                  align-items: center !important;
+                  justify-content: center !important;
+                  z-index: -10 !important;
+                  pointer-events: none !important;
+                  opacity: 0.11 !important;
                   background: transparent !important;
                 }
-                #reconciliation-printable-root * {
-                  visibility: visible !important;
+                /* Use table layout for perfectly aligned repeating header/footer spacers and prevent overlap */
+                .print-table {
+                  width: 100% !important;
+                  border-collapse: collapse !important;
+                  background: transparent !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+                }
+                .print-thead {
+                  display: table-header-group !important;
+                }
+                .print-tfoot {
+                  display: table-footer-group !important;
+                }
+                .print-page-number {
+                  font-size: 0 !important;
+                }
+                .print-page-number::after {
+                  font-size: 8.5px !important;
+                  content: "PAGE " counter(page) " OF " counter(pages) !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                }
+                #reconciliation-printable-invoice, 
+                #reconciliation-printable-invoice * {
+                  background-color: transparent !important;
                 }
                 table, tbody, thead, th, td {
                   page-break-inside: auto !important;
@@ -7100,71 +7113,6 @@ export default function App() {
                 .break-inside-avoid {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
-                }
-
-                /* Fixed Position running headers and footers printed on every landscape page */
-                .print-header {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 8mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
-                  height: 8mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8.5px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
-                  box-sizing: border-box !important;
-                }
-                .print-footer {
-                  display: flex !important;
-                  position: fixed !important;
-                  bottom: 8mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
-                  height: 8mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8.5px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
-                  box-sizing: border-box !important;
-                }
-                .print-page-number {
-                  font-size: 0 !important;
-                }
-                .print-page-number::after {
-                  font-size: 8.5px !important;
-                  content: "PAGE " counter(page);
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                }
-                .print-watermark {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  align-items: center !important;
-                  justify-content: center !important;
-                  z-index: -1 !important;
-                  pointer-events: none !important;
-                  opacity: 0.14 !important;
                 }
               }
             `}</style>
