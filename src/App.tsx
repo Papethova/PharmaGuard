@@ -4451,11 +4451,7 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-              margin: 0 !important;
-            }
-            .print-watermark,
-            .print-footer {
-              display: none !important;
+              margin: 18mm 20mm 18mm 20mm !important;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4491,7 +4487,7 @@ export default function App() {
                 width: 100% !important;
                 height: auto !important;
                 overflow: visible !important;
-                padding: 18mm 20mm 18mm 20mm !important;
+                padding: 0 !important;
                 margin: 0 !important;
                 background: transparent !important;
                 box-sizing: border-box !important;
@@ -4503,7 +4499,7 @@ export default function App() {
                 min-height: 0 !important;
                 position: static !important;
                 overflow: visible !important;
-              }
+                }
               .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
                 width: 100% !important;
                 height: auto !important;
@@ -4515,7 +4511,8 @@ export default function App() {
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: flex-start !important;
-                position: static !important;
+                position: relative !important;
+                z-index: 10 !important;
                 width: 100% !important;
                 height: auto !important;
                 min-height: 170mm !important;
@@ -4531,7 +4528,7 @@ export default function App() {
                 width: 100% !important;
                 height: auto !important;
                 min-height: 170mm !important;
-                position: static !important;
+                position: relative !important;
                 box-sizing: border-box !important;
                 padding: 0 !important;
                 background: transparent !important;
@@ -4560,9 +4557,9 @@ export default function App() {
               .print-footer {
                 display: flex !important;
                 position: fixed !important;
-                bottom: 8mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
+                bottom: -11mm !important;
+                left: 0 !important;
+                right: 0 !important;
                 height: 8mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
@@ -4596,15 +4593,15 @@ export default function App() {
                 height: 100% !important;
                 align-items: center !important;
                 justify-content: center !important;
-                z-index: -10 !important;
+                z-index: 1 !important;
                 pointer-events: none !important;
-                opacity: 0.14 !important;
+                opacity: 0.12 !important;
                 background: transparent !important;
               }
             }
           `}</style>
         )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none bg-transparent" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl bg-white"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 text-gray-900 font-sans`}>
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:z-10 print:bg-transparent print:border-none print:shadow-none bg-transparent" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl bg-white"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 text-gray-900 font-sans`}>
           {isForPrint ? (
             <>
               <div className="print-watermark">
@@ -6854,12 +6851,12 @@ export default function App() {
                           <!DOCTYPE html>
                           <html class="${isSafariOrIPad ? 'is-safari' : ''} ${isIOSOrIPadSafari ? 'is-ios-safari' : ''}">
                             <head>
-                              <title>PharmaGuard Reconciliation Report</title>
+                              <title>Generated Using PharmaGuard</title>
                               ${styleTags}
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 0 !important;
+                                  margin: 18mm 20mm 18mm 20mm !important;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6903,7 +6900,7 @@ export default function App() {
                                   min-height: 0 !important;
                                   max-height: none !important;
                                   overflow: visible !important;
-                                  padding: 18mm 20mm 18mm 20mm !important;
+                                  padding: 0 !important;
                                   margin: 0 !important;
                                   background: transparent !important;
                                   box-sizing: border-box !important;
@@ -6912,7 +6909,8 @@ export default function App() {
                                   display: flex !important;
                                   flex-direction: column !important;
                                   justify-content: flex-start !important;
-                                  position: static !important;
+                                  position: relative !important;
+                                  z-index: 10 !important;
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 170mm !important;
@@ -6944,9 +6942,9 @@ export default function App() {
                                 .print-footer {
                                   display: flex !important;
                                   position: fixed !important;
-                                  bottom: 8mm !important;
-                                  left: 20mm !important;
-                                  right: 20mm !important;
+                                  bottom: -11mm !important;
+                                  left: 0 !important;
+                                  right: 0 !important;
                                   height: 8mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
@@ -6980,9 +6978,9 @@ export default function App() {
                                   height: 100% !important;
                                   align-items: center !important;
                                   justify-content: center !important;
-                                  z-index: -10 !important;
+                                  z-index: 1 !important;
                                   pointer-events: none !important;
-                                  opacity: 0.14 !important;
+                                  opacity: 0.12 !important;
                                   background: transparent !important;
                                 }
                               </style>
@@ -6993,8 +6991,14 @@ export default function App() {
                               </div>
                               <script>
                                 function triggerPrint() {
+                                  try {
+                                    window.history.pushState(null, "", "Generated_Using_PharmaGuard");
+                                  } catch (e) {}
                                   setTimeout(() => {
                                     window.print();
+                                    setTimeout(() => { window.close(); }, 1500);
+                                  }, 800);
+                                }
                                     setTimeout(() => { window.close(); }, 1500);
                                   }, 800);
                                 }
@@ -7030,7 +7034,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 22mm 20mm 22mm 20mm !important;
+                margin: 18mm 20mm 18mm 20mm !important;
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -7074,7 +7078,8 @@ export default function App() {
                   display: flex !important;
                   flex-direction: column !important;
                   justify-content: flex-start !important;
-                  position: static !important;
+                  position: relative !important;
+                  z-index: 10 !important;
                   width: 100% !important;
                   height: auto !important;
                   min-height: 170mm !important;
@@ -7095,37 +7100,17 @@ export default function App() {
                   height: 100% !important;
                   align-items: center !important;
                   justify-content: center !important;
-                  z-index: -10 !important;
+                  z-index: 1 !important;
                   pointer-events: none !important;
-                  opacity: 0.14 !important;
+                  opacity: 0.12 !important;
                   background: transparent !important;
-                }
-                .print-header {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 8mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
-                  height: 8mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8.5px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: uppercase !important;
-                  box-sizing: border-box !important;
                 }
                 .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 8mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
+                  bottom: -11mm !important;
+                  left: 0 !important;
+                  right: 0 !important;
                   height: 8mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
@@ -7136,7 +7121,7 @@ export default function App() {
                   font-weight: bold !important;
                   color: #111827 !important;
                   z-index: 9999 !important;
-                  background: white !important;
+                  background: transparent !important;
                   text-transform: uppercase !important;
                   box-sizing: border-box !important;
                 }
