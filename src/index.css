@@ -310,7 +310,7 @@
     overflow: visible !important;
     padding: 0 !important;
     margin: 0 !important;
-    background: white !important;
+    background: transparent !important;
   }
 
   #reconciliation-printable-invoice {
@@ -325,7 +325,7 @@
     overflow: visible !important;
     padding: 0 !important;
     border: none !important;
-    background: white !important;
+    background: transparent !important;
     box-sizing: border-box !important;
   }
 

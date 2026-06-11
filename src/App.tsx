@@ -4451,7 +4451,11 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-              margin: 22mm 20mm 22mm 20mm !important;
+              margin: 0 !important;
+            }
+            .print-watermark,
+            .print-footer {
+              display: none !important;
             }
             @media screen {
               #reconciliation-printable-root {
@@ -4487,9 +4491,10 @@ export default function App() {
                 width: 100% !important;
                 height: auto !important;
                 overflow: visible !important;
-                padding: 0 !important;
+                padding: 18mm 20mm 18mm 20mm !important;
                 margin: 0 !important;
                 background: transparent !important;
+                box-sizing: border-box !important;
               }
               /* Support clean layout overrides for Safari and iOS Safari */
               .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
@@ -4534,6 +4539,10 @@ export default function App() {
               #reconciliation-printable-root * {
                 visibility: visible !important;
               }
+              #reconciliation-printable-invoice,
+              #reconciliation-printable-invoice * {
+                background-color: transparent !important;
+              }
               table, tbody, thead, th, td {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
@@ -4548,27 +4557,6 @@ export default function App() {
                 break-inside: avoid !important;
               }
 
-              /* Fixed Position running headers and footers printed on every landscape page */
-              .print-header {
-                display: flex !important;
-                position: fixed !important;
-                top: 8mm !important;
-                left: 20mm !important;
-                right: 20mm !important;
-                height: 8mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 1.5mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8.5px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: uppercase !important;
-                box-sizing: border-box !important;
-              }
               .print-footer {
                 display: flex !important;
                 position: fixed !important;
@@ -4585,7 +4573,7 @@ export default function App() {
                 font-weight: bold !important;
                 color: #111827 !important;
                 z-index: 9999 !important;
-                background: white !important;
+                background: transparent !important;
                 text-transform: uppercase !important;
                 box-sizing: border-box !important;
               }
@@ -4608,9 +4596,10 @@ export default function App() {
                 height: 100% !important;
                 align-items: center !important;
                 justify-content: center !important;
-                z-index: -1 !important;
+                z-index: -10 !important;
                 pointer-events: none !important;
                 opacity: 0.14 !important;
+                background: transparent !important;
               }
             }
           `}</style>
@@ -4618,18 +4607,11 @@ export default function App() {
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:static print:bg-transparent print:border-none print:shadow-none bg-transparent" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl bg-white"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 text-gray-900 font-sans`}>
           {isForPrint ? (
             <>
-              <div className="print-header hidden print:flex">
-                <span>PHARMAGUARD RECONCILIATION REPORT</span>
-                <span>{selectedHistoricalReport 
-                  ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                  : new Date().toLocaleDateString()
-                }</span>
-              </div>
-              <div className="print-watermark hidden print:flex">
+              <div className="print-watermark">
                 <PharmaLogo className="w-[380px] h-[380px]" />
               </div>
-              <div className="print-footer hidden print:flex">
-                <span>GENERATED WITH PHARMAGUARD</span>
+              <div className="print-footer">
+                <span>GENERATED USING PHARMAGUARD</span>
                 <span className="print-page-number">PAGE 1</span>
               </div>
               {invoiceInnerBody}
@@ -6877,7 +6859,7 @@ export default function App() {
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 22mm 20mm 22mm 20mm !important;
+                                  margin: 0 !important;
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6921,9 +6903,10 @@ export default function App() {
                                   min-height: 0 !important;
                                   max-height: none !important;
                                   overflow: visible !important;
-                                  padding: 0 !important;
+                                  padding: 18mm 20mm 18mm 20mm !important;
                                   margin: 0 !important;
                                   background: transparent !important;
+                                  box-sizing: border-box !important;
                                 }
                                 #reconciliation-printable-invoice {
                                   display: flex !important;
@@ -6941,6 +6924,10 @@ export default function App() {
                                   background: transparent !important;
                                   box-sizing: border-box !important;
                                 }
+                                #reconciliation-printable-invoice,
+                                #reconciliation-printable-invoice * {
+                                  background-color: transparent !important;
+                                }
                                 table, tbody, thead, th, td {
                                   page-break-inside: auto !important;
                                   break-inside: auto !important;
@@ -6953,26 +6940,6 @@ export default function App() {
                                 .break-inside-avoid {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
-                                }
-                                .print-header {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  top: 8mm !important;
-                                  left: 20mm !important;
-                                  right: 20mm !important;
-                                  height: 8mm !important;
-                                  justify-content: space-between !important;
-                                  align-items: center !important;
-                                  border-bottom: 0.5px solid #e5e7eb !important;
-                                  padding-bottom: 1.5mm !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8.5px !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  z-index: 9999 !important;
-                                  background: white !important;
-                                  text-transform: uppercase !important;
-                                  box-sizing: border-box !important;
                                 }
                                 .print-footer {
                                   display: flex !important;
@@ -6990,7 +6957,7 @@ export default function App() {
                                   font-weight: bold !important;
                                   color: #111827 !important;
                                   z-index: 9999 !important;
-                                  background: white !important;
+                                  background: transparent !important;
                                   text-transform: uppercase !important;
                                   box-sizing: border-box !important;
                                 }
@@ -7013,9 +6980,10 @@ export default function App() {
                                   height: 100% !important;
                                   align-items: center !important;
                                   justify-content: center !important;
-                                  z-index: -1 !important;
+                                  z-index: -10 !important;
                                   pointer-events: none !important;
                                   opacity: 0.14 !important;
+                                  background: transparent !important;
                                 }
                               </style>
                             </head>
