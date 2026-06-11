@@ -4555,36 +4555,6 @@ export default function App() {
                   break-inside: avoid !important;
                 }
 
-                .print-footer {
-                  display: flex !important;
-                  position: fixed !important;
-                  bottom: 12mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
-                  height: 8mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8.5px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: transparent !important;
-                  text-transform: uppercase !important;
-                  box-sizing: border-box !important;
-                }
-                .print-page-number {
-                  font-size: 8.5px !important;
-                }
-                .print-page-number::after {
-                  font-size: 8.5px !important;
-                  content: " OF 1" !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                }
                 .print-watermark {
                   display: flex !important;
                   position: fixed !important;
@@ -4604,10 +4574,6 @@ export default function App() {
             `}</style>
             <div className="print-watermark">
               <PharmaLogo className="w-[380px] h-[380px]" />
-            </div>
-            <div className="print-footer">
-              <span>GENERATED USING PHARMAGUARD</span>
-              <span className="print-page-number">PAGE 1</span>
             </div>
           </>
         )}
@@ -6942,7 +6908,7 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-                                .print-footer {
+                                .print-footer-disabled {
                                   display: flex !important;
                                   position: fixed !important;
                                   bottom: 12mm !important;
@@ -6962,10 +6928,10 @@ export default function App() {
                                   text-transform: uppercase !important;
                                   box-sizing: border-box !important;
                                 }
-                                .print-page-number {
+                                .print-page-number-disabled {
                                   font-size: 8.5px !important;
                                 }
-                                .print-page-number::after {
+                                .print-page-number-disabled::after {
                                   font-size: 8.5px !important;
                                   content: " OF 1" !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
@@ -7103,36 +7069,7 @@ export default function App() {
                   opacity: 0.12 !important;
                   background: transparent !important;
                 }
-                .print-footer {
-                  display: flex !important;
-                  position: fixed !important;
-                  bottom: 12mm !important;
-                  left: 20mm !important;
-                  right: 20mm !important;
-                  height: 8mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8.5px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: transparent !important;
-                  text-transform: uppercase !important;
-                  box-sizing: border-box !important;
-                }
-                .print-page-number {
-                  font-size: 8.5px !important;
-                }
-                .print-page-number::after {
-                  font-size: 8.5px !important;
-                  content: " OF 1" !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                }
+
                 #reconciliation-printable-invoice, 
                 #reconciliation-printable-invoice * {
                   background-color: transparent !important;
