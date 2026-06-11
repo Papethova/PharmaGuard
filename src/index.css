@@ -314,15 +314,18 @@
   }
 
   #reconciliation-printable-invoice {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
     position: static !important;
     width: 100% !important;
     height: auto !important;
-    overflow: visible !important;
+    min-height: 175mm !important;
     max-height: none !important;
+    overflow: visible !important;
     padding: 0 !important;
     border: none !important;
-    background: transparent !important;
+    background: white !important;
     box-sizing: border-box !important;
   }
 
