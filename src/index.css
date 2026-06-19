@@ -247,7 +247,7 @@
 @media print {
   @page {
     size: landscape;
-    margin: 0 !important;
+    margin: 10mm 15mm 15mm 15mm;
   }
   html, body {
     position: static !important;
@@ -284,22 +284,6 @@
     display: none !important;
   }
 
-  .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    position: static !important;
-    overflow: visible !important;
-  }
-
-  .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
-    width: 100% !important;
-    height: auto !important;
-    position: static !important;
-    transform: none !important;
-    overflow: visible !important;
-  }
-
   #reconciliation-printable-root {
     display: block !important;
     position: static !important;
@@ -308,9 +292,9 @@
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
-    padding: 18mm 20mm 18mm 20mm !important;
+    padding: 0 !important;
     margin: 0 !important;
-    background: transparent !important;
+    background: white !important;
   }
 
   #reconciliation-printable-invoice {
@@ -323,10 +307,7 @@
     min-height: 175mm !important;
     max-height: none !important;
     overflow: visible !important;
-    padding: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    box-sizing: border-box !important;
+    background: white !important;
   }
 
   #reconciliation-printable-root * {
