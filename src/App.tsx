@@ -326,15 +326,7 @@ const parseCompoundStrength = (str: string): { first: number; second: number } =
 
 const isSafariOrIPad = typeof window !== "undefined" && (
   /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
-  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh")) ||
-  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-  /CriOS|FxiOS/.test(navigator.userAgent)
-);
-
-const isIOSOrIPadSafari = typeof window !== "undefined" && (
-  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh")) ||
-  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-  /CriOS|FxiOS/.test(navigator.userAgent)
+  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh"))
 );
 
 const compareSubstances = (a: any, b: any): number => {
@@ -393,9 +385,6 @@ export default function App() {
   useEffect(() => {
     if (isSafariOrIPad) {
       document.documentElement.classList.add("is-safari");
-    }
-    if (isIOSOrIPadSafari) {
-      document.documentElement.classList.add("is-ios-safari");
     }
   }, []);
 
@@ -1384,25 +1373,17 @@ export default function App() {
     testConnection();
 
     let unsubProfile: (() => void) | undefined;
-    let pendingUnauthTimeout: NodeJS.Timeout | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
-      if (pendingUnauthTimeout) {
-        clearTimeout(pendingUnauthTimeout);
-        pendingUnauthTimeout = undefined;
-      }
-
       if (!currentUser) {
-        pendingUnauthTimeout = setTimeout(() => {
-          setUser(null);
-          setUserProfile(null);
-          if (unsubProfile) unsubProfile();
-          setIsAuthReady(true);
-          setIsInitializing(false);
-          setEmail("");
-          setPassword("");
-          setOrgName("");
-        }, 450); // 450ms debounce helps prevent intermediate login screen flashing during user reload/refresh
+        setUser(null);
+        setUserProfile(null);
+        if (unsubProfile) unsubProfile();
+        setIsAuthReady(true);
+        setIsInitializing(false);
+        setEmail("");
+        setPassword("");
+        setOrgName("");
         return;
       }
       
@@ -1581,7 +1562,6 @@ export default function App() {
     return () => {
       clearTimeout(delayTimer);
       clearTimeout(bypassTimer);
-      if (pendingUnauthTimeout) clearTimeout(pendingUnauthTimeout);
       unsubAuth();
       if (unsubProfile) unsubProfile();
     };
@@ -4161,446 +4141,515 @@ export default function App() {
     const picSig = selectedHistoricalReport ? selectedHistoricalReport.picSigData : picSigData;
     const isSigRequired = userProfile?.isSignatureRequirementEnabled !== false;
 
-    const invoiceInnerBody = (
-      <>
-        {/* Visual Official Letterhead */}
-        <div className="flex justify-between items-end pb-0">
-          <div className="flex flex-col space-y-1 min-w-0 flex-1">
-            <h1 className="text-xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
-            <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
-              const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
-              return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
-            })()}</p>
-            <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
-          </div>
-          <div className="text-right flex flex-col items-end justify-end space-y-1 shrink-0 whitespace-nowrap ml-4">
-            <p className="text-xs font-bold font-sans text-gray-900 leading-none whitespace-nowrap">
-              COMPLETED BY: {
-                selectedHistoricalReport
-                  ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
-                  : (() => {
-                      const selectedUserObj = users.find(u => u.id === reconUser);
-                      return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
-                    })()
-              }
-            </p>
-            <p className="text-xs font-normal font-sans text-gray-900 leading-none whitespace-nowrap font-medium">DATE EXECUTED: {
-              selectedHistoricalReport 
-                ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                : new Date().toLocaleDateString()
-            }</p>
-          </div>
-        </div>
-
-        {/* Audit Grid/Table */}
-        <div className="!mt-1">
-          <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
-            <colgroup>
-              <col className="w-[33%]" />
-              <col className="w-[11%]" />
-              <col className="w-[11%]" />
-              <col className="w-[8%]" />
-              <col className="w-[8%]" />
-              <col className="w-[8%]" />
-              <col className="w-[7%]" />
-              <col className="w-[7%]" />
-              <col className="w-[7%]" />
-            </colgroup>
-            <thead>
-              <tr className="border-t-2 border-gray-900">
-                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>MEDICATION</span>
-                  </div>
-                </th>
-                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>NDC</span>
-                  </div>
-                </th>
-                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>LAST REPORT</span>
-                    <span className="mt-0.5">COUNT</span>
-                  </div>
-                </th>
-                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>PURCHASED</span>
-                  </div>
-                </th>
-                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>DISPENSED</span>
-                  </div>
-                </th>
-                <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>ADJUSTED</span>
-                  </div>
-                </th>
-                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>EXPECTED</span>
-                    <span className="mt-0.5">COUNT</span>
-                  </div>
-                </th>
-                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>PHYSICAL</span>
-                    <span className="mt-0.5">COUNT</span>
-                  </div>
-                </th>
-                <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
-                  <div className="flex flex-col items-center justify-center leading-none">
-                    <span>VARIANCE</span>
-                  </div>
-                </th>
-              </tr>
-              <tr className="border-b-2 border-gray-900">
-                <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans px-1" style={{ paddingTop: '2px', paddingBottom: '3px', verticalAlign: 'middle' }}>
-                  <span className="inline-block px-2 py-0.5 rounded-full bg-gray-900/10 text-gray-900 text-[8px] font-black uppercase tracking-wider border border-gray-900/15">
-                    SINCE LAST REPORT ON {headerPrevReportDate}
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {selectedHistoricalReport ? (
-                [...selectedHistoricalReport.items].sort(compareSubstances).map(item => {
-                  const variance = item.variance;
-                  return (
-                    <Fragment key={item.substanceId}>
-                      <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <div 
-                            onClick={() => {
-                              if (!isForPrint) {
-                                const invItem = inventory.find(i => i.id === item.substanceId);
-                                if (invItem) setSelectedSubstanceDetail(invItem);
-                              }
-                            }}
-                            className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
-                            title={`${item.substanceName} ${item.strength} - Click to view transaction history`}
-                          >
-                            {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
-                          </div>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{item.expected || 0}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{item.physical || 0}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
-                        </td>
-                      </tr>
-                      {variance !== 0 && (
-                        <tr className="bg-gray-50/50">
-                          <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans border-t border-b border-gray-100">
-                            Discrepancy Reason: {item.reason || "State reason omitted"}
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  );
-                })
-              ) : (
-                [...substancesToReconcile].sort(compareSubstances).map(sub => {
-                  const metrics = getSubstanceHistoryMetrics(sub.id);
-                  const counted = getReconPhysicalCount(sub.id) ?? 0;
-                  const variance = counted - metrics.expected;
-                  const reason = reconReasons[sub.id] || "";
-                  
-                  return (
-                    <Fragment key={sub.id}>
-                      <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
-                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <div 
-                            onClick={() => !isForPrint && setSelectedSubstanceDetail(sub)}
-                            className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
-                            title={`${sub.name} ${sub.strength} - Click to view transaction history`}
-                          >
-                            {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
-                          </div>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
-                          <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{metrics.expected}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
-                          <span className="text-[10px] leading-none">{counted}</span>
-                        </td>
-                        <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
-                          <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
-                        </td>
-                      </tr>
-                      {variance !== 0 && (
-                        <tr className="bg-gray-50/50">
-                          <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans border-t border-b border-gray-100">
-                            Discrepancy Reason: {reason || "State reason omitted"}
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Flexible Spacer to push signatures to the bottom of the page */}
-        <div className="flex-grow flex-1 min-h-[16px]" />
-
-        {/* Signature box info */}
-        <div className="space-y-1 pt-1.5 border-t border-gray-100 break-inside-avoid">
-          {/* Moved disclaimer above signature fields in historical report block */}
-          <p className="text-[10px] text-gray-900 font-normal leading-normal text-left">
-            By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
-          </p>
-          {isSigRequired ? (
-            <div className="grid grid-cols-2 gap-4 pt-1">
-              {/* Left signature field */}
-              <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
-                <div className="flex items-center gap-1.5 pb-1">
-                  <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
-                  <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                    {perfName}
-                  </span>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  {userSig ? (
-                    <img src={userSig} className="max-h-12 object-contain font-medium" alt="Performed by signature" />
-                  ) : (
-                    <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                      No signature captured
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Right signature field */}
-              <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
-                <div className="flex items-center gap-1.5 pb-1">
-                  <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
-                  <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
-                    {picName}
-                  </span>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  {picSig ? (
-                    <img src={picSig} className="max-h-12 object-contain font-medium" alt="PIC signature" />
-                  ) : (
-                    <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
-                      No signature captured
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
-              <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
-              <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
-            </div>
-          )}
-        </div>
-
-        {/* Bottom watermark footer, visible on screen preview, but hidden during print */}
-        <div className="flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
-          <span>GENERATED WITH PHARMAGUARD</span>
-          <span className="text-right">PAGE 1 OF 1</span>
-        </div>
-      </>
-    );
-
     return (
-      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative bg-transparent"}>
+      <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative"}>
         {isForPrint && (
-          <>
-            <style>{`
+          <style>{`
+            @page {
+              size: landscape;
+            }
+            @media print {
               @page {
                 size: landscape;
+              }
+            }
+            @page {
+              margin: 10mm 15mm 15mm 15mm;
+              @bottom-right {
+                content: "page " counter(page) " of " counter(pages);
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 8px;
+                font-weight: bold;
+                color: #111827;
+                vertical-align: top;
+                padding-top: 2mm;
+              }
+              @bottom-left {
+                content: "Generated With PharmaGuard";
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 8px;
+                font-weight: bold;
+                color: #111827;
+                vertical-align: top;
+                padding-top: 2mm;
+              }
+            }
+            @media screen {
+              #reconciliation-printable-root {
+                display: none !important;
+              }
+            }
+            @media print {
+              html, body {
+                position: static !important;
+                overflow: visible !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+                width: auto !important;
+                height: auto !important;
+                max-height: none !important;
+                min-height: 0 !important;
+                top: auto !important;
+                left: auto !important;
+                right: auto !important;
+                bottom: auto !important;
                 margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
               }
-              @media screen {
-                #reconciliation-printable-root {
-                  display: none !important;
-                }
+              .is-safari, .is-safari body {
+                width: 297mm !important;
+                height: auto !important;
+                min-height: 210mm !important;
               }
-              @media print {
-                html, body {
-                  position: static !important;
-                  overflow: visible !important;
-                  overflow-x: visible !important;
-                  overflow-y: visible !important;
-                  width: auto !important;
-                  height: auto !important;
-                  max-height: none !important;
-                  min-height: 0 !important;
-                  top: auto !important;
-                  left: auto !important;
-                  right: auto !important;
-                  bottom: auto !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  background: transparent !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
-                body > *:not(#reconciliation-printable-root) {
-                  display: none !important;
-                }
-                #reconciliation-printable-root {
-                  display: block !important;
-                  position: static !important;
-                  width: 100% !important;
-                  height: auto !important;
-                  overflow: visible !important;
-                  padding: 18mm 20mm 18mm 20mm !important;
-                  margin: 0 !important;
-                  background: transparent !important;
-                  box-sizing: border-box !important;
-                }
-                /* Support clean layout overrides for Safari and iOS Safari */
-                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
-                  width: 100% !important;
-                  height: auto !important;
-                  min-height: 0 !important;
-                  position: static !important;
-                  overflow: visible !important;
-                }
-                .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
-                  width: 100% !important;
-                  height: auto !important;
-                  position: static !important;
-                  transform: none !important;
-                  overflow: visible !important;
-                }
-                #reconciliation-printable-invoice {
-                  display: flex !important;
-                  flex-direction: column !important;
-                  justify-content: flex-start !important;
-                  position: relative !important;
-                  z-index: 10 !important;
-                  width: 100% !important;
-                  height: auto !important;
-                  min-height: 175mm !important;
-                  overflow: visible !important;
-                  max-height: none !important;
-                  padding: 0 !important;
-                  box-shadow: none !important;
-                  border: none !important;
-                  background: transparent !important;
-                  box-sizing: border-box !important;
-                }
-                .is-safari #reconciliation-printable-invoice {
-                  width: 100% !important;
-                  height: auto !important;
-                  min-height: 175mm !important;
-                  position: relative !important;
-                  box-sizing: border-box !important;
-                  padding: 0 !important;
-                  background: transparent !important;
-                }
-                #reconciliation-printable-root * {
-                  visibility: visible !important;
-                }
-                #reconciliation-printable-invoice,
-                #reconciliation-printable-invoice * {
-                  background-color: transparent !important;
-                }
-                table, tbody, thead, th, td {
-                  page-break-inside: auto !important;
-                  break-inside: auto !important;
-                  height: auto !important;
-                }
-                tr {
-                  page-break-inside: avoid !important;
-                  break-inside: avoid !important;
-                }
-                .break-inside-avoid {
-                  page-break-inside: avoid !important;
-                  break-inside: avoid !important;
-                }
-
-                .print-watermark {
+              body > *:not(#reconciliation-printable-root) {
+                display: none !important;
+              }
+              #reconciliation-printable-root {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+              }
+              .is-safari #reconciliation-printable-root {
+                width: 297mm !important;
+                height: auto !important;
+                min-height: 210mm !important;
+                position: relative !important;
+              }
+              #reconciliation-printable-invoice {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important;
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 175mm !important;
+                overflow: visible !important;
+                max-height: none !important;
+                padding-top: 8mm !important;
+                padding-bottom: 8mm !important;
+                box-shadow: none !important;
+                border: none !important;
+              }
+              .is-safari #reconciliation-printable-invoice {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 175mm !important;
+                position: relative !important;
+                box-sizing: border-box !important;
+              }
+              .is-safari #reconciliation-printable-invoice .print\\:fixed {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+              }
+              #reconciliation-printable-root * {
+                visibility: visible !important;
+              }
+              table, tbody, thead, th, td {
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+                height: auto !important;
+              }
+              tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+              }
+              .break-inside-avoid {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+              }
+              /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+              .print-header, .print-footer {
+                display: none !important;
+              }
+              /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
+              @supports (-webkit-touch-callout: none) {
+                .print-header {
                   display: flex !important;
                   position: fixed !important;
-                  top: 50% !important;
-                  left: 50% !important;
-                  width: 380px !important;
-                  height: 380px !important;
-                  transform: translate(-50%, -50%) !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  justify-content: space-between !important;
                   align-items: center !important;
-                  justify-content: center !important;
-                  z-index: -10 !important;
-                  pointer-events: none !important;
-                  opacity: 0.12 !important;
-                  background: transparent !important;
+                  border-bottom: 0.5px solid #e5e7eb !important;
+                  padding-bottom: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                }
+                .print-footer {
+                  display: flex !important;
+                  position: fixed !important;
+                  bottom: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-top: 0.5px solid #e5e7eb !important;
+                  padding-top: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
                 }
               }
-            `}</style>
-            <div className="print-watermark">
-              <PharmaLogo className="w-[380px] h-[380px]" />
-            </div>
-          </>
+              .is-safari .print-header {
+                display: flex !important;
+                position: fixed !important;
+                top: 5mm !important;
+                left: 15mm !important;
+                right: 15mm !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-bottom: 0.5px solid #e5e7eb !important;
+                padding-bottom: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
+              }
+              .is-safari .print-footer {
+                display: flex !important;
+                position: fixed !important;
+                bottom: 5mm !important;
+                left: 15mm !important;
+                right: 15mm !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-top: 0.5px solid #e5e7eb !important;
+                padding-top: 1.5mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: uppercase !important;
+              }
+            }
+          `}</style>
         )}
-        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:z-10 print:bg-transparent print:border-none print:shadow-none bg-transparent" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl bg-white"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 text-gray-900 font-sans`}>
-          {isForPrint ? (
-            <>
-              {invoiceInnerBody}
-            </>
-          ) : (
-            <>
-              {/* Header element visible on screen preview, but hidden during actual printing */}
-              <div className="flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none print:hidden">
-                <span>PHARMAGUARD RECONCILIATION REPORT</span>
-                <span>{selectedHistoricalReport 
+        <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:pb-10" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
+          {/* Header element visible on screen preview, or as hidden print overlay */}
+          <div className={isForPrint ? "hidden print:flex print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+            <span>PHARMAGUARD RECONCILIATION REPORT</span>
+            <span>{selectedHistoricalReport 
+              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+              : new Date().toLocaleDateString()
+            }</span>
+          </div>
+          
+          {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.14] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
+            <PharmaLogo className="w-[380px] h-[380px]" />
+          </div>
+          
+          {/* Visual Official Letterhead */}
+          <div className="flex justify-between items-end pb-0">
+            <div className="flex flex-col space-y-1 min-w-0 flex-1">
+              <h1 className="text-xl font-extrabold tracking-tight uppercase leading-none whitespace-nowrap">{getReportTitle().toUpperCase()}</h1>
+              <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REPORT #: {(() => {
+                const rNum = selectedHistoricalReport ? selectedHistoricalReport.reportNumber : reconRef;
+                return rNum?.startsWith("REC-") ? rNum : `REC-${rNum}`;
+              })()}</p>
+              <p className="text-xs text-gray-900 font-sans leading-none whitespace-nowrap">REGISTRY ID: {userProfile?.organizationName?.toUpperCase() || "PHARMA GUARD ACTIVE NODE"}</p>
+            </div>
+            <div className="text-right flex flex-col items-end justify-end space-y-1 shrink-0 whitespace-nowrap ml-4">
+              <p className="text-xs font-bold font-sans text-gray-900 leading-none whitespace-nowrap">
+                COMPLETED BY: {
+                  selectedHistoricalReport
+                    ? `${selectedHistoricalReport.performedByName} ${selectedHistoricalReport.performedByTitle ? `(${selectedHistoricalReport.performedByTitle})` : ""}`
+                    : (() => {
+                        const selectedUserObj = users.find(u => u.id === reconUser);
+                        return selectedUserObj ? `${selectedUserObj.name} ${selectedUserObj.title ? `(${selectedUserObj.title})` : ""}` : "AUTHORIZED STAFF";
+                      })()
+                }
+              </p>
+              <p className="text-xs font-normal font-sans text-gray-900 leading-none whitespace-nowrap">DATE EXECUTED: {
+                selectedHistoricalReport 
                   ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
                   : new Date().toLocaleDateString()
-                }</span>
-              </div>
-              
-              {/* Centered Watermark for Screen, hidden during printing */}
-              <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:hidden">
-                <PharmaLogo className="w-[380px] h-[380px]" />
-              </div>
+              }</p>
+            </div>
+          </div>
 
-              {invoiceInnerBody}
-            </>
-          )}
+          {/* Audit Grid/Table */}
+          <div className="!mt-1">
+            <table className="w-full text-xs font-sans text-gray-900 table-fixed" style={{ height: 'auto' }}>
+              <colgroup>
+                <col className="w-[33%]" />
+                <col className="w-[11%]" />
+                <col className="w-[11%]" />
+                <col className="w-[8%]" />
+                <col className="w-[8%]" />
+                <col className="w-[8%]" />
+                <col className="w-[7%]" />
+                <col className="w-[7%]" />
+                <col className="w-[7%]" />
+              </colgroup>
+              <thead>
+                <tr className="border-t-2 border-gray-900">
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>MEDICATION</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>NDC</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>LAST REPORT</span>
+                      <span className="mt-0.5">COUNT</span>
+                    </div>
+                  </th>
+                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>PURCHASED</span>
+                    </div>
+                  </th>
+                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>DISPENSED</span>
+                    </div>
+                  </th>
+                  <th className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '0px', verticalAlign: 'bottom' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>ADJUSTED</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>EXPECTED</span>
+                      <span className="mt-0.5">COUNT</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>PHYSICAL</span>
+                      <span className="mt-0.5">COUNT</span>
+                    </div>
+                  </th>
+                  <th rowSpan={2} className="text-center font-bold text-[10px] font-sans" style={{ paddingTop: '1px', paddingBottom: '1px', verticalAlign: 'middle' }}>
+                    <div className="flex flex-col items-center justify-center leading-none">
+                      <span>VARIANCE</span>
+                    </div>
+                  </th>
+                </tr>
+                <tr className="border-b-2 border-gray-900">
+                  <th colSpan={3} className="text-center font-bold text-[9px] text-gray-900 font-sans px-1" style={{ paddingTop: '2px', paddingBottom: '3px', verticalAlign: 'middle' }}>
+                    <span className="inline-block px-2 py-0.5 rounded-full bg-gray-900/10 text-gray-900 text-[8px] font-black uppercase tracking-wider border border-gray-900/15">
+                      SINCE LAST REPORT ON {headerPrevReportDate}
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {selectedHistoricalReport ? (
+                  [...selectedHistoricalReport.items].sort(compareSubstances).map(item => {
+                    const variance = item.variance;
+                    return (
+                      <Fragment key={item.substanceId}>
+                        <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div 
+                              onClick={() => {
+                                if (!isForPrint) {
+                                  const invItem = inventory.find(i => i.id === item.substanceId);
+                                  if (invItem) setSelectedSubstanceDetail(invItem);
+                                }
+                              }}
+                              className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                              title={`${item.substanceName} ${item.strength} - Click to view transaction history`}
+                            >
+                              {item.substanceName} <span className="text-gray-900 font-normal ml-1">{item.strength}</span>
+                            </div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{item.ndc}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div className="font-bold text-[10px] text-gray-900 leading-none">{item.lastClosingCount || 0}</div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{(item.purchases || 0) === 0 ? "Ø" : `+${item.purchases}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{(item.dispensed || 0) === 0 ? "Ø" : `-${item.dispensed}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{item.adjustments === 0 ? "Ø" : (item.adjustments > 0 ? `+${item.adjustments}` : item.adjustments)}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{item.expected || 0}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{item.physical || 0}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                          </td>
+                        </tr>
+                        {variance !== 0 && (
+                          <tr className="bg-gray-50/50">
+                            <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
+                              Discrepancy Reason: {item.reason || "State reason omitted"}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })
+                ) : (
+                  [...substancesToReconcile].sort(compareSubstances).map(sub => {
+                    const metrics = getSubstanceHistoryMetrics(sub.id);
+                    const counted = getReconPhysicalCount(sub.id) ?? 0;
+                    const variance = counted - metrics.expected;
+                    const reason = reconReasons[sub.id] || "";
+                    
+                    return (
+                      <Fragment key={sub.id}>
+                        <tr className="text-center text-gray-900 font-sans" style={{ height: '40px' }}>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div 
+                              onClick={() => !isForPrint && setSelectedSubstanceDetail(sub)}
+                              className={`font-bold text-gray-900 text-[10px] leading-tight truncate max-w-[230px] mx-auto whitespace-nowrap ${!isForPrint ? 'cursor-pointer hover:text-brand-blue hover:underline' : ''}`} 
+                              title={`${sub.name} ${sub.strength} - Click to view transaction history`}
+                            >
+                              {sub.name} <span className="text-gray-900 font-normal ml-1">{sub.strength}</span>
+                            </div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <span className="font-bold text-[10px] text-gray-900 font-sans leading-none">{sub.ndc}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-sans align-middle">
+                            <div className="font-bold text-[10px] text-gray-900 leading-none">{metrics.lastClosingCount}</div>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.purchases === 0 ? "Ø" : `+${metrics.purchases}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.dispensed === 0 ? "Ø" : `-${metrics.dispensed}`}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.adjustments === 0 ? "Ø" : (metrics.adjustments > 0 ? `+${metrics.adjustments}` : metrics.adjustments)}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{metrics.expected}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center text-gray-900 font-bold font-sans align-middle">
+                            <span className="text-[10px] leading-none">{counted}</span>
+                          </td>
+                          <td className="py-1 px-1 text-center font-bold text-gray-900 font-sans align-middle">
+                            <span className="text-[10px] leading-none">{variance === 0 ? "0" : variance > 0 ? `+${variance}` : variance}</span>
+                          </td>
+                        </tr>
+                        {variance !== 0 && (
+                          <tr className="bg-gray-50/50">
+                            <td colSpan={9} className="py-2 pl-4 text-left border-l-2 border-gray-900 text-[10px] text-gray-900 italic font-sans">
+                              Discrepancy Reason: {reason || "State reason omitted"}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Flexible Spacer to push signatures to the bottom of the page */}
+          <div className="flex-grow flex-1 min-h-[16px]" />
+
+          {/* Signature box info */}
+          <div className="space-y-1 pt-1.5 border-t border-gray-100 break-inside-avoid">
+            {/* Moved disclaimer above signature fields in historical report block */}
+            <p className="text-[10px] text-gray-900 font-medium leading-normal text-left">
+              By executing this report, you certify that the physical count has been completed, any discrepancies are explained truthfully, and stock metrics are reconciled in good faith.
+            </p>
+            {isSigRequired ? (
+              <div className="grid grid-cols-2 gap-4 pt-1">
+                {/* Left signature field */}
+                <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                  <div className="flex items-center gap-1.5 pb-1">
+                    <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">COMPLETED BY:</span>
+                    <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                      {perfName}
+                    </span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
+                    {userSig ? (
+                      <img src={userSig} className="max-h-12 object-contain" alt="Performed by signature" />
+                    ) : (
+                      <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                        No signature captured
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right signature field */}
+                <div className="border border-black p-2.5 rounded-lg relative h-20 flex flex-col justify-between bg-gray-50/20">
+                  <div className="flex items-center gap-1.5 pb-1">
+                    <span className="text-[10px] text-gray-900 font-sans uppercase font-black tracking-wider">PIC:</span>
+                    <span className="text-[10px] text-gray-900 font-sans font-bold truncate">
+                      {picName}
+                    </span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
+                    {picSig ? (
+                      <img src={picSig} className="max-h-12 object-contain" alt="PIC signature" />
+                    ) : (
+                      <span className="text-gray-900 text-[9px] font-sans uppercase tracking-wider italic">
+                        No signature captured
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="pt-1.5 flex flex-col sm:flex-row justify-between text-[10px] text-gray-900 font-sans font-bold uppercase gap-2">
+                <div>COMPLETED BY: {perfName} (SYSTEM AUTHENTICATED)</div>
+                <div>PIC: {picName} (AUTO-BYPASS ENFORCED)</div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
+          <div className={isForPrint ? "hidden print:flex print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
+            <span>GENERATED WITH PHARMAGUARD</span>
+            <span className="text-right">PAGE 1 OF 1</span>
+          </div>
+
         </div>
       </div>
     );
@@ -6783,10 +6832,9 @@ export default function App() {
         </div>
 
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''} bg-[#f1f5f9]`}>
-
           {/* Print Report Review Page (Forced Landscape Frame for iPad / Standard Screen Verification) */}
           <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-start md:justify-center items-start">
-            <div className="w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
+            <div className="w-full max-w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
               {renderReconciliationReportContent(false)}
             </div>
           </div>
@@ -6818,14 +6866,39 @@ export default function App() {
                       if (printWindow) {
                         printWindow.document.write(`
                           <!DOCTYPE html>
-                          <html class="${isSafariOrIPad ? 'is-safari' : ''} ${isIOSOrIPadSafari ? 'is-ios-safari' : ''}">
+                          <html class="${isSafariOrIPad ? 'is-safari' : ''}">
                             <head>
-                              <title>Generated Using PharmaGuard</title>
+                              <title>PharmaGuard Reconciliation Report</title>
                               ${styleTags}
                               <style>
                                 @page {
                                   size: landscape;
-                                  margin: 0 !important;
+                                }
+                                @media print {
+                                  @page {
+                                    size: landscape;
+                                  }
+                                }
+                                @page {
+                                  margin: 10mm 15mm 15mm 15mm;
+                                  @bottom-right {
+                                    content: "page " counter(page) " of " counter(pages);
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                                    font-size: 8px;
+                                    font-weight: bold;
+                                    color: #111827;
+                                    vertical-align: top;
+                                    padding-top: 2mm;
+                                  }
+                                  @bottom-left {
+                                    content: "Generated With PharmaGuard";
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                                    font-size: 8px;
+                                    font-weight: bold;
+                                    color: #111827;
+                                    vertical-align: top;
+                                    padding-top: 2mm;
+                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6841,18 +6914,14 @@ export default function App() {
                                   right: auto !important;
                                   bottom: auto !important;
                                   overscroll-behavior: auto !important;
-                                  background: transparent !important;
+                                  background: white !important;
                                   color: black !important;
                                 }
-                                /* Support clean layout overrides for Safari and iOS Safari */
-                                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
-                                  width: 100% !important;
+                                .is-safari, .is-safari body {
+                                  width: 297mm !important;
                                   height: auto !important;
-                                  min-height: 0 !important;
-                                  position: static !important;
-                                  overflow: visible !important;
+                                  min-height: 210mm !important;
                                 }
-                                /* iOS Safari body layout uses standard margins */
                                 body {
                                   margin: 0 !important;
                                   padding: 0 !important;
@@ -6869,31 +6938,49 @@ export default function App() {
                                   min-height: 0 !important;
                                   max-height: none !important;
                                   overflow: visible !important;
-                                  padding: 18mm 20mm 18mm 20mm !important;
+                                  padding: 0 !important;
                                   margin: 0 !important;
-                                  background: transparent !important;
-                                  box-sizing: border-box !important;
+                                  background: white !important;
+                                }
+                                .is-safari #reconciliation-printable-root {
+                                  width: 297mm !important;
+                                  height: auto !important;
+                                  min-height: 210mm !important;
+                                  position: relative !important;
                                 }
                                 #reconciliation-printable-invoice {
                                   display: flex !important;
                                   flex-direction: column !important;
                                   justify-content: flex-start !important;
                                   position: relative !important;
-                                  z-index: 10 !important;
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 175mm !important;
-                                  overflow: visible !important;
                                   max-height: none !important;
-                                  padding: 0 !important;
+                                  overflow: visible !important;
                                   box-shadow: none !important;
                                   border: none !important;
-                                  background: transparent !important;
+                                  padding-top: 8mm !important;
+                                  padding-bottom: 8mm !important;
+                                }
+                                .is-safari #reconciliation-printable-invoice {
+                                  width: 100% !important;
+                                  height: auto !important;
+                                  min-height: 175mm !important;
+                                  position: relative !important;
                                   box-sizing: border-box !important;
                                 }
-                                #reconciliation-printable-invoice,
-                                #reconciliation-printable-invoice * {
-                                  background-color: transparent !important;
+                                .is-safari #reconciliation-printable-invoice .print\\:fixed {
+                                  position: absolute !important;
+                                  top: 0 !important;
+                                  left: 0 !important;
+                                  right: 0 !important;
+                                  bottom: 0 !important;
+                                  height: 100% !important;
+                                  width: 100% !important;
+                                  display: flex !important;
+                                  align-items: center !important;
+                                  justify-content: center !important;
                                 }
                                 table, tbody, thead, th, td {
                                   page-break-inside: auto !important;
@@ -6908,50 +6995,84 @@ export default function App() {
                                   page-break-inside: avoid !important;
                                   break-inside: avoid !important;
                                 }
-                                .print-footer-disabled {
+                                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+                                .print-header, .print-footer {
+                                  display: none !important;
+                                }
+                                /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
+                                @supports (-webkit-touch-callout: none) {
+                                  .print-header {
+                                    display: flex !important;
+                                    position: fixed !important;
+                                    top: 0 !important;
+                                    left: 0 !important;
+                                    right: 0 !important;
+                                    justify-content: space-between !important;
+                                    align-items: center !important;
+                                    border-bottom: 0.5px solid #e5e7eb !important;
+                                    padding-bottom: 1.5mm !important;
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                    font-size: 8px !important;
+                                    font-weight: bold !important;
+                                    color: #111827 !important;
+                                    z-index: 9999 !important;
+                                    background: white !important;
+                                    text-transform: uppercase !important;
+                                  }
+                                  .print-footer {
+                                    display: flex !important;
+                                    position: fixed !important;
+                                    bottom: 0 !important;
+                                    left: 0 !important;
+                                    right: 0 !important;
+                                    justify-content: space-between !important;
+                                    align-items: center !important;
+                                    border-top: 0.5px solid #e5e7eb !important;
+                                    padding-top: 1.5mm !important;
+                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                    font-size: 8px !important;
+                                    font-weight: bold !important;
+                                    color: #111827 !important;
+                                    z-index: 9999 !important;
+                                    background: white !important;
+                                    text-transform: uppercase !important;
+                                  }
+                                }
+                                .is-safari .print-header {
                                   display: flex !important;
                                   position: fixed !important;
-                                  bottom: 12mm !important;
-                                  left: 20mm !important;
-                                  right: 20mm !important;
-                                  height: 8mm !important;
+                                  top: 5mm !important;
+                                  left: 15mm !important;
+                                  right: 15mm !important;
+                                  justify-content: space-between !important;
+                                  align-items: center !important;
+                                  border-bottom: 0.5px solid #e5e7eb !important;
+                                  padding-bottom: 1.5mm !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-size: 8px !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
+                                  z-index: 9999 !important;
+                                  background: white !important;
+                                  text-transform: uppercase !important;
+                                }
+                                .is-safari .print-footer {
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  bottom: 5mm !important;
+                                  left: 15mm !important;
+                                  right: 15mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-top: 0.5px solid #e5e7eb !important;
                                   padding-top: 1.5mm !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8.5px !important;
+                                  font-size: 8px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
                                   z-index: 9999 !important;
-                                  background: transparent !important;
+                                  background: white !important;
                                   text-transform: uppercase !important;
-                                  box-sizing: border-box !important;
-                                }
-                                .print-page-number-disabled {
-                                  font-size: 8.5px !important;
-                                }
-                                .print-page-number-disabled::after {
-                                  font-size: 8.5px !important;
-                                  content: " OF 1" !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                }
-                                .print-watermark {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  top: 50% !important;
-                                  left: 50% !important;
-                                  width: 380px !important;
-                                  height: 380px !important;
-                                  transform: translate(-50%, -50%) !important;
-                                  align-items: center !important;
-                                  justify-content: center !important;
-                                  z-index: -10 !important;
-                                  pointer-events: none !important;
-                                  opacity: 0.12 !important;
-                                  background: transparent !important;
                                 }
                               </style>
                             </head>
@@ -6998,7 +7119,32 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 0 !important;
+              }
+              @media print {
+                @page {
+                  size: landscape;
+                }
+              }
+              @page {
+                margin: 10mm 15mm 15mm 15mm;
+                @bottom-right {
+                  content: "page " counter(page) " of " counter(pages);
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                  font-size: 8px;
+                  font-weight: bold;
+                  color: #111827;
+                  vertical-align: top;
+                  padding-top: 2mm;
+                }
+                @bottom-left {
+                  content: "Generated With PharmaGuard";
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                  font-size: 8px;
+                  font-weight: bold;
+                  color: #111827;
+                  vertical-align: top;
+                  padding-top: 2mm;
+                }
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -7025,6 +7171,11 @@ export default function App() {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
+                .is-safari, .is-safari body {
+                  width: 297mm !important;
+                  height: auto !important;
+                  min-height: 210mm !important;
+                }
                 body > *:not(#reconciliation-printable-root) {
                   display: none !important;
                 }
@@ -7034,45 +7185,52 @@ export default function App() {
                   width: 100% !important;
                   height: auto !important;
                   overflow: visible !important;
-                  padding: 18mm 20mm 18mm 20mm !important;
+                  padding: 0 !important;
                   margin: 0 !important;
-                  background: transparent !important;
+                  background: white !important;
+                }
+                .is-safari #reconciliation-printable-root {
+                  width: 297mm !important;
+                  height: auto !important;
+                  min-height: 210mm !important;
+                  position: relative !important;
                 }
                 #reconciliation-printable-invoice {
                   display: flex !important;
                   flex-direction: column !important;
                   justify-content: flex-start !important;
                   position: relative !important;
-                  z-index: 10 !important;
                   width: 100% !important;
                   height: auto !important;
                   min-height: 175mm !important;
                   overflow: visible !important;
                   max-height: none !important;
-                  padding: 0 !important;
+                  padding-top: 8mm !important;
+                  padding-bottom: 8mm !important;
+                  box-shadow: none !important;
                   border: none !important;
-                  background: transparent !important;
+                }
+                .is-safari #reconciliation-printable-invoice {
+                  width: 100% !important;
+                  height: auto !important;
+                  min-height: 175mm !important;
+                  position: relative !important;
                   box-sizing: border-box !important;
                 }
-                /* Center the watermark on every page cleanly on Safari and Chrome */
-                .print-watermark {
-                  display: flex !important;
-                  position: fixed !important;
+                .is-safari #reconciliation-printable-invoice .print\\:fixed {
+                  position: absolute !important;
                   top: 0 !important;
                   left: 0 !important;
-                  width: 100% !important;
+                  right: 0 !important;
+                  bottom: 0 !important;
                   height: 100% !important;
+                  width: 100% !important;
+                  display: flex !important;
                   align-items: center !important;
                   justify-content: center !important;
-                  z-index: 1 !important;
-                  pointer-events: none !important;
-                  opacity: 0.12 !important;
-                  background: transparent !important;
                 }
-
-                #reconciliation-printable-invoice, 
-                #reconciliation-printable-invoice * {
-                  background-color: transparent !important;
+                #reconciliation-printable-root * {
+                  visibility: visible !important;
                 }
                 table, tbody, thead, th, td {
                   page-break-inside: auto !important;
@@ -7086,6 +7244,85 @@ export default function App() {
                 .break-inside-avoid {
                   page-break-inside: avoid !important;
                   break-inside: avoid !important;
+                }
+                /* Hide custom overlay headers and footers on standard layouts supporting @page margin boxes */
+                .print-header, .print-footer {
+                  display: none !important;
+                }
+                /* Only enable overlay headers and footers on iOS / Safari devices where @page margin boxes are unsupported */
+                @supports (-webkit-touch-callout: none) {
+                  .print-header {
+                    display: flex !important;
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    border-bottom: 0.5px solid #e5e7eb !important;
+                    padding-bottom: 1.5mm !important;
+                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                    font-size: 8px !important;
+                    font-weight: bold !important;
+                    color: #111827 !important;
+                    z-index: 9999 !important;
+                    background: white !important;
+                    text-transform: uppercase !important;
+                  }
+                  .print-footer {
+                    display: flex !important;
+                    position: fixed !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    border-top: 0.5px solid #e5e7eb !important;
+                    padding-top: 1.5mm !important;
+                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                    font-size: 8px !important;
+                    font-weight: bold !important;
+                    color: #111827 !important;
+                    z-index: 9999 !important;
+                    background: white !important;
+                    text-transform: uppercase !important;
+                  }
+                }
+                .is-safari .print-header {
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 5mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-bottom: 0.5px solid #e5e7eb !important;
+                  padding-bottom: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
+                }
+                .is-safari .print-footer {
+                  display: flex !important;
+                  position: fixed !important;
+                  bottom: 5mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-top: 0.5px solid #e5e7eb !important;
+                  padding-top: 1.5mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: uppercase !important;
                 }
               }
             `}</style>
