@@ -4369,33 +4369,23 @@ export default function App() {
           `}</style>
         )}
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:pb-10" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
-          {/* Header element visible on screen preview, or as hidden print overlay */}
-          <div className={isForPrint ? "hidden print:flex print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
-            {isForPrint ? (
-              <>
-                <span>{selectedHistoricalReport 
-                  ? new Date(selectedHistoricalReport.timestamp).toLocaleString(undefined, {
-                      year: "numeric",
-                      month: "numeric",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                      hour12: true
-                    })
-                  : printTimestamp
-                }</span>
-                <span>PharmaGuard Reconciliation Report</span>
-              </>
-            ) : (
-              <>
-                <span>PHARMAGUARD RECONCILIATION REPORT</span>
-                <span>{selectedHistoricalReport 
-                  ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-                  : new Date().toLocaleDateString()
-                }</span>
-              </>
-            )}
-          </div>
+          {/* Header element visible as hidden print overlay */}
+          {isForPrint && (
+            <div className="hidden print:flex print-header justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none">
+              <span>{selectedHistoricalReport 
+                ? new Date(selectedHistoricalReport.timestamp).toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true
+                  })
+                : printTimestamp
+              }</span>
+              <span>PharmaGuard Reconciliation Report</span>
+            </div>
+          )}
           
           {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
           <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.14] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
