@@ -4648,7 +4648,7 @@ export default function App() {
 
           {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
           <div className={isForPrint ? "hidden print:flex print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
-            <span>GENERATED WITH PHARMAGUARD</span>
+            <span>GENERATED USING PHARMAGUARD</span>
             <span className="text-right">PAGE 1 OF 1</span>
           </div>
 
