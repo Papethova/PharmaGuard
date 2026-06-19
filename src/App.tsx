@@ -4163,26 +4163,39 @@ export default function App() {
     return (
       <div id={isForPrint ? "reconciliation-printable-root" : undefined} className={!isForPrint ? "w-full max-w-full relative" : "relative"}>
         {isForPrint && (
+          isSafariOrIPad ? (
+            <style>{`
+              @page {
+                size: landscape;
+                margin: 0 !important;
+              }
+            `}</style>
+          ) : (
+            <style>{`
+              @page {
+                size: landscape;
+                margin: 10mm 15mm 15mm 15mm;
+                @top-left {
+                  content: "${printTimestamp}";
+                }
+                @top-center {
+                  content: "";
+                }
+                @top-right {
+                  content: "PharmaGuard Reconciliation Report";
+                }
+                @bottom-left {
+                  content: "Generated Using PharmaGuard";
+                }
+                @bottom-right {
+                  content: "Page " counter(page) " of " counter(pages);
+                }
+              }
+            `}</style>
+          )
+        )}
+        {isForPrint && (
           <style>{`
-            @page {
-              size: landscape;
-              margin: 10mm 15mm 15mm 15mm;
-              @top-left {
-                content: "${printTimestamp}";
-              }
-              @top-center {
-                content: "";
-              }
-              @top-right {
-                content: "PharmaGuard Reconciliation Report";
-              }
-              @bottom-left {
-                content: "Generated Using PharmaGuard";
-              }
-              @bottom-right {
-                content: "Page " counter(page) " of " counter(pages);
-              }
-            }
             @media screen {
               #reconciliation-printable-root {
                 display: none !important;
@@ -4257,6 +4270,10 @@ export default function App() {
                 min-height: 175mm !important;
                 position: relative !important;
                 box-sizing: border-box !important;
+                padding-top: 22mm !important;
+                padding-bottom: 22mm !important;
+                padding-left: 15mm !important;
+                padding-right: 15mm !important;
               }
               .is-safari #reconciliation-printable-invoice .print\\:fixed {
                 position: absolute !important;
@@ -4295,13 +4312,13 @@ export default function App() {
                 .print-header {
                   display: flex !important;
                   position: fixed !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
+                  top: 10mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
+                  padding-bottom: 2mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-size: 8px !important;
                   font-weight: bold !important;
@@ -4309,17 +4326,18 @@ export default function App() {
                   z-index: 9999 !important;
                   background: white !important;
                   text-transform: none !important;
+                  box-sizing: border-box !important;
                 }
                 .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 0 !important;
-                  left: 0 !important;
-                  right: 0 !important;
+                  bottom: 10mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
+                  padding-top: 2mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-size: 8px !important;
                   font-weight: bold !important;
@@ -4327,18 +4345,19 @@ export default function App() {
                   z-index: 9999 !important;
                   background: white !important;
                   text-transform: none !important;
+                  box-sizing: border-box !important;
                 }
               }
               .is-safari .print-header {
                 display: flex !important;
                 position: fixed !important;
-                top: 5mm !important;
+                top: 10mm !important;
                 left: 15mm !important;
                 right: 15mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 1.5mm !important;
+                padding-bottom: 2mm !important;
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                 font-size: 8px !important;
                 font-weight: bold !important;
@@ -4346,17 +4365,18 @@ export default function App() {
                 z-index: 9999 !important;
                 background: white !important;
                 text-transform: none !important;
+                box-sizing: border-box !important;
               }
               .is-safari .print-footer {
                 display: flex !important;
                 position: fixed !important;
-                bottom: 5mm !important;
+                bottom: 10mm !important;
                 left: 15mm !important;
                 right: 15mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 1.5mm !important;
+                padding-top: 2mm !important;
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                 font-size: 8px !important;
                 font-weight: bold !important;
@@ -4364,6 +4384,14 @@ export default function App() {
                 z-index: 9999 !important;
                 background: white !important;
                 text-transform: none !important;
+                box-sizing: border-box !important;
+              }
+              .print-page-number-container {
+                font-size: 0 !important;
+              }
+              .print-page-number-container::after {
+                content: "Page " counter(page) " of " counter(pages) !important;
+                font-size: 8px !important;
               }
             }
           `}</style>
@@ -4671,7 +4699,7 @@ export default function App() {
             {isForPrint ? (
               <>
                 <span>Generated Using PharmaGuard</span>
-                <span className="text-right">Page 1 of 2</span>
+                <span className="text-right print-page-number-container">Page 1 of 2</span>
               </>
             ) : (
               <>
@@ -6902,25 +6930,32 @@ export default function App() {
                               <title>PharmaGuard Reconciliation Report</title>
                               ${styleTags}
                               <style>
-                                @page {
-                                  size: landscape;
-                                  margin: 10mm 15mm 15mm 15mm;
-                                  @top-left {
-                                    content: "${printTimestamp}";
+                                ${isSafariOrIPad ? `
+                                  @page {
+                                    size: landscape;
+                                    margin: 0 !important;
                                   }
-                                  @top-center {
-                                    content: "";
+                                ` : `
+                                  @page {
+                                    size: landscape;
+                                    margin: 10mm 15mm 15mm 15mm;
+                                    @top-left {
+                                      content: "${printTimestamp}";
+                                    }
+                                    @top-center {
+                                      content: "";
+                                    }
+                                    @top-right {
+                                      content: "PharmaGuard Reconciliation Report";
+                                    }
+                                    @bottom-left {
+                                      content: "Generated Using PharmaGuard";
+                                    }
+                                    @bottom-right {
+                                      content: "Page " counter(page) " of " counter(pages);
+                                    }
                                   }
-                                  @top-right {
-                                    content: "PharmaGuard Reconciliation Report";
-                                  }
-                                  @bottom-left {
-                                    content: "Generated Using PharmaGuard";
-                                  }
-                                  @bottom-right {
-                                    content: "Page " counter(page) " of " counter(pages);
-                                  }
-                                }
+                                `}
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
                                   height: auto !important;
@@ -6995,6 +7030,10 @@ export default function App() {
                                   min-height: 175mm !important;
                                   position: relative !important;
                                   box-sizing: border-box !important;
+                                  padding-top: 22mm !important;
+                                  padding-bottom: 22mm !important;
+                                  padding-left: 15mm !important;
+                                  padding-right: 15mm !important;
                                 }
                                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
                                   position: absolute !important;
@@ -7030,75 +7069,86 @@ export default function App() {
                                   .print-header {
                                     display: flex !important;
                                     position: fixed !important;
-                                    top: 0 !important;
-                                    left: 0 !important;
-                                    right: 0 !important;
+                                    top: 10mm !important;
+                                    left: 15mm !important;
+                                    right: 15mm !important;
                                     justify-content: space-between !important;
                                     align-items: center !important;
                                     border-bottom: 0.5px solid #e5e7eb !important;
-                                    padding-bottom: 1.5mm !important;
+                                    padding-bottom: 2mm !important;
                                     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                     font-size: 8px !important;
                                     font-weight: bold !important;
                                     color: #111827 !important;
                                     z-index: 9999 !important;
                                     background: white !important;
-                                    text-transform: uppercase !important;
+                                    text-transform: none !important;
+                                    box-sizing: border-box !important;
                                   }
                                   .print-footer {
                                     display: flex !important;
                                     position: fixed !important;
-                                    bottom: 0 !important;
-                                    left: 0 !important;
-                                    right: 0 !important;
+                                    bottom: 10mm !important;
+                                    left: 15mm !important;
+                                    right: 15mm !important;
                                     justify-content: space-between !important;
                                     align-items: center !important;
                                     border-top: 0.5px solid #e5e7eb !important;
-                                    padding-top: 1.5mm !important;
+                                    padding-top: 2mm !important;
                                     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                     font-size: 8px !important;
                                     font-weight: bold !important;
                                     color: #111827 !important;
                                     z-index: 9999 !important;
                                     background: white !important;
-                                    text-transform: uppercase !important;
+                                    text-transform: none !important;
+                                    box-sizing: border-box !important;
                                   }
                                 }
                                 .is-safari .print-header {
                                   display: flex !important;
                                   position: fixed !important;
-                                  top: 5mm !important;
+                                  top: 10mm !important;
                                   left: 15mm !important;
                                   right: 15mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-bottom: 0.5px solid #e5e7eb !important;
-                                  padding-bottom: 1.5mm !important;
+                                  padding-bottom: 2mm !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-size: 8px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
                                   z-index: 9999 !important;
                                   background: white !important;
-                                  text-transform: uppercase !important;
+                                  text-transform: none !important;
+                                  box-sizing: border-box !important;
                                 }
                                 .is-safari .print-footer {
                                   display: flex !important;
                                   position: fixed !important;
-                                  bottom: 5mm !important;
+                                  bottom: 10mm !important;
                                   left: 15mm !important;
                                   right: 15mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-top: 0.5px solid #e5e7eb !important;
-                                  padding-top: 1.5mm !important;
+                                  padding-top: 2mm !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-size: 8px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
                                   z-index: 9999 !important;
                                   background: white !important;
-                                  text-transform: uppercase !important;
+                                  text-transform: none !important;
+                                  box-sizing: border-box !important;
+                                }
+                                .print-page-number-container {
+                                  font-size: 0 !important;
+                                }
+                                .print-page-number-container::after {
+                                  content: "Page " counter(page) " of " counter(pages) !important;
+                                  font-size: 8px !important;
                                 }
                               </style>
                               <style>
@@ -7147,26 +7197,37 @@ export default function App() {
             </div>
 
             {/* Print utilities to style print view on Ctrl+P or button click */}
+            {isSafariOrIPad ? (
+              <style>{`
+                @page {
+                  size: landscape;
+                  margin: 0 !important;
+                }
+              `}</style>
+            ) : (
+              <style>{`
+                @page {
+                  size: landscape;
+                  margin: 10mm 15mm 15mm 15mm;
+                  @top-left {
+                    content: "${printTimestamp}";
+                  }
+                  @top-center {
+                    content: "";
+                  }
+                  @top-right {
+                    content: "PharmaGuard Reconciliation Report";
+                  }
+                  @bottom-left {
+                    content: "Generated Using PharmaGuard";
+                  }
+                  @bottom-right {
+                    content: "Page " counter(page) " of " counter(pages);
+                  }
+                }
+              `}</style>
+            )}
             <style>{`
-              @page {
-                size: landscape;
-                margin: 10mm 15mm 15mm 15mm;
-                @top-left {
-                  content: "${printTimestamp}";
-                }
-                @top-center {
-                  content: "";
-                }
-                @top-right {
-                  content: "PharmaGuard Reconciliation Report";
-                }
-                @bottom-left {
-                  content: "Generated Using PharmaGuard";
-                }
-                @bottom-right {
-                  content: "Page " counter(page) " of " counter(pages);
-                }
-              }
               @media screen {
                 #reconciliation-printable-root {
                   display: none !important;
@@ -7241,6 +7302,10 @@ export default function App() {
                   min-height: 175mm !important;
                   position: relative !important;
                   box-sizing: border-box !important;
+                  padding-top: 22mm !important;
+                  padding-bottom: 22mm !important;
+                  padding-left: 15mm !important;
+                  padding-right: 15mm !important;
                 }
                 .is-safari #reconciliation-printable-invoice .print\\:fixed {
                   position: absolute !important;
@@ -7279,13 +7344,13 @@ export default function App() {
                   .print-header {
                     display: flex !important;
                     position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
+                    top: 10mm !important;
+                    left: 15mm !important;
+                    right: 15mm !important;
                     justify-content: space-between !important;
                     align-items: center !important;
                     border-bottom: 0.5px solid #e5e7eb !important;
-                    padding-bottom: 1.5mm !important;
+                    padding-bottom: 2mm !important;
                     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                     font-size: 8px !important;
                     font-weight: bold !important;
@@ -7293,17 +7358,18 @@ export default function App() {
                     z-index: 9999 !important;
                     background: white !important;
                     text-transform: none !important;
+                    box-sizing: border-box !important;
                   }
                   .print-footer {
                     display: flex !important;
                     position: fixed !important;
-                    bottom: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
+                    bottom: 10mm !important;
+                    left: 15mm !important;
+                    right: 15mm !important;
                     justify-content: space-between !important;
                     align-items: center !important;
                     border-top: 0.5px solid #e5e7eb !important;
-                    padding-top: 1.5mm !important;
+                    padding-top: 2mm !important;
                     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                     font-size: 8px !important;
                     font-weight: bold !important;
@@ -7311,18 +7377,19 @@ export default function App() {
                     z-index: 9999 !important;
                     background: white !important;
                     text-transform: none !important;
+                    box-sizing: border-box !important;
                   }
                 }
                 .is-safari .print-header {
                   display: flex !important;
                   position: fixed !important;
-                  top: 5mm !important;
+                  top: 10mm !important;
                   left: 15mm !important;
                   right: 15mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 1.5mm !important;
+                  padding-bottom: 2mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-size: 8px !important;
                   font-weight: bold !important;
@@ -7330,17 +7397,18 @@ export default function App() {
                   z-index: 9999 !important;
                   background: white !important;
                   text-transform: none !important;
+                  box-sizing: border-box !important;
                 }
                 .is-safari .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 5mm !important;
+                  bottom: 10mm !important;
                   left: 15mm !important;
                   right: 15mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 1.5mm !important;
+                  padding-top: 2mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-size: 8px !important;
                   font-weight: bold !important;
@@ -7348,6 +7416,14 @@ export default function App() {
                   z-index: 9999 !important;
                   background: white !important;
                   text-transform: none !important;
+                  box-sizing: border-box !important;
+                }
+                .print-page-number-container {
+                  font-size: 0 !important;
+                }
+                .print-page-number-container::after {
+                  content: "Page " counter(page) " of " counter(pages) !important;
+                  font-size: 8px !important;
                 }
               }
             `}</style>
