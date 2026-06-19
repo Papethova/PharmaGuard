@@ -4159,6 +4159,12 @@ export default function App() {
             @page {
               size: landscape;
               margin: 10mm 15mm 15mm 15mm;
+              @top-center {
+                content: "";
+              }
+              @top-right {
+                content: "PharmaGuard Reconciliation Report";
+              }
               @bottom-left {
                 content: "Generated Using PharmaGuard";
               }
@@ -6870,6 +6876,12 @@ export default function App() {
                                 @page {
                                   size: landscape;
                                   margin: 10mm 15mm 15mm 15mm;
+                                  @top-center {
+                                    content: "";
+                                  }
+                                  @top-right {
+                                    content: "PharmaGuard Reconciliation Report";
+                                  }
                                   @bottom-left {
                                     content: "Generated Using PharmaGuard";
                                   }
@@ -7102,6 +7114,12 @@ export default function App() {
               @page {
                 size: landscape;
                 margin: 10mm 15mm 15mm 15mm;
+                @top-center {
+                  content: "";
+                }
+                @top-right {
+                  content: "PharmaGuard Reconciliation Report";
+                }
                 @bottom-left {
                   content: "Generated Using PharmaGuard";
                 }
