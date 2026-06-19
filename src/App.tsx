@@ -4695,19 +4695,12 @@ export default function App() {
           </div>
 
           {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
-          <div className={isForPrint ? "hidden print:flex print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
-            {isForPrint ? (
-              <>
-                <span>Generated Using PharmaGuard</span>
-                <span className="text-right print-page-number-container">Page 1 of 2</span>
-              </>
-            ) : (
-              <>
-                <span>GENERATED USING PHARMAGUARD</span>
-                <span className="text-right">PAGE 1 OF 1</span>
-              </>
-            )}
-          </div>
+          {isForPrint && (
+            <div className="hidden print:flex print-footer">
+              <span>Generated Using PharmaGuard</span>
+              <span className="text-right print-page-number-container">Page 1 of 2</span>
+            </div>
+          )}
 
         </div>
       </div>
@@ -6892,8 +6885,8 @@ export default function App() {
 
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''} bg-[#f1f5f9]`}>
           {/* Print Report Review Page (Forced Landscape Frame for iPad / Standard Screen Verification) */}
-          <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-start md:justify-center items-start">
-            <div className="w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 flex justify-center items-start">
+            <div className="w-[1120px] max-w-full bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
               {renderReconciliationReportContent(false)}
             </div>
           </div>
