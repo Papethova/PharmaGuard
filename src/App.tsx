@@ -115,7 +115,9 @@ import {
   deleteDoc,
   limit,
   where,
-  getDocsFromCache
+  getDocsFromCache,
+  startAfter,
+  getCountFromServer
 } from "firebase/firestore";
 
 
@@ -324,7 +326,15 @@ const parseCompoundStrength = (str: string): { first: number; second: number } =
 
 const isSafariOrIPad = typeof window !== "undefined" && (
   /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
-  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh"))
+  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh")) ||
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  /CriOS|FxiOS/.test(navigator.userAgent)
+);
+
+const isIOSOrIPadSafari = typeof window !== "undefined" && (
+  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh")) ||
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  /CriOS|FxiOS/.test(navigator.userAgent)
 );
 
 const compareSubstances = (a: any, b: any): number => {
@@ -375,6 +385,8 @@ export default function App() {
 
     const sigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
+  const userUid = user?.uid;
+  const userEmail = user?.email;
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isVerificationBypassed, setIsVerificationBypassed] = useState<boolean>(false);
 
@@ -382,19 +394,32 @@ export default function App() {
     if (isSafariOrIPad) {
       document.documentElement.classList.add("is-safari");
     }
+    if (isIOSOrIPadSafari) {
+      document.documentElement.classList.add("is-ios-safari");
+    }
   }, []);
 
   useEffect(() => {
-    if (user) {
-      setIsVerificationBypassed(localStorage.getItem(`bypass_verification_${user.uid}`) === "true");
+    if (userUid) {
+      setIsVerificationBypassed(localStorage.getItem(`bypass_verification_${userUid}`) === "true");
     } else {
       setIsVerificationBypassed(false);
     }
-  }, [user]);
+  }, [userUid]);
 
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [inventory, setInventory] = useState<Substance[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [searchedTransactions, setSearchedTransactions] = useState<Transaction[] | null>(null);
+  const [isSearchingDb, setIsSearchingDb] = useState(false);
+  const [searchedTransactionsCount, setSearchedTransactionsCount] = useState<number | null>(null);
+  const [lastSearchedDoc, setLastSearchedDoc] = useState<any | null>(null);
+  const [hasMoreSearchDocs, setHasMoreSearchDocs] = useState(true);
+  const [isSearchingMore, setIsSearchingMore] = useState(false);
+  const transactionsRefVal = useRef<Transaction[]>([]);
+  useEffect(() => {
+    transactionsRefVal.current = transactions;
+  }, [transactions]);
   const [isLogOpen, setIsLogOpen] = useState(false);
   
   // Reset form when dialog closes or on initialization
@@ -411,6 +436,24 @@ export default function App() {
   const [selectedSubstanceDetail, setSelectedSubstanceDetail] = useState<Substance | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
+  // Local date helper functions for default range initialization (7 days)
+  const getNDaysAgoDateString = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [historyMedicationFilter, setHistoryMedicationFilter] = useState("");
@@ -436,6 +479,10 @@ export default function App() {
 
   // Medication-specific transactions listener state for high-performance and deep history
   const [substanceTransactions, setSubstanceTransactions] = useState<Transaction[]>([]);
+  const substanceTransactionsRef = useRef<Transaction[]>([]);
+  useEffect(() => {
+    substanceTransactionsRef.current = substanceTransactions;
+  }, [substanceTransactions]);
   const [substanceHistoryLimit, setSubstanceHistoryLimit] = useState<number>(30);
   const isIncrementingSubstanceLimitRef = useRef(false);
   const [isUsingFallback, setIsUsingFallback] = useState<boolean>(false);
@@ -484,8 +531,8 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (!user) return;
-    const emailId = user.email?.toLowerCase() || user.uid;
+    if (!userUid) return;
+    const emailId = userEmail?.toLowerCase() || userUid;
     if (isInitializing) return;
 
     const timer = setTimeout(() => {
@@ -493,18 +540,18 @@ export default function App() {
     }, 4000); // 4 seconds idle background write pooling/debouncing (Option 2)
 
     return () => clearTimeout(timer);
-  }, [user, inventory.length, users.length, transactions.length, isInitializing]);
+  }, [userUid, userEmail, inventory.length, users.length, transactions.length, isInitializing]);
 
   useEffect(() => {
-    if (!user) return;
-    const emailId = user.email?.toLowerCase() || user.uid;
+    if (!userUid) return;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const metricsRef = doc(db, "users", emailId, "metadata", "metrics");
     return onSnapshot(metricsRef, (snap) => {
       if (snap.exists()) {
         setGlobalMetrics(snap.data());
       }
     });
-  }, [user]);
+  }, [userUid, userEmail]);
 
   // Lock background scroll when user management is open
   useEffect(() => {
@@ -1099,13 +1146,13 @@ export default function App() {
   const [editingOrgName, setEditingOrgName] = useState("");
 
   const isMasterAdmin = useMemo(() => {
-    const email = user?.email?.toLowerCase();
-    const isMaster = email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
-    if (user) {
+    const email = userEmail?.toLowerCase();
+    const isMaster = email === MASTER_ADMIN_EMAIL.toLowerCase();
+    if (userUid) {
       console.log(`Identity Check: ${email} | Master: ${isMaster}`);
     }
     return isMaster;
-  }, [user]);
+  }, [userUid, userEmail]);
 
   // Email Auth State
   const [authMode, setAuthMode] = useState<"google" | "login" | "signup" | "forgot">("google");
@@ -1236,8 +1283,8 @@ export default function App() {
   const pendingProfileUpdatesRef = useRef<Partial<UserProfile>>({});
 
   const debouncedUpdateProfile = useCallback((updates: Partial<UserProfile>) => {
-    if (!user || !user.email) return;
-    const userEmail = user.email.toLowerCase();
+    if (!userUid || !userEmail) return;
+    const userEmailLower = userEmail.toLowerCase();
 
     // Option A: Skip redundant writes check
     const currentProfileData = userProfile || {};
@@ -1281,7 +1328,7 @@ export default function App() {
 
       console.log("Option B - Saving debounced profile updates to Firestore (2.5s Idle):", finalUpdates);
       try {
-        const userDocRef = doc(db, "users", userEmail);
+        const userDocRef = doc(db, "users", userEmailLower);
         await updateDoc(userDocRef, {
           ...finalUpdates,
           updatedAt: serverTimestamp()
@@ -1290,10 +1337,10 @@ export default function App() {
         console.log("Firestore state successfully synchronized.");
       } catch (error) {
         console.error("Debounced Firestore sync failed:", error);
-        handleFirestoreError(error, OperationType.UPDATE, `users/${userEmail}`);
+        handleFirestoreError(error, OperationType.UPDATE, `users/${userEmailLower}`);
       }
     }, 2500); // 2.5 seconds idle time for Option B
-  }, [user, userProfile]);
+  }, [userUid, userEmail, userProfile]);
 
   useEffect(() => {
     return () => {
@@ -1542,15 +1589,14 @@ export default function App() {
       setReconTimestamps({});
       setReconReasons({});
     }
-  }, [user]);
+  }, [userUid]);
 
   // Real-time Data Listeners split to prevent redundant re-subscription reads of all collections
   // whenever any sub-limit or single sync property updates in real-time.
   useEffect(() => {
-    if (!user) return;
+    if (!userUid) return;
 
-    const emailId = user.email?.toLowerCase() || user.uid;
-    const uid = user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const substancesRef = collection(db, "users", emailId, "substances");
 
     const unsubSubstances = onSnapshot(substancesRef, (snapshot) => {
@@ -1558,19 +1604,19 @@ export default function App() {
       setInventory(items);
     }, (error) => {
       if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/substances`);
+        handleFirestoreError(error, OperationType.LIST, `users/${userUid}/substances`);
       } else {
         console.warn("Substances listener failed - likely pending approval:", error);
       }
     });
 
     return () => unsubSubstances();
-  }, [user, userProfile?.status]);
+  }, [userUid, userEmail, userProfile?.status]);
 
   const fetchStaff = useCallback(async (forceServer = false) => {
-    if (!user) return;
+    if (!userUid) return;
     setIsLoadingStaff(true);
-    const emailId = user.email?.toLowerCase() || user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const staffRef = collection(db, "users", emailId, "staff");
     
     try {
@@ -1681,19 +1727,19 @@ export default function App() {
       }
     } catch (err: any) {
       if (userProfile?.status === 'active') {
-        handleFirestoreError(err, OperationType.LIST, `users/${user.uid}/staff`);
+        handleFirestoreError(err, OperationType.LIST, `users/${userUid}/staff`);
       } else {
         console.warn("Staff list fetch failed - likely pending approval:", err);
       }
     } finally {
       setIsLoadingStaff(false);
     }
-  }, [user, userProfile?.status]);
+  }, [userUid, userEmail, userProfile?.status]);
 
   const fetchHistoricalReports = useCallback(async (forceServer = false) => {
-    if (!user) return;
+    if (!userUid) return;
     setIsLoadingHistoricalReports(true);
-    const emailId = user.email?.toLowerCase() || user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
     
     try {
@@ -1723,42 +1769,65 @@ export default function App() {
     } finally {
       setIsLoadingHistoricalReports(false);
     }
-  }, [user]);
+  }, [userUid, userEmail]);
 
   const fetchSubstanceTransactions = useCallback(async (limitCount = 30) => {
-    if (!user || !selectedSubstanceDetail) {
+    if (!userUid || !selectedSubstanceDetail?.id) {
       setSubstanceTransactions([]);
       return;
     }
     setIsLoadingSubstanceTransactions(true);
-    const emailId = user.email || "";
+    const emailId = userEmail || "";
     if (!emailId) return;
 
     const txRef = collection(db, "users", emailId, "transactions");
-    const q = query(
-      txRef,
-      where("substanceId", "==", selectedSubstanceDetail.id),
-      orderBy("timestamp", "desc"),
-      limit(limitCount)
-    );
+    
+    // Check if we are loading more/next page for the currently selected substance
+    const existing = substanceTransactionsRef.current;
+    const hasExisting = existing.length > 0 && existing[0].substanceId === selectedSubstanceDetail.id;
+    const isFetchingMore = hasExisting && limitCount > existing.length;
+
+    let q;
+    if (isFetchingMore) {
+      const lastTx = existing[existing.length - 1];
+      q = query(
+        txRef,
+        where("substanceId", "==", selectedSubstanceDetail.id),
+        orderBy("timestamp", "desc"),
+        startAfter(lastTx.timestamp),
+        limit(30)
+      );
+    } else {
+      q = query(
+        txRef,
+        where("substanceId", "==", selectedSubstanceDetail.id),
+        orderBy("timestamp", "desc"),
+        limit(limitCount)
+      );
+    }
 
     try {
+      let snapshot;
       try {
-        const snapshot = await getDocsFromCache(q);
-        if (!snapshot.empty) {
-          const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-          setSubstanceTransactions(items);
-          setIsUsingFallback(false);
-          setIsLoadingSubstanceTransactions(false);
-          return;
+        snapshot = await getDocsFromCache(q);
+        if (snapshot.empty && !isFetchingMore) {
+          snapshot = await getDocs(q);
         }
       } catch (cacheErr) {
-        // Fall through
+        snapshot = await getDocs(q);
       }
 
-      const snapshotServer = await getDocs(q);
-      const items = snapshotServer.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-      setSubstanceTransactions(items);
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      
+      if (isFetchingMore) {
+        setSubstanceTransactions(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const filteredNew = items.filter(n => !existingIds.has(n.id));
+          return [...prev, ...filteredNew];
+        });
+      } else {
+        setSubstanceTransactions(items);
+      }
       setIsUsingFallback(false);
     } catch (error: any) {
       if (error.code === 'failed-precondition' || error.message?.includes('index')) {
@@ -1770,15 +1839,15 @@ export default function App() {
     } finally {
       setIsLoadingSubstanceTransactions(false);
     }
-  }, [user, selectedSubstanceDetail]);
+  }, [userUid, userEmail, selectedSubstanceDetail?.id]);
 
   // Initial loads and tab-based trigger effects
   useEffect(() => {
-    if (user) {
+    if (userUid) {
       fetchStaff(false);
       fetchHistoricalReports(false);
     }
-  }, [user, fetchStaff, fetchHistoricalReports]);
+  }, [userUid, fetchStaff, fetchHistoricalReports]);
 
   useEffect(() => {
     if (isUserManagementOpen) {
@@ -1793,39 +1862,274 @@ export default function App() {
   }, [reconViewMode, fetchHistoricalReports]);
 
   useEffect(() => {
-    if (!user || !selectedSubstanceDetail) {
+    if (!userUid || !selectedSubstanceDetail?.id) {
       setSubstanceTransactions([]);
       setSubstanceHistoryLimit(30);
       setIsUsingFallback(false);
       return;
     }
     fetchSubstanceTransactions(substanceHistoryLimit);
-  }, [user, selectedSubstanceDetail, substanceHistoryLimit, fetchSubstanceTransactions]);
+  }, [userUid, selectedSubstanceDetail?.id, substanceHistoryLimit, fetchSubstanceTransactions]);
 
+  // Main live transactions listener - permanently capped at 30 items for high efficiency, merging new entries into historical state
   useEffect(() => {
-    if (!user) return;
+    if (!userUid) return;
 
-    const emailId = user.email?.toLowerCase() || user.uid;
-    const uid = user.uid;
+    const emailId = userEmail?.toLowerCase() || userUid;
     const transactionsRef = collection(db, "users", emailId, "transactions");
 
-    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(syncLimit)), (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
-      setTransactions(items);
+    const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(30)), (snapshot) => {
+      setTransactions((prev) => {
+        const liveItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+        if (liveItems.length === 0) return [];
+        
+        const oldestLiveTimestamp = liveItems[liveItems.length - 1].timestamp;
+        const oldestTime = oldestLiveTimestamp?.toDate 
+          ? oldestLiveTimestamp.toDate().getTime() 
+          : new Date(oldestLiveTimestamp).getTime();
+
+        const liveIds = new Set(liveItems.map(l => l.id));
+        const historicalItems = prev.filter(p => {
+          if (liveIds.has(p.id)) return false;
+          const pTime = p.timestamp?.toDate ? p.timestamp.toDate().getTime() : new Date(p.timestamp).getTime();
+          return pTime < oldestTime;
+        });
+
+        return [...liveItems, ...historicalItems].sort((a, b) => {
+          const tA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+          const tB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+          return tB - tA;
+        });
+      });
     }, (error) => {
       if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${uid}/transactions`);
+        handleFirestoreError(error, OperationType.LIST, `users/${userUid}/transactions`);
       } else {
         console.warn("Transactions listener failed - likely pending approval:", error);
       }
     });
 
     return () => unsubTransactions();
-  }, [user, userProfile?.status, syncLimit]);
+  }, [userUid, userEmail, userProfile?.status]);
+
+  // Lazy loading incremental pages for older historical records as the user scrolls
+  const lastFetchedLimitRef = useRef(30);
+  useEffect(() => {
+    if (!userUid) return;
+    
+    if (syncLimit <= 30) {
+      lastFetchedLimitRef.current = 30;
+      return;
+    }
+
+    if (syncLimit <= lastFetchedLimitRef.current) return;
+    lastFetchedLimitRef.current = syncLimit;
+
+    const fetchMore = async () => {
+      try {
+        const emailId = userEmail?.toLowerCase() || userUid;
+        const transactionsRef = collection(db, "users", emailId, "transactions");
+        
+        const currentList = transactionsRefVal.current;
+        if (currentList.length === 0) return;
+        
+        const lastTx = currentList[currentList.length - 1];
+        const lastTimestamp = lastTx.timestamp;
+
+        const q = query(
+          transactionsRef,
+          orderBy("timestamp", "desc"),
+          startAfter(lastTimestamp),
+          limit(30)
+        );
+
+        const snap = await getDocs(q);
+        const newItems = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+
+        if (newItems.length > 0) {
+          setTransactions(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const filteredNew = newItems.filter(n => !existingIds.has(n.id));
+            return [...prev, ...filteredNew].sort((a, b) => {
+              const tA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+              const tB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+              return tB - tA;
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching more transactions:", err);
+      }
+    };
+
+    fetchMore();
+  }, [syncLimit, userUid, userEmail]);
+
+  // Helper to compile the active base query for transaction search
+  const getSearchBaseQuery = useCallback((selectedSubstanceId?: string) => {
+    if (!userUid) return null;
+    const emailId = userEmail?.toLowerCase() || userUid;
+    const transactionsRef = collection(db, "users", emailId, "transactions");
+
+    const filterId = selectedSubstanceId || historyMedicationFilter;
+    const searchTerm = historyMedicationSearch.trim();
+
+    if (!filterId && !searchTerm) {
+      return null;
+    }
+
+    let qBase = query(transactionsRef);
+
+    if (filterId) {
+      const selectedDrug = inventory.find(s => s.id === filterId);
+      const isCorrectSchedule = activeSchedule === "ALL" || (selectedDrug && selectedDrug.schedule === activeSchedule);
+      if (!isCorrectSchedule) {
+        return null;
+      }
+      qBase = query(qBase, where("substanceId", "==", filterId));
+    } else {
+      const queryTerm = searchTerm.split(" - ")[0].split(" (")[0].trim().toLowerCase();
+      
+      const matched = inventory.filter(s => 
+        (activeSchedule === "ALL" || s.schedule === activeSchedule) &&
+        (s.name.toLowerCase().startsWith(queryTerm) ||
+         s.ndc.toLowerCase().startsWith(queryTerm) ||
+         (s.strength && s.strength.toLowerCase().startsWith(queryTerm)))
+      );
+
+      if (matched.length > 0) {
+        const matchedIds = matched.map(s => s.id);
+        const sliceIds = matchedIds.slice(0, 30); // limit for IN operator list
+        qBase = query(qBase, where("substanceId", "in", sliceIds));
+      } else {
+        // Fallback search that matches nothing directly
+        return null;
+      }
+    }
+
+    if (historyTypeFilter !== "All") {
+      qBase = query(qBase, where("type", "==", historyTypeFilter));
+    }
+
+    return qBase;
+  }, [userUid, userEmail, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, inventory, activeSchedule]);
+
+  // Execute deep searching strictly upon choosing/typing and pressing search.
+  // Pulls the first page of up to 30 items and resolves total document count instantly via getCountFromServer
+  const handleTransactionSearch = useCallback(async (selectedSubstanceId?: string) => {
+    if (!userUid) return;
+    setIsSearchingDb(true);
+    setSearchedTransactionsCount(null);
+
+    try {
+      const qBase = getSearchBaseQuery(selectedSubstanceId);
+      if (!qBase) {
+        setSearchedTransactions([]);
+        setSearchedTransactionsCount(0);
+        setLastSearchedDoc(null);
+        setHasMoreSearchDocs(false);
+        setIsSearchingDb(false);
+        return;
+      }
+
+      // 1. Fetch count from firestore server metadata (extremely optimized / cheap)
+      try {
+        const countSnap = await getCountFromServer(qBase);
+        setSearchedTransactionsCount(countSnap.data().count);
+      } catch (countErr) {
+        console.error("Error executing database matches count:", countErr);
+        setSearchedTransactionsCount(null);
+      }
+
+      // 2. Fetch first 30 documents
+      let snap;
+      try {
+        const qSorted = query(qBase, orderBy("timestamp", "desc"), limit(30));
+        snap = await getDocs(qSorted);
+      } catch (sortErr) {
+        console.warn("Index not found or sorting failed, falling back to unsorted fetch + client sort:", sortErr);
+        const qUnsorted = query(qBase, limit(30)); 
+        snap = await getDocs(qUnsorted);
+      }
+
+      const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      const sortedItems = [...items].sort((a, b) => {
+        const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+        const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+        return dateB - dateA;
+      });
+
+      setSearchedTransactions(sortedItems);
+      setLastSearchedDoc(snap.docs[snap.docs.length - 1] || null);
+      setHasMoreSearchDocs(snap.docs.length >= 30);
+    } catch (err) {
+      console.error("Error conducting paginated transaction search:", err);
+      setSearchedTransactions([]);
+    } finally {
+      setIsSearchingDb(false);
+    }
+  }, [userUid, getSearchBaseQuery]);
+
+  // Support lazy loading next pages (of 30 docs) on scroll of searchedTransactions list
+  const handleLoadMoreSearch = useCallback(async () => {
+    if (isSearchingMore || !hasMoreSearchDocs || !lastSearchedDoc || !userUid) return;
+    setIsSearchingMore(true);
+
+    try {
+      const qBase = getSearchBaseQuery();
+      if (!qBase) {
+        setIsSearchingMore(false);
+        return;
+      }
+
+      let snap;
+      try {
+        const qSorted = query(qBase, orderBy("timestamp", "desc"), startAfter(lastSearchedDoc), limit(30));
+        snap = await getDocs(qSorted);
+      } catch (sortErr) {
+        console.warn("Index not found or sorting failed for next page, falling back to unsorted next page:", sortErr);
+        const qUnsorted = query(qBase, startAfter(lastSearchedDoc), limit(30));
+        snap = await getDocs(qUnsorted);
+      }
+
+      const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+      if (items.length > 0) {
+        setSearchedTransactions(prev => {
+          const combined = prev ? [...prev, ...items] : items;
+          const seen = new Set();
+          return combined.filter(t => {
+            if (seen.has(t.id)) return false;
+            seen.add(t.id);
+            return true;
+          }).sort((a, b) => {
+            const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+            const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+            return dateB - dateA;
+          });
+        });
+        setLastSearchedDoc(snap.docs[snap.docs.length - 1] || null);
+      }
+      setHasMoreSearchDocs(snap.docs.length >= 30);
+    } catch (err) {
+      console.error("Error pagination loading more search transactions:", err);
+    } finally {
+      setIsSearchingMore(false);
+    }
+  }, [userUid, isSearchingMore, hasMoreSearchDocs, lastSearchedDoc, getSearchBaseQuery]);
+
+  // Instantly restore standard live scroll stream when search inputs are fully cleared
+  useEffect(() => {
+    if (!historyMedicationFilter && !historyMedicationSearch.trim()) {
+      setSearchedTransactions(null);
+      setSearchedTransactionsCount(null);
+      setLastSearchedDoc(null);
+      setHasMoreSearchDocs(true);
+    }
+  }, [historyMedicationFilter, historyMedicationSearch]);
 
   // Super Admin Listener
   useEffect(() => {
-    if (!user || !isMasterAdmin) {
+    if (!userUid || !isMasterAdmin) {
       setAllUserProfiles([]);
       return;
     }
@@ -1846,7 +2150,7 @@ export default function App() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [userUid, isMasterAdmin]);
 
   const handleGoogleLogin = async () => {
     setIsSubmitting(true);
@@ -3117,8 +3421,9 @@ export default function App() {
       .sort(compareSubstances),
   [inventory, activeSchedule]);
 
-  const filteredTransactions = useMemo(() => 
-    transactions
+  const filteredTransactions = useMemo(() => {
+    const list = searchedTransactions !== null ? searchedTransactions : transactions;
+    return list
       .filter(t => {
         // Exclude all reconciliation report transactions (reference starting with REC- or RECON-)
         if (t.referenceNumber && (t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))) {
@@ -3128,8 +3433,22 @@ export default function App() {
         const matchesSchedule = activeSchedule === "ALL" || 
           inventory.find(s => s.id === t.substanceId)?.schedule === activeSchedule;
         const transactionDate = t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
-        const matchesStartDate = !startDate || transactionDate >= new Date(startDate);
-        const matchesEndDate = !endDate || transactionDate <= new Date(endDate + "T23:59:59");
+        let matchesStartDate = true;
+        let matchesEndDate = true;
+
+        if (startDate) {
+          matchesStartDate = transactionDate >= new Date(startDate);
+        } else if (!endDate) {
+          // Default to last 7 days if BOTH start and end dates are empty (not filled out)
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          sevenDaysAgo.setHours(0, 0, 0, 0);
+          matchesStartDate = transactionDate >= sevenDaysAgo;
+        }
+
+        if (endDate) {
+          matchesEndDate = transactionDate <= new Date(endDate + "T23:59:59");
+        }
         const cleanQuery = historyMedicationSearch
           ? historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase()
           : "";
@@ -3147,8 +3466,8 @@ export default function App() {
         const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
         const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
         return dateB - dateA;
-      }),
-  [transactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
+      });
+  }, [transactions, searchedTransactions, activeSchedule, inventory, startDate, endDate, historyMedicationFilter, historyMedicationSearch, historyTypeFilter]);
 
   const medicationHistoryTransactions = useMemo(() => {
     const rawTxs = isUsingFallback
@@ -3178,6 +3497,16 @@ export default function App() {
       }
     }
   }, [transactions.length, syncLimit, filteredTransactions.length]);
+
+  // Dynamically page and fetch deeper results from the database if the active client-side filters (dates, types)
+  // filter out most fetched items and prevent scrollbars from displaying.
+  useEffect(() => {
+    if (searchedTransactions !== null && hasMoreSearchDocs && !isSearchingMore) {
+      if (filteredTransactions.length < 15) {
+        handleLoadMoreSearch();
+      }
+    }
+  }, [searchedTransactions, hasMoreSearchDocs, isSearchingMore, filteredTransactions.length, handleLoadMoreSearch]);
 
   // Auto-fill logic for Substance Detail History dialog, debounced to stop runaway queries costing unnecessary reads
   useEffect(() => {
@@ -3829,32 +4158,7 @@ export default function App() {
           <style>{`
             @page {
               size: landscape;
-            }
-            @media print {
-              @page {
-                size: landscape;
-              }
-            }
-            @page {
               margin: 10mm 15mm 15mm 15mm;
-              @bottom-right {
-                content: "page " counter(page) " of " counter(pages);
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                font-size: 8px;
-                font-weight: bold;
-                color: #111827;
-                vertical-align: top;
-                padding-top: 2mm;
-              }
-              @bottom-left {
-                content: "Generated With PharmaGuard";
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                font-size: 8px;
-                font-weight: bold;
-                color: #111827;
-                vertical-align: top;
-                padding-top: 2mm;
-              }
             }
             @media screen {
               #reconciliation-printable-root {
@@ -3881,10 +4185,20 @@ export default function App() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
               }
-              .is-safari, .is-safari body {
-                width: 297mm !important;
+              /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
+              .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                width: 100% !important;
                 height: auto !important;
-                min-height: 210mm !important;
+                min-height: 0 !important;
+                position: static !important;
+                overflow: visible !important;
+              }
+              .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                transform: none !important;
+                overflow: visible !important;
               }
               body > *:not(#reconciliation-printable-root) {
                 display: none !important;
@@ -3898,12 +4212,6 @@ export default function App() {
                 padding: 0 !important;
                 margin: 0 !important;
                 background: white !important;
-              }
-              .is-safari #reconciliation-printable-root {
-                width: 297mm !important;
-                height: auto !important;
-                min-height: 210mm !important;
-                position: relative !important;
               }
               #reconciliation-printable-invoice {
                 display: flex !important;
@@ -4048,7 +4356,7 @@ export default function App() {
           </div>
           
           {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.24] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
+          <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex items-center justify-center opacity-[0.20] print:opacity-[0.14] print:fixed print:inset-0 print:flex print:items-center print:justify-center">
             <PharmaLogo className="w-[380px] h-[380px]" />
           </div>
           
@@ -5642,7 +5950,7 @@ export default function App() {
                                   </button>
                                 </TableCell>
                                 <TableCell className="text-center font-normal text-sm py-1 h-10">
-                                  {item.currentStock <= item.minThreshold ? (
+                                  {item.currentStock <= item.minThreshold && userProfile?.isAlertsEnabled !== false ? (
                                     <span className="px-2.5 py-1 bg-brand-blue text-brand-yellow font-extrabold rounded-full text-xs shadow-sm shadow-brand-blue/10 inline-block">
                                       {item.currentStock} {item.unit}
                                     </span>
@@ -5670,55 +5978,60 @@ export default function App() {
 
           <TabsContent value="history" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
             <div className="shrink-0 flex flex-col gap-3 bg-brand-surface p-4 rounded-lg border border-brand-grey/10 shadow-sm relative z-20">
-              <div className="flex flex-row flex-wrap items-end gap-3.5 w-full">
-                <div className="grid gap-1.5 w-[110px] shrink-0">
+              <div className="flex flex-row flex-wrap items-end gap-2 md:gap-2.5 w-full">
+                <div className="grid gap-1.5 w-[100px] shrink-0">
                   <Label htmlFor="start-date" className="text-xs font-bold text-brand-blue text-center">Start Date</Label>
                   <Input 
                     id="start-date"
                     type="date" 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)}
-                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 custom-clean-date-input ${startDate ? "has-value" : ""}`}
+                    className={`w-[100px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1 py-0 custom-clean-date-input ${startDate ? "has-value" : ""}`}
                   />
                 </div>
-                <div className="grid gap-1.5 w-[110px] shrink-0">
+                <div className="grid gap-1.5 w-[100px] shrink-0">
                   <Label htmlFor="end-date" className="text-xs font-bold text-brand-blue text-center">End Date</Label>
                   <Input 
                     id="end-date"
                     type="date" 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)}
-                    className={`w-[110px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1.5 py-0 custom-clean-date-input ${endDate ? "has-value" : ""}`}
+                    className={`w-[100px] !h-9 text-xs border-brand-grey/20 focus:border-brand-blue text-center px-1 py-0 custom-clean-date-input ${endDate ? "has-value" : ""}`}
                   />
                 </div>
 
-                <div className="grid gap-1.5 w-[240px] shrink-0 relative">
+                <div className="grid gap-1.5 flex-1 min-w-[130px] max-w-[340px] relative">
                   <Label htmlFor="history-med-search" className="text-xs font-bold text-brand-blue text-center">Medication Filter</Label>
-                  <Input
-                    id="history-med-search"
-                    placeholder="Search medication..."
-                    value={historyMedicationSearch}
-                    onChange={(e) => {
-                      setHistoryMedicationSearch(e.target.value);
-                      setHistoryMedicationFilter(""); 
-                      setIsHistorySearchFocused(true);
-                    }}
-                    onFocus={() => setIsHistorySearchFocused(true)}
-                    onBlur={() => {
-                      // Small delay to allow clicking on list items
-                      setTimeout(() => setIsHistorySearchFocused(false), 200);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        setIsHistorySearchFocused(false);
-                      }
-                    }}
-                    className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-4 w-full"
-                  />
+                  <div className="relative w-full">
+                    <Input
+                      id="history-med-search"
+                      placeholder="Type medication name..."
+                      value={historyMedicationSearch}
+                      onChange={(e) => {
+                        setHistoryMedicationSearch(e.target.value);
+                        setHistoryMedicationFilter(""); 
+                        setIsHistorySearchFocused(true);
+                      }}
+                      onFocus={() => setIsHistorySearchFocused(true)}
+                      onBlur={() => {
+                        // Small delay to allow clicking on list items
+                        setTimeout(() => setIsHistorySearchFocused(false), 200);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          setIsHistorySearchFocused(false);
+                          handleTransactionSearch();
+                        }
+                      }}
+                      className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-3 w-full"
+                    />
+                  </div>
                   {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
                     <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
                       {inventory
                         .filter(s => {
+                          const isCorrectSchedule = activeSchedule === "ALL" || s.schedule === activeSchedule;
+                          if (!isCorrectSchedule) return false;
                           const query = historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase();
                           return s.name.toLowerCase().startsWith(query) || 
                                  s.ndc.toLowerCase().startsWith(query) ||
@@ -5730,7 +6043,10 @@ export default function App() {
                             className="px-3 py-2 hover:bg-brand-blue/5 cursor-pointer text-sm flex justify-between items-center group"
                             onClick={() => {
                               setHistoryMedicationFilter(s.id);
-                              setHistoryMedicationSearch(s.name);
+                              const fullText = s.strength ? `${s.name} ${s.strength}` : s.name;
+                              setHistoryMedicationSearch(fullText);
+                              setIsHistorySearchFocused(false);
+                              handleTransactionSearch(s.id);
                             }}
                           >
                             <div className="flex flex-col">
@@ -5749,7 +6065,7 @@ export default function App() {
                   )}
                 </div>
 
-                <div className="grid gap-1.5 w-[125px] shrink-0">
+                <div className="grid gap-1.5 w-[115px] shrink-0">
                   <Label htmlFor="history-type-filter" className="text-xs font-bold text-brand-blue text-center whitespace-nowrap">Transaction Type</Label>
                   <Select value={historyTypeFilter} onValueChange={setHistoryTypeFilter}>
                     <SelectTrigger id="history-type-filter" className="w-full !h-9 text-sm border-brand-grey/20 focus:ring-brand-blue bg-brand-surface text-brand-dark-grey hover:bg-brand-blue/5 px-2">
@@ -5800,14 +6116,25 @@ export default function App() {
                     setHistoryMedicationFilter("");
                     setHistoryMedicationSearch("");
                     setHistoryTypeFilter("All");
+                    setSearchedTransactions(null);
+                    setSearchedTransactionsCount(null);
+                    setLastSearchedDoc(null);
+                    setHasMoreSearchDocs(true);
                   }}
-                  className="!h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[90px] shrink-0 flex items-center justify-center p-0"
+                  className="!h-9 text-xs border-brand-grey/20 hover:bg-brand-blue/5 w-[85px] shrink-0 flex items-center justify-center p-0"
                 >
                   Clear Filter
                 </Button>
 
                 <div className="ml-auto shrink-0 h-9 flex items-center text-xs text-brand-dark-grey/60 font-medium whitespace-nowrap px-1">
-                  Showing {filteredTransactions.length} transactions
+                  {isSearchingDb ? (
+                    <span className="flex items-center gap-1.5 animate-pulse text-brand-blue font-semibold">
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-blue animate-ping" />
+                      Searching deep history...
+                    </span>
+                  ) : (
+                    `Showing ${searchedTransactions !== null && searchedTransactionsCount !== null ? searchedTransactionsCount : filteredTransactions.length} transactions${(!startDate && !endDate) ? " (Last 7 Days)" : ""}`
+                  )}
                 </div>
               </div>
 
@@ -5838,7 +6165,11 @@ export default function App() {
                     setAuditScrollTop(roundedScrollTop);
                   }
                   if (target.scrollHeight - target.scrollTop - target.clientHeight < 120) {
-                    if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
+                    if (searchedTransactions !== null) {
+                      if (hasMoreSearchDocs && !isSearchingMore) {
+                        handleLoadMoreSearch();
+                      }
+                    } else if (transactions.length >= syncLimit && !isIncrementingSyncLimitRef.current) {
                       isIncrementingSyncLimitRef.current = true;
                       setSyncLimit(prev => prev + 30);
                       setTimeout(() => {
@@ -5886,7 +6217,8 @@ export default function App() {
                           {filteredTransactions.slice(txStartIndex, txEndIndex).map((t) => (
                             <TableRow 
                               key={t.id} 
-                              className={`h-10 transition-colors group animate-fade-in ${
+                              onClick={() => setViewingTransaction(t)}
+                              className={`h-10 transition-colors cursor-pointer group animate-fade-in ${
                                 viewingTransaction?.id === t.id 
                                   ? "bg-brand-blue/10" 
                                   : "hover:bg-brand-blue/5"
@@ -5897,8 +6229,7 @@ export default function App() {
                               </TableCell>
                               <TableCell className="text-center py-1 h-10">
                                 {t.referenceNumber ? (
-                                  <button 
-                                    onClick={() => setViewingTransaction(t)}
+                                  <span 
                                     className={`text-xs font-normal transition-colors ${
                                       viewingTransaction?.id === t.id 
                                         ? "text-brand-yellow font-bold" 
@@ -5906,7 +6237,7 @@ export default function App() {
                                     }`}
                                   >
                                     {t.referenceNumber}
-                                  </button>
+                                  </span>
                                 ) : (
                                   <span className="text-brand-dark-grey/40 italic">-</span>
                                 )}
@@ -5915,12 +6246,9 @@ export default function App() {
                                 <div className="text-sm font-normal text-brand-dark-grey">{t.substanceName}&nbsp;{t.strength}</div>
                               </TableCell>
                               <TableCell className="text-xs font-normal text-center py-1 h-10">
-                                <button 
-                                  onClick={() => handleNDCClick(t.ndc)}
-                                  className="text-brand-blue hover:underline font-normal transition-colors"
-                                >
+                                <span className="text-brand-blue font-normal">
                                   {t.ndc}
-                                </button>
+                                </span>
                               </TableCell>
                               <TableCell className="py-1 text-center h-10">
                                 <TransactionBadge type={t.type} />
@@ -6496,7 +6824,7 @@ export default function App() {
         <div className={`flex flex-col flex-1 min-h-0 ${!reconShowPreview ? 'hidden' : ''} bg-[#f1f5f9]`}>
           {/* Print Report Review Page (Forced Landscape Frame for iPad / Standard Screen Verification) */}
           <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-start md:justify-center items-start">
-            <div className="w-[1120px] min-w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
+            <div className="w-[1120px] bg-white shadow-2xl rounded-2xl border border-gray-200/80 shrink-0">
               {renderReconciliationReportContent(false)}
             </div>
           </div>
@@ -6528,39 +6856,14 @@ export default function App() {
                       if (printWindow) {
                         printWindow.document.write(`
                           <!DOCTYPE html>
-                          <html class="${isSafariOrIPad ? 'is-safari' : ''}">
+                          <html class="${isSafariOrIPad ? 'is-safari' : ''} ${isIOSOrIPadSafari ? 'is-ios-safari' : ''}">
                             <head>
                               <title>PharmaGuard Reconciliation Report</title>
                               ${styleTags}
                               <style>
                                 @page {
                                   size: landscape;
-                                }
-                                @media print {
-                                  @page {
-                                    size: landscape;
-                                  }
-                                }
-                                @page {
                                   margin: 10mm 15mm 15mm 15mm;
-                                  @bottom-right {
-                                    content: "page " counter(page) " of " counter(pages);
-                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                                    font-size: 8px;
-                                    font-weight: bold;
-                                    color: #111827;
-                                    vertical-align: top;
-                                    padding-top: 2mm;
-                                  }
-                                  @bottom-left {
-                                    content: "Generated With PharmaGuard";
-                                    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                                    font-size: 8px;
-                                    font-weight: bold;
-                                    color: #111827;
-                                    vertical-align: top;
-                                    padding-top: 2mm;
-                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -6579,10 +6882,13 @@ export default function App() {
                                   background: white !important;
                                   color: black !important;
                                 }
-                                .is-safari, .is-safari body {
-                                  width: 297mm !important;
+                                /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
+                                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                                  width: 100% !important;
                                   height: auto !important;
-                                  min-height: 210mm !important;
+                                  min-height: 0 !important;
+                                  position: static !important;
+                                  overflow: visible !important;
                                 }
                                 body {
                                   margin: 0 !important;
@@ -6604,11 +6910,13 @@ export default function App() {
                                   margin: 0 !important;
                                   background: white !important;
                                 }
-                                .is-safari #reconciliation-printable-root {
-                                  width: 297mm !important;
+
+                                .is-ios-safari #reconciliation-printable-root {
+                                  width: 100% !important;
                                   height: auto !important;
-                                  min-height: 210mm !important;
-                                  position: relative !important;
+                                  position: static !important;
+                                  transform: none !important;
+                                  overflow: visible !important;
                                 }
                                 #reconciliation-printable-invoice {
                                   display: flex !important;
@@ -6781,32 +7089,7 @@ export default function App() {
             <style>{`
               @page {
                 size: landscape;
-              }
-              @media print {
-                @page {
-                  size: landscape;
-                }
-              }
-              @page {
                 margin: 10mm 15mm 15mm 15mm;
-                @bottom-right {
-                  content: "page " counter(page) " of " counter(pages);
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                  font-size: 8px;
-                  font-weight: bold;
-                  color: #111827;
-                  vertical-align: top;
-                  padding-top: 2mm;
-                }
-                @bottom-left {
-                  content: "Generated With PharmaGuard";
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                  font-size: 8px;
-                  font-weight: bold;
-                  color: #111827;
-                  vertical-align: top;
-                  padding-top: 2mm;
-                }
               }
               @media screen {
                 #reconciliation-printable-root {
@@ -6833,11 +7116,6 @@ export default function App() {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
-                .is-safari, .is-safari body {
-                  width: 297mm !important;
-                  height: auto !important;
-                  min-height: 210mm !important;
-                }
                 body > *:not(#reconciliation-printable-root) {
                   display: none !important;
                 }
@@ -6851,11 +7129,20 @@ export default function App() {
                   margin: 0 !important;
                   background: white !important;
                 }
-                .is-safari #reconciliation-printable-root {
-                  width: 297mm !important;
+                /* Native landscape layout for Safari/iOS devices to avoid breaking multi-page vertical flow and page numbering */
+                .is-safari, .is-safari body, .is-ios-safari, .is-ios-safari body {
+                  width: 100% !important;
                   height: auto !important;
-                  min-height: 210mm !important;
-                  position: relative !important;
+                  min-height: 0 !important;
+                  position: static !important;
+                  overflow: visible !important;
+                }
+                .is-safari #reconciliation-printable-root, .is-ios-safari #reconciliation-printable-root {
+                  width: 100% !important;
+                  height: auto !important;
+                  position: static !important;
+                  transform: none !important;
+                  overflow: visible !important;
                 }
                 #reconciliation-printable-invoice {
                   display: flex !important;
