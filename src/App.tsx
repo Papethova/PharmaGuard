@@ -4308,7 +4308,7 @@ export default function App() {
                   color: #111827 !important;
                   z-index: 9999 !important;
                   background: white !important;
-                  text-transform: uppercase !important;
+                  text-transform: none !important;
                 }
                 .print-footer {
                   display: flex !important;
@@ -4326,7 +4326,7 @@ export default function App() {
                   color: #111827 !important;
                   z-index: 9999 !important;
                   background: white !important;
-                  text-transform: uppercase !important;
+                  text-transform: none !important;
                 }
               }
               .is-safari .print-header {
@@ -4345,7 +4345,7 @@ export default function App() {
                 color: #111827 !important;
                 z-index: 9999 !important;
                 background: white !important;
-                text-transform: uppercase !important;
+                text-transform: none !important;
               }
               .is-safari .print-footer {
                 display: flex !important;
@@ -4363,7 +4363,7 @@ export default function App() {
                 color: #111827 !important;
                 z-index: 9999 !important;
                 background: white !important;
-                text-transform: uppercase !important;
+                text-transform: none !important;
               }
             }
           `}</style>
@@ -4371,11 +4371,30 @@ export default function App() {
         <div id={isForPrint ? "reconciliation-printable-invoice" : undefined} className={`${isForPrint ? "relative pb-10 print:relative print:pb-10" : "relative pb-4 overflow-hidden shadow-md border border-gray-200 rounded-xl"} min-h-[175mm] flex flex-col justify-start px-8 pt-4 space-y-3 text-left selection:bg-brand-yellow/30 bg-white text-gray-900 font-sans`}>
           {/* Header element visible on screen preview, or as hidden print overlay */}
           <div className={isForPrint ? "hidden print:flex print-header" : "flex border-b border-gray-100 pb-2 mb-2 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
-            <span>PHARMAGUARD RECONCILIATION REPORT</span>
-            <span>{selectedHistoricalReport 
-              ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
-              : new Date().toLocaleDateString()
-            }</span>
+            {isForPrint ? (
+              <>
+                <span>{selectedHistoricalReport 
+                  ? new Date(selectedHistoricalReport.timestamp).toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true
+                    })
+                  : printTimestamp
+                }</span>
+                <span>PharmaGuard Reconciliation Report</span>
+              </>
+            ) : (
+              <>
+                <span>PHARMAGUARD RECONCILIATION REPORT</span>
+                <span>{selectedHistoricalReport 
+                  ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                  : new Date().toLocaleDateString()
+                }</span>
+              </>
+            )}
           </div>
           
           {/* Centered Watermark for Screen, and Centered fixed Watermark for Page Print */}
@@ -4659,8 +4678,17 @@ export default function App() {
 
           {/* Bottom watermark footer, visible on screen preview, or as hidden print overlay */}
           <div className={isForPrint ? "hidden print:flex print-footer" : "flex border-t border-gray-100 pt-2 mt-6 justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-widest leading-none pointer-events-none select-none"}>
-            <span>GENERATED USING PHARMAGUARD</span>
-            <span className="text-right">PAGE 1 OF 1</span>
+            {isForPrint ? (
+              <>
+                <span>Generated Using PharmaGuard</span>
+                <span className="text-right">Page 1 of 2</span>
+              </>
+            ) : (
+              <>
+                <span>GENERATED USING PHARMAGUARD</span>
+                <span className="text-right">PAGE 1 OF 1</span>
+              </>
+            )}
           </div>
 
         </div>
@@ -7083,6 +7111,11 @@ export default function App() {
                                   text-transform: uppercase !important;
                                 }
                               </style>
+                              <style>
+                                .print-header, .print-footer, .is-safari .print-header, .is-safari .print-footer {
+                                  text-transform: none !important;
+                                }
+                              </style>
                             </head>
                             <body class="bg-white">
                               <div id="reconciliation-printable-root">
@@ -7269,7 +7302,7 @@ export default function App() {
                     color: #111827 !important;
                     z-index: 9999 !important;
                     background: white !important;
-                    text-transform: uppercase !important;
+                    text-transform: none !important;
                   }
                   .print-footer {
                     display: flex !important;
@@ -7287,7 +7320,7 @@ export default function App() {
                     color: #111827 !important;
                     z-index: 9999 !important;
                     background: white !important;
-                    text-transform: uppercase !important;
+                    text-transform: none !important;
                   }
                 }
                 .is-safari .print-header {
@@ -7306,7 +7339,7 @@ export default function App() {
                   color: #111827 !important;
                   z-index: 9999 !important;
                   background: white !important;
-                  text-transform: uppercase !important;
+                  text-transform: none !important;
                 }
                 .is-safari .print-footer {
                   display: flex !important;
@@ -7324,7 +7357,7 @@ export default function App() {
                   color: #111827 !important;
                   z-index: 9999 !important;
                   background: white !important;
-                  text-transform: uppercase !important;
+                  text-transform: none !important;
                 }
               }
             `}</style>
