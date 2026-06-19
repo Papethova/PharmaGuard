@@ -4162,6 +4162,9 @@ export default function App() {
               @bottom-left {
                 content: "Generated Using PharmaGuard";
               }
+              @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+              }
             }
             @media screen {
               #reconciliation-printable-root {
@@ -6870,6 +6873,9 @@ export default function App() {
                                   @bottom-left {
                                     content: "Generated Using PharmaGuard";
                                   }
+                                  @bottom-right {
+                                    content: "Page " counter(page) " of " counter(pages);
+                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -7098,6 +7104,9 @@ export default function App() {
                 margin: 10mm 15mm 15mm 15mm;
                 @bottom-left {
                   content: "Generated Using PharmaGuard";
+                }
+                @bottom-right {
+                  content: "Page " counter(page) " of " counter(pages);
                 }
               }
               @media screen {
