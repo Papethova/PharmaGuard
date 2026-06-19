@@ -4159,6 +4159,9 @@ export default function App() {
             @page {
               size: landscape;
               margin: 10mm 15mm 15mm 15mm;
+              @bottom-left {
+                content: "Generated Using PharmaGuard";
+              }
             }
             @media screen {
               #reconciliation-printable-root {
@@ -6864,6 +6867,9 @@ export default function App() {
                                 @page {
                                   size: landscape;
                                   margin: 10mm 15mm 15mm 15mm;
+                                  @bottom-left {
+                                    content: "Generated Using PharmaGuard";
+                                  }
                                 }
                                 html, body, #reconciliation-printable-root, #reconciliation-printable-invoice {
                                   width: 100% !important;
@@ -7051,11 +7057,6 @@ export default function App() {
                                 ${printContent}
                               </div>
                               <script>
-                                try {
-                                  window.history.replaceState(null, "", "Generated-Using-PharmaGuard");
-                                } catch (e) {
-                                  console.warn("History state update failed:", e);
-                                }
                                 function triggerPrint() {
                                   setTimeout(() => {
                                     window.print();
@@ -7095,6 +7096,9 @@ export default function App() {
               @page {
                 size: landscape;
                 margin: 10mm 15mm 15mm 15mm;
+                @bottom-left {
+                  content: "Generated Using PharmaGuard";
+                }
               }
               @media screen {
                 #reconciliation-printable-root {
