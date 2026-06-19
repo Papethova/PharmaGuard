@@ -683,6 +683,14 @@ export default function App() {
   const [reconViewMode, setReconViewMode] = useState<"form" | "history">("form");
   const [reconOpenedFrom, setReconOpenedFrom] = useState<"footer" | "submenu">("submenu");
   const [selectedHistoricalReport, setSelectedHistoricalReport] = useState<any>(null);
+  const printTimestamp = new Date().toLocaleString(undefined, {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
   const [historicalReports, setHistoricalReports] = useState<any[]>([]);
   const [isLoadingHistoricalReports, setIsLoadingHistoricalReports] = useState<boolean>(false);
   const [isLoadingStaff, setIsLoadingStaff] = useState<boolean>(false);
@@ -4159,6 +4167,9 @@ export default function App() {
             @page {
               size: landscape;
               margin: 10mm 15mm 15mm 15mm;
+              @top-left {
+                content: "${printTimestamp}";
+              }
               @top-center {
                 content: "";
               }
@@ -6876,6 +6887,9 @@ export default function App() {
                                 @page {
                                   size: landscape;
                                   margin: 10mm 15mm 15mm 15mm;
+                                  @top-left {
+                                    content: "${printTimestamp}";
+                                  }
                                   @top-center {
                                     content: "";
                                   }
@@ -7114,6 +7128,9 @@ export default function App() {
               @page {
                 size: landscape;
                 margin: 10mm 15mm 15mm 15mm;
+                @top-left {
+                  content: "${printTimestamp}";
+                }
                 @top-center {
                   content: "";
                 }
