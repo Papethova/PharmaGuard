@@ -7051,6 +7051,11 @@ export default function App() {
                                 ${printContent}
                               </div>
                               <script>
+                                try {
+                                  window.history.replaceState(null, "", "Generated-Using-PharmaGuard");
+                                } catch (e) {
+                                  console.warn("History state update failed:", e);
+                                }
                                 function triggerPrint() {
                                   setTimeout(() => {
                                     window.print();
