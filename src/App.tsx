@@ -4353,7 +4353,24 @@ export default function App() {
                 }
               }
               .is-safari .print-header {
-                display: none !important;
+                display: flex !important;
+                position: fixed !important;
+                top: 10mm !important;
+                left: 22mm !important;
+                right: 22mm !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-bottom: 0.5px solid #e5e7eb !important;
+                padding-bottom: 2mm !important;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                letter-spacing: normal !important;
+                color: #111827 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                text-transform: none !important;
+                box-sizing: border-box !important;
               }
               .is-safari .print-footer {
                 display: none !important;
@@ -6892,7 +6909,7 @@ export default function App() {
                           <!DOCTYPE html>
                           <html class="${isSafariOrIPad ? 'is-safari' : ''} ${isIOSOrIPadSafari ? 'is-ios-safari' : ''}">
                             <head>
-                              <title>PharmaGuard Reconciliation Report</title>
+                              <title>${isSafariOrIPad ? 'Generated using PharmaGuard' : 'PharmaGuard Reconciliation Report'}</title>
                               ${styleTags}
                               <style>
                                 ${isSafariOrIPad ? `
@@ -7072,7 +7089,23 @@ export default function App() {
                                   }
                                 }
                                 .is-safari .print-header {
-                                  display: none !important;
+                                  display: flex !important;
+                                  position: fixed !important;
+                                  top: 10mm !important;
+                                  left: 15mm !important;
+                                  right: 15mm !important;
+                                  justify-content: space-between !important;
+                                  align-items: center !important;
+                                  border-bottom: 0.5px solid #e5e7eb !important;
+                                  padding-bottom: 2mm !important;
+                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                                  font-size: 8px !important;
+                                  font-weight: bold !important;
+                                  color: #111827 !important;
+                                  z-index: 9999 !important;
+                                  background: white !important;
+                                  text-transform: none !important;
+                                  box-sizing: border-box !important;
                                 }
                                 .is-safari .print-footer {
                                   display: none !important;
@@ -7132,7 +7165,16 @@ export default function App() {
                   }
 
                   if (!printedViaPopup) {
+                    const originalTitle = document.title;
+                    if (isSafariOrIPad) {
+                      document.title = "Generated using PharmaGuard";
+                    }
                     window.print();
+                    if (isSafariOrIPad) {
+                      setTimeout(() => {
+                        document.title = originalTitle;
+                      }, 1000);
+                    }
                   }
                 }}
                 className="text-xs font-black uppercase tracking-widest bg-brand-yellow hover:brightness-110 text-brand-blue rounded-xl h-12 shadow-lg shadow-brand-yellow/20 px-6 border-none transition-all flex gap-2 items-center justify-center"
@@ -7328,7 +7370,23 @@ export default function App() {
                   }
                 }
                 .is-safari .print-header {
-                  display: none !important;
+                  display: flex !important;
+                  position: fixed !important;
+                  top: 10mm !important;
+                  left: 15mm !important;
+                  right: 15mm !important;
+                  justify-content: space-between !important;
+                  align-items: center !important;
+                  border-bottom: 0.5px solid #e5e7eb !important;
+                  padding-bottom: 2mm !important;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                  font-size: 8px !important;
+                  font-weight: bold !important;
+                  color: #111827 !important;
+                  z-index: 9999 !important;
+                  background: white !important;
+                  text-transform: none !important;
+                  box-sizing: border-box !important;
                 }
                 .is-safari .print-footer {
                   display: none !important;
