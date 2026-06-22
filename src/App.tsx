@@ -4250,7 +4250,9 @@ export default function App() {
                 background: white !important;
               }
               #reconciliation-printable-invoice {
-                display: block !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important;
                 position: relative !important;
                 width: 100% !important;
                 height: auto !important;
@@ -7005,7 +7007,9 @@ export default function App() {
                                   overflow: visible !important;
                                 }
                                 #reconciliation-printable-invoice {
-                                  display: block !important;
+                                  display: flex !important;
+                                  flex-direction: column !important;
+                                  justify-content: flex-start !important;
                                   position: relative !important;
                                   width: 100% !important;
                                   height: auto !important;
@@ -7156,7 +7160,9 @@ export default function App() {
                                   display: block !important;
                                 }
                                 #reconciliation-printable-invoice {
-                                  display: block !important;
+                                  display: flex !important;
+                                  flex-direction: column !important;
+                                  justify-content: flex-start !important;
                                 }
                               </style>
                             </head>
@@ -7438,7 +7444,9 @@ export default function App() {
                   display: block !important;
                 }
                 #reconciliation-printable-invoice {
-                  display: block !important;
+                  display: flex !important;
+                  flex-direction: column !important;
+                  justify-content: flex-start !important;
                 }
               }
             `}</style>
