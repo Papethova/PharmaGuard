@@ -4389,16 +4389,19 @@ export default function App() {
           {/* Header element visible as hidden print overlay */}
           {isForPrint && (
             <div className="hidden print:flex print-header justify-between items-center text-[8.5px] font-bold text-gray-900 uppercase tracking-normal leading-none pointer-events-none select-none">
-              <span>{selectedHistoricalReport 
-                ? new Date(selectedHistoricalReport.timestamp).toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                    hour12: true
-                  })
-                : printTimestamp
+              <span>{isSafariOrIPad 
+                ? "Generated using PharmaGuard" 
+                : (selectedHistoricalReport 
+                    ? new Date(selectedHistoricalReport.timestamp).toLocaleString(undefined, {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true
+                      })
+                    : printTimestamp
+                  )
               }</span>
               <span>PharmaGuard Reconciliation Report</span>
             </div>
