@@ -4403,7 +4403,7 @@ export default function App() {
                     : printTimestamp
                   )
               }</span>
-              <span>PharmaGuard Reconciliation Report</span>
+              <span style={isSafariOrIPad ? { paddingRight: "30px" } : undefined}>PharmaGuard Reconciliation Report</span>
             </div>
           )}
           
