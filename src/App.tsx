@@ -4264,7 +4264,8 @@ export default function App() {
                 box-shadow: none !important;
                 border: none !important;
               }
-              .is-safari #reconciliation-printable-invoice {
+              .is-safari #reconciliation-printable-invoice, .is-ios-safari #reconciliation-printable-invoice {
+                display: block !important;
                 width: 100% !important;
                 height: auto !important;
                 min-height: 175mm !important;
@@ -7021,7 +7022,8 @@ export default function App() {
                                   padding-top: 8mm !important;
                                   padding-bottom: 8mm !important;
                                 }
-                                .is-safari #reconciliation-printable-invoice {
+                                .is-safari #reconciliation-printable-invoice, .is-ios-safari #reconciliation-printable-invoice {
+                                  display: block !important;
                                   width: 100% !important;
                                   height: auto !important;
                                   min-height: 175mm !important;
@@ -7305,7 +7307,8 @@ export default function App() {
                   box-shadow: none !important;
                   border: none !important;
                 }
-                .is-safari #reconciliation-printable-invoice {
+                .is-safari #reconciliation-printable-invoice, .is-ios-safari #reconciliation-printable-invoice {
+                  display: block !important;
                   width: 100% !important;
                   height: auto !important;
                   min-height: 175mm !important;
