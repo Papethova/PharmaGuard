@@ -4353,43 +4353,10 @@ export default function App() {
                 }
               }
               .is-safari .print-header {
-                display: flex !important;
-                position: fixed !important;
-                top: 10mm !important;
-                left: 22mm !important;
-                right: 22mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-bottom: 0.5px solid #e5e7eb !important;
-                padding-bottom: 2mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
-                letter-spacing: normal !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: none !important;
-                box-sizing: border-box !important;
+                display: none !important;
               }
               .is-safari .print-footer {
-                display: flex !important;
-                position: fixed !important;
-                bottom: 10mm !important;
-                left: 22mm !important;
-                right: 22mm !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 2mm !important;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
-                color: #111827 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                text-transform: none !important;
-                box-sizing: border-box !important;
+                display: none !important;
               }
               .print-page-number-container {
                 font-size: 0 !important;
@@ -7105,42 +7072,10 @@ export default function App() {
                                   }
                                 }
                                 .is-safari .print-header {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  top: 10mm !important;
-                                  left: 15mm !important;
-                                  right: 15mm !important;
-                                  justify-content: space-between !important;
-                                  align-items: center !important;
-                                  border-bottom: 0.5px solid #e5e7eb !important;
-                                  padding-bottom: 2mm !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8px !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  z-index: 9999 !important;
-                                  background: white !important;
-                                  text-transform: none !important;
-                                  box-sizing: border-box !important;
+                                  display: none !important;
                                 }
                                 .is-safari .print-footer {
-                                  display: flex !important;
-                                  position: fixed !important;
-                                  bottom: 10mm !important;
-                                  left: 15mm !important;
-                                  right: 15mm !important;
-                                  justify-content: space-between !important;
-                                  align-items: center !important;
-                                  border-top: 0.5px solid #e5e7eb !important;
-                                  padding-top: 2mm !important;
-                                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                                  font-size: 8px !important;
-                                  font-weight: bold !important;
-                                  color: #111827 !important;
-                                  z-index: 9999 !important;
-                                  background: white !important;
-                                  text-transform: none !important;
-                                  box-sizing: border-box !important;
+                                  display: none !important;
                                 }
                                 .print-page-number-container {
                                   font-size: 0 !important;
@@ -7393,42 +7328,10 @@ export default function App() {
                   }
                 }
                 .is-safari .print-header {
-                  display: flex !important;
-                  position: fixed !important;
-                  top: 10mm !important;
-                  left: 15mm !important;
-                  right: 15mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-bottom: 0.5px solid #e5e7eb !important;
-                  padding-bottom: 2mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: none !important;
-                  box-sizing: border-box !important;
+                  display: none !important;
                 }
                 .is-safari .print-footer {
-                  display: flex !important;
-                  position: fixed !important;
-                  bottom: 10mm !important;
-                  left: 15mm !important;
-                  right: 15mm !important;
-                  justify-content: space-between !important;
-                  align-items: center !important;
-                  border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 2mm !important;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                  font-size: 8px !important;
-                  font-weight: bold !important;
-                  color: #111827 !important;
-                  z-index: 9999 !important;
-                  background: white !important;
-                  text-transform: none !important;
-                  box-sizing: border-box !important;
+                  display: none !important;
                 }
                 .print-page-number-container {
                   font-size: 0 !important;
