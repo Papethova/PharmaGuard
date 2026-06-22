@@ -4372,21 +4372,23 @@ export default function App() {
                 text-transform: none !important;
                 box-sizing: border-box !important;
               }
-              .is-safari .print-footer {
+              .is-safari .print-footer, .is-ios-safari .print-footer {
                 display: flex !important;
                 position: fixed !important;
-                bottom: 10mm !important;
-                left: 22mm !important;
-                right: 22mm !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 15mm !important;
+                padding-left: 22mm !important;
+                padding-right: 22mm !important;
                 justify-content: space-between !important;
                 align-items: center !important;
                 border-top: 0.5px solid #e5e7eb !important;
-                padding-top: 2mm !important;
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                 font-size: 8px !important;
                 font-weight: bold !important;
                 color: #111827 !important;
-                z-index: 9999 !important;
+                z-index: 999999 !important;
                 background: white !important;
                 text-transform: none !important;
                 box-sizing: border-box !important;
@@ -7123,21 +7125,23 @@ export default function App() {
                                   text-transform: none !important;
                                   box-sizing: border-box !important;
                                 }
-                                .is-safari .print-footer {
+                                .is-safari .print-footer, .is-ios-safari .print-footer {
                                   display: flex !important;
                                   position: fixed !important;
-                                  bottom: 10mm !important;
-                                  left: 15mm !important;
-                                  right: 15mm !important;
+                                  bottom: 0 !important;
+                                  left: 0 !important;
+                                  right: 0 !important;
+                                  height: 15mm !important;
+                                  padding-left: 22mm !important;
+                                  padding-right: 22mm !important;
                                   justify-content: space-between !important;
                                   align-items: center !important;
                                   border-top: 0.5px solid #e5e7eb !important;
-                                  padding-top: 2mm !important;
                                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                                   font-size: 8px !important;
                                   font-weight: bold !important;
                                   color: #111827 !important;
-                                  z-index: 9999 !important;
+                                  z-index: 999999 !important;
                                   background: white !important;
                                   text-transform: none !important;
                                   box-sizing: border-box !important;
@@ -7156,6 +7160,10 @@ export default function App() {
                                   left: 22mm !important;
                                   right: 22mm !important;
                                   letter-spacing: normal !important;
+                                }
+                                .is-safari .print-footer, .is-ios-safari .print-footer {
+                                  left: 0 !important;
+                                  right: 0 !important;
                                 }
                                 .break-inside-avoid {
                                   break-inside: avoid-page !important;
@@ -7411,21 +7419,23 @@ export default function App() {
                   text-transform: none !important;
                   box-sizing: border-box !important;
                 }
-                .is-safari .print-footer {
+                .is-safari .print-footer, .is-ios-safari .print-footer {
                   display: flex !important;
                   position: fixed !important;
-                  bottom: 10mm !important;
-                  left: 15mm !important;
-                  right: 15mm !important;
+                  bottom: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  height: 15mm !important;
+                  padding-left: 22mm !important;
+                  padding-right: 22mm !important;
                   justify-content: space-between !important;
                   align-items: center !important;
                   border-top: 0.5px solid #e5e7eb !important;
-                  padding-top: 2mm !important;
                   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                   font-size: 8px !important;
                   font-weight: bold !important;
                   color: #111827 !important;
-                  z-index: 9999 !important;
+                  z-index: 999999 !important;
                   background: white !important;
                   text-transform: none !important;
                   box-sizing: border-box !important;
@@ -7441,6 +7451,10 @@ export default function App() {
                   left: 22mm !important;
                   right: 22mm !important;
                   letter-spacing: normal !important;
+                }
+                .is-safari .print-footer, .is-ios-safari .print-footer {
+                  left: 0 !important;
+                  right: 0 !important;
                 }
                 .break-inside-avoid {
                   break-inside: avoid-page !important;
