@@ -941,17 +941,17 @@ export default function App() {
 
     // Sort matching reports by timestamp descending
     const sortedReports = [...matchingReports].sort((a, b) => {
-      const aTime = new Date(a.timestamp).getTime();
-      const bTime = new Date(b.timestamp).getTime();
+      const aTime = getTimestampMs(a.timestamp);
+      const bTime = getTimestampMs(b.timestamp);
       return bTime - aTime;
     });
 
     const latestReport = sortedReports[0];
     const latestRef = latestReport.reportNumber || latestReport.id;
-    const lastReportTimestampMs = new Date(latestReport.timestamp).getTime();
+    const lastReportTimestampMs = getTimestampMs(latestReport.timestamp);
 
     // Format date MM/DD/YY
-    const d = new Date(latestReport.timestamp);
+    const d = new Date(lastReportTimestampMs);
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     const yy = String(d.getFullYear()).slice(-2);
@@ -1721,111 +1721,39 @@ export default function App() {
     const staffRef = collection(db, "users", emailId, "staff");
     
     try {
-      if (forceServer) {
-        const snap = await getDocs(staffRef);
-        const items = snap.docs.map(doc => ({ 
-          id: doc.id, 
-          name: doc.data().name as string,
-          title: doc.data().title as string
-        }));
-        
-        items.sort((a, b) => {
-          const getPriority = (title: string = "") => {
-            const t = title.toUpperCase();
-            if (t === "PIC") return 1;
-            if (t === "RPH") return 2;
-            if (t === "TECH") return 4;
-            return 3; 
-          };
-          
-          const pA = getPriority(a.title);
-          const pB = getPriority(b.title);
-          
-          if (pA !== pB) return pA - pB;
-          return a.name.localeCompare(b.name);
-        });
-        
-        setUsers(items);
-      } else {
-        try {
-          const snap = await getDocsFromCache(staffRef);
-          if (!snap.empty) {
-            const items = snap.docs.map(doc => ({ 
-              id: doc.id, 
-              name: doc.data().name as string,
-              title: doc.data().title as string
-            }));
-            
-            items.sort((a, b) => {
-              const getPriority = (title: string = "") => {
-                const t = title.toUpperCase();
-                if (t === "PIC") return 1;
-                if (t === "RPH") return 2;
-                if (t === "TECH") return 4;
-                return 3; 
-              };
-              
-              const pA = getPriority(a.title);
-              const pB = getPriority(b.title);
-              
-              if (pA !== pB) return pA - pB;
-              return a.name.localeCompare(b.name);
-            });
-            
-            setUsers(items);
-          } else {
-            const serverSnap = await getDocs(staffRef);
-            const items = serverSnap.docs.map(doc => ({ 
-              id: doc.id, 
-              name: doc.data().name as string,
-              title: doc.data().title as string
-            }));
-            
-            items.sort((a, b) => {
-              const getPriority = (title: string = "") => {
-                const t = title.toUpperCase();
-                if (t === "PIC") return 1;
-                if (t === "RPH") return 2;
-                if (t === "TECH") return 4;
-                return 3; 
-              };
-              
-              const pA = getPriority(a.title);
-              const pB = getPriority(b.title);
-              
-              if (pA !== pB) return pA - pB;
-              return a.name.localeCompare(b.name);
-            });
-            
-            setUsers(items);
-          }
-        } catch (cacheErr) {
-          const serverSnap = await getDocs(staffRef);
-          const items = serverSnap.docs.map(doc => ({ 
-            id: doc.id, 
-            name: doc.data().name as string,
-            title: doc.data().title as string
-          }));
-          
-          items.sort((a, b) => {
-            const getPriority = (title: string = "") => {
-              const t = title.toUpperCase();
-              if (t === "PIC") return 1;
-              if (t === "RPH") return 2;
-              if (t === "TECH") return 4;
-              return 3; 
-            };
-            
-            const pA = getPriority(a.title);
-            const pB = getPriority(b.title);
-            
-            if (pA !== pB) return pA - pB;
-            return a.name.localeCompare(b.name);
-          });
-          
-          setUsers(items);
-        }
+      let snap;
+      try {
+        // Try fetching from the server first to prevent stale cached data
+        snap = await getDocs(staffRef);
+      } catch (serverErr) {
+        // Fall back to local cache if completely offline
+        console.warn("Server fetch failed for staff, falling back to cache:", serverErr);
+        snap = await getDocsFromCache(staffRef);
       }
+      
+      const items = snap.docs.map(doc => ({ 
+        id: doc.id, 
+        name: doc.data().name as string,
+        title: doc.data().title as string
+      }));
+      
+      items.sort((a, b) => {
+        const getPriority = (title: string = "") => {
+          const t = title.toUpperCase();
+          if (t === "PIC") return 1;
+          if (t === "RPH") return 2;
+          if (t === "TECH") return 4;
+          return 3; 
+        };
+        
+        const pA = getPriority(a.title);
+        const pB = getPriority(b.title);
+        
+        if (pA !== pB) return pA - pB;
+        return a.name.localeCompare(b.name);
+      });
+      
+      setUsers(items);
     } catch (err: any) {
       if (userProfile?.status === 'active') {
         handleFirestoreError(err, OperationType.LIST, `users/${userUid}/staff`);
@@ -1844,27 +1772,18 @@ export default function App() {
     const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
     
     try {
-      if (forceServer) {
-        const snapshot = await getDocs(reportsRef);
-        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setHistoricalReports(items);
-      } else {
-        try {
-          const snapshot = await getDocsFromCache(reportsRef);
-          if (!snapshot.empty) {
-            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setHistoricalReports(items);
-          } else {
-            const snapshotServer = await getDocs(reportsRef);
-            const items = snapshotServer.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setHistoricalReports(items);
-          }
-        } catch (cacheError) {
-          const snapshotServer = await getDocs(reportsRef);
-          const items = snapshotServer.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setHistoricalReports(items);
-        }
+      let snapshot;
+      try {
+        // Always attempt server fetch first to ensure all users/devices see identical up-to-date data
+        snapshot = await getDocs(reportsRef);
+      } catch (serverErr) {
+        // Fall back to cache only if completely offline or server request fails
+        console.warn("Server fetch failed for historical reports, falling back to cache:", serverErr);
+        snapshot = await getDocsFromCache(reportsRef);
       }
+      
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setHistoricalReports(items);
     } catch (err) {
       console.error("Failed to fetch reconciliation reports:", err);
     } finally {
@@ -1910,12 +1829,12 @@ export default function App() {
     try {
       let snapshot;
       try {
-        snapshot = await getDocsFromCache(q);
-        if (snapshot.empty && !isFetchingMore) {
-          snapshot = await getDocs(q);
-        }
-      } catch (cacheErr) {
+        // Fetch from the server first to prevent stale cached history
         snapshot = await getDocs(q);
+      } catch (serverErr) {
+        // Fall back to local cache if offline
+        console.warn("Server fetch failed for substance transactions, falling back to cache:", serverErr);
+        snapshot = await getDocsFromCache(q);
       }
 
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
@@ -4485,7 +4404,7 @@ export default function App() {
               <span>{isSafariOrIPad 
                 ? "Generated using PharmaGuard" 
                 : (selectedHistoricalReport 
-                    ? new Date(selectedHistoricalReport.timestamp).toLocaleString(undefined, {
+                    ? new Date(getTimestampMs(selectedHistoricalReport.timestamp)).toLocaleString(undefined, {
                         year: "numeric",
                         month: "numeric",
                         day: "numeric",
@@ -4528,7 +4447,7 @@ export default function App() {
               </p>
               <p className="text-xs font-normal font-sans text-gray-900 leading-none whitespace-nowrap">DATE EXECUTED: {
                 selectedHistoricalReport 
-                  ? new Date(selectedHistoricalReport.timestamp).toLocaleDateString()
+                  ? new Date(getTimestampMs(selectedHistoricalReport.timestamp)).toLocaleDateString()
                   : new Date().toLocaleDateString()
               }</p>
             </div>
@@ -7548,7 +7467,7 @@ export default function App() {
                       </tr>
                     ) : (
                       [...historicalReports]
-                        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                        .sort((a, b) => getTimestampMs(b.timestamp) - getTimestampMs(a.timestamp))
                         .map((report) => (
                           <tr 
                             key={report.id} 
@@ -7559,7 +7478,7 @@ export default function App() {
                             className="hover:bg-brand-blue/5 cursor-pointer transition-all duration-150 group animate-in fade-in slide-in-from-bottom-1 duration-150"
                           >
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-semibold font-sans text-brand-dark-grey" style={{ verticalAlign: 'middle' }}>
-                              {new Date(report.timestamp).toLocaleDateString()} at {new Date(report.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(getTimestampMs(report.timestamp)).toLocaleDateString()} at {new Date(getTimestampMs(report.timestamp)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </td>
                             <td className="text-center border-b border-brand-blue/5 py-4 px-4 font-black font-sans text-brand-blue group-hover:text-brand-yellow transition-colors" style={{ verticalAlign: 'middle' }}>
                               {report.reportNumber?.startsWith("REC-") ? report.reportNumber : `REC-${report.reportNumber}`}
@@ -7792,7 +7711,7 @@ export default function App() {
                             ));
                           
                           if (hasMed && r.timestamp) {
-                            const ms = new Date(r.timestamp).getTime();
+                            const ms = getTimestampMs(r.timestamp);
                             if (ms > maxReportTime) {
                               maxReportTime = ms;
                             }
