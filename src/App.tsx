@@ -6109,8 +6109,25 @@ export default function App() {
                           handleTransactionSearch();
                         }
                       }}
-                      className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-3 w-full"
+                      className="!h-9 text-sm border-brand-grey/20 focus:border-brand-blue bg-brand-surface text-left pl-3 pr-8 w-full"
                     />
+                    {historyMedicationSearch && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHistoryMedicationSearch("");
+                          setHistoryMedicationFilter("");
+                          setSearchedTransactions(null);
+                          setSearchedTransactionsCount(null);
+                          setLastSearchedDoc(null);
+                          setHasMoreSearchDocs(false);
+                        }}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-brand-grey hover:text-brand-blue rounded-full hover:bg-brand-blue/10 transition-colors"
+                        title="Clear filter"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
                   {historyMedicationSearch && !historyMedicationFilter && isHistorySearchFocused && (
                     <div className="absolute z-50 w-full min-w-[300px] top-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-[400px] overflow-y-auto left-0">
