@@ -692,6 +692,8 @@ export default function App() {
     hour12: true
   });
   const [historicalReports, setHistoricalReports] = useState<any[]>([]);
+  const [reconciliationTransactions, setReconciliationTransactions] = useState<Transaction[]>([]);
+  const [isLoadingReconTxs, setIsLoadingReconTxs] = useState(false);
   const [isLoadingHistoricalReports, setIsLoadingHistoricalReports] = useState<boolean>(false);
   const [isLoadingStaff, setIsLoadingStaff] = useState<boolean>(false);
   const [isLoadingSubstanceTransactions, setIsLoadingSubstanceTransactions] = useState<boolean>(false);
@@ -862,75 +864,114 @@ export default function App() {
   }, [isReconOpen, reconSigData, picSigData]);
 
   const lastReport = useMemo(() => {
-    const reconTxs = transactions.filter(t => {
-      if (!t.referenceNumber) return false;
-      if (!(t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))) return false;
-      if (t.referenceNumber === reconRef) return false;
-
-      // Filter based on reconScheduleFilter if not ALL
-      if (reconScheduleFilter !== "ALL") {
-        const sub = inventory.find(s => s.id === t.substanceId);
-        if (!sub) return false;
-        if (reconScheduleFilter === "C-II") {
-          return sub.schedule === "C-II";
-        }
-        if (reconScheduleFilter === "C-III/C-IV/C-V") {
-          return sub.schedule === "C-III" || sub.schedule === "C-IV" || sub.schedule === "C-V";
-        }
-      }
-      return true;
+    // Filter historicalReports based on schedule filter
+    const matchingReports = historicalReports.filter(r => {
+      if (reconScheduleFilter === "ALL") return true;
+      return r.scheduleFilter === reconScheduleFilter;
     });
 
-    if (reconTxs.length === 0) {
-      return { date: "N/A", counts: {} as Record<string, number>, ref: "N/A", timestampMs: 0 };
+    if (matchingReports.length === 0) {
+      // Fallback to legacy transaction parsing if no reports in collection yet
+      const reconTxs = transactions.filter(t => {
+        if (!t.referenceNumber) return false;
+        if (!(t.referenceNumber.startsWith("REC-") || t.referenceNumber.startsWith("RECON-"))) return false;
+        if (t.referenceNumber === reconRef) return false;
+
+        // Filter based on reconScheduleFilter if not ALL
+        if (reconScheduleFilter !== "ALL") {
+          const sub = inventory.find(s => s.id === t.substanceId);
+          if (!sub) return false;
+          if (reconScheduleFilter === "C-II") {
+            return sub.schedule === "C-II";
+          }
+          if (reconScheduleFilter === "C-III/C-IV/C-V") {
+            return sub.schedule === "C-III" || sub.schedule === "C-IV" || sub.schedule === "C-V";
+          }
+        }
+        return true;
+      });
+
+      if (reconTxs.length === 0) {
+        return { date: "N/A", counts: {} as Record<string, number>, ref: "N/A", timestampMs: 0 };
+      }
+
+      const sortedReconTxs = [...reconTxs].sort((a, b) => {
+        const aTime = getTimestampMs(a.timestamp);
+        const bTime = getTimestampMs(b.timestamp);
+        return bTime - aTime;
+      });
+
+      const latestRef = sortedReconTxs[0].referenceNumber || "";
+
+      let lastDate = "N/A";
+      let lastReportTimestampMs = 0;
+
+      const latestRefTxs = reconTxs.filter(t => t.referenceNumber === latestRef);
+      latestRefTxs.forEach(t => {
+        const ms = getTimestampMs(t.timestamp);
+        if (ms > lastReportTimestampMs) {
+          lastReportTimestampMs = ms;
+        }
+      });
+
+      const firstTxWithLatestRef = sortedReconTxs.find(t => t.referenceNumber === latestRef);
+      if (firstTxWithLatestRef?.timestamp) {
+        const ts = firstTxWithLatestRef.timestamp;
+        let d: Date;
+        if (typeof ts.toDate === "function") {
+          d = ts.toDate();
+        } else if (ts instanceof Date) {
+          d = ts;
+        } else {
+          d = new Date(ts);
+        }
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const yy = String(d.getFullYear()).slice(-2);
+        lastDate = `${mm}/${dd}/${yy}`;
+      }
+
+      const counts: Record<string, number> = {};
+      sortedReconTxs.filter(t => t.referenceNumber === latestRef).forEach(t => {
+        counts[t.substanceId] = t.newStock;
+      });
+
+      return { date: lastDate, counts, ref: latestRef, timestampMs: lastReportTimestampMs };
     }
 
-    const sortedReconTxs = [...reconTxs].sort((a, b) => {
-      const aTime = getTimestampMs(a.timestamp);
-      const bTime = getTimestampMs(b.timestamp);
+    // Sort matching reports by timestamp descending
+    const sortedReports = [...matchingReports].sort((a, b) => {
+      const aTime = new Date(a.timestamp).getTime();
+      const bTime = new Date(b.timestamp).getTime();
       return bTime - aTime;
     });
 
-    const latestRef = sortedReconTxs[0].referenceNumber || "";
+    const latestReport = sortedReports[0];
+    const latestRef = latestReport.reportNumber || latestReport.id;
+    const lastReportTimestampMs = new Date(latestReport.timestamp).getTime();
 
-    let lastDate = "N/A";
-    let lastReportTimestampMs = 0;
-
-    const latestRefTxs = reconTxs.filter(t => t.referenceNumber === latestRef);
-    latestRefTxs.forEach(t => {
-      const ms = getTimestampMs(t.timestamp);
-      if (ms > lastReportTimestampMs) {
-        lastReportTimestampMs = ms;
-      }
-    });
-
-    const firstTxWithLatestRef = sortedReconTxs.find(t => t.referenceNumber === latestRef);
-    if (firstTxWithLatestRef?.timestamp) {
-      const ts = firstTxWithLatestRef.timestamp;
-      let d: Date;
-      if (typeof ts.toDate === "function") {
-        d = ts.toDate();
-      } else if (ts instanceof Date) {
-        d = ts;
-      } else {
-        d = new Date(ts);
-      }
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      const yy = String(d.getFullYear()).slice(-2);
-      lastDate = `${mm}/${dd}/${yy}`;
-    }
+    // Format date MM/DD/YY
+    const d = new Date(latestReport.timestamp);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const yy = String(d.getFullYear()).slice(-2);
+    const lastDate = `${mm}/${dd}/${yy}`;
 
     const counts: Record<string, number> = {};
-    sortedReconTxs.filter(t => t.referenceNumber === latestRef).forEach(t => {
-      counts[t.substanceId] = t.newStock;
-    });
+    if (Array.isArray(latestReport.items)) {
+      latestReport.items.forEach((item: any) => {
+        counts[item.substanceId] = item.physical;
+      });
+    }
 
     return { date: lastDate, counts, ref: latestRef, timestampMs: lastReportTimestampMs };
-  }, [transactions, reconRef, inventory, reconScheduleFilter]);
+  }, [reconScheduleFilter, historicalReports, transactions, inventory, reconRef]);
 
   const getSubstanceHistoryMetrics = useCallback((subId: string) => {
-    const subTxs = transactions.filter(t => t.substanceId === subId);
+    const activeTxs = (isReconOpen && reconciliationTransactions.length > 0)
+      ? reconciliationTransactions
+      : transactions;
+    const subTxs = activeTxs.filter(t => t.substanceId === subId);
     
     let lastClosingCount = 0;
     let prevReportDate = "N/A";
@@ -941,6 +982,10 @@ export default function App() {
       if (prevReconTx) {
         lastClosingCount = prevReconTx.newStock;
         lastReportTxTime = getTimestampMs(prevReconTx.timestamp);
+        prevReportDate = lastReport.date;
+      } else if (lastReport.counts[subId] !== undefined) {
+        lastClosingCount = lastReport.counts[subId];
+        lastReportTxTime = lastReport.timestampMs;
         prevReportDate = lastReport.date;
       } else {
         lastClosingCount = 0;
@@ -1003,7 +1048,55 @@ export default function App() {
       adjustments,
       expected
     };
-  }, [transactions, lastReport, reconRef, inventory]);
+  }, [transactions, lastReport, reconRef, inventory, isReconOpen, reconciliationTransactions]);
+
+  // Effect to load full transaction logs from Firestore specifically when report generator is opened
+  useEffect(() => {
+    if (!isReconOpen || !userUid) {
+      if (reconciliationTransactions.length > 0) {
+        setReconciliationTransactions([]);
+      }
+      return;
+    }
+
+    const fetchAllTransactionsForReconciliation = async () => {
+      setIsLoadingReconTxs(true);
+      try {
+        const emailId = userEmail?.toLowerCase() || userUid;
+        const transactionsRef = collection(db, "users", emailId, "transactions");
+
+        let q;
+        if (lastReport.timestampMs > 0) {
+          // Fetch all transactions since the last report with a tiny 10-second buffer
+          const sinceDate = new Date(lastReport.timestampMs - 10000);
+          q = query(
+            transactionsRef,
+            where("timestamp", ">=", sinceDate),
+            orderBy("timestamp", "desc")
+          );
+        } else {
+          // Fallback: load transactions from last 90 days to capture history
+          const ninetyDaysAgo = new Date();
+          ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+          q = query(
+            transactionsRef,
+            where("timestamp", ">=", ninetyDaysAgo),
+            orderBy("timestamp", "desc")
+          );
+        }
+
+        const snapshot = await getDocs(q);
+        const items = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) } as Transaction));
+        setReconciliationTransactions(items);
+      } catch (err) {
+        console.error("Error fetching transactions for reconciliation:", err);
+      } finally {
+        setIsLoadingReconTxs(false);
+      }
+    };
+
+    fetchAllTransactionsForReconciliation();
+  }, [isReconOpen, userUid, userEmail, lastReport.timestampMs]);
 
   const getLatestVerifiedCount = useCallback((subId: string) => {
     const subTxs = transactions.filter(t => 
