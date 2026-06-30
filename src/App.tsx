@@ -2010,12 +2010,16 @@ export default function App() {
     } else {
       const queryTerm = searchTerm.split(" - ")[0].split(" (")[0].trim().toLowerCase();
       
-      const matched = inventory.filter(s => 
-        (activeSchedule === "ALL" || s.schedule === activeSchedule) &&
-        (s.name.toLowerCase().startsWith(queryTerm) ||
-         s.ndc.toLowerCase().startsWith(queryTerm) ||
-         (s.strength && s.strength.toLowerCase().startsWith(queryTerm)))
-      );
+      const matched = inventory.filter(s => {
+        const isCorrectSchedule = activeSchedule === "ALL" || s.schedule === activeSchedule;
+        if (!isCorrectSchedule) return false;
+        const cleanQuery = queryTerm.replace(/[^a-z0-9]/g, "");
+        const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
+        return s.name.toLowerCase().startsWith(queryTerm) || 
+               s.ndc.toLowerCase().includes(queryTerm) ||
+               (cleanQuery !== "" && cleanNDC.includes(cleanQuery)) ||
+               (s.strength && s.strength.toLowerCase().startsWith(queryTerm));
+      });
 
       if (matched.length > 0) {
         const matchedIds = matched.map(s => s.id);
@@ -5049,10 +5053,14 @@ export default function App() {
                             {newMed.name && !selectedSubstance && isNewMedSearchFocused && (
                               <div className="absolute z-[100] w-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-2xl max-h-60 overflow-y-auto left-0 top-full">
                                 {inventory
-                                  .filter(s => 
-                                    s.name.toLowerCase().startsWith(newMed.name.toLowerCase()) || 
-                                    s.ndc.startsWith(newMed.name)
-                                  )
+                                  .filter(s => {
+                                    const queryLower = newMed.name.toLowerCase();
+                                    const cleanQuery = queryLower.replace(/[^a-z0-9]/g, "");
+                                    const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
+                                    return s.name.toLowerCase().startsWith(queryLower) || 
+                                           s.ndc.toLowerCase().includes(queryLower) ||
+                                           (cleanQuery !== "" && cleanNDC.includes(cleanQuery));
+                                  })
                                   .sort(compareSubstances)
                                   .map(s => (
                                     <div
@@ -5084,10 +5092,14 @@ export default function App() {
                                       </div>
                                     </div>
                                   ))}
-                                {inventory.filter(s => 
-                                  s.name.toLowerCase().startsWith(newMed.name.toLowerCase()) || 
-                                  s.ndc.startsWith(newMed.name)
-                                ).length === 0 && (
+                                {inventory.filter(s => {
+                                  const queryLower = newMed.name.toLowerCase();
+                                  const cleanQuery = queryLower.replace(/[^a-z0-9]/g, "");
+                                  const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
+                                  return s.name.toLowerCase().startsWith(queryLower) || 
+                                         s.ndc.toLowerCase().includes(queryLower) ||
+                                         (cleanQuery !== "" && cleanNDC.includes(cleanQuery));
+                                }).length === 0 && (
                                   <div className="px-3 py-2 text-xs text-brand-dark-grey/50 italic">New medication entry...</div>
                                 )}
                               </div>
@@ -5276,10 +5288,14 @@ export default function App() {
                         {substanceSearch && !selectedSubstance && isSubstanceSearchFocused && (
                           <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-md shadow-xl max-h-60 overflow-y-auto">
                             {inventory
-                              .filter(s => 
-                                s.name.toLowerCase().startsWith(substanceSearch.toLowerCase()) || 
-                                s.ndc.startsWith(substanceSearch)
-                              )
+                              .filter(s => {
+                                const queryLower = substanceSearch.toLowerCase();
+                                const cleanQuery = queryLower.replace(/[^a-z0-9]/g, "");
+                                const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
+                                return s.name.toLowerCase().startsWith(queryLower) || 
+                                       s.ndc.toLowerCase().includes(queryLower) ||
+                                       (cleanQuery !== "" && cleanNDC.includes(cleanQuery));
+                              })
                               .sort(compareSubstances)
                               .map(s => (
                                 <div
@@ -5302,10 +5318,14 @@ export default function App() {
                                   </div>
                                 </div>
                               ))}
-                            {inventory.filter(s => 
-                              s.name.toLowerCase().startsWith(substanceSearch.toLowerCase()) || 
-                              s.ndc.startsWith(substanceSearch)
-                            ).length === 0 && (
+                            {inventory.filter(s => {
+                              const queryLower = substanceSearch.toLowerCase();
+                              const cleanQuery = queryLower.replace(/[^a-z0-9]/g, "");
+                              const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
+                              return s.name.toLowerCase().startsWith(queryLower) || 
+                                     s.ndc.toLowerCase().includes(queryLower) ||
+                                     (cleanQuery !== "" && cleanNDC.includes(cleanQuery));
+                            }).length === 0 && (
                               <div className="px-3 py-2 text-xs text-brand-dark-grey/50 italic">No matches found</div>
                             )}
                           </div>
@@ -6099,8 +6119,11 @@ export default function App() {
                           const isCorrectSchedule = activeSchedule === "ALL" || s.schedule === activeSchedule;
                           if (!isCorrectSchedule) return false;
                           const query = historyMedicationSearch.split(" - ")[0].split(" (")[0].trim().toLowerCase();
+                          const cleanQuery = query.replace(/[^a-z0-9]/g, "");
+                          const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
                           return s.name.toLowerCase().startsWith(query) || 
-                                 s.ndc.toLowerCase().startsWith(query) ||
+                                 s.ndc.toLowerCase().includes(query) ||
+                                 (cleanQuery !== "" && cleanNDC.includes(cleanQuery)) ||
                                  (s.strength && s.strength.toLowerCase().startsWith(query));
                         })
                         .map(s => (
