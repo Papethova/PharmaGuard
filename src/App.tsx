@@ -1479,6 +1479,25 @@ export default function App() {
     };
   }, []);
 
+  const updateLastActive = useCallback(async () => {
+    if (!auth.currentUser) return;
+    const emailId = auth.currentUser.email?.toLowerCase() || auth.currentUser.uid;
+    try {
+      await updateDoc(doc(db, "users", emailId), {
+        lastActiveAt: serverTimestamp()
+      });
+    } catch (err) {
+      console.warn("Failed to update lastActiveAt:", err);
+    }
+  }, []);
+
+  // Track last active timestamp on login / boot / active session restore
+  useEffect(() => {
+    if (!userUid) return;
+    updateLastActive();
+  }, [userUid, userEmail, updateLastActive]);
+
+
   // Auth Listener
   useEffect(() => {
     // Advanced Safety Heartbeat: Ensure we never stay on a white screen
@@ -2114,6 +2133,10 @@ export default function App() {
       setSearchedTransactions(sortedItems);
       setLastSearchedDoc(snap.docs[snap.docs.length - 1] || null);
       setHasMoreSearchDocs(snap.docs.length >= 30);
+      if (auditScrollContainerRef.current) {
+        auditScrollContainerRef.current.scrollTop = 0;
+      }
+      setAuditScrollTop(0);
     } catch (err) {
       console.error("Error conducting paginated transaction search:", err);
       setSearchedTransactions([]);
@@ -2714,6 +2737,7 @@ export default function App() {
       });
 
       await batch.commit();
+      updateLastActive();
 
       if (transactionType === "VERIFY") {
         setReconCounts(prev => ({ ...prev, [targetMedId]: quantity }));
@@ -2918,6 +2942,7 @@ export default function App() {
       batch.set(reportDocRef, reportPayload);
 
       await batch.commit();
+      updateLastActive();
       await fetchHistoricalReports(true);
       toast.success("Reconciliation Report finalized and saved to registry logs!");
       
@@ -5083,6 +5108,11 @@ export default function App() {
                                 {inventory
                                   .filter(s => {
                                     const queryLower = newMed.name.toLowerCase();
+                                    const digitsOnlyQuery = queryLower.replace(/[^0-9]/g, "");
+                                    const digitsOnlyNDC = s.ndc.replace(/[^0-9]/g, "");
+                                    if (digitsOnlyQuery && digitsOnlyNDC.includes(digitsOnlyQuery)) {
+                                      return true;
+                                    }
                                     const cleanQuery = queryLower.replace(/[^a-z0-9]/g, "");
                                     const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
                                     return s.name.toLowerCase().startsWith(queryLower) || 
@@ -5122,6 +5152,11 @@ export default function App() {
                                   ))}
                                 {inventory.filter(s => {
                                   const queryLower = newMed.name.toLowerCase();
+                                  const digitsOnlyQuery = queryLower.replace(/[^0-9]/g, "");
+                                  const digitsOnlyNDC = s.ndc.replace(/[^0-9]/g, "");
+                                  if (digitsOnlyQuery && digitsOnlyNDC.includes(digitsOnlyQuery)) {
+                                    return true;
+                                  }
                                   const cleanQuery = queryLower.replace(/[^a-z0-9]/g, "");
                                   const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
                                   return s.name.toLowerCase().startsWith(queryLower) || 
@@ -5318,6 +5353,11 @@ export default function App() {
                             {inventory
                               .filter(s => {
                                 const queryLower = substanceSearch.toLowerCase();
+                                const digitsOnlyQuery = queryLower.replace(/[^0-9]/g, "");
+                                const digitsOnlyNDC = s.ndc.replace(/[^0-9]/g, "");
+                                if (digitsOnlyQuery && digitsOnlyNDC.includes(digitsOnlyQuery)) {
+                                  return true;
+                                }
                                 const cleanQuery = queryLower.replace(/[^a-z0-9]/g, "");
                                 const cleanNDC = s.ndc.toLowerCase().replace(/[^a-z0-9]/g, "");
                                 return s.name.toLowerCase().startsWith(queryLower) || 
@@ -6029,7 +6069,10 @@ export default function App() {
                       ) : (() => {
                         const invItemHeight = 40;
                         const invVisibleCount = 18;
-                        const invStartIndex = Math.max(0, Math.floor(inventoryScrollTop / invItemHeight) - 4);
+                        const rawInvStartIndex = Math.floor(inventoryScrollTop / invItemHeight);
+                        const invStartIndex = rawInvStartIndex * invItemHeight >= filteredInventory.length * invItemHeight
+                          ? 0
+                          : Math.max(0, rawInvStartIndex - 4);
                         const invEndIndex = Math.min(filteredInventory.length, invStartIndex + invVisibleCount + 8);
                         const invSpaceTop = invStartIndex * invItemHeight;
                         const invSpaceBottom = Math.max(0, (filteredInventory.length - invEndIndex) * invItemHeight);
@@ -6150,6 +6193,10 @@ export default function App() {
                           setSearchedTransactionsCount(null);
                           setLastSearchedDoc(null);
                           setHasMoreSearchDocs(false);
+                          if (auditScrollContainerRef.current) {
+                            auditScrollContainerRef.current.scrollTop = 0;
+                          }
+                          setAuditScrollTop(0);
                         }}
                         className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-brand-grey hover:text-brand-blue rounded-full hover:bg-brand-blue/10 transition-colors"
                         title="Clear filter"
@@ -6338,7 +6385,10 @@ export default function App() {
                     ) : (() => {
                       const txItemHeight = 40;
                       const txVisibleCount = 18;
-                      const txStartIndex = Math.max(0, Math.floor(auditScrollTop / txItemHeight) - 4);
+                      const rawTxStartIndex = Math.floor(auditScrollTop / txItemHeight);
+                      const txStartIndex = rawTxStartIndex * txItemHeight >= filteredTransactions.length * txItemHeight
+                        ? 0
+                        : Math.max(0, rawTxStartIndex - 4);
                       const txEndIndex = Math.min(filteredTransactions.length, txStartIndex + txVisibleCount + 8);
                       const txSpaceTop = txStartIndex * txItemHeight;
                       const txSpaceBottom = Math.max(0, (filteredTransactions.length - txEndIndex) * txItemHeight);
@@ -8235,6 +8285,9 @@ export default function App() {
                                  </span>
                                  <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10 whitespace-nowrap">
                                    UID: {profile.docId}
+                                 </Badge>
+                                 <Badge variant="outline" className="text-[8px] font-mono text-brand-blue bg-brand-blue/5 px-1.5 py-0 h-4 border-brand-blue/15 whitespace-nowrap">
+                                   ACTIVE: {profile.lastActiveAt ? formatDateTime(profile.lastActiveAt) : "NEVER"}
                                  </Badge>
                               </div>
                             </div>
