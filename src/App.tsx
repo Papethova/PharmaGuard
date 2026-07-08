@@ -463,6 +463,8 @@ export default function App() {
   // Option 2 & Virtual Scroll Lists: Local view-state to virtualization and metrics document caching
   const [inventoryScrollTop, setInventoryScrollTop] = useState(0);
   const [auditScrollTop, setAuditScrollTop] = useState(0);
+  const auditScrollContainerRef = useRef<HTMLDivElement>(null);
+  const inventoryScrollContainerRef = useRef<HTMLDivElement>(null);
   const [globalMetrics, setGlobalMetrics] = useState<{
     totalSubstances?: number;
     totalTransactions?: number;
@@ -486,6 +488,32 @@ export default function App() {
   const [substanceHistoryLimit, setSubstanceHistoryLimit] = useState<number>(30);
   const isIncrementingSubstanceLimitRef = useRef(false);
   const [isUsingFallback, setIsUsingFallback] = useState<boolean>(false);
+
+  // Whenever any of the transaction filters or query changes, reset the audit virtual scroll state
+  // and scroll the DOM container back to the top. This avoids empty/invisible lists due to stale scroll offsets.
+  useEffect(() => {
+    setAuditScrollTop(0);
+    if (auditScrollContainerRef.current) {
+      auditScrollContainerRef.current.scrollTop = 0;
+    }
+  }, [
+    historyMedicationSearch, 
+    historyMedicationFilter, 
+    activeSchedule, 
+    startDate, 
+    endDate, 
+    historyTypeFilter, 
+    searchedTransactions
+  ]);
+
+  // Whenever the active schedule filter changes, reset the inventory virtual scroll state
+  // and scroll the DOM container back to the top.
+  useEffect(() => {
+    setInventoryScrollTop(0);
+    if (inventoryScrollContainerRef.current) {
+      inventoryScrollContainerRef.current.scrollTop = 0;
+    }
+  }, [activeSchedule]);
 
   // Stub variables for hidden pagination compatibility
   const pageSize = 15;
@@ -5971,6 +5999,7 @@ export default function App() {
           <TabsContent value="inventory" className="flex-1 min-h-0 h-full mt-0 outline-none data-[state=inactive]:hidden flex flex-col relative z-20 m-0 overflow-hidden">
               <Card className="flex-1 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
                 <div 
+                  ref={inventoryScrollContainerRef}
                   className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto"
                   onScroll={(e) => {
                     const roundedScrollTop = Math.floor(e.currentTarget.scrollTop / 10) * 10;
@@ -6263,6 +6292,7 @@ export default function App() {
             </div>
             <Card className="flex-1 mt-4 min-h-0 border-brand-grey/10 shadow-sm bg-brand-surface/70 backdrop-blur-[2px] flex flex-col overflow-hidden py-0">
               <div 
+                ref={auditScrollContainerRef}
                 className="flex-1 min-h-0 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-brand-blue/20 touch-auto"
                 onScroll={(e) => {
                   const target = e.currentTarget;
