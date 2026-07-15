@@ -8267,7 +8267,7 @@ export default function App() {
                               <Badge 
                                 className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
                                   profile.status === 'active' 
-                                    ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                                    ? 'bg-brand-blue text-white border-brand-blue' 
                                     : profile.status === 'pending'
                                       ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
                                       : 'bg-red-50 text-red-700 border-red-200'
