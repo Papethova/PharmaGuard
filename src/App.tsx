@@ -3471,8 +3471,7 @@ export default function App() {
         if (!term) return true;
         return (p.email?.toLowerCase() || "").includes(term) || 
                (p.displayName?.toLowerCase() || "").includes(term) ||
-               (p.organizationName?.toLowerCase() || "").includes(term) ||
-               (p.docId?.toLowerCase() || "").includes(term);
+               (p.organizationName?.toLowerCase() || "").includes(term);
       })
       .sort((a: UserProfile, b: UserProfile) => {
         const isMasterA = (a.email || "").toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim();
