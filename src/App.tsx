@@ -8156,9 +8156,8 @@ export default function App() {
             <div className="px-3 py-2 bg-brand-yellow rounded-lg border border-brand-yellow/20 flex items-center justify-between">
               <div className="flex gap-4 items-center">
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Authenticated Master Identity</span>
                   <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
-                    {getIdentityString(userProfile, user?.email)} 
+                    {escapeEmail(user?.email || "")} 
                   </span>
                 </div>
                 <div className="h-6 w-px bg-brand-blue/10" />
@@ -8277,7 +8276,7 @@ export default function App() {
                               <Badge 
                                 className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
                                   profile.status === 'active' 
-                                    ? 'bg-green-50 text-green-700 border-green-200' 
+                                    ? 'bg-blue-50 text-blue-700 border-blue-200' 
                                     : profile.status === 'pending'
                                       ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
                                       : 'bg-red-50 text-red-700 border-red-200'
