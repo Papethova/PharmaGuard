@@ -3469,8 +3469,7 @@ export default function App() {
       .filter((p: UserProfile) => {
         const term = userSearchTerm.toLowerCase();
         if (!term) return true;
-        return (p.email?.toLowerCase() || "").includes(term) || 
-               (p.displayName?.toLowerCase() || "").includes(term) ||
+        return (p.displayName?.toLowerCase() || "").includes(term) ||
                (p.organizationName?.toLowerCase() || "").includes(term);
       })
       .sort((a: UserProfile, b: UserProfile) => {
