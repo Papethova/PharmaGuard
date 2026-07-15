@@ -8243,7 +8243,7 @@ export default function App() {
                                 <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
                                   {escapeEmail(profile.organizationName || profile.displayName || "Unregistered Node")}
                                 </span>
-                                <Badge variant="outline" className="text-[8px] text-brand-blue bg-brand-blue/5 px-1.5 py-0 h-4 border-brand-blue/15 whitespace-nowrap">
+                                <Badge className="text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border bg-brand-blue text-white border-brand-blue whitespace-nowrap">
                                   LAST ACTIVITY: {profile.lastActiveAt ? formatDateTime(profile.lastActiveAt) : "NEVER"}
                                 </Badge>
                               </div>
