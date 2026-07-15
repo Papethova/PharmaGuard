@@ -8269,22 +8269,14 @@ export default function App() {
                                     ? 'bg-brand-blue text-white border-brand-blue' 
                                     : profile.status === 'pending'
                                       ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
-                                      : idx % 3 === 0 
-                                        ? 'bg-neutral-800 text-neutral-100 border-neutral-700' 
-                                        : idx % 3 === 1 
-                                          ? 'bg-amber-100 text-amber-800 border-amber-300' 
-                                          : 'bg-indigo-100 text-indigo-800 border-indigo-300'
+                                      : 'bg-neutral-800 text-neutral-100 border-neutral-700'
                                 }`}
                               >
                                 {profile.status === 'active' 
                                   ? 'Active' 
                                   : profile.status === 'pending' 
                                     ? '● Pending' 
-                                    : idx % 3 === 0 
-                                      ? 'Suspended (Charcoal)' 
-                                      : idx % 3 === 1 
-                                        ? 'Suspended (Amber)' 
-                                        : 'Suspended (Indigo)'}
+                                    : 'Suspended'}
                               </Badge>
                               {isAdminNode ? (
                                 <div className="flex justify-end items-center gap-2">
@@ -8309,7 +8301,7 @@ export default function App() {
                                     onClick={() => handleUpdateSubscription(profile.docId || profile.uid, profile.status)}
                                     className={`font-black uppercase tracking-tighter text-[9px] h-7 px-3 border transition-all shrink-0 ${
                                       profile.status === 'active' 
-                                        ? 'border-red-100 text-red-600 hover:bg-red-600 hover:text-white' 
+                                        ? 'border-neutral-300 text-neutral-700 hover:bg-neutral-800 hover:text-white hover:border-neutral-800' 
                                         : 'bg-brand-blue text-white hover:bg-brand-blue/90'
                                     }`}
                                   >
