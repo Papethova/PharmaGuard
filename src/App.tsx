@@ -8255,17 +8255,6 @@ export default function App() {
                                 <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
                                   {escapeEmail(profile.organizationName || profile.displayName || "Unregistered Node")}
                                 </span>
-                                <Badge 
-                                  className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
-                                    profile.status === 'active' 
-                                      ? 'bg-green-50 text-green-700 border-green-200' 
-                                      : profile.status === 'pending'
-                                        ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
-                                        : 'bg-red-50 text-red-700 border-red-200'
-                                  }`}
-                                >
-                                  {profile.status === 'active' ? '● Active' : profile.status === 'pending' ? '● Pending' : '● Suspended'}
-                                </Badge>
                               </div>
                               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5 min-w-0">
                                  <span className="text-[10px] text-brand-grey font-medium break-all block no-interact">
@@ -8288,61 +8277,74 @@ export default function App() {
                             </div>
                           </td>
                           <td className="py-2 px-4 w-[20%] text-right">
-                            {isAdminNode ? (
-                              <div className="flex justify-end items-center gap-2">
-                                <Button 
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setNodeToReset(profile);
-                                    setIsResetConfirmOpen(true);
-                                  }}
-                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-yellow"
-                                  title="Clear User Data"
-                                >
-                                  <RefreshCcw className="h-3.5 w-3.5" />
-                                </Button>
-                              </div>
-                            ) : (
-                              <div className="flex justify-end gap-1">
-                                <Button 
-                                  variant={profile.status === 'active' ? 'outline' : 'default'}
-                                  size="sm"
-                                  onClick={() => handleUpdateSubscription(profile.docId || profile.uid, profile.status)}
-                                  className={`font-black uppercase tracking-tighter text-[9px] h-7 px-3 border transition-all shrink-0 ${
-                                    profile.status === 'active' 
-                                      ? 'border-red-100 text-red-600 hover:bg-red-600 hover:text-white' 
-                                      : 'bg-brand-blue text-white hover:bg-brand-blue/90'
-                                  }`}
-                                >
-                                  {profile.status === 'active' ? 'Suspend' : profile.status === 'pending' ? 'Grant Access' : 'Restore'}
-                                </Button>
-                                <Button 
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setNodeToReset(profile);
-                                    setIsResetConfirmOpen(true);
-                                  }}
-                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-yellow"
-                                  title="Clear User Data"
-                                >
-                                  <RefreshCcw className="h-3.5 w-3.5" />
-                                </Button>
-                                <Button 
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setNodeToDelete(profile);
-                                    setIsDeleteConfirmOpen(true);
-                                  }}
-                                  className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
-                                  title="Purge Node"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
-                              </div>
-                            )}
+                            <div className="flex flex-col items-end justify-center gap-1">
+                              <Badge 
+                                className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
+                                  profile.status === 'active' 
+                                    ? 'bg-green-50 text-green-700 border-green-200' 
+                                    : profile.status === 'pending'
+                                      ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
+                                      : 'bg-red-50 text-red-700 border-red-200'
+                                }`}
+                              >
+                                {profile.status === 'active' ? '● Active' : profile.status === 'pending' ? '● Pending' : '● Suspended'}
+                              </Badge>
+                              {isAdminNode ? (
+                                <div className="flex justify-end items-center gap-2">
+                                  <Button 
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setNodeToReset(profile);
+                                      setIsResetConfirmOpen(true);
+                                    }}
+                                    className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-yellow"
+                                    title="Clear User Data"
+                                  >
+                                    <RefreshCcw className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="flex justify-end gap-1">
+                                  <Button 
+                                    variant={profile.status === 'active' ? 'outline' : 'default'}
+                                    size="sm"
+                                    onClick={() => handleUpdateSubscription(profile.docId || profile.uid, profile.status)}
+                                    className={`font-black uppercase tracking-tighter text-[9px] h-7 px-3 border transition-all shrink-0 ${
+                                      profile.status === 'active' 
+                                        ? 'border-red-100 text-red-600 hover:bg-red-600 hover:text-white' 
+                                        : 'bg-brand-blue text-white hover:bg-brand-blue/90'
+                                    }`}
+                                  >
+                                    {profile.status === 'active' ? 'Suspend' : profile.status === 'pending' ? 'Grant Access' : 'Restore'}
+                                  </Button>
+                                  <Button 
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setNodeToReset(profile);
+                                      setIsResetConfirmOpen(true);
+                                    }}
+                                    className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-brand-yellow"
+                                    title="Clear User Data"
+                                  >
+                                    <RefreshCcw className="h-3.5 w-3.5" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setNodeToDelete(profile);
+                                      setIsDeleteConfirmOpen(true);
+                                    }}
+                                    className="h-7 w-7 p-0 text-brand-dark-grey/60 hover:text-red-500"
+                                    title="Purge Node"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
