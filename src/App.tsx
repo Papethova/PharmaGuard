@@ -8272,7 +8272,7 @@ export default function App() {
                                       : 'bg-red-50 text-red-700 border-red-200'
                                 }`}
                               >
-                                {profile.status === 'active' ? '● Active' : profile.status === 'pending' ? '● Pending' : '● Suspended'}
+                                {profile.status === 'active' ? 'Active' : profile.status === 'pending' ? '● Pending' : 'Suspended'}
                               </Badge>
                               {isAdminNode ? (
                                 <div className="flex justify-end items-center gap-2">
