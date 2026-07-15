@@ -8216,8 +8216,8 @@ export default function App() {
               <table className="w-full table-fixed">
                 <thead>
                   <tr className="h-9">
-                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-left w-[80%]">Organization ID & Status</th>
-                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-right w-[20%]">Terminal Operations</th>
+                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-left w-[70%]">Organization ID & Status</th>
+                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-right w-[30%] whitespace-nowrap">Terminal Operations</th>
                   </tr>
                 </thead>
               </table>
@@ -8237,7 +8237,7 @@ export default function App() {
                               : 'hover:bg-brand-blue/5'
                           }`}
                         >
-                          <td className="py-2 px-4 w-[80%]">
+                          <td className="py-2 px-4 w-[70%]">
                             <div className="flex flex-col gap-0.5 min-w-0">
                               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                                 <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
@@ -8261,7 +8261,7 @@ export default function App() {
                               </div>
                             </div>
                           </td>
-                          <td className="py-2 px-4 w-[20%] text-right">
+                          <td className="py-2 px-4 w-[30%] text-right">
                             <div className="flex flex-col items-end justify-center gap-1">
                               <Badge 
                                 className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
