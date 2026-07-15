@@ -8287,7 +8287,7 @@ export default function App() {
                                    UID: {profile.docId}
                                  </Badge>
                                  <Badge variant="outline" className="text-[8px] font-mono text-brand-blue bg-brand-blue/5 px-1.5 py-0 h-4 border-brand-blue/15 whitespace-nowrap">
-                                   ACTIVE: {profile.lastActiveAt ? formatDateTime(profile.lastActiveAt) : "NEVER"}
+                                   LAST ACTIVITY: {profile.lastActiveAt ? formatDateTime(profile.lastActiveAt) : "NEVER"}
                                  </Badge>
                               </div>
                             </div>
