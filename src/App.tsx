@@ -8267,9 +8267,7 @@ export default function App() {
                                      )}
                                    </span>
                                  </span>
-                                 <Badge variant="outline" className="text-[8px] font-mono text-brand-grey/50 px-1 py-0 h-4 border-brand-grey/10 whitespace-nowrap">
-                                   UID: {profile.docId}
-                                 </Badge>
+
                                  <Badge variant="outline" className="text-[8px] font-mono text-brand-blue bg-brand-blue/5 px-1.5 py-0 h-4 border-brand-blue/15 whitespace-nowrap">
                                    LAST ACTIVITY: {profile.lastActiveAt ? formatDateTime(profile.lastActiveAt) : "NEVER"}
                                  </Badge>
