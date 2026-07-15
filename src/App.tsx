@@ -8159,7 +8159,6 @@ export default function App() {
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Authenticated Master Identity</span>
                   <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
                     {getIdentityString(userProfile, user?.email)} 
-                    <span className={`h-1.5 w-1.5 rounded-full ${isMasterAdmin ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} title={isMasterAdmin ? 'Authority Verified' : 'Standard User Restricted'} />
                   </span>
                 </div>
                 <div className="h-6 w-px bg-brand-blue/10" />
@@ -8370,15 +8369,7 @@ export default function App() {
           </div>
         </div>
         
-        <div className="p-3 px-4 bg-brand-blue/5 flex justify-between items-center border-t border-brand-blue/10">
-          <div className="flex flex-col">
-            <p className="text-[8px] text-brand-grey/40 uppercase tracking-widest font-black no-interact">
-              Authority: <span className="cursor-default select-none no-underline">{getIdentityString(userProfile, user?.email)}</span>
-            </p>
-            <p className="text-[8px] text-brand-blue/40 uppercase tracking-widest font-black">
-              PharmaGuard Inventory Registry Terminal
-            </p>
-          </div>
+        <div className="p-3 px-4 bg-brand-blue/5 flex justify-end items-center border-t border-brand-blue/10">
           <div className="flex gap-2">
             <Button 
               variant="default" 
