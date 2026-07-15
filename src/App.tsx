@@ -8226,7 +8226,7 @@ export default function App() {
               <table className="w-full table-fixed">
                 <tbody className="divide-y divide-brand-blue/5">
                   {filteredUserProfiles.length > 0 ? (
-                    filteredUserProfiles.map((profile) => {
+                    filteredUserProfiles.map((profile, idx) => {
                       const isAdminNode = (profile.email || "").toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim();
                       return (
                         <tr 
@@ -8269,10 +8269,22 @@ export default function App() {
                                     ? 'bg-brand-blue text-white border-brand-blue' 
                                     : profile.status === 'pending'
                                       ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
-                                      : 'bg-red-50 text-red-700 border-red-200'
+                                      : idx % 3 === 0 
+                                        ? 'bg-neutral-800 text-neutral-100 border-neutral-700' 
+                                        : idx % 3 === 1 
+                                          ? 'bg-amber-100 text-amber-800 border-amber-300' 
+                                          : 'bg-indigo-100 text-indigo-800 border-indigo-300'
                                 }`}
                               >
-                                {profile.status === 'active' ? 'Active' : profile.status === 'pending' ? '● Pending' : 'Suspended'}
+                                {profile.status === 'active' 
+                                  ? 'Active' 
+                                  : profile.status === 'pending' 
+                                    ? '● Pending' 
+                                    : idx % 3 === 0 
+                                      ? 'Suspended (Charcoal)' 
+                                      : idx % 3 === 1 
+                                        ? 'Suspended (Amber)' 
+                                        : 'Suspended (Indigo)'}
                               </Badge>
                               {isAdminNode ? (
                                 <div className="flex justify-end items-center gap-2">
