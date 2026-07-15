@@ -8156,12 +8156,6 @@ export default function App() {
             <div className="px-3 py-2 bg-brand-yellow rounded-lg border border-brand-yellow/20 flex items-center justify-between">
               <div className="flex gap-4 items-center">
                 <div className="flex flex-col">
-                  <span className="text-xs font-black text-brand-blue/80 tracking-tight flex items-center gap-2 no-interact">
-                    {escapeEmail(user?.email || "")} 
-                  </span>
-                </div>
-                <div className="h-6 w-px bg-brand-blue/10" />
-                <div className="flex flex-col">
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-blue/60 leading-none mb-1">Registry Synchronization Status</span>
                   <span className="text-xs font-black text-brand-blue/80 tracking-tight">
                     {filteredUserProfiles.filter(p => (p.email || "").toLowerCase().trim() !== MASTER_ADMIN_EMAIL.toLowerCase().trim()).length} Managed Customer Nodes Registered
