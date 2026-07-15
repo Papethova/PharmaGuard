@@ -8245,7 +8245,7 @@ export default function App() {
                           key={profile.docId || profile.uid} 
                           className={`transition-colors h-14 border-b border-brand-blue/5 ${
                             isAdminNode 
-                              ? 'bg-brand-blue/10 hover:bg-brand-blue/15 border-l-4 border-brand-yellow' 
+                              ? 'bg-brand-blue/10 hover:bg-brand-blue/15' 
                               : 'hover:bg-brand-blue/5'
                           }`}
                         >
@@ -8255,11 +8255,6 @@ export default function App() {
                                 <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
                                   {escapeEmail(profile.organizationName || profile.displayName || "Unregistered Node")}
                                 </span>
-                                {profile.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() && (
-                                  <Badge className="bg-brand-blue text-white text-[7px] font-black px-1.5 h-3.5 rounded-sm uppercase tracking-tighter animate-pulse">
-                                    MASTER AUTHORITY
-                                  </Badge>
-                                )}
                                 <Badge 
                                   className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
                                     profile.status === 'active' 
@@ -8295,9 +8290,6 @@ export default function App() {
                           <td className="py-2 px-4 w-[20%] text-right">
                             {isAdminNode ? (
                               <div className="flex justify-end items-center gap-2">
-                                <span className="text-[9px] font-black text-brand-blue uppercase tracking-widest pointer-events-none select-none">
-                                  ● SYSTEM ROOT
-                                </span>
                                 <Button 
                                   variant="ghost"
                                   size="sm"
