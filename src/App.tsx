@@ -8146,10 +8146,7 @@ export default function App() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <DialogTitle className="text-xl font-black tracking-tight leading-none truncate text-white">Super Admin Command Center</DialogTitle>
-                <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] tracking-widest mt-1 leading-tight truncate">
-                  REAL-TIME REGISTRY MANAGEMENT AND GLOBAL SUBSCRIPTION AUTHORITY TERMINAL.
-                </DialogDescription>
+                <DialogTitle className="text-xl font-black tracking-tight leading-none truncate text-white">Command Center</DialogTitle>
               </div>
             </div>
 
