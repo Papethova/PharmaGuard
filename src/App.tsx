@@ -8264,7 +8264,7 @@ export default function App() {
                                    <span className="cursor-default select-none no-underline flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                                      <span>{profile.email ? escapeEmail(profile.email) : "No Email Bound"}</span>
                                      {profile.email && profile.password && profile.password.toLowerCase() !== "legacy account" && (
-                                       <span className="text-brand-blue font-mono font-bold bg-brand-blue/5 border border-brand-blue/10 px-1.5 py-0.5 rounded select-all leading-none inline-flex items-center whitespace-nowrap">
+                                       <span className="text-brand-blue font-mono font-bold select-all">
                                           PW: {profile.password}
                                        </span>
                                      )}
