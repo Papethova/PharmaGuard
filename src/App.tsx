@@ -443,6 +443,7 @@ export default function App() {
   const [reassignSelectedUser, setReassignSelectedUser] = useState("");
   const [isReassignSubmitting, setIsReassignSubmitting] = useState(false);
   const [reassignSearchTerm, setReassignSearchTerm] = useState("");
+  const [isReassignSearchFocused, setIsReassignSearchFocused] = useState(false);
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   // Local date helper functions for default range initialization (7 days)
   const getNDaysAgoDateString = (days: number) => {
@@ -5858,6 +5859,7 @@ export default function App() {
                                   onClick={() => {
                                     setReassignTargetSubstanceId("");
                                     setReassignSearchTerm("");
+                                    setIsReassignSearchFocused(false);
                                     setReassignReason("Dispensing error correction: incorrect NDC selected at dispense");
                                     setReassignSelectedUser(users[0]?.id || userUid || "");
                                     reassignSigPad.current?.clear();
@@ -6041,50 +6043,74 @@ export default function App() {
                               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/50" />
                               <Input
                                 type="text"
-                                placeholder="Filter inventory by name or NDC..."
+                                placeholder="Type medication name or NDC..."
                                 value={reassignSearchTerm}
-                                onChange={(e) => setReassignSearchTerm(e.target.value)}
-                                className="pl-8 h-9 text-xs border border-brand-grey/20 bg-brand-surface rounded-xl text-brand-dark-grey focus:border-brand-blue focus:ring-1 focus:ring-brand-blue font-medium"
+                                onChange={(e) => {
+                                  setReassignSearchTerm(e.target.value);
+                                  setReassignTargetSubstanceId("");
+                                  setIsReassignSearchFocused(true);
+                                }}
+                                onFocus={() => setIsReassignSearchFocused(true)}
+                                onBlur={() => {
+                                  setTimeout(() => setIsReassignSearchFocused(false), 200);
+                                }}
+                                className="pl-8 pr-8 h-9 text-xs border border-brand-grey/20 bg-brand-surface rounded-xl text-brand-dark-grey focus:border-brand-blue focus:ring-1 focus:ring-brand-blue font-medium"
                               />
-                            </div>
+                              {(reassignSearchTerm || reassignTargetSubstanceId) && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReassignSearchTerm("");
+                                    setReassignTargetSubstanceId("");
+                                    setIsReassignSearchFocused(true);
+                                  }}
+                                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-brand-grey hover:text-brand-dark-grey"
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </button>
+                              )}
 
-                            <div className="max-h-36 overflow-y-auto border border-brand-grey/20 rounded-xl divide-y divide-brand-grey/10 bg-brand-surface shadow-inner">
-                              {availableTargetSubstances.length > 0 ? (
-                                availableTargetSubstances.map((sub) => {
-                                  const isSelected = reassignTargetSubstanceId === sub.id;
-                                  return (
-                                    <button
-                                      key={sub.id}
-                                      type="button"
-                                      onClick={() => setReassignTargetSubstanceId(sub.id)}
-                                      className={`w-full p-2.5 text-left text-xs transition-colors flex items-center justify-between gap-3 ${
-                                        isSelected 
-                                          ? 'bg-brand-blue/10 border-l-4 border-l-brand-blue font-bold' 
-                                          : 'hover:bg-brand-blue/5'
-                                      }`}
-                                    >
-                                      <div className="min-w-0 flex-1">
-                                        <div className="flex items-center gap-1.5 flex-wrap">
-                                          <span className="font-bold text-brand-dark-grey truncate">{sub.name}</span>
-                                          <span className="text-brand-blue font-semibold">{sub.strength}</span>
-                                          <Badge variant="outline" className="text-[8px] px-1.5 py-0 h-4 border-brand-blue/20 text-brand-blue font-bold">
-                                            {sub.schedule}
-                                          </Badge>
+                              {isReassignSearchFocused && (
+                                <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-xl shadow-2xl max-h-48 overflow-y-auto left-0 top-full divide-y divide-brand-grey/10">
+                                  {availableTargetSubstances.length > 0 ? (
+                                    availableTargetSubstances.map((sub) => {
+                                      const isSelected = reassignTargetSubstanceId === sub.id;
+                                      return (
+                                        <div
+                                          key={sub.id}
+                                          className={`p-2.5 hover:bg-brand-blue/5 cursor-pointer text-xs flex items-center justify-between gap-3 transition-colors ${
+                                            isSelected ? 'bg-brand-blue/10 font-bold' : ''
+                                          }`}
+                                          onMouseDown={() => {
+                                            setReassignTargetSubstanceId(sub.id);
+                                            setReassignSearchTerm(`${sub.name} ${sub.strength} - NDC: ${sub.ndc}`);
+                                            setIsReassignSearchFocused(false);
+                                          }}
+                                        >
+                                          <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                              <span className="font-bold text-brand-dark-grey truncate">{sub.name}</span>
+                                              <span className="text-brand-blue font-semibold">{sub.strength}</span>
+                                              <Badge variant="outline" className="text-[8px] px-1.5 py-0 h-4 border-brand-blue/20 text-brand-blue font-bold">
+                                                {sub.schedule}
+                                              </Badge>
+                                            </div>
+                                            <div className="text-[11px] font-bold text-brand-blue mt-0.5">
+                                              NDC: {sub.ndc}
+                                            </div>
+                                          </div>
+                                          <div className="text-right shrink-0">
+                                            <div className="text-[9px] uppercase font-bold text-brand-grey">Stock</div>
+                                            <div className="text-xs font-bold text-brand-dark-grey">{sub.currentStock} units</div>
+                                          </div>
                                         </div>
-                                        <div className="text-[11px] font-bold text-brand-blue mt-0.5">
-                                          NDC: {sub.ndc}
-                                        </div>
-                                      </div>
-                                      <div className="text-right shrink-0">
-                                        <div className="text-[9px] uppercase font-bold text-brand-grey">Stock</div>
-                                        <div className="text-xs font-bold text-brand-dark-grey">{sub.currentStock} units</div>
-                                      </div>
-                                    </button>
-                                  );
-                                })
-                              ) : (
-                                <div className="p-3 text-center text-xs text-brand-grey italic font-medium">
-                                  No other medications match search filter.
+                                      );
+                                    })
+                                  ) : (
+                                    <div className="p-3 text-center text-xs text-brand-grey italic font-medium">
+                                      No medications match search filter.
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
