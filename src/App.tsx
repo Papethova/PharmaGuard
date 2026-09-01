@@ -5832,6 +5832,24 @@ export default function App() {
                                 {viewingTransaction.ndc}
                               </button>
                             </div>
+                            {viewingTransaction.type === 'OUT' && (
+                              <div className="pt-1">
+                                <Button 
+                                  type="button"
+                                  className="h-7 px-2.5 text-[9px] font-black uppercase tracking-wider bg-brand-blue hover:bg-brand-blue/90 text-white rounded-lg transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.98]"
+                                  onClick={() => {
+                                    setReassignTargetSubstanceId("");
+                                    setReassignSearchTerm("");
+                                    setReassignReason("Dispensing error correction: incorrect NDC selected at dispense");
+                                    setReassignSelectedUser(users[0]?.id || userUid || "");
+                                    setIsReassignNDCOpen(true);
+                                  }}
+                                >
+                                  <ArrowRightLeft className="h-3 w-3 text-white" />
+                                  Reassign NDC
+                                </Button>
+                              </div>
+                            )}
                           </div>
                           <div className="space-y-1">
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Action</Label>
@@ -5939,26 +5957,9 @@ export default function App() {
                   </div>
                 </ScrollArea>
 
-                <DialogFooter className="px-6 pb-6 pt-3 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex items-center justify-between gap-3">
-                  {viewingTransaction?.type === 'OUT' && (
-                    <Button 
-                      type="button"
-                      variant="outline"
-                      className="h-10 px-4 text-[10px] font-black uppercase tracking-widest border border-brand-blue/20 text-brand-blue bg-brand-blue/5 hover:bg-brand-blue/10 rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
-                      onClick={() => {
-                        setReassignTargetSubstanceId("");
-                        setReassignSearchTerm("");
-                        setReassignReason("Dispensing error correction: incorrect NDC selected at dispense");
-                        setReassignSelectedUser(users[0]?.id || userUid || "");
-                        setIsReassignNDCOpen(true);
-                      }}
-                    >
-                      <ArrowRightLeft className="h-3.5 w-3.5 text-brand-blue" />
-                      Reassign NDC
-                    </Button>
-                  )}
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex justify-end">
                   <Button 
-                    className="flex-1 h-10 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all"
+                    className="w-1/2 h-10 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all"
                     onClick={() => setViewingTransaction(null)}
                   >
                     Close Record
