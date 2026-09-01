@@ -6070,7 +6070,7 @@ export default function App() {
                                 </button>
                               )}
 
-                              {isReassignSearchFocused && (
+                              {isReassignSearchFocused && reassignSearchTerm.trim().length > 0 && (
                                 <div className="absolute z-50 w-full mt-1 bg-brand-surface border border-brand-grey/20 rounded-xl shadow-2xl max-h-48 overflow-y-auto left-0 top-full divide-y divide-brand-grey/10">
                                   {availableTargetSubstances.length > 0 ? (
                                     availableTargetSubstances.map((sub) => {
