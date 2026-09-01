@@ -6244,7 +6244,7 @@ export default function App() {
                                 onClick={() => reassignSigPad.current?.clear()}
                                 className="text-[9px] uppercase font-bold text-brand-blue hover:underline"
                               >
-                                Clear Signature
+                                Clear
                               </button>
                             </div>
                             <div className="border border-brand-grey/20 rounded-xl bg-brand-surface overflow-hidden">
