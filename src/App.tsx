@@ -6290,7 +6290,7 @@ export default function App() {
                     ) : (
                       <>
                         <Check className="h-4 w-4" strokeWidth={3} />
-                        Confirm & Reassign NDC
+                        Reassign NDC
                       </>
                     )}
                   </Button>
