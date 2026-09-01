@@ -5999,7 +5999,7 @@ export default function App() {
                     </div>
                     <div className="flex flex-col gap-0">
                       <DialogTitle className="text-xl font-black tracking-tight text-white uppercase leading-none">
-                        Reassign Dispense NDC
+                        Reassign Dispensed NDC
                       </DialogTitle>
                       <DialogDescription className="text-brand-yellow/70 font-bold text-[11px] uppercase tracking-widest mt-1">
                         CORRECT DISPENSING NDC & ATOMICALLY REBALANCE INVENTORY
@@ -6021,26 +6021,26 @@ export default function App() {
                           {/* Dispense Summary Card */}
                           <div className="bg-brand-light-grey/40 border border-brand-grey/20 rounded-xl p-4 space-y-2 text-xs">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-blue/70">Prescription Ref</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-dark-grey">Prescription Ref</span>
                               <span className="font-bold text-brand-blue">{formatRefForDisplay(viewingTransaction.referenceNumber)}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-blue/70">Dispensed Quantity</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-dark-grey">Dispensed Quantity</span>
                               <span className="font-bold text-brand-dark-grey">{viewingTransaction.quantity} units</span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-blue/70">Original Timestamp</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-dark-grey">Original Timestamp</span>
                               <span className="font-semibold text-brand-dark-grey">{formatDateTime(viewingTransaction.timestamp)}</span>
                             </div>
                           </div>
 
                           {/* Target NDC Selection */}
                           <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
+                            <Label className="text-[10px] uppercase font-bold text-brand-dark-grey tracking-wider">
                               Select Correct Target NDC / Medication
                             </Label>
                             <div className="relative">
-                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/50" />
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-dark-grey/50" />
                               <Input
                                 type="text"
                                 placeholder="Type medication name or NDC..."
@@ -6118,7 +6118,7 @@ export default function App() {
 
                           {/* Live Count Impact Comparison */}
                           <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
+                            <Label className="text-[10px] uppercase font-bold text-brand-dark-grey tracking-wider">
                               Inventory Impact
                             </Label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -6136,7 +6136,7 @@ export default function App() {
                                   NDC: {viewingTransaction.ndc}
                                 </div>
                                 <div className="pt-1.5 border-t border-brand-blue/15 flex items-center justify-between text-xs">
-                                  <span className="text-[10px] uppercase font-bold text-brand-blue/80">Count</span>
+                                  <span className="text-[10px] uppercase font-bold text-brand-dark-grey/80">Count</span>
                                   <div className="flex items-center gap-1.5 font-bold">
                                     <span className="text-brand-dark-grey">{sourceSub?.currentStock ?? 0}</span>
                                     <ArrowRight className="h-3 w-3 text-brand-blue" />
@@ -6149,115 +6149,115 @@ export default function App() {
                               {/* Target NDC Card */}
                               <div className={`border rounded-xl p-3 space-y-1.5 shadow-sm ${
                                 targetSub 
-                                  ? 'border-brand-blue/20 bg-brand-light-grey/40' 
-                                  : 'border-brand-grey/20 bg-brand-light-grey/20 opacity-60'
-                              }`}>
-                                <div className="flex items-center justify-between">
-                                  <Badge className="bg-brand-blue text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                    Target NDC (Deducting)
-                                  </Badge>
-                                </div>
-                                {targetSub ? (
-                                  <>
-                                    <div className="text-xs font-bold text-brand-dark-grey truncate">
-                                      {targetSub.name} {targetSub.strength}
-                                    </div>
-                                    <div className="text-[11px] font-bold text-brand-blue">
-                                      NDC: {targetSub.ndc}
-                                    </div>
-                                    <div className="pt-1.5 border-t border-brand-blue/15 flex items-center justify-between text-xs">
-                                      <span className="text-[10px] uppercase font-bold text-brand-blue/80">Count</span>
-                                      <div className="flex items-center gap-1.5 font-bold">
-                                        <span className="text-brand-dark-grey">{targetSub.currentStock}</span>
-                                        <ArrowRight className="h-3 w-3 text-brand-blue" />
-                                        <span className={targetProposed < 0 ? "text-red-600 font-black" : "text-brand-blue font-black"}>
-                                          {targetProposed}
-                                        </span>
-                                        <span className="text-[10px] font-bold text-brand-blue">(-{viewingTransaction.quantity})</span>
-                                      </div>
-                                    </div>
-                                  </>
-                                ) : (
-                                  <div className="h-12 flex items-center justify-center text-center text-[10px] text-brand-grey italic font-medium">
-                                    Select target NDC above
+                                ? 'border-brand-blue/20 bg-brand-light-grey/40' 
+                                : 'border-brand-grey/20 bg-brand-light-grey/20 opacity-60'
+                            }`}>
+                              <div className="flex items-center justify-between">
+                                <Badge className="bg-brand-blue text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                  Target NDC (Deducting)
+                                </Badge>
+                              </div>
+                              {targetSub ? (
+                                <>
+                                  <div className="text-xs font-bold text-brand-dark-grey truncate">
+                                    {targetSub.name} {targetSub.strength}
                                   </div>
-                                )}
-                              </div>
+                                  <div className="text-[11px] font-bold text-brand-blue">
+                                    NDC: {targetSub.ndc}
+                                  </div>
+                                  <div className="pt-1.5 border-t border-brand-blue/15 flex items-center justify-between text-xs">
+                                    <span className="text-[10px] uppercase font-bold text-brand-dark-grey/80">Count</span>
+                                    <div className="flex items-center gap-1.5 font-bold">
+                                      <span className="text-brand-dark-grey">{targetSub.currentStock}</span>
+                                      <ArrowRight className="h-3 w-3 text-brand-blue" />
+                                      <span className={targetProposed < 0 ? "text-red-600 font-black" : "text-brand-blue font-black"}>
+                                        {targetProposed}
+                                      </span>
+                                      <span className="text-[10px] font-bold text-brand-blue">(-{viewingTransaction.quantity})</span>
+                                    </div>
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="h-12 flex items-center justify-center text-center text-[10px] text-brand-grey italic font-medium">
+                                  Select target NDC above
+                                </div>
+                              )}
                             </div>
-
-                            {targetSub && targetProposed < 0 && (
-                              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span>Warning: Target NDC stock balance will be negative ({targetProposed} units).</span>
-                              </div>
-                            )}
                           </div>
 
-                          {/* Audit Justification & Authorized By */}
-                          <div className="space-y-3 pt-1">
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
-                                Audit Reason / Justification
+                          {targetSub && targetProposed < 0 && (
+                            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
+                              <AlertCircle className="h-4 w-4 shrink-0" />
+                              <span>Warning: Target NDC stock balance will be negative ({targetProposed} units).</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Audit Justification & Authorized By */}
+                        <div className="space-y-3 pt-1">
+                          <div className="space-y-1.5">
+                            <Label className="text-[10px] uppercase font-bold text-brand-dark-grey tracking-wider">
+                              Audit Reason / Justification
+                            </Label>
+                            <Input
+                              type="text"
+                              placeholder="e.g. Dispensing error correction: product dispensed was NDC..."
+                              value={reassignReason}
+                              onChange={(e) => setReassignReason(e.target.value)}
+                              className="h-9 text-xs border border-brand-grey/20 bg-brand-surface rounded-xl text-brand-dark-grey focus:border-brand-blue focus:ring-1 focus:ring-brand-blue font-medium"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label className="text-[10px] uppercase font-bold text-brand-dark-grey tracking-wider">
+                              Authorizing Staff / Pharmacist
+                            </Label>
+                            <Select value={reassignSelectedUser || undefined} onValueChange={setReassignSelectedUser}>
+                              <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal rounded-xl data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!reassignSelectedUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                <SelectValue placeholder="Select...">
+                                  {(() => {
+                                    const u = users.find(u => u.id === reassignSelectedUser);
+                                    return u ? (
+                                      <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                                    ) : null;
+                                  })()}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent className="bg-brand-surface" align="start">
+                                {users.map(u => (
+                                  <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3 text-xs">
+                                    {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Pharmacist Digital Signature Canvas */}
+                          <div className="space-y-1.5 pt-1">
+                            <div className="flex items-center justify-between">
+                              <Label className="text-[10px] uppercase font-bold text-brand-dark-grey tracking-wider">
+                                Pharmacist Signature Confirmation
                               </Label>
-                              <Input
-                                type="text"
-                                placeholder="e.g. Dispensing error correction: product dispensed was NDC..."
-                                value={reassignReason}
-                                onChange={(e) => setReassignReason(e.target.value)}
-                                className="h-9 text-xs border border-brand-grey/20 bg-brand-surface rounded-xl text-brand-dark-grey focus:border-brand-blue focus:ring-1 focus:ring-brand-blue font-medium"
+                              <button
+                                type="button"
+                                onClick={() => reassignSigPad.current?.clear()}
+                                className="text-[9px] uppercase font-bold text-brand-blue hover:underline"
+                              >
+                                Clear Signature
+                              </button>
+                            </div>
+                            <div className="border border-brand-grey/20 rounded-xl bg-brand-surface overflow-hidden">
+                              <SignatureCanvas 
+                                ref={reassignSigPad}
+                                penColor="#0d3151"
+                                canvasProps={{
+                                  id: "reassign-signature-canvas",
+                                  className: "w-full h-24 cursor-crosshair bg-transparent"
+                                }}
                               />
                             </div>
-
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
-                                Authorizing Staff / Pharmacist
-                              </Label>
-                              <Select value={reassignSelectedUser || undefined} onValueChange={setReassignSelectedUser}>
-                                <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal rounded-xl data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!reassignSelectedUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
-                                  <SelectValue placeholder="Select...">
-                                    {(() => {
-                                      const u = users.find(u => u.id === reassignSelectedUser);
-                                      return u ? (
-                                        <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
-                                      ) : null;
-                                    })()}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent className="bg-brand-surface" align="start">
-                                  {users.map(u => (
-                                    <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3 text-xs">
-                                      {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            {/* Pharmacist Digital Signature Canvas */}
-                            <div className="space-y-1.5 pt-1">
-                              <div className="flex items-center justify-between">
-                                <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
-                                  Pharmacist Signature Confirmation
-                                </Label>
-                                <button
-                                  type="button"
-                                  onClick={() => reassignSigPad.current?.clear()}
-                                  className="text-[9px] uppercase font-bold text-brand-blue hover:underline"
-                                >
-                                  Clear Signature
-                                </button>
-                              </div>
-                              <div className="border border-brand-grey/20 rounded-xl bg-brand-surface overflow-hidden">
-                                <SignatureCanvas 
-                                  ref={reassignSigPad}
-                                  penColor="#0d3151"
-                                  canvasProps={{
-                                    id: "reassign-signature-canvas",
-                                    className: "w-full h-24 cursor-crosshair bg-transparent"
-                                  }}
-                                />
-                              </div>
-                            </div>
+                          </div>
                           </div>
                         </>
                       );
