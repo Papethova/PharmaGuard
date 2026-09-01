@@ -14,7 +14,6 @@ import {
   Pill,
   ArrowDown,
   ArrowRight,
-  ArrowRightLeft,
   RefreshCcw,
   Users,
   UserPlus,
@@ -5866,7 +5865,7 @@ export default function App() {
                                     setIsReassignNDCOpen(true);
                                   }}
                                 >
-                                  <ArrowRightLeft className="h-3 w-3 text-white" />
+                                  <OneSidedArrowLeftRight className="h-3 w-3 text-white" strokeWidth={3} />
                                   Reassign NDC
                                 </Button>
                               </div>
@@ -5935,7 +5934,7 @@ export default function App() {
                         {viewingTransaction.reassignmentAudit && (
                           <div className="p-4 bg-brand-light-grey/50 border border-brand-blue/20 rounded-xl text-brand-dark-grey space-y-1.5 shadow-sm">
                             <div className="flex items-center gap-1.5 font-black text-xs uppercase tracking-wider text-brand-blue">
-                              <ArrowRightLeft className="h-3.5 w-3.5 text-brand-blue shrink-0" />
+                              <OneSidedArrowLeftRight className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
                               <span>NDC Reassignment Audit Record</span>
                             </div>
                             <p className="text-xs text-brand-dark-grey leading-relaxed">
@@ -5995,7 +5994,7 @@ export default function App() {
                 <DialogHeader className="p-6 bg-brand-blue text-white relative shrink-0">
                   <div className="flex items-center gap-4 relative z-10 text-left">
                     <div className="h-12 w-12 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border border-brand-yellow/20">
-                      <ArrowRightLeft className="h-6 w-6 text-brand-blue" />
+                      <OneSidedArrowLeftRight className="h-6 w-6 text-brand-blue" strokeWidth={3} />
                     </div>
                     <div className="flex flex-col gap-0">
                       <DialogTitle className="text-xl font-black tracking-tight text-white uppercase leading-none">
