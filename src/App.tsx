@@ -385,6 +385,7 @@ export default function App() {
   // Rendered natively via React Portal on document.body to stay above overlays
 
     const sigPad = useRef<SignatureCanvas>(null);
+    const reassignSigPad = useRef<SignatureCanvas>(null);
     const [user, setUser] = useState<User | null>(null);
   const userUid = user?.uid;
   const userEmail = user?.email;
@@ -2783,6 +2784,21 @@ export default function App() {
       return;
     }
 
+    const pad = reassignSigPad.current;
+    if (!pad || pad.isEmpty()) {
+      toast.error("Please provide pharmacist digital signature to confirm reassignment.");
+      return;
+    }
+
+    const canvas = pad.getCanvas();
+    const trimmedCanvas = canvas ? trimSignatureCanvas(canvas) : null;
+    const signature = trimmedCanvas ? trimmedCanvas.toDataURL("image/png") : (canvas ? canvas.toDataURL("image/png") : "");
+
+    if (!signature) {
+      toast.error("Please provide pharmacist digital signature to confirm reassignment.");
+      return;
+    }
+
     if (!user) {
       toast.error("User session not authenticated.");
       return;
@@ -2833,6 +2849,7 @@ export default function App() {
         reassignedBy: user.uid,
         reassignedByName: authName,
         reassignedByTitle: authTitle,
+        signature: signature,
         reason: reassignReason.trim() || "Dispensing error correction: NDC reassigned"
       };
 
@@ -2869,6 +2886,7 @@ export default function App() {
 
       toast.success(`NDC reassigned to ${targetSubstance.ndc} (${targetSubstance.name})`);
       setIsReassignNDCOpen(false);
+      reassignSigPad.current?.clear();
     } catch (error: any) {
       console.error("Reassign NDC Error:", error);
       toast.error(`Reassignment failed: ${error.message}`);
@@ -5842,6 +5860,7 @@ export default function App() {
                                     setReassignSearchTerm("");
                                     setReassignReason("Dispensing error correction: incorrect NDC selected at dispense");
                                     setReassignSelectedUser(users[0]?.id || userUid || "");
+                                    reassignSigPad.current?.clear();
                                     setIsReassignNDCOpen(true);
                                   }}
                                 >
@@ -6015,9 +6034,8 @@ export default function App() {
 
                           {/* Target NDC Selection */}
                           <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider flex items-center justify-between">
-                              <span>Select Correct Target NDC / Medication <span className="text-red-500">*</span></span>
-                              <span className="text-[9px] font-semibold text-brand-grey">Search name or NDC</span>
+                            <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
+                              Select Correct Target NDC / Medication
                             </Label>
                             <div className="relative">
                               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/50" />
@@ -6079,9 +6097,9 @@ export default function App() {
                             </Label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {/* Source NDC Card */}
-                              <div className="border border-emerald-200 bg-emerald-50/70 rounded-xl p-3 space-y-1.5 shadow-sm">
+                              <div className="border border-brand-blue/20 bg-brand-light-grey/40 rounded-xl p-3 space-y-1.5 shadow-sm">
                                 <div className="flex items-center justify-between">
-                                  <Badge className="bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                  <Badge className="bg-brand-blue text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                                     Original NDC (Restoring)
                                   </Badge>
                                 </div>
@@ -6091,13 +6109,13 @@ export default function App() {
                                 <div className="text-[11px] font-bold text-brand-blue">
                                   NDC: {viewingTransaction.ndc}
                                 </div>
-                                <div className="pt-1.5 border-t border-emerald-200 flex items-center justify-between text-xs">
-                                  <span className="text-[10px] uppercase font-bold text-emerald-800">Count</span>
+                                <div className="pt-1.5 border-t border-brand-blue/15 flex items-center justify-between text-xs">
+                                  <span className="text-[10px] uppercase font-bold text-brand-blue/80">Count</span>
                                   <div className="flex items-center gap-1.5 font-bold">
                                     <span className="text-brand-dark-grey">{sourceSub?.currentStock ?? 0}</span>
-                                    <ArrowRight className="h-3 w-3 text-emerald-600" />
-                                    <span className="text-emerald-700 font-black">{sourceRestored}</span>
-                                    <span className="text-[10px] font-bold text-emerald-600">(+{viewingTransaction.quantity})</span>
+                                    <ArrowRight className="h-3 w-3 text-brand-blue" />
+                                    <span className="text-brand-blue font-black">{sourceRestored}</span>
+                                    <span className="text-[10px] font-bold text-brand-blue">(+{viewingTransaction.quantity})</span>
                                   </div>
                                 </div>
                               </div>
@@ -6153,7 +6171,7 @@ export default function App() {
                           <div className="space-y-3 pt-1">
                             <div className="space-y-1.5">
                               <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
-                                Audit Reason / Justification <span className="text-red-500">*</span>
+                                Audit Reason / Justification
                               </Label>
                               <Input
                                 type="text"
@@ -6180,6 +6198,32 @@ export default function App() {
                                 ))}
                               </select>
                             </div>
+
+                            {/* Pharmacist Digital Signature Canvas */}
+                            <div className="space-y-1.5 pt-1">
+                              <div className="flex items-center justify-between">
+                                <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
+                                  Pharmacist Signature Confirmation
+                                </Label>
+                                <button
+                                  type="button"
+                                  onClick={() => reassignSigPad.current?.clear()}
+                                  className="text-[9px] uppercase font-bold text-brand-blue hover:underline"
+                                >
+                                  Clear Signature
+                                </button>
+                              </div>
+                              <div className="border border-brand-grey/20 rounded-xl bg-brand-surface overflow-hidden">
+                                <SignatureCanvas 
+                                  ref={reassignSigPad}
+                                  penColor="#0d3151"
+                                  canvasProps={{
+                                    id: "reassign-signature-canvas",
+                                    className: "w-full h-24 cursor-crosshair bg-transparent"
+                                  }}
+                                />
+                              </div>
+                            </div>
                           </div>
                         </>
                       );
@@ -6190,10 +6234,13 @@ export default function App() {
                 <DialogFooter className="px-6 pb-6 pt-3 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex items-center justify-end gap-3">
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     disabled={isReassignSubmitting}
-                    onClick={() => setIsReassignNDCOpen(false)}
-                    className="h-11 px-5 text-xs font-black uppercase tracking-widest bg-brand-blue/10 hover:bg-brand-blue/20 text-brand-blue rounded-xl"
+                    onClick={() => {
+                      reassignSigPad.current?.clear();
+                      setIsReassignNDCOpen(false);
+                    }}
+                    className="h-10 text-xs font-black uppercase tracking-widest border border-brand-blue/20 text-brand-blue bg-brand-blue/5 hover:bg-brand-blue/10 rounded-xl"
                   >
                     Cancel
                   </Button>
@@ -6201,7 +6248,7 @@ export default function App() {
                     type="button"
                     disabled={!reassignTargetSubstanceId || isReassignSubmitting}
                     onClick={handleConfirmNDCReassignment}
-                    className="flex-1 h-11 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                    className="flex-1 h-10 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
                   >
                     {isReassignSubmitting ? (
                       <>
