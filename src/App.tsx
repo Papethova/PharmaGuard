@@ -6288,10 +6288,7 @@ export default function App() {
                         Reassigning...
                       </>
                     ) : (
-                      <>
-                        <Check className="h-4 w-4" strokeWidth={3} />
-                        Reassign NDC
-                      </>
+                      "Reassign NDC"
                     )}
                   </Button>
                 </DialogFooter>
