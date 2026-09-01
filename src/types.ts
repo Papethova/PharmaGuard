@@ -34,6 +34,18 @@ export interface Transaction {
   signature?: string;
   photo?: string;
   witnessId?: string;
+  reassignmentAudit?: {
+    previousSubstanceId: string;
+    previousSubstanceName: string;
+    previousStrength: string;
+    previousNdc: string;
+    reassignedAt: string;
+    reassignedBy: string;
+    reassignedByName: string;
+    reassignedByTitle?: string;
+    reason: string;
+  };
+  reassignedFromNdc?: string;
 }
 
 export interface UserProfile {

@@ -14,6 +14,7 @@ import {
   Pill,
   ArrowDown,
   ArrowRight,
+  ArrowRightLeft,
   RefreshCcw,
   Users,
   UserPlus,
@@ -435,6 +436,12 @@ export default function App() {
   const [activeSchedule, setActiveSchedule] = useState("ALL");
   const [selectedSubstanceDetail, setSelectedSubstanceDetail] = useState<Substance | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
+  const [isReassignNDCOpen, setIsReassignNDCOpen] = useState(false);
+  const [reassignTargetSubstanceId, setReassignTargetSubstanceId] = useState("");
+  const [reassignReason, setReassignReason] = useState("");
+  const [reassignSelectedUser, setReassignSelectedUser] = useState("");
+  const [isReassignSubmitting, setIsReassignSubmitting] = useState(false);
+  const [reassignSearchTerm, setReassignSearchTerm] = useState("");
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   // Local date helper functions for default range initialization (7 days)
   const getNDaysAgoDateString = (days: number) => {
@@ -2750,6 +2757,123 @@ export default function App() {
       toast.error(`System Error: ${error.message}`);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const availableTargetSubstances = useMemo(() => {
+    if (!viewingTransaction) return [];
+    const term = reassignSearchTerm.toLowerCase().trim();
+    return inventory
+      .filter(s => s.id !== viewingTransaction.substanceId)
+      .filter(s => {
+        if (!term) return true;
+        return (
+          s.name.toLowerCase().includes(term) ||
+          s.ndc.toLowerCase().includes(term) ||
+          s.strength.toLowerCase().includes(term) ||
+          s.schedule.toLowerCase().includes(term)
+        );
+      })
+      .sort(compareSubstances);
+  }, [inventory, viewingTransaction, reassignSearchTerm]);
+
+  const handleConfirmNDCReassignment = async () => {
+    if (!viewingTransaction || !reassignTargetSubstanceId) {
+      toast.error("Please select the correct target medication / NDC.");
+      return;
+    }
+
+    if (!user) {
+      toast.error("User session not authenticated.");
+      return;
+    }
+
+    const emailId = userEmail?.toLowerCase() || user.uid;
+    const sourceSubstance = inventory.find(s => s.id === viewingTransaction.substanceId);
+    const targetSubstance = inventory.find(s => s.id === reassignTargetSubstanceId);
+
+    if (!targetSubstance) {
+      toast.error("Target medication not found in current inventory.");
+      return;
+    }
+
+    try {
+      setIsReassignSubmitting(true);
+      const batch = new ChunkedBatch(db);
+      const quantity = viewingTransaction.quantity;
+
+      // 1. Restore stock to source medication (if present)
+      if (sourceSubstance) {
+        const sourceRestoredStock = Number(sourceSubstance.currentStock || 0) + Number(quantity);
+        batch.update(doc(db, "users", emailId, "substances", sourceSubstance.id), {
+          currentStock: sourceRestoredStock,
+          lastUpdated: serverTimestamp()
+        });
+      }
+
+      // 2. Deduct stock from target medication
+      const targetNewStock = Number(targetSubstance.currentStock || 0) - Number(quantity);
+      batch.update(doc(db, "users", emailId, "substances", targetSubstance.id), {
+        currentStock: targetNewStock,
+        lastUpdated: serverTimestamp()
+      });
+
+      // 3. Update the transaction document in Firestore (preserving original timestamp & date)
+      const txRef = doc(db, "users", emailId, "transactions", viewingTransaction.id);
+      const authorizingUser = users.find(u => u.id === reassignSelectedUser);
+      const authName = authorizingUser?.name || user?.displayName || user?.email || "AUTHORIZED PHARMACIST";
+      const authTitle = authorizingUser?.title || "Pharmacist";
+
+      const reassignmentAudit = {
+        previousSubstanceId: viewingTransaction.substanceId,
+        previousSubstanceName: viewingTransaction.substanceName,
+        previousStrength: viewingTransaction.strength,
+        previousNdc: viewingTransaction.ndc,
+        reassignedAt: new Date().toISOString(),
+        reassignedBy: user.uid,
+        reassignedByName: authName,
+        reassignedByTitle: authTitle,
+        reason: reassignReason.trim() || "Dispensing error correction: NDC reassigned"
+      };
+
+      const updatedTxFields: any = {
+        substanceId: targetSubstance.id,
+        substanceName: targetSubstance.name,
+        strength: targetSubstance.strength,
+        ndc: targetSubstance.ndc,
+        previousStock: targetSubstance.currentStock,
+        newStock: targetNewStock,
+        reassignmentAudit: reassignmentAudit,
+        reassignedFromNdc: viewingTransaction.ndc
+      };
+
+      batch.update(txRef, updatedTxFields);
+
+      await batch.commit();
+      updateLastActive();
+
+      // Update viewingTransaction in state
+      const updatedTx: Transaction = {
+        ...viewingTransaction,
+        ...updatedTxFields
+      };
+      setViewingTransaction(updatedTx);
+
+      // Update in-memory transactions list
+      setTransactions(prev => prev.map(t => t.id === viewingTransaction.id ? { ...t, ...updatedTxFields } : t));
+
+      // Update reconciliation transactions if currently loaded
+      if (reconciliationTransactions.length > 0) {
+        setReconciliationTransactions(prev => prev.map(t => t.id === viewingTransaction.id ? { ...t, ...updatedTxFields } : t));
+      }
+
+      toast.success(`NDC reassigned to ${targetSubstance.ndc} (${targetSubstance.name})`);
+      setIsReassignNDCOpen(false);
+    } catch (error: any) {
+      console.error("Reassign NDC Error:", error);
+      toast.error(`Reassignment failed: ${error.message}`);
+    } finally {
+      setIsReassignSubmitting(false);
     }
   };
 
@@ -5769,6 +5893,23 @@ export default function App() {
                           </div>
                         )}
 
+                        {viewingTransaction.reassignmentAudit && (
+                          <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 space-y-1.5 shadow-sm">
+                            <div className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider text-amber-800">
+                              <ArrowRightLeft className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                              <span>NDC Reassignment Audit Record</span>
+                            </div>
+                            <p className="text-xs text-amber-950 leading-relaxed">
+                              Originally logged under <span className="font-mono font-bold">{viewingTransaction.reassignmentAudit.previousNdc}</span> ({viewingTransaction.reassignmentAudit.previousSubstanceName} {viewingTransaction.reassignmentAudit.previousStrength}). Reassigned by <span className="font-semibold">{viewingTransaction.reassignmentAudit.reassignedByName}</span> on {formatDateTime(viewingTransaction.reassignmentAudit.reassignedAt)}.
+                            </p>
+                            {viewingTransaction.reassignmentAudit.reason && (
+                              <p className="text-[11px] italic text-amber-800/80 pt-0.5">
+                                Reason: "{viewingTransaction.reassignmentAudit.reason}"
+                              </p>
+                            )}
+                          </div>
+                        )}
+
                         <div className="space-y-2 pb-4 pt-2 border-t border-brand-blue/5">
                           <Label className="text-[10px] uppercase font-bold text-brand-blue/60">
                             {viewingTransaction.photo ? 'Identity Capture' : 'Digital Signature'}
@@ -5798,12 +5939,280 @@ export default function App() {
                   </div>
                 </ScrollArea>
 
-                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex justify-end">
+                <DialogFooter className="px-6 pb-6 pt-3 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex items-center justify-between gap-3">
+                  {viewingTransaction?.type === 'OUT' && (
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      className="h-10 px-4 text-[10px] font-black uppercase tracking-widest border-amber-300 text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+                      onClick={() => {
+                        setReassignTargetSubstanceId("");
+                        setReassignSearchTerm("");
+                        setReassignReason("Dispensing error correction: incorrect NDC selected at dispense");
+                        setReassignSelectedUser(users[0]?.id || userUid || "");
+                        setIsReassignNDCOpen(true);
+                      }}
+                    >
+                      <ArrowRightLeft className="h-3.5 w-3.5 text-amber-700" />
+                      Reassign NDC
+                    </Button>
+                  )}
                   <Button 
-                    className="w-1/2 h-10 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all"
+                    className="flex-1 h-10 text-[10px] font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all"
                     onClick={() => setViewingTransaction(null)}
                   >
                     Close Record
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* NDC Reassignment Modal */}
+            <Dialog open={isReassignNDCOpen} onOpenChange={(open) => !open && !isReassignSubmitting && setIsReassignNDCOpen(false)}>
+              <DialogContent showCloseButton={false} className="sm:max-w-[560px] bg-brand-surface border-brand-blue/10 p-0 gap-0 overflow-hidden rounded-2xl flex flex-col max-h-[92vh]">
+                <DialogHeader className="p-5 bg-brand-blue text-white relative shrink-0">
+                  <div className="flex items-center gap-3.5 relative z-10 text-left">
+                    <div className="h-11 w-11 rounded-full bg-amber-400 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden text-brand-blue">
+                      <ArrowRightLeft className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <DialogTitle className="text-lg font-black tracking-tight text-white uppercase leading-none">
+                        Reassign Dispense NDC
+                      </DialogTitle>
+                      <DialogDescription className="text-amber-300 font-bold text-[10px] uppercase tracking-widest">
+                        CORRECT DISPENSING NDC & ATOMICALLY REBALANCE INVENTORY
+                      </DialogDescription>
+                    </div>
+                  </div>
+                </DialogHeader>
+
+                <ScrollArea className="flex-1 overflow-y-auto max-h-[calc(92vh-140px)]">
+                  <div className="p-5 space-y-4">
+                    {viewingTransaction && (() => {
+                      const sourceSub = inventory.find(s => s.id === viewingTransaction.substanceId);
+                      const targetSub = inventory.find(s => s.id === reassignTargetSubstanceId);
+                      const sourceRestored = (sourceSub?.currentStock ?? 0) + viewingTransaction.quantity;
+                      const targetProposed = targetSub ? (targetSub.currentStock - viewingTransaction.quantity) : 0;
+
+                      return (
+                        <>
+                          {/* Dispense Summary Card */}
+                          <div className="bg-brand-blue/5 border border-brand-blue/15 rounded-xl p-3.5 space-y-1.5 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-blue/70">Prescription Ref</span>
+                              <span className="font-mono font-bold text-brand-blue">{formatRefForDisplay(viewingTransaction.referenceNumber)}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-blue/70">Dispensed Quantity</span>
+                              <span className="font-bold text-brand-dark-grey">{viewingTransaction.quantity} units</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-blue/70">Original Timestamp</span>
+                              <span className="text-brand-dark-grey">{formatDateTime(viewingTransaction.timestamp)}</span>
+                            </div>
+                          </div>
+
+                          {/* Target NDC Selection */}
+                          <div className="space-y-1.5">
+                            <Label className="text-[10px] uppercase font-bold text-brand-blue tracking-wider flex items-center justify-between">
+                              <span>Select Correct Target NDC / Medication <span className="text-red-500">*</span></span>
+                              <span className="text-[9px] font-normal text-brand-dark-grey/60">Search name or NDC</span>
+                            </Label>
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/40" />
+                              <Input
+                                type="text"
+                                placeholder="Filter inventory by name or NDC..."
+                                value={reassignSearchTerm}
+                                onChange={(e) => setReassignSearchTerm(e.target.value)}
+                                className="pl-8 h-8 text-xs border-brand-blue/20 bg-white"
+                              />
+                            </div>
+
+                            <div className="max-h-36 overflow-y-auto border border-brand-blue/15 rounded-xl divide-y divide-brand-blue/10 bg-white shadow-inner">
+                              {availableTargetSubstances.length > 0 ? (
+                                availableTargetSubstances.map((sub) => {
+                                  const isSelected = reassignTargetSubstanceId === sub.id;
+                                  return (
+                                    <button
+                                      key={sub.id}
+                                      type="button"
+                                      onClick={() => setReassignTargetSubstanceId(sub.id)}
+                                      className={`w-full p-2 text-left text-xs transition-colors flex items-center justify-between gap-3 ${
+                                        isSelected 
+                                          ? 'bg-amber-500/10 border-l-4 border-l-amber-500 font-bold' 
+                                          : 'hover:bg-brand-blue/5'
+                                      }`}
+                                    >
+                                      <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                          <span className="font-bold text-brand-dark-grey truncate">{sub.name}</span>
+                                          <span className="text-brand-blue/80 font-medium">{sub.strength}</span>
+                                          <Badge variant="outline" className="text-[8px] px-1 py-0 h-3.5 border-brand-blue/20 text-brand-blue">
+                                            {sub.schedule}
+                                          </Badge>
+                                        </div>
+                                        <div className="text-[10px] font-mono text-brand-blue mt-0.5">
+                                          NDC: {sub.ndc}
+                                        </div>
+                                      </div>
+                                      <div className="text-right shrink-0">
+                                        <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Stock</div>
+                                        <div className="text-xs font-bold text-brand-blue">{sub.currentStock} units</div>
+                                      </div>
+                                    </button>
+                                  );
+                                })
+                              ) : (
+                                <div className="p-3 text-center text-xs text-brand-dark-grey/50 italic">
+                                  No other medications match search filter.
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Live Count Impact Comparison */}
+                          <div className="space-y-1.5">
+                            <Label className="text-[10px] uppercase font-bold text-brand-blue tracking-wider">
+                              Inventory Impact & Live Count Preview
+                            </Label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                              {/* Source NDC Card */}
+                              <div className="border border-emerald-200 bg-emerald-50/60 rounded-xl p-2.5 space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <Badge className="bg-emerald-600 text-white text-[8px] px-1.5 py-0 h-3.5 uppercase tracking-tighter">
+                                    Original NDC (Restoring)
+                                  </Badge>
+                                </div>
+                                <div className="text-xs font-bold text-brand-dark-grey truncate">
+                                  {viewingTransaction.substanceName} {viewingTransaction.strength}
+                                </div>
+                                <div className="text-[10px] font-mono text-brand-blue">
+                                  NDC: {viewingTransaction.ndc}
+                                </div>
+                                <div className="pt-1 border-t border-emerald-200/60 flex items-center justify-between text-xs">
+                                  <span className="text-[10px] uppercase font-semibold text-emerald-800">Count</span>
+                                  <div className="flex items-center gap-1.5 font-bold">
+                                    <span className="text-brand-dark-grey">{sourceSub?.currentStock ?? 0}</span>
+                                    <ArrowRight className="h-3 w-3 text-emerald-600" />
+                                    <span className="text-emerald-700">{sourceRestored}</span>
+                                    <span className="text-[10px] font-bold text-emerald-600">(+{viewingTransaction.quantity})</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Target NDC Card */}
+                              <div className={`border rounded-xl p-2.5 space-y-1 ${
+                                targetSub 
+                                  ? 'border-amber-200 bg-amber-50/60' 
+                                  : 'border-brand-grey/20 bg-brand-light-grey/20 opacity-60'
+                              }`}>
+                                <div className="flex items-center justify-between">
+                                  <Badge className="bg-amber-600 text-white text-[8px] px-1.5 py-0 h-3.5 uppercase tracking-tighter">
+                                    Target NDC (Deducting)
+                                  </Badge>
+                                </div>
+                                {targetSub ? (
+                                  <>
+                                    <div className="text-xs font-bold text-brand-dark-grey truncate">
+                                      {targetSub.name} {targetSub.strength}
+                                    </div>
+                                    <div className="text-[10px] font-mono text-brand-blue">
+                                      NDC: {targetSub.ndc}
+                                    </div>
+                                    <div className="pt-1 border-t border-amber-200/60 flex items-center justify-between text-xs">
+                                      <span className="text-[10px] uppercase font-semibold text-amber-800">Count</span>
+                                      <div className="flex items-center gap-1.5 font-bold">
+                                        <span className="text-brand-dark-grey">{targetSub.currentStock}</span>
+                                        <ArrowRight className="h-3 w-3 text-amber-600" />
+                                        <span className={targetProposed < 0 ? "text-red-600 font-black" : "text-amber-700"}>
+                                          {targetProposed}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-amber-600">(-{viewingTransaction.quantity})</span>
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="h-12 flex items-center justify-center text-center text-[10px] text-brand-dark-grey/50 italic">
+                                    Select target NDC above
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {targetSub && targetProposed < 0 && (
+                              <div className="flex items-center gap-2 p-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-[11px]">
+                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                <span>Warning: Target NDC stock balance will be negative ({targetProposed} units).</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Audit Justification & Authorized By */}
+                          <div className="space-y-2 pt-1">
+                            <div className="space-y-1">
+                              <Label className="text-[10px] uppercase font-bold text-brand-blue tracking-wider">
+                                Audit Reason / Justification <span className="text-red-500">*</span>
+                              </Label>
+                              <Input
+                                type="text"
+                                placeholder="e.g. Dispensing error correction: product dispensed was NDC..."
+                                value={reassignReason}
+                                onChange={(e) => setReassignReason(e.target.value)}
+                                className="h-8 text-xs border-brand-blue/20 bg-white"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label className="text-[10px] uppercase font-bold text-brand-blue tracking-wider">
+                                Authorizing Staff / Pharmacist
+                              </Label>
+                              <select
+                                value={reassignSelectedUser}
+                                onChange={(e) => setReassignSelectedUser(e.target.value)}
+                                className="w-full h-8 px-2.5 rounded-md border border-brand-blue/20 bg-white text-xs font-semibold text-brand-dark-grey focus:outline-none focus:ring-1 focus:ring-brand-blue"
+                              >
+                                {users.map((u) => (
+                                  <option key={u.id} value={u.id}>
+                                    {u.name} {u.title ? `(${u.title})` : ''}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </ScrollArea>
+
+                <DialogFooter className="px-5 py-3 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex items-center justify-end gap-2.5">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={isReassignSubmitting}
+                    onClick={() => setIsReassignNDCOpen(false)}
+                    className="h-9 text-xs font-bold text-brand-dark-grey hover:bg-brand-blue/10 rounded-xl"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={!reassignTargetSubstanceId || isReassignSubmitting}
+                    onClick={handleConfirmNDCReassignment}
+                    className="h-9 px-4 text-[10px] font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-brand-blue shadow-md shadow-amber-500/20 rounded-xl transition-all flex items-center gap-1.5"
+                  >
+                    {isReassignSubmitting ? (
+                      <>
+                        <RefreshCcw className="h-3.5 w-3.5 animate-spin" />
+                        Reassigning...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                        Confirm & Reassign NDC
+                      </>
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>
