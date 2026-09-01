@@ -6257,16 +6257,15 @@ export default function App() {
                   </div>
                 </ScrollArea>
 
-                <DialogFooter className="px-6 pb-6 pt-3 bg-brand-blue/5 border-t border-brand-blue/10 shrink-0 flex items-center justify-end gap-3">
+                <DialogFooter className="px-6 pb-6 pt-2 bg-brand-blue/5 border-t border-brand-blue/10 flex flex-col sm:flex-row gap-3 shrink-0">
                   <Button
                     type="button"
-                    variant="outline"
                     disabled={isReassignSubmitting}
                     onClick={() => {
                       reassignSigPad.current?.clear();
                       setIsReassignNDCOpen(false);
                     }}
-                    className="h-10 text-xs font-black uppercase tracking-widest border border-brand-blue/20 text-brand-blue bg-brand-blue/5 hover:bg-brand-blue/10 rounded-xl"
+                    className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-blue text-white hover:brightness-110 shadow-lg shadow-brand-blue/10 rounded-xl"
                   >
                     Cancel
                   </Button>
@@ -6274,7 +6273,7 @@ export default function App() {
                     type="button"
                     disabled={!reassignTargetSubstanceId || isReassignSubmitting}
                     onClick={handleConfirmNDCReassignment}
-                    className="flex-1 h-10 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                    className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] disabled:opacity-100"
                   >
                     {isReassignSubmitting ? (
                       <>
