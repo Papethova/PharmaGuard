@@ -6212,17 +6212,25 @@ export default function App() {
                               <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
                                 Authorizing Staff / Pharmacist
                               </Label>
-                              <select
-                                value={reassignSelectedUser}
-                                onChange={(e) => setReassignSelectedUser(e.target.value)}
-                                className="w-full h-9 px-3 rounded-xl border border-brand-grey/20 bg-brand-surface text-xs font-bold text-brand-dark-grey focus:outline-none focus:ring-1 focus:ring-brand-blue"
-                              >
-                                {users.map((u) => (
-                                  <option key={u.id} value={u.id}>
-                                    {u.name} {u.title ? `(${u.title})` : ''}
-                                  </option>
-                                ))}
-                              </select>
+                              <Select value={reassignSelectedUser || undefined} onValueChange={setReassignSelectedUser}>
+                                <SelectTrigger className={`border-brand-grey/20 focus:ring-brand-blue bg-brand-surface h-9 font-normal rounded-xl data-placeholder:text-brand-grey/50 data-placeholder:font-normal ${!reassignSelectedUser ? 'text-brand-grey/50' : 'text-brand-dark-grey'}`}>
+                                  <SelectValue placeholder="Select...">
+                                    {(() => {
+                                      const u = users.find(u => u.id === reassignSelectedUser);
+                                      return u ? (
+                                        <span>{u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}</span>
+                                      ) : null;
+                                    })()}
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent className="bg-brand-surface" align="start">
+                                  {users.map(u => (
+                                    <SelectItem key={u.id} value={u.id} className="text-brand-dark-grey pl-3 text-xs">
+                                      {u.name} {u.title && <span className="text-brand-dark-grey">({u.title})</span>}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
 
                             {/* Pharmacist Digital Signature Canvas */}
