@@ -6093,7 +6093,7 @@ export default function App() {
                           {/* Live Count Impact Comparison */}
                           <div className="space-y-2">
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/70 tracking-wider">
-                              Inventory Impact & Live Count Preview
+                              Inventory Impact
                             </Label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {/* Source NDC Card */}
