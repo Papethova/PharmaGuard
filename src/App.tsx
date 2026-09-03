@@ -538,6 +538,7 @@ export default function App() {
   const [quantity, setQuantity] = useState("");
   const [reason, setReason] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
+  const [isSplitFill, setIsSplitFill] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -2584,11 +2585,22 @@ export default function App() {
           }
         }
 
-        const N = rxMatches.length;
-        if (N > 0) {
-          finalRef = `RX-${baseNumeric}R${N}`;
+        if (isSplitFill) {
+          // In split fill mode, dispense is part of the same fill across alternate NDCs.
+          // Retain the base fill reference number without incrementing the refill counter.
+          const latestMatch = rxMatches.length > 0 ? rxMatches[0] : null;
+          const matchRef = latestMatch?.referenceNumber?.trim() || "";
+          const refillSuffixMatch = matchRef.match(/R\d+$/);
+          const refillSuffix = refillSuffixMatch ? refillSuffixMatch[0] : "";
+          finalRef = `RX-${baseNumeric}${refillSuffix}`;
         } else {
-          finalRef = `RX-${baseNumeric}`;
+          const nonSplitMatches = rxMatches.filter(t => !t.isSplitFill);
+          const N = nonSplitMatches.length;
+          if (N > 0) {
+            finalRef = `RX-${baseNumeric}R${N}`;
+          } else {
+            finalRef = `RX-${baseNumeric}`;
+          }
         }
       } else if (transactionType === "IN") {
         const numeric = finalRef.replace(/^INV-/, "");
@@ -2733,8 +2745,9 @@ export default function App() {
         performedByName: users.find(u => u.id === selectedUser)?.name || user.displayName || user.email || "AUTHORIZED",
         performedByTitle: users.find(u => u.id === selectedUser)?.title || "",
         timestamp: serverTimestamp(),
-        reason: transactionType === "ADJUST" ? reason : (transactionType === "IN" ? "Inventory Addition" : transactionType === "OUT" ? "Dispensed" : "Verified"),
+        reason: transactionType === "ADJUST" ? reason : (transactionType === "IN" ? "Inventory Addition" : transactionType === "OUT" ? (isSplitFill ? (reason ? `Split Fill - ${reason}` : "Split Fill Dispensed") : "Dispensed") : "Verified"),
         referenceNumber: finalRef,
+        isSplitFill: transactionType === "OUT" && isSplitFill,
         signature,
         photo: ""
       });
@@ -2760,6 +2773,55 @@ export default function App() {
       setIsSubmitting(false);
     }
   };
+
+  const splitFillInfo = useMemo(() => {
+    if (transactionType !== "OUT" || !referenceNumber.trim() || !selectedSubstance) return null;
+    const baseNumeric = referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+    if (!baseNumeric) return null;
+    const currentMed = inventory.find(s => s.id === selectedSubstance);
+    if (!currentMed) return null;
+
+    const matches = transactions.filter(t => {
+      if (t.type !== "OUT" || !t.referenceNumber) return false;
+      const refNum = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+      return refNum === baseNumeric;
+    });
+
+    if (matches.length === 0) return null;
+
+    const mismatch = matches.find(t => {
+      const tName = (t.substanceName || "").trim().toLowerCase();
+      const tStrength = (t.strength || "").trim().toLowerCase();
+      const cName = (currentMed.name || "").trim().toLowerCase();
+      const cStrength = (currentMed.strength || "").trim().toLowerCase();
+      return tName !== cName || tStrength !== cStrength;
+    });
+
+    if (mismatch) {
+      return {
+        status: "mismatch" as const,
+        substanceName: mismatch.substanceName,
+        strength: mismatch.strength,
+        message: `This RX # is already registered to a different medication (${mismatch.substanceName} ${mismatch.strength})`
+      };
+    }
+
+    const alternateNdcMatch = matches.find(t => t.ndc !== currentMed.ndc);
+    if (alternateNdcMatch) {
+      return {
+        status: "alternate_ndc" as const,
+        alternateNdc: alternateNdcMatch.ndc,
+        priorSubstanceName: alternateNdcMatch.substanceName,
+        priorStrength: alternateNdcMatch.strength,
+        message: `Prescription previously dispensed under alternate NDC ${alternateNdcMatch.ndc} for ${currentMed.name} ${currentMed.strength}.`
+      };
+    }
+
+    return {
+      status: "same_ndc" as const,
+      message: `Existing dispense record found for ${currentMed.name} ${currentMed.strength}.`
+    };
+  }, [transactionType, referenceNumber, selectedSubstance, inventory, transactions]);
 
   const availableTargetSubstances = useMemo(() => {
     if (!viewingTransaction) return [];
@@ -3480,6 +3542,7 @@ export default function App() {
     setQuantity("");
     setReason("");
     setReferenceNumber("");
+    setIsSplitFill(false);
     setCapturedPhoto(null);
     setIsCameraActive(false);
     setUseSignatureFallback(false);
@@ -5560,9 +5623,22 @@ export default function App() {
 
                   {transactionType !== "VERIFY" && (
                     <div className="grid gap-1.5">
-                      <Label htmlFor="referenceNumber" className="text-brand-dark-grey text-xs">
-                        {transactionType === "OUT" ? "RX #" : transactionType === "IN" ? "Invoice #" : "Reference #"}
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="referenceNumber" className="text-brand-dark-grey text-xs">
+                          {transactionType === "OUT" ? "RX #" : transactionType === "IN" ? "Invoice #" : "Reference #"}
+                        </Label>
+                        {transactionType === "OUT" && (
+                          <label className="flex items-center gap-1.5 cursor-pointer select-none text-[11px] font-bold text-brand-blue hover:opacity-80 transition-opacity">
+                            <input
+                              type="checkbox"
+                              checked={isSplitFill}
+                              onChange={(e) => setIsSplitFill(e.target.checked)}
+                              className="h-3.5 w-3.5 rounded border-brand-blue/30 text-brand-blue focus:ring-brand-blue accent-brand-blue cursor-pointer"
+                            />
+                            <span>Split Fill</span>
+                          </label>
+                        )}
+                      </div>
                       <Input 
                         id="referenceNumber" 
                         placeholder={transactionType === "OUT" ? "Enter RX #" : transactionType === "IN" ? "Enter invoice #" : "Auto-assigned"} 
@@ -5574,6 +5650,40 @@ export default function App() {
                         }}
                         readOnly={transactionType === "ADJUST"}
                       />
+
+                      {splitFillInfo?.status === "alternate_ndc" && (
+                        <div className="p-2.5 bg-brand-yellow/15 border border-brand-yellow/30 rounded-lg text-brand-dark-grey text-xs flex items-start justify-between gap-2">
+                          <div>
+                            <p className="font-bold text-brand-blue text-[11px]">Alternate NDC Detected</p>
+                            <p className="text-[11px] text-brand-dark-grey/80 leading-tight mt-0.5">
+                              RX was previously dispensed under NDC <span className="font-bold text-brand-blue">{splitFillInfo.alternateNdc}</span> ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}).
+                            </p>
+                          </div>
+                          {!isSplitFill && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => setIsSplitFill(true)}
+                              className="h-6 text-[10px] font-bold bg-brand-blue text-white hover:brightness-110 px-2 py-0 shrink-0 shadow-sm"
+                            >
+                              Select Split Fill
+                            </Button>
+                          )}
+                        </div>
+                      )}
+
+                      {isSplitFill && (
+                        <div className="p-2 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs text-brand-blue flex items-center gap-1.5 font-bold">
+                          <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
+                          <span>Split Fill Mode Active — linked to identical substance & strength</span>
+                        </div>
+                      )}
+
+                      {splitFillInfo?.status === "mismatch" && (
+                        <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-xs font-semibold">
+                          {splitFillInfo.message}
+                        </div>
+                      )}
                     </div>
                   )}
                   {transactionType === "ADJUST" && (
@@ -5900,7 +6010,14 @@ export default function App() {
                           </div>
                           <div className="space-y-1">
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Reference #</Label>
-                            <div className="text-sm text-brand-blue font-bold">{formatRefForDisplay(viewingTransaction.referenceNumber)}</div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm text-brand-blue font-bold">{formatRefForDisplay(viewingTransaction.referenceNumber)}</span>
+                              {viewingTransaction.isSplitFill && (
+                                <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                                  Split Fill
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <div className="space-y-1">
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Performed By</Label>
@@ -6899,15 +7016,22 @@ export default function App() {
                               </TableCell>
                               <TableCell className="text-center py-1 h-10">
                                 {t.referenceNumber ? (
-                                  <span 
-                                    className={`text-xs font-normal transition-colors ${
-                                      viewingTransaction?.id === t.id 
-                                        ? "text-brand-yellow font-bold" 
-                                        : "text-brand-blue group-hover:text-brand-yellow"
-                                    }`}
-                                  >
-                                    {t.referenceNumber}
-                                  </span>
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <span 
+                                      className={`text-xs font-normal transition-colors ${
+                                        viewingTransaction?.id === t.id 
+                                          ? "text-brand-yellow font-bold" 
+                                          : "text-brand-blue group-hover:text-brand-yellow"
+                                      }`}
+                                    >
+                                      {t.referenceNumber}
+                                    </span>
+                                    {t.isSplitFill && (
+                                      <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue/10 text-brand-blue px-1.5 py-0.5 rounded border border-brand-blue/20" title="Split Fill across multiple NDCs">
+                                        SPLIT
+                                      </span>
+                                    )}
+                                  </div>
                                 ) : (
                                   <span className="text-brand-dark-grey/40 italic">-</span>
                                 )}
@@ -8379,13 +8503,20 @@ export default function App() {
                         </TableCell>
                         <TableCell className="text-center py-1">
                           {t.referenceNumber ? (
-                            <span className={`transition-colors ${
-                              viewingTransaction?.id === t.id 
-                                ? "text-brand-yellow font-bold" 
-                                : "text-brand-blue font-normal group-hover:text-brand-yellow"
-                            }`}>
-                              {formatRefForDisplay(t.referenceNumber)}
-                            </span>
+                            <div className="flex items-center justify-center gap-1.5">
+                              <span className={`transition-colors ${
+                                viewingTransaction?.id === t.id 
+                                  ? "text-brand-yellow font-bold" 
+                                  : "text-brand-blue font-normal group-hover:text-brand-yellow"
+                              }`}>
+                                {formatRefForDisplay(t.referenceNumber)}
+                              </span>
+                              {t.isSplitFill && (
+                                <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue/10 text-brand-blue px-1.5 py-0.5 rounded border border-brand-blue/20" title="Split Fill across multiple NDCs">
+                                  SPLIT
+                                </span>
+                              )}
+                            </div>
                           ) : (
                             <span className="text-brand-dark-grey/40 italic">-</span>
                           )}

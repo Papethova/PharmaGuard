@@ -34,6 +34,7 @@ export interface Transaction {
   signature?: string;
   photo?: string;
   witnessId?: string;
+  isSplitFill?: boolean;
   reassignmentAudit?: {
     previousSubstanceId: string;
     previousSubstanceName: string;
