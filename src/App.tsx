@@ -5765,13 +5765,13 @@ export default function App() {
                       )}
 
                       {splitFillInfo?.status === "already_associated" && !isSplitFill && (
-                        <div className="p-2.5 bg-amber-500/15 border border-amber-500/30 rounded-lg text-brand-dark-grey text-xs flex items-start justify-between gap-2">
+                        <div className="p-2.5 bg-brand-yellow/20 border border-brand-yellow/50 rounded-lg text-brand-dark-grey text-xs flex items-start justify-between gap-2 shadow-sm">
                           <div className="space-y-0.5">
-                            <p className="font-bold text-amber-800 text-[11px] flex items-center gap-1">
-                              <AlertCircle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                            <p className="font-bold text-brand-blue text-[11px] flex items-center gap-1">
+                              <AlertCircle className="h-3.5 w-3.5 text-brand-blue shrink-0" />
                               RX # Already Associated
                             </p>
-                            <p className="text-[11px] text-brand-dark-grey/80 leading-tight">
+                            <p className="text-[11px] text-brand-dark-grey/90 leading-tight">
                               This RX # is already associated with an existing prescription record ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}). You must check <span className="font-bold text-brand-blue">Split Fill</span> to dispense under this RX number.
                             </p>
                           </div>
