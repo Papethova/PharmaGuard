@@ -2906,6 +2906,29 @@ export default function App() {
     return false;
   }, [splitFillRxNumbers]);
 
+  const relatedSplitTransactions = useMemo(() => {
+    if (!viewingTransaction || viewingTransaction.type !== "OUT" || !viewingTransaction.referenceNumber) {
+      return [];
+    }
+    const baseNumeric = viewingTransaction.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+    if (!baseNumeric) return [];
+
+    const matches = transactions.filter(t => {
+      if (t.type !== "OUT" || !t.referenceNumber) return false;
+      const refNum = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+      return refNum === baseNumeric;
+    });
+
+    const isSplit = isTxSplitFill(viewingTransaction) || matches.some(t => isTxSplitFill(t)) || matches.length > 1;
+    if (!isSplit) return [];
+
+    return [...matches].sort((a, b) => {
+      const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+      const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+      return dateA - dateB;
+    });
+  }, [viewingTransaction, transactions, isTxSplitFill]);
+
   const availableTargetSubstances = useMemo(() => {
     if (!viewingTransaction) return [];
     const term = reassignSearchTerm.toLowerCase().trim();
@@ -6135,6 +6158,70 @@ export default function App() {
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Timestamp</Label>
                             <div className="text-sm text-brand-dark-grey">{formatDateTime(viewingTransaction.timestamp)}</div>
                           </div>
+
+                          {/* Split Fill information below Performed By (user) in the empty space */}
+                          {relatedSplitTransactions.length > 0 && isTxSplitFill(viewingTransaction) ? (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Split Fill Allocation</Label>
+                                <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
+                                  {relatedSplitTransactions.length > 1 ? `${relatedSplitTransactions.length}-Part Split` : "Split Rx"}
+                                </span>
+                              </div>
+                              <div className="p-2.5 bg-brand-surface rounded-lg border border-brand-blue/20 space-y-2 shadow-sm">
+                                <div className="text-[10px] text-brand-dark-grey/80 leading-tight">
+                                  Prescription split across multiple NDCs:
+                                </div>
+                                <div className="space-y-1.5">
+                                  {relatedSplitTransactions.map((stx, idx) => {
+                                    const isCurrent = stx.id === viewingTransaction.id;
+                                    const ordinal = idx === 0 ? "1st" : idx === 1 ? "2nd" : idx === 2 ? "3rd" : `${idx + 1}th`;
+                                    return (
+                                      <div
+                                        key={stx.id || idx}
+                                        onClick={() => {
+                                          if (!isCurrent) setViewingTransaction(stx);
+                                        }}
+                                        title={!isCurrent ? "Click to view this split transaction" : undefined}
+                                        className={`p-2 rounded-md border flex items-center justify-between gap-2 text-xs transition-all ${
+                                          isCurrent
+                                            ? "bg-brand-blue/10 border-brand-blue/30 text-brand-blue font-bold"
+                                            : "bg-brand-light-grey/40 border-brand-grey/15 text-brand-dark-grey hover:border-brand-blue/30 hover:bg-brand-blue/5 cursor-pointer"
+                                        }`}
+                                      >
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                          <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
+                                            {ordinal} NDC
+                                          </span>
+                                          <span className="font-mono text-xs font-bold text-brand-dark-grey truncate">
+                                            {stx.ndc}
+                                          </span>
+                                          {isCurrent && (
+                                            <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue text-white px-1.5 py-0.2 rounded shrink-0">
+                                              Current
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="text-xs font-black text-brand-blue shrink-0">
+                                          Qty: {stx.quantity}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                {relatedSplitTransactions.length > 1 && (
+                                  <div className="pt-1.5 border-t border-brand-blue/10 flex items-center justify-between text-[10px] font-bold text-brand-dark-grey/70">
+                                    <span>Total Split Dispensed:</span>
+                                    <span className="font-black text-brand-blue text-xs">
+                                      {relatedSplitTransactions.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0)} units
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="hidden" />
+                          )}
                         </div>
 
                         {viewingTransaction.type === 'ADJUST' && (
