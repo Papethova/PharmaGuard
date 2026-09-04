@@ -2605,6 +2605,7 @@ export default function App() {
       }
 
       let finalRef = referenceNumber.trim();
+      let rxMatches: Transaction[] = [];
       
       if (transactionType === "OUT") {
         // Strip any existing prefix to avoid RX-RX-
@@ -2614,7 +2615,7 @@ export default function App() {
         
         // Count existing transactions that share this exact base RX number
         const normalizedBase = baseNumeric.toLowerCase();
-        const rxMatches = transactions.filter(t => {
+        rxMatches = transactions.filter(t => {
           if (t.type !== "OUT" || !t.referenceNumber) return false;
           let ref = t.referenceNumber.trim();
           let refNum = ref.replace(/^RX-/, "");
@@ -2636,6 +2637,11 @@ export default function App() {
             toast.error(`This RX number is already registered to a different medication (${mismatch.substanceName} ${mismatch.strength})`);
             return;
           }
+
+          if (!isSplitFill) {
+            toast.error(`This RX number is already associated with an existing prescription (${rxMatches[0].substanceName} ${rxMatches[0].strength}). You must check 'Split Fill' first to dispense under this RX number.`);
+            return;
+          }
         }
 
         if (isSplitFill) {
@@ -2647,13 +2653,7 @@ export default function App() {
           const refillSuffix = refillSuffixMatch ? refillSuffixMatch[0] : "";
           finalRef = `RX-${baseNumeric}${refillSuffix}`;
         } else {
-          const nonSplitMatches = rxMatches.filter(t => !t.isSplitFill);
-          const N = nonSplitMatches.length;
-          if (N > 0) {
-            finalRef = `RX-${baseNumeric}R${N}`;
-          } else {
-            finalRef = `RX-${baseNumeric}`;
-          }
+          finalRef = `RX-${baseNumeric}`;
         }
       } else if (transactionType === "IN") {
         const numeric = finalRef.replace(/^INV-/, "");
@@ -2804,6 +2804,17 @@ export default function App() {
         signature,
         photo: ""
       });
+
+      // When completing a split fill, also tag all prior dispenses for this RX as split fills
+      if (transactionType === "OUT" && isSplitFill && rxMatches.length > 0) {
+        for (const match of rxMatches) {
+          if (!match.isSplitFill && match.id) {
+            batch.update(doc(db, "users", emailId, "transactions", match.id), {
+              isSplitFill: true
+            });
+          }
+        }
+      }
       
       batch.update(doc(db, "users", emailId, "substances", targetMedId), {
         currentStock: newStock,
@@ -2859,24 +2870,41 @@ export default function App() {
       };
     }
 
-    const alternateNdcMatch = matches.find(t => t.ndc !== currentMed.ndc);
-    if (alternateNdcMatch) {
-      return {
-        status: "alternate_ndc" as const,
-        alternateNdc: alternateNdcMatch.ndc,
-        priorSubstanceName: alternateNdcMatch.substanceName,
-        priorStrength: alternateNdcMatch.strength,
-        message: `Prescription previously dispensed under alternate NDC ${alternateNdcMatch.ndc} for ${currentMed.name} ${currentMed.strength}.`
-      };
-    }
+    const priorMatch = matches[0];
+    const isAlternateNdc = matches.some(t => t.ndc !== currentMed.ndc);
+    const matchedAlternate = matches.find(t => t.ndc !== currentMed.ndc);
 
     return {
-      status: "same_ndc" as const,
-      matchedSubstanceName: matches[0]?.substanceName || currentMed.name,
-      matchedStrength: matches[0]?.strength || currentMed.strength,
-      message: `Existing dispense record found for ${currentMed.name} ${currentMed.strength}.`
+      status: "already_associated" as const,
+      isAlternateNdc,
+      alternateNdc: matchedAlternate?.ndc || priorMatch.ndc,
+      priorSubstanceName: priorMatch.substanceName,
+      priorStrength: priorMatch.strength,
+      priorRef: priorMatch.referenceNumber,
+      message: `This RX # is already associated with an existing prescription (${priorMatch.substanceName} ${priorMatch.strength}). You must check 'Split Fill' first to dispense under this RX number.`
     };
   }, [transactionType, referenceNumber, selectedSubstance, inventory, transactions]);
+
+  const splitFillRxNumbers = useMemo(() => {
+    const set = new Set<string>();
+    for (const t of transactions) {
+      if (t.type === "OUT" && t.referenceNumber && t.isSplitFill) {
+        const base = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+        if (base) set.add(base);
+      }
+    }
+    return set;
+  }, [transactions]);
+
+  const isTxSplitFill = useCallback((t: { type?: string; referenceNumber?: string; isSplitFill?: boolean } | null | undefined): boolean => {
+    if (!t) return false;
+    if (t.isSplitFill) return true;
+    if (t.type === "OUT" && t.referenceNumber) {
+      const base = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+      if (base && splitFillRxNumbers.has(base)) return true;
+    }
+    return false;
+  }, [splitFillRxNumbers]);
 
   const availableTargetSubstances = useMemo(() => {
     if (!viewingTransaction) return [];
@@ -5706,28 +5734,45 @@ export default function App() {
                         readOnly={transactionType === "ADJUST"}
                       />
 
-                      {splitFillInfo?.status === "alternate_ndc" && (
-                        <div className="p-2.5 bg-brand-yellow/15 border border-brand-yellow/30 rounded-lg text-brand-dark-grey text-xs flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-bold text-brand-blue text-[11px]">Alternate NDC Detected</p>
-                            <p className="text-[11px] text-brand-dark-grey/80 leading-tight mt-0.5">
-                              RX was previously dispensed under NDC <span className="font-bold text-brand-blue">{splitFillInfo.alternateNdc}</span> ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}).
-                            </p>
-                          </div>
-                          {!isSplitFill && (
-                            <Button
-                              type="button"
-                              size="sm"
-                              onClick={() => setIsSplitFill(true)}
-                              className="h-6 text-[10px] font-bold bg-brand-blue text-white hover:brightness-110 px-2 py-0 shrink-0 shadow-sm"
-                            >
-                              Select Split Fill
-                            </Button>
-                          )}
+                      {splitFillInfo?.status === "mismatch" && (
+                        <div className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-xs font-semibold flex items-start gap-1.5">
+                          <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                          <span>{splitFillInfo.message}</span>
                         </div>
                       )}
 
-                      {isSplitFill && (
+                      {splitFillInfo?.status === "already_associated" && !isSplitFill && (
+                        <div className="p-2.5 bg-amber-500/15 border border-amber-500/30 rounded-lg text-brand-dark-grey text-xs flex items-start justify-between gap-2">
+                          <div className="space-y-0.5">
+                            <p className="font-bold text-amber-800 text-[11px] flex items-center gap-1">
+                              <AlertCircle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                              RX # Already Associated
+                            </p>
+                            <p className="text-[11px] text-brand-dark-grey/80 leading-tight">
+                              This RX # is already associated with an existing prescription record ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}). You must check <span className="font-bold text-brand-blue">Split Fill</span> to dispense under this RX number.
+                            </p>
+                          </div>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => setIsSplitFill(true)}
+                            className="h-6 text-[10px] font-bold bg-brand-blue text-white hover:brightness-110 px-2 py-0 shrink-0 shadow-sm"
+                          >
+                            Check Split Fill
+                          </Button>
+                        </div>
+                      )}
+
+                      {isSplitFill && splitFillInfo?.status === "already_associated" && (
+                        <div className="p-2.5 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs text-brand-blue flex items-center gap-1.5 font-bold">
+                          <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
+                          <span>
+                            Split Fill Active — dispensing under prescription {formatRefForDisplay(referenceNumber.trim())} ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength})
+                          </span>
+                        </div>
+                      )}
+
+                      {isSplitFill && splitFillInfo === null && (
                         <div className="p-2 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs text-brand-blue flex items-center gap-1.5 font-bold">
                           <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
                           {referenceNumber.trim() ? (
@@ -5735,12 +5780,6 @@ export default function App() {
                           ) : (
                             <span>Split Fill Mode Enabled — enter the RX # above to link fill records</span>
                           )}
-                        </div>
-                      )}
-
-                      {splitFillInfo?.status === "mismatch" && (
-                        <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-xs font-semibold">
-                          {splitFillInfo.message}
                         </div>
                       )}
                     </div>
@@ -6071,7 +6110,7 @@ export default function App() {
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Reference #</Label>
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-sm text-brand-blue font-bold">{formatRefForDisplay(viewingTransaction.referenceNumber)}</span>
-                              {viewingTransaction.isSplitFill && (
+                              {isTxSplitFill(viewingTransaction) && (
                                 <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
                                   Split Fill
                                 </span>
@@ -7085,7 +7124,7 @@ export default function App() {
                                     >
                                       {t.referenceNumber}
                                     </span>
-                                    {t.isSplitFill && (
+                                    {isTxSplitFill(t) && (
                                       <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue/10 text-brand-blue px-1.5 py-0.5 rounded border border-brand-blue/20" title="Split Fill across multiple NDCs">
                                         SPLIT
                                       </span>
@@ -8570,7 +8609,7 @@ export default function App() {
                               }`}>
                                 {formatRefForDisplay(t.referenceNumber)}
                               </span>
-                              {t.isSplitFill && (
+                              {isTxSplitFill(t) && (
                                 <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue/10 text-brand-blue px-1.5 py-0.5 rounded border border-brand-blue/20" title="Split Fill across multiple NDCs">
                                   SPLIT
                                 </span>
