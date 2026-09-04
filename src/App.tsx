@@ -324,6 +324,59 @@ const parseCompoundStrength = (str: string): { first: number; second: number } =
   };
 };
 
+const normalizeDrugName = (name: string): string => {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .replace(/tab(let)?s?|cap(sule)?s?|oral|film|soln|solution/gi, "")
+    .replace(/(\d+(?:\.\d+)?)\s*(\/\s*\d+(?:\.\d+)?)?\s*(mg|mcg|ml|g|%)?/gi, "")
+    .replace(/[^a-z0-9]/g, "")
+    .trim();
+};
+
+const normalizeStrengthStr = (str: string): string => {
+  if (!str) return "";
+  return str.toLowerCase().replace(/[^a-z0-9]/g, "");
+};
+
+const areStrengthsEquivalent = (s1: string, s2: string): boolean => {
+  const norm1 = normalizeStrengthStr(s1);
+  const norm2 = normalizeStrengthStr(s2);
+  if (norm1 === norm2) return true;
+  const p1 = parseCompoundStrength(s1);
+  const p2 = parseCompoundStrength(s2);
+  if (p1.first > 0 && p1.first === p2.first && p1.second === p2.second) {
+    return true;
+  }
+  return false;
+};
+
+const areSubstancesEquivalent = (name1: string, strength1: string, name2: string, strength2: string): boolean => {
+  const rawName1 = (name1 || "").trim().toLowerCase();
+  const rawName2 = (name2 || "").trim().toLowerCase();
+  const rawStr1 = (strength1 || "").trim().toLowerCase();
+  const rawStr2 = (strength2 || "").trim().toLowerCase();
+
+  // Exact match
+  if (rawName1 === rawName2 && rawStr1 === rawStr2) return true;
+
+  // Normalized drug core name comparison
+  const nName1 = normalizeDrugName(name1);
+  const nName2 = normalizeDrugName(name2);
+  const nameMatches = nName1 === nName2 || (nName1.length > 3 && nName2.length > 3 && (nName1.includes(nName2) || nName2.includes(nName1)));
+
+  // If one name already contains the strength or combination (e.g., Oxycodone 30mg vs Oxycodone)
+  const combo1 = `${rawName1} ${rawStr1}`.replace(/[^a-z0-9]/g, "");
+  const combo2 = `${rawName2} ${rawStr2}`.replace(/[^a-z0-9]/g, "");
+  if (combo1 === combo2) return true;
+
+  if (nameMatches && areStrengthsEquivalent(strength1, strength2)) {
+    return true;
+  }
+
+  return false;
+};
+
 const isSafariOrIPad = typeof window !== "undefined" && (
   /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
   (navigator.maxTouchPoints > 1 && navigator.userAgent.includes("Macintosh")) ||
@@ -2572,11 +2625,11 @@ export default function App() {
         const currentMed = inventory.find(s => s.id === medId);
         if (rxMatches.length > 0 && currentMed) {
           const mismatch = rxMatches.find(t => {
-            const tName = (t.substanceName || "").trim().toLowerCase();
-            const tStrength = (t.strength || "").trim().toLowerCase();
-            const cName = (currentMed.name || "").trim().toLowerCase();
-            const cStrength = (currentMed.strength || "").trim().toLowerCase();
-            return tName !== cName || tStrength !== cStrength;
+            const tName = t.substanceName || "";
+            const tStrength = t.strength || "";
+            const cName = currentMed.name || "";
+            const cStrength = currentMed.strength || "";
+            return !areSubstancesEquivalent(tName, tStrength, cName, cStrength);
           });
 
           if (mismatch) {
@@ -2790,11 +2843,11 @@ export default function App() {
     if (matches.length === 0) return null;
 
     const mismatch = matches.find(t => {
-      const tName = (t.substanceName || "").trim().toLowerCase();
-      const tStrength = (t.strength || "").trim().toLowerCase();
-      const cName = (currentMed.name || "").trim().toLowerCase();
-      const cStrength = (currentMed.strength || "").trim().toLowerCase();
-      return tName !== cName || tStrength !== cStrength;
+      const tName = t.substanceName || "";
+      const tStrength = t.strength || "";
+      const cName = currentMed.name || "";
+      const cStrength = currentMed.strength || "";
+      return !areSubstancesEquivalent(tName, tStrength, cName, cStrength);
     });
 
     if (mismatch) {
@@ -2819,6 +2872,8 @@ export default function App() {
 
     return {
       status: "same_ndc" as const,
+      matchedSubstanceName: matches[0]?.substanceName || currentMed.name,
+      matchedStrength: matches[0]?.strength || currentMed.strength,
       message: `Existing dispense record found for ${currentMed.name} ${currentMed.strength}.`
     };
   }, [transactionType, referenceNumber, selectedSubstance, inventory, transactions]);
@@ -5675,7 +5730,11 @@ export default function App() {
                       {isSplitFill && (
                         <div className="p-2 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs text-brand-blue flex items-center gap-1.5 font-bold">
                           <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
-                          <span>Split Fill Mode Active — linked to identical substance & strength</span>
+                          {referenceNumber.trim() ? (
+                            <span>Split Fill Active — dispensing under prescription {formatRefForDisplay(referenceNumber.trim())}</span>
+                          ) : (
+                            <span>Split Fill Mode Enabled — enter the RX # above to link fill records</span>
+                          )}
                         </div>
                       )}
 
