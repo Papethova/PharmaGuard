@@ -442,7 +442,32 @@ export default function App() {
   const userUid = user?.uid;
   const userEmail = user?.email;
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [allUserProfiles, setAllUserProfiles] = useState<UserProfile[]>([]);
   const [isVerificationBypassed, setIsVerificationBypassed] = useState<boolean>(false);
+
+  const isMasterAdmin = useMemo(() => {
+    const email = userEmail?.toLowerCase();
+    const isMaster = email === MASTER_ADMIN_EMAIL.toLowerCase();
+    if (userUid) {
+      console.log(`Identity Check: ${email} | Master: ${isMaster}`);
+    }
+    return isMaster;
+  }, [userUid, userEmail]);
+
+  // Option A: Master Admin Inspection of Customer Nodes
+  const [inspectedNodeEmail, setInspectedNodeEmail] = useState<string | null>(null);
+
+  const inspectedProfile = useMemo(() => {
+    if (!inspectedNodeEmail) return null;
+    return allUserProfiles.find((p: UserProfile) => (p.email || "").toLowerCase().trim() === inspectedNodeEmail.toLowerCase().trim()) || null;
+  }, [inspectedNodeEmail, allUserProfiles]);
+
+  const activeNodeEmail = useMemo(() => {
+    if (isMasterAdmin && inspectedNodeEmail) {
+      return inspectedNodeEmail.toLowerCase().trim();
+    }
+    return userEmail?.toLowerCase() || userUid;
+  }, [isMasterAdmin, inspectedNodeEmail, userEmail, userUid]);
 
   useEffect(() => {
     if (isSafariOrIPad) {
@@ -1152,7 +1177,7 @@ export default function App() {
     const fetchAllTransactionsForReconciliation = async () => {
       setIsLoadingReconTxs(true);
       try {
-        const emailId = userEmail?.toLowerCase() || userUid;
+        const emailId = activeNodeEmail;
         const transactionsRef = collection(db, "users", emailId, "transactions");
 
         let q;
@@ -1186,7 +1211,7 @@ export default function App() {
     };
 
     fetchAllTransactionsForReconciliation();
-  }, [isReconOpen, userUid, userEmail, lastReport.timestampMs]);
+  }, [isReconOpen, userUid, activeNodeEmail, lastReport.timestampMs]);
 
   const getLatestVerifiedCount = useCallback((subId: string) => {
     const subTxs = transactions.filter(t => 
@@ -1330,20 +1355,10 @@ export default function App() {
     }
   };
 
-  const [allUserProfiles, setAllUserProfiles] = useState<UserProfile[]>([]);
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [bootTimeout, setBootTimeout] = useState(false);
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [editingOrgName, setEditingOrgName] = useState("");
-
-  const isMasterAdmin = useMemo(() => {
-    const email = userEmail?.toLowerCase();
-    const isMaster = email === MASTER_ADMIN_EMAIL.toLowerCase();
-    if (userUid) {
-      console.log(`Identity Check: ${email} | Master: ${isMaster}`);
-    }
-    return isMaster;
-  }, [userUid, userEmail]);
 
   // Email Auth State
   const [authMode, setAuthMode] = useState<"google" | "login" | "signup" | "forgot">("google");
@@ -1801,33 +1816,42 @@ export default function App() {
     }
   }, [userUid]);
 
+  useEffect(() => {
+    setInventory([]);
+    setTransactions([]);
+    setUsers([]);
+    setHistoricalReports([]);
+    setReconCounts({});
+    setReconTimestamps({});
+    setReconReasons({});
+    setSelectedSubstanceDetail(null);
+  }, [activeNodeEmail]);
+
   // Real-time Data Listeners split to prevent redundant re-subscription reads of all collections
   // whenever any sub-limit or single sync property updates in real-time.
   useEffect(() => {
-    if (!userUid) return;
+    if (!userUid || !activeNodeEmail) return;
 
-    const emailId = userEmail?.toLowerCase() || userUid;
-    const substancesRef = collection(db, "users", emailId, "substances");
+    const substancesRef = collection(db, "users", activeNodeEmail, "substances");
 
     const unsubSubstances = onSnapshot(substancesRef, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Substance));
       setInventory(items);
     }, (error) => {
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${userUid}/substances`);
+      if (userProfile?.status === 'active' || isMasterAdmin) {
+        handleFirestoreError(error, OperationType.LIST, `users/${activeNodeEmail}/substances`);
       } else {
         console.warn("Substances listener failed - likely pending approval:", error);
       }
     });
 
     return () => unsubSubstances();
-  }, [userUid, userEmail, userProfile?.status]);
+  }, [userUid, activeNodeEmail, userProfile?.status, isMasterAdmin]);
 
   const fetchStaff = useCallback(async (forceServer = false) => {
-    if (!userUid) return;
+    if (!userUid || !activeNodeEmail) return;
     setIsLoadingStaff(true);
-    const emailId = userEmail?.toLowerCase() || userUid;
-    const staffRef = collection(db, "users", emailId, "staff");
+    const staffRef = collection(db, "users", activeNodeEmail, "staff");
     
     try {
       let snap;
@@ -1864,21 +1888,20 @@ export default function App() {
       
       setUsers(items);
     } catch (err: any) {
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(err, OperationType.LIST, `users/${userUid}/staff`);
+      if (userProfile?.status === 'active' || isMasterAdmin) {
+        handleFirestoreError(err, OperationType.LIST, `users/${activeNodeEmail}/staff`);
       } else {
         console.warn("Staff list fetch failed - likely pending approval:", err);
       }
     } finally {
       setIsLoadingStaff(false);
     }
-  }, [userUid, userEmail, userProfile?.status]);
+  }, [userUid, activeNodeEmail, userProfile?.status, isMasterAdmin]);
 
   const fetchHistoricalReports = useCallback(async (forceServer = false) => {
-    if (!userUid) return;
+    if (!userUid || !activeNodeEmail) return;
     setIsLoadingHistoricalReports(true);
-    const emailId = userEmail?.toLowerCase() || userUid;
-    const reportsRef = collection(db, "users", emailId, "reconciliation_reports");
+    const reportsRef = collection(db, "users", activeNodeEmail, "reconciliation_reports");
     
     try {
       let snapshot;
@@ -1898,18 +1921,16 @@ export default function App() {
     } finally {
       setIsLoadingHistoricalReports(false);
     }
-  }, [userUid, userEmail]);
+  }, [userUid, activeNodeEmail]);
 
   const fetchSubstanceTransactions = useCallback(async (limitCount = 30) => {
-    if (!userUid || !selectedSubstanceDetail?.id) {
+    if (!userUid || !selectedSubstanceDetail?.id || !activeNodeEmail) {
       setSubstanceTransactions([]);
       return;
     }
     setIsLoadingSubstanceTransactions(true);
-    const emailId = userEmail || "";
-    if (!emailId) return;
 
-    const txRef = collection(db, "users", emailId, "transactions");
+    const txRef = collection(db, "users", activeNodeEmail, "transactions");
     
     // Check if we are loading more/next page for the currently selected substance
     const existing = substanceTransactionsRef.current;
@@ -1968,15 +1989,15 @@ export default function App() {
     } finally {
       setIsLoadingSubstanceTransactions(false);
     }
-  }, [userUid, userEmail, selectedSubstanceDetail?.id]);
+  }, [userUid, activeNodeEmail, selectedSubstanceDetail?.id]);
 
   // Initial loads and tab-based trigger effects
   useEffect(() => {
-    if (userUid) {
+    if (userUid && activeNodeEmail) {
       fetchStaff(false);
       fetchHistoricalReports(false);
     }
-  }, [userUid, fetchStaff, fetchHistoricalReports]);
+  }, [userUid, activeNodeEmail, fetchStaff, fetchHistoricalReports]);
 
   useEffect(() => {
     if (isUserManagementOpen) {
@@ -2002,10 +2023,9 @@ export default function App() {
 
   // Main live transactions listener - permanently capped at 30 items for high efficiency, merging new entries into historical state
   useEffect(() => {
-    if (!userUid) return;
+    if (!userUid || !activeNodeEmail) return;
 
-    const emailId = userEmail?.toLowerCase() || userUid;
-    const transactionsRef = collection(db, "users", emailId, "transactions");
+    const transactionsRef = collection(db, "users", activeNodeEmail, "transactions");
 
     const unsubTransactions = onSnapshot(query(transactionsRef, orderBy("timestamp", "desc"), limit(30)), (snapshot) => {
       setTransactions((prev) => {
@@ -2031,20 +2051,20 @@ export default function App() {
         });
       });
     }, (error) => {
-      if (userProfile?.status === 'active') {
-        handleFirestoreError(error, OperationType.LIST, `users/${userUid}/transactions`);
+      if (userProfile?.status === 'active' || isMasterAdmin) {
+        handleFirestoreError(error, OperationType.LIST, `users/${activeNodeEmail}/transactions`);
       } else {
         console.warn("Transactions listener failed - likely pending approval:", error);
       }
     });
 
     return () => unsubTransactions();
-  }, [userUid, userEmail, userProfile?.status]);
+  }, [userUid, activeNodeEmail, userProfile?.status, isMasterAdmin]);
 
   // Lazy loading incremental pages for older historical records as the user scrolls
   const lastFetchedLimitRef = useRef(30);
   useEffect(() => {
-    if (!userUid) return;
+    if (!userUid || !activeNodeEmail) return;
     
     if (syncLimit <= 30) {
       lastFetchedLimitRef.current = 30;
@@ -2056,8 +2076,7 @@ export default function App() {
 
     const fetchMore = async () => {
       try {
-        const emailId = userEmail?.toLowerCase() || userUid;
-        const transactionsRef = collection(db, "users", emailId, "transactions");
+        const transactionsRef = collection(db, "users", activeNodeEmail, "transactions");
         
         const currentList = transactionsRefVal.current;
         if (currentList.length === 0) return;
@@ -2092,13 +2111,12 @@ export default function App() {
     };
 
     fetchMore();
-  }, [syncLimit, userUid, userEmail]);
+  }, [syncLimit, userUid, activeNodeEmail]);
 
   // Helper to compile the active base query for transaction search
   const getSearchBaseQuery = useCallback((selectedSubstanceId?: string) => {
-    if (!userUid) return null;
-    const emailId = userEmail?.toLowerCase() || userUid;
-    const transactionsRef = collection(db, "users", emailId, "transactions");
+    if (!userUid || !activeNodeEmail) return null;
+    const transactionsRef = collection(db, "users", activeNodeEmail, "transactions");
 
     const filterId = selectedSubstanceId || historyMedicationFilter;
     const searchTerm = historyMedicationSearch.trim();
@@ -2145,7 +2163,7 @@ export default function App() {
     }
 
     return qBase;
-  }, [userUid, userEmail, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, inventory, activeSchedule]);
+  }, [userUid, activeNodeEmail, historyMedicationFilter, historyMedicationSearch, historyTypeFilter, inventory, activeSchedule]);
 
   // Execute deep searching strictly upon choosing/typing and pressing search.
   // Pulls the first page of up to 30 items and resolves total document count instantly via getCountFromServer
@@ -2604,6 +2622,11 @@ export default function App() {
         return;
       }
 
+      if (isMasterAdmin && inspectedNodeEmail) {
+        toast.warning("Inspection Mode: Dispense, Add, and Adjust actions are disabled while inspecting customer nodes. Exit inspection to log transactions.");
+        return;
+      }
+
       let finalRef = referenceNumber.trim();
       let rxMatches: Transaction[] = [];
       
@@ -2972,6 +2995,11 @@ export default function App() {
       return;
     }
 
+    if (isMasterAdmin && inspectedNodeEmail) {
+      toast.warning("Inspection Mode: Reassigning NDC is disabled while inspecting customer nodes.");
+      return;
+    }
+
     const emailId = userEmail?.toLowerCase() || user.uid;
     const sourceSubstance = inventory.find(s => s.id === viewingTransaction.substanceId);
     const targetSubstance = inventory.find(s => s.id === reassignTargetSubstanceId);
@@ -3065,6 +3093,10 @@ export default function App() {
 
   const handleReconciliationSubmit = async () => {
     if (!user) return;
+    if (isMasterAdmin && inspectedNodeEmail) {
+      toast.warning("Inspection Mode: Submitting reconciliations is disabled while inspecting customer nodes.");
+      return;
+    }
     const emailId = user.email?.toLowerCase() || user.uid;
     
     if (!reconUser) {
@@ -3287,6 +3319,10 @@ export default function App() {
 
   const handleUpdateMinThreshold = async () => {
     if (!user || !editingMed) return;
+    if (isMasterAdmin && inspectedNodeEmail) {
+      toast.warning("Inspection Mode: Adjusting safeguard thresholds is disabled while inspecting customer nodes.");
+      return;
+    }
     const emailId = user.email?.toLowerCase() || user.uid;
 
     // Option A: Skip redundant writes check
@@ -3319,6 +3355,10 @@ export default function App() {
 
   const handleUpdateMedDetails = async () => {
     if (!user || !editingMed) return;
+    if (isMasterAdmin && inspectedNodeEmail) {
+      toast.warning("Inspection Mode: Updating medication catalog is disabled while inspecting customer nodes.");
+      return;
+    }
     const emailId = user.email?.toLowerCase() || user.uid;
 
     // Option A: Skip redundant writes check
@@ -3669,6 +3709,10 @@ export default function App() {
 
   const handleAddUser = async () => {
     if (!user || !newUserName.trim()) return;
+    if (isMasterAdmin && inspectedNodeEmail) {
+      toast.warning("Inspection Mode: Adding staff is disabled while inspecting customer nodes.");
+      return;
+    }
     const emailId = user.email?.toLowerCase() || user.uid;
     setIsSubmitting(true);
     try {
@@ -3690,6 +3734,10 @@ export default function App() {
 
   const handleUpdateUser = async () => {
     if (!user || !editingUser) return;
+    if (isMasterAdmin && inspectedNodeEmail) {
+      toast.warning("Inspection Mode: Updating staff is disabled while inspecting customer nodes.");
+      return;
+    }
     const emailId = user.email?.toLowerCase() || user.uid;
 
     // Option A: Skip redundant writes check
@@ -3722,6 +3770,10 @@ export default function App() {
 
   const handleDeleteUser = async (id: string) => {
     if (!user) return;
+    if (isMasterAdmin && inspectedNodeEmail) {
+      toast.warning("Inspection Mode: Removing staff is disabled while inspecting customer nodes.");
+      return;
+    }
     const emailId = user.email?.toLowerCase() || user.uid;
     try {
       await deleteDoc(doc(db, "users", emailId, "staff", id));
@@ -5079,6 +5131,46 @@ export default function App() {
 
   return (
     <div className="h-[100dvh] overflow-hidden overscroll-none bg-brand-light-grey font-sans text-brand-grey flex flex-col touch-none">
+      {/* Option A: Master Admin Inspection Banner */}
+      {isMasterAdmin && inspectedNodeEmail && (
+        <div className="shrink-0 z-[60] bg-brand-yellow border-b border-brand-blue/20 px-4 py-2 text-brand-blue flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider">
+            <Eye className="h-4 w-4 text-brand-blue shrink-0 animate-pulse" strokeWidth={2.5} />
+            <span className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-extrabold">Node Inspection Mode:</span>
+              <span className="bg-brand-blue text-white px-2 py-0.5 rounded text-[11px] font-bold">
+                {inspectedProfile?.organizationName || inspectedProfile?.displayName || "Node"}
+              </span>
+              <span className="text-brand-dark-grey/80 text-[11px] font-mono lowercase">
+                ({inspectedNodeEmail})
+              </span>
+              <span className="text-[10px] bg-brand-blue/10 text-brand-blue font-black px-1.5 py-0.5 rounded ml-1 border border-brand-blue/20">
+                AUDIT ONLY • READ-ONLY
+              </span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              size="sm"
+              onClick={() => setIsSuperAdminOpen(true)}
+              className="h-7 text-[10px] font-black uppercase tracking-wider bg-brand-blue/15 text-brand-blue hover:bg-brand-blue/25 border border-brand-blue/30 px-2.5 shadow-none"
+            >
+              Switch Node
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setInspectedNodeEmail(null);
+                toast.info("Exited inspection mode. Returned to Master Admin registry.");
+              }}
+              className="h-7 text-[10px] font-black uppercase tracking-wider bg-brand-blue text-white hover:bg-brand-blue/90 shadow-sm px-3"
+            >
+              Exit Inspection
+            </Button>
+          </div>
+        </div>
+      )}
+
       <header className={`shrink-0 sticky top-0 z-50 w-full border-b border-brand-blue/10 bg-brand-surface/90 backdrop-blur-md touch-auto ${isUserManagementOpen ? "pointer-events-none select-none overflow-hidden touch-none" : ""}`}>
         <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="flex h-14 items-center gap-8">
@@ -5155,15 +5247,24 @@ export default function App() {
             <div className="flex flex-col gap-3 w-full shrink-0">
               <div className="px-5 p-0 m-0 text-center flex flex-col items-center justify-center min-h-[40px]">
                 <h3 className={`font-black text-blue-400/90 tracking-tight leading-tight transition-colors duration-300 no-interact ${
-                  (getIdentityString(userProfile, user?.email).length || 0) > 20 ? "text-lg" : 
-                  (getIdentityString(userProfile, user?.email).length || 0) > 15 ? "text-xl" : "text-2xl"
+                  ((inspectedProfile ? getIdentityString(inspectedProfile, inspectedNodeEmail) : getIdentityString(userProfile, user?.email)).length || 0) > 20 ? "text-lg" : 
+                  ((inspectedProfile ? getIdentityString(inspectedProfile, inspectedNodeEmail) : getIdentityString(userProfile, user?.email)).length || 0) > 15 ? "text-xl" : "text-2xl"
                 }`}>
-                  {getIdentityString(userProfile, user?.email)}
+                  {inspectedProfile ? getIdentityString(inspectedProfile, inspectedNodeEmail) : getIdentityString(userProfile, user?.email)}
                 </h3>
               </div>
               <Button 
-                onClick={() => { resetForm(); setTransactionType("OUT"); setIsLogOpen(true); }}
-                className="relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => { 
+                  if (isMasterAdmin && inspectedNodeEmail) {
+                    toast.warning("Inspection Mode: Dispense is disabled while inspecting customer nodes.");
+                    return;
+                  }
+                  resetForm(); setTransactionType("OUT"); setIsLogOpen(true); 
+                }}
+                disabled={Boolean(isMasterAdmin && inspectedNodeEmail)}
+                className={`relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                  isMasterAdmin && inspectedNodeEmail ? "opacity-50 cursor-not-allowed hover:scale-100" : ""
+                }`}
               >
                 <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
                   <ArrowDown className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -5171,8 +5272,17 @@ export default function App() {
                 Dispense
               </Button>
               <Button 
-                onClick={() => { resetForm(); setTransactionType("IN"); setIsLogOpen(true); }}
-                className="relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => { 
+                  if (isMasterAdmin && inspectedNodeEmail) {
+                    toast.warning("Inspection Mode: Add is disabled while inspecting customer nodes.");
+                    return;
+                  }
+                  resetForm(); setTransactionType("IN"); setIsLogOpen(true); 
+                }}
+                disabled={Boolean(isMasterAdmin && inspectedNodeEmail)}
+                className={`relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                  isMasterAdmin && inspectedNodeEmail ? "opacity-50 cursor-not-allowed hover:scale-100" : ""
+                }`}
               >
                 <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
                   <Plus className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -5180,8 +5290,17 @@ export default function App() {
                 Add
               </Button>
               <Button 
-                onClick={() => { resetForm(); setTransactionType("ADJUST"); setIsLogOpen(true); }}
-                className="relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => { 
+                  if (isMasterAdmin && inspectedNodeEmail) {
+                    toast.warning("Inspection Mode: Adjust is disabled while inspecting customer nodes.");
+                    return;
+                  }
+                  resetForm(); setTransactionType("ADJUST"); setIsLogOpen(true); 
+                }}
+                disabled={Boolean(isMasterAdmin && inspectedNodeEmail)}
+                className={`relative z-10 bg-brand-blue hover:brightness-110 text-white gap-3 shadow-lg shadow-brand-blue/20 h-14 w-full justify-start px-6 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                  isMasterAdmin && inspectedNodeEmail ? "opacity-50 cursor-not-allowed hover:scale-100" : ""
+                }`}
               >
                 <div className="h-7 w-7 rounded-full bg-brand-yellow flex items-center justify-center shrink-0 shadow-sm border border-brand-yellow/20">
                   <RefreshCcw className="h-4 w-4 text-brand-blue" strokeWidth={3} />
@@ -8935,7 +9054,7 @@ export default function App() {
 
     {/* Super Admin Dialog */}
     <Dialog open={isSuperAdminOpen} onOpenChange={setIsSuperAdminOpen}>
-      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-xl w-full h-[85vh] overflow-hidden flex flex-col p-0 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
+      <DialogContent showCloseButton={false} className="max-w-[95vw] lg:max-w-3xl w-full h-[85vh] overflow-hidden flex flex-col p-0 gap-0 border-brand-blue/20 bg-brand-surface rounded-xl shadow-2xl">
         <DialogHeader className="p-4 bg-brand-blue text-white overflow-hidden relative border-none rounded-t-lg">
           <div className="flex flex-col gap-4 relative z-10 w-full">
             <div className="flex items-center gap-4">
@@ -9017,8 +9136,8 @@ export default function App() {
               <table className="w-full table-fixed">
                 <thead>
                   <tr className="h-9">
-                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-left w-[70%]">Organization ID & Status</th>
-                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-right w-[30%] whitespace-nowrap">Terminal Operations</th>
+                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-left w-[52%]">Organization ID & Status</th>
+                    <th className="py-2 px-4 font-black text-brand-blue uppercase tracking-widest text-[9px] text-right w-[48%] whitespace-nowrap">Terminal Operations</th>
                   </tr>
                 </thead>
               </table>
@@ -9029,16 +9148,19 @@ export default function App() {
                   {filteredUserProfiles.length > 0 ? (
                     filteredUserProfiles.map((profile, idx) => {
                       const isAdminNode = (profile.email || "").toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase().trim();
+                      const isCurrentlyInspected = Boolean(inspectedNodeEmail && inspectedNodeEmail.toLowerCase().trim() === (profile.email || "").toLowerCase().trim());
                       return (
                         <tr 
                           key={profile.docId || profile.uid} 
                           className={`transition-colors h-14 border-b border-brand-blue/5 ${
                             isAdminNode 
                               ? 'bg-brand-blue/10 hover:bg-brand-blue/15' 
-                              : 'hover:bg-brand-blue/5'
+                              : isCurrentlyInspected
+                                ? 'bg-brand-yellow/15 hover:bg-brand-yellow/25'
+                                : 'hover:bg-brand-blue/5'
                           }`}
                         >
-                          <td className="py-2 px-4 w-[70%]">
+                          <td className="py-2 px-4 w-[52%]">
                             <div className="flex flex-col gap-0.5 min-w-0">
                               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                                 <span className="font-bold text-xs text-brand-dark-grey break-all no-interact">
@@ -9047,6 +9169,11 @@ export default function App() {
                                 <Badge className="text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border bg-brand-blue text-white border-brand-blue whitespace-nowrap">
                                   LAST ACTIVITY: {profile.lastActiveAt ? formatDateTime(profile.lastActiveAt) : "NEVER"}
                                 </Badge>
+                                {isCurrentlyInspected && (
+                                  <Badge className="text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border bg-brand-yellow text-brand-blue border-brand-blue/30 whitespace-nowrap animate-pulse">
+                                    CURRENTLY INSPECTING
+                                  </Badge>
+                                )}
                               </div>
                               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5 min-w-0">
                                  <span className="text-[10px] text-brand-grey font-medium break-all block no-interact">
@@ -9062,13 +9189,13 @@ export default function App() {
                               </div>
                             </div>
                           </td>
-                          <td className="py-2 px-4 w-[30%] text-right">
+                          <td className="py-2 px-4 w-[48%] text-right">
                             <div className="flex flex-col items-end justify-center gap-1">
                               <Badge 
                                 className={`text-[7px] font-black px-1.5 h-3.5 rounded-sm inline-flex items-center uppercase tracking-tighter shrink-0 border ${
                                   profile.status === 'active' 
                                     ? 'bg-brand-blue text-white border-brand-blue' 
-                                    : profile.status === 'pending'
+                                    : profile.status === 'pending' 
                                       ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/30'
                                       : 'bg-neutral-800 text-neutral-100 border-neutral-700'
                                 }`}
@@ -9080,7 +9207,21 @@ export default function App() {
                                     : 'Suspended'}
                               </Badge>
                               {isAdminNode ? (
-                                <div className="flex justify-end items-center gap-2">
+                                <div className="flex justify-end items-center gap-1.5">
+                                  {inspectedNodeEmail && (
+                                    <Button 
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setInspectedNodeEmail(null);
+                                        setIsSuperAdminOpen(false);
+                                        toast.info("Returned to Master Admin Registry");
+                                      }}
+                                      className="font-black uppercase tracking-tighter text-[9px] h-7 px-2.5 border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white transition-all shrink-0"
+                                    >
+                                      My Registry
+                                    </Button>
+                                  )}
                                   <Button 
                                     variant="ghost"
                                     size="sm"
@@ -9095,18 +9236,46 @@ export default function App() {
                                   </Button>
                                 </div>
                               ) : (
-                                <div className="flex justify-end gap-1">
+                                <div className="flex justify-end items-center gap-1">
+                                  <Button 
+                                    variant={isCurrentlyInspected ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => {
+                                      const targetEmail = (profile.email || "").toLowerCase().trim();
+                                      if (!targetEmail) {
+                                        toast.error("No email bound to this node");
+                                        return;
+                                      }
+                                      if (isCurrentlyInspected) {
+                                        setInspectedNodeEmail(null);
+                                        toast.info("Exited inspection mode");
+                                      } else {
+                                        setInspectedNodeEmail(targetEmail);
+                                        setIsSuperAdminOpen(false);
+                                        toast.info(`Inspecting Node: ${profile.organizationName || profile.displayName || targetEmail} (Audit Mode)`);
+                                      }
+                                    }}
+                                    className={`font-black uppercase tracking-tighter text-[9px] h-7 px-2 border transition-all shrink-0 flex items-center gap-1 ${
+                                      isCurrentlyInspected
+                                        ? 'bg-brand-yellow text-brand-blue border-brand-yellow hover:bg-brand-yellow/90 font-bold'
+                                        : 'border-brand-blue/30 text-brand-blue hover:bg-brand-blue hover:text-white'
+                                    }`}
+                                    title={isCurrentlyInspected ? "Currently inspecting this node - click to exit" : "Inspect customer node inventory and transactions"}
+                                  >
+                                    <Eye className="h-3 w-3" />
+                                    <span>{isCurrentlyInspected ? 'Inspecting' : 'Inspect'}</span>
+                                  </Button>
                                   <Button 
                                     variant={profile.status === 'active' ? 'outline' : 'default'}
                                     size="sm"
                                     onClick={() => handleUpdateSubscription(profile.docId || profile.uid, profile.status)}
-                                    className={`font-black uppercase tracking-tighter text-[9px] h-7 px-3 border transition-all shrink-0 ${
+                                    className={`font-black uppercase tracking-tighter text-[9px] h-7 px-2 border transition-all shrink-0 ${
                                       profile.status === 'active' 
                                         ? 'border-neutral-300 text-neutral-700 hover:bg-neutral-800 hover:text-white hover:border-neutral-800' 
                                         : 'bg-brand-blue text-white hover:bg-brand-blue/90'
                                     }`}
                                   >
-                                    {profile.status === 'active' ? 'Suspend' : profile.status === 'pending' ? 'Grant Access' : 'Restore'}
+                                    {profile.status === 'active' ? 'Suspend' : profile.status === 'pending' ? 'Grant' : 'Restore'}
                                   </Button>
                                   <Button 
                                     variant="ghost"
