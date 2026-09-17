@@ -6,6 +6,7 @@
   ],
   "majorCapabilities": [
     "authentication",
-    "realtime-db"
+    "realtime-db",
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
   ]
 }

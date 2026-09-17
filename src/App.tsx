@@ -1578,45 +1578,41 @@ export default function App() {
   // Auth Listener
   useEffect(() => {
     // Advanced Safety Heartbeat: Ensure we never stay on a white screen
-    // If auth hasn't responded in 3 seconds, show the delay box
+    // If auth hasn't responded in 8 seconds, show the delay box with manual bypass option
     const delayTimer = setTimeout(() => {
       setIsAuthReady(ready => {
         if (!ready) setBootTimeout(true);
         return ready;
       });
-    }, 3000);
+    }, 8000);
 
-    // Hard Bypass: If auth hasn't responded in 6 seconds, force show the login screen
+    // Hard Bypass: If auth hasn't responded in 12 seconds, force show the login screen
     const bypassTimer = setTimeout(() => {
       setIsAuthReady(ready => {
         if (!ready) {
           console.warn("Auth Heartbeat: Forcing auth ready state due to timeout");
           setIsInitializing(false);
+          setBootTimeout(false);
           return true;
         }
         return ready;
       });
-    }, 6000);
-
-    // Connection Test
-    const testConnection = async () => {
-      try {
-        await getDocFromServer(doc(db, 'test', 'connection'));
-      } catch (error) {
-        console.error("Database connection check failed - might be in offline mode:", error);
-      }
-    };
-    testConnection();
+    }, 12000);
 
     let unsubProfile: (() => void) | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
+      clearTimeout(delayTimer);
+      clearTimeout(bypassTimer);
+      setBootTimeout(false);
+
       if (!currentUser) {
         setUser(null);
         setUserProfile(null);
         if (unsubProfile) unsubProfile();
         setIsAuthReady(true);
         setIsInitializing(false);
+        setBootTimeout(false);
         setEmail("");
         setPassword("");
         setOrgName("");
@@ -1792,6 +1788,7 @@ export default function App() {
         // ALWAYS mark as ready even if profile loading failed
         setIsAuthReady(true);
         setIsInitializing(false);
+        setBootTimeout(false);
       }
     });
 
@@ -4077,9 +4074,20 @@ export default function App() {
               <div className="space-y-4">
                 <Button 
                   onClick={() => window.location.reload()}
-                  className="w-full bg-brand-blue text-brand-yellow font-bold py-6 rounded-xl hover:scale-105 transition-transform"
+                  className="w-full bg-brand-blue text-brand-yellow font-bold py-5 rounded-xl hover:scale-105 transition-transform"
                 >
                   Force Restart Terminal
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setBootTimeout(false);
+                    setIsInitializing(false);
+                    setIsAuthReady(true);
+                  }}
+                  className="w-full border-brand-blue/30 text-brand-blue hover:bg-brand-blue hover:text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-colors"
+                >
+                  Proceed to Login
                 </Button>
                 <div className="flex items-center justify-center gap-2 opacity-40">
                   <div className="h-1 w-1 bg-brand-blue rounded-full animate-pulse" />
