@@ -6067,22 +6067,22 @@ export default function App() {
                       )}
 
                       {splitFillInfo?.status === "partial_active" && (
-                        <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs space-y-2.5 shadow-sm">
+                        <div className="p-3 bg-brand-yellow/20 border border-brand-yellow/60 rounded-lg text-xs space-y-2.5 shadow-sm">
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <div className="font-bold text-amber-800 flex items-center gap-1.5 text-xs">
-                                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                              <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
+                                <AlertCircle className="h-4 w-4 text-brand-blue shrink-0" />
                                 Active Prescription Partial Fill Detected
                               </div>
-                              <p className="text-[11px] text-amber-900/90 mt-0.5">
+                              <p className="text-[11px] text-brand-dark-grey mt-0.5">
                                 Prescription <span className="font-bold text-brand-blue">{formatRefForDisplay(referenceNumber.trim())}</span> has an open balance.
                               </p>
                             </div>
-                            <span className="px-2 py-0.5 bg-amber-600 text-white text-[10px] font-extrabold rounded-full shrink-0 uppercase tracking-wide">
+                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 uppercase tracking-wide border border-brand-blue/30">
                               {splitFillInfo.priorFills?.length || 1} Prior Fill{(splitFillInfo.priorFills?.length || 1) > 1 ? 's' : ''}
                             </span>
                           </div>
-                          <div className="grid grid-cols-3 gap-2 p-2 bg-brand-surface rounded border border-amber-500/20 text-center">
+                          <div className="grid grid-cols-3 gap-2 p-2 bg-brand-surface rounded border border-brand-blue/15 text-center">
                             <div>
                               <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Prescribed</div>
                               <div className="text-sm font-bold text-brand-dark-grey">{splitFillInfo.prescribedQuantity}</div>
@@ -6092,12 +6092,12 @@ export default function App() {
                               <div className="text-sm font-bold text-brand-blue">{splitFillInfo.totalDispensed}</div>
                             </div>
                             <div>
-                              <div className="text-[9px] uppercase font-bold text-amber-700">Balance Owed</div>
-                              <div className="text-sm font-black text-amber-700">{splitFillInfo.balanceRemaining}</div>
+                              <div className="text-[9px] uppercase font-bold text-brand-blue">Balance Owed</div>
+                              <div className="text-sm font-black text-brand-blue">{splitFillInfo.balanceRemaining}</div>
                             </div>
                           </div>
                           <div className="flex items-center justify-between gap-2 pt-0.5">
-                            <span className="text-[11px] text-amber-900/80 font-medium">
+                            <span className="text-[11px] text-brand-dark-grey font-medium">
                               Dispensing now will link to this prescription.
                             </span>
                             <Button
@@ -6107,7 +6107,7 @@ export default function App() {
                                 setQuantity(String(splitFillInfo.balanceRemaining));
                                 if (!reason) setReason("Balance Completed");
                               }}
-                              className="h-7 text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white px-2.5 shadow-sm shrink-0"
+                              className="h-7 text-[11px] font-bold bg-brand-blue hover:brightness-110 text-brand-yellow px-2.5 shadow-sm shrink-0 border border-brand-blue/30"
                             >
                               Fill Balance ({splitFillInfo.balanceRemaining})
                             </Button>
@@ -6190,18 +6190,18 @@ export default function App() {
                   )}
 
                   {transactionType === "OUT" && splitFillInfo?.status === "partial_active" && quantity && (
-                    <div className="p-2 bg-amber-500/10 rounded border border-amber-500/20 text-xs flex items-center justify-between">
-                      <span className="text-amber-900 font-medium">
+                    <div className="p-2 bg-brand-blue/5 rounded border border-brand-blue/20 text-xs flex items-center justify-between">
+                      <span className="text-brand-dark-grey font-medium">
                         Dispensing: <strong className="text-brand-blue">{quantity}</strong> of {splitFillInfo.balanceRemaining} owed
                       </span>
                       <span className="font-bold">
                         {Number(quantity) === splitFillInfo.balanceRemaining ? (
-                          <span className="text-emerald-700 flex items-center gap-1">
+                          <span className="text-brand-blue flex items-center gap-1 font-bold">
                             <Check className="h-3.5 w-3.5" /> Full Balance Complete (0 remaining)
                           </span>
                         ) : Number(quantity) < splitFillInfo.balanceRemaining ? (
-                          <span className="text-amber-800">
-                            Remaining after fill: {splitFillInfo.balanceRemaining - Number(quantity)} units
+                          <span className="text-brand-dark-grey font-bold">
+                            Remaining after fill: <span className="text-brand-blue font-black">{splitFillInfo.balanceRemaining - Number(quantity)} units</span>
                           </span>
                         ) : (
                           <span className="text-red-600">
@@ -6225,7 +6225,7 @@ export default function App() {
                           <span>Partial Fill (Balance Owed)</span>
                         </label>
                         {isPartialFillActive && (
-                          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 border border-amber-500/30">
+                          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-brand-yellow/30 text-brand-blue border border-brand-yellow/60">
                             Partial Fill Mode
                           </span>
                         )}
@@ -6269,10 +6269,10 @@ export default function App() {
                               </span>
                               <span className="font-bold">
                                 {Number(quantity) >= Number(prescribedQuantity) ? (
-                                  <span className="text-emerald-700">Full amount covered (uncheck Partial if full fill)</span>
+                                  <span className="text-brand-blue font-bold">Full amount covered (uncheck Partial if full fill)</span>
                                 ) : (
-                                  <span className="text-amber-700">
-                                    Balance Owed: {Number(prescribedQuantity) - (Number(quantity) || 0)} units
+                                  <span className="text-brand-dark-grey font-bold">
+                                    Balance Owed: <span className="text-brand-blue font-black">{Number(prescribedQuantity) - (Number(quantity) || 0)} units</span>
                                   </span>
                                 )}
                               </span>
@@ -6579,11 +6579,11 @@ export default function App() {
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-sm text-brand-blue font-bold">{formatRefForDisplay(viewingTransaction.referenceNumber)}</span>
                               {viewingTransaction.isBalanceCompletion || viewingTransaction.fillStage === "COMPLETION" ? (
-                                <span className="bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                                <span className="bg-brand-blue text-brand-yellow border border-brand-blue/30 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
                                   Balance Completed
                                 </span>
                               ) : (viewingTransaction.isPartialFill || viewingTransaction.fillStage === "PARTIAL") ? (
-                                <span className="bg-amber-500/10 text-amber-700 border border-amber-500/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                                <span className="bg-brand-yellow/30 text-brand-blue border border-brand-yellow/60 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
                                   Partial Fill {viewingTransaction.partialFillNumber ? `#${viewingTransaction.partialFillNumber}` : ''}
                                 </span>
                               ) : isTxSplitFill(viewingTransaction) ? (
@@ -6628,8 +6628,8 @@ export default function App() {
                                     <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Prescription Fulfillment History</Label>
                                     <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
                                       isClosed 
-                                        ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" 
-                                        : "bg-amber-500/10 text-amber-700 border-amber-500/20"
+                                        ? "bg-brand-blue text-brand-yellow border-brand-blue/30" 
+                                        : "bg-brand-yellow/30 text-brand-blue border border-brand-yellow/60"
                                     }`}>
                                       {isClosed ? "Fully Fulfilled" : `Open Balance: ${remainingBalance} Owed`}
                                     </span>
@@ -6647,7 +6647,7 @@ export default function App() {
                                         </div>
                                         <div>
                                           <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Status</div>
-                                          <div className={`text-xs font-black ${isClosed ? 'text-emerald-700' : 'text-amber-700'}`}>
+                                          <div className="text-xs font-black text-brand-blue">
                                             {isClosed ? "Completed" : `${remainingBalance} Owed`}
                                           </div>
                                         </div>
@@ -6678,7 +6678,7 @@ export default function App() {
                                             <div className="flex items-center justify-between gap-2">
                                               <div className="flex items-center gap-1.5 min-w-0">
                                                 <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                                                  isCompletion ? "bg-emerald-500/15 text-emerald-700" : "bg-amber-500/15 text-amber-700"
+                                                  isCompletion ? "bg-brand-blue text-brand-yellow" : "bg-brand-yellow/30 text-brand-blue border border-brand-yellow/50"
                                                 }`}>
                                                   {isCompletion ? "Final Balance" : ordinal}
                                                 </span>
@@ -6700,7 +6700,7 @@ export default function App() {
                                                 Staff: {escapeEmail(stx.performedByName)}
                                               </span>
                                               {stx.balanceRemaining !== undefined && stx.balanceRemaining !== null && (
-                                                <span className="font-semibold text-amber-700 shrink-0">
+                                                <span className="font-semibold text-brand-blue shrink-0">
                                                   {stx.balanceRemaining === 0 ? "Balance: 0 (Closed)" : `Owed after fill: ${stx.balanceRemaining}`}
                                                 </span>
                                               )}
@@ -7768,11 +7768,11 @@ export default function App() {
                                       {t.referenceNumber}
                                     </span>
                                     {t.isBalanceCompletion || t.fillStage === "COMPLETION" ? (
-                                      <span className="text-[8px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-500/20" title={`Balance Completed (${t.prescribedQuantity ? `Total Prescribed: ${t.prescribedQuantity}` : 'Fulfilled'})`}>
+                                      <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue text-brand-yellow px-1.5 py-0.5 rounded border border-brand-blue/30" title={`Balance Completed (${t.prescribedQuantity ? `Total Prescribed: ${t.prescribedQuantity}` : 'Fulfilled'})`}>
                                         BALANCE
                                       </span>
                                     ) : (t.isPartialFill || t.fillStage === "PARTIAL") ? (
-                                      <span className="text-[8px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-700 px-1.5 py-0.5 rounded border border-amber-500/20" title={`Partial Fill ${t.partialFillNumber ? `#${t.partialFillNumber}` : ''} (${t.quantity}/${t.prescribedQuantity || '?'} - Balance Owed: ${t.balanceRemaining ?? '?'})`}>
+                                      <span className="text-[8px] font-black uppercase tracking-wider bg-brand-yellow/30 text-brand-blue px-1.5 py-0.5 rounded border border-brand-yellow/60" title={`Partial Fill ${t.partialFillNumber ? `#${t.partialFillNumber}` : ''} (${t.quantity}/${t.prescribedQuantity || '?'} - Balance Owed: ${t.balanceRemaining ?? '?'})`}>
                                         PARTIAL{t.partialFillNumber ? ` #${t.partialFillNumber}` : ''}
                                       </span>
                                     ) : isTxSplitFill(t) ? (
@@ -9261,11 +9261,11 @@ export default function App() {
                                 {formatRefForDisplay(t.referenceNumber)}
                               </span>
                               {t.isBalanceCompletion || t.fillStage === "COMPLETION" ? (
-                                <span className="text-[8px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-500/20" title={`Balance Completed (${t.prescribedQuantity ? `Total Prescribed: ${t.prescribedQuantity}` : 'Fulfilled'})`}>
+                                <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue text-brand-yellow px-1.5 py-0.5 rounded border border-brand-blue/30" title={`Balance Completed (${t.prescribedQuantity ? `Total Prescribed: ${t.prescribedQuantity}` : 'Fulfilled'})`}>
                                   BALANCE
                                 </span>
                               ) : (t.isPartialFill || t.fillStage === "PARTIAL") ? (
-                                <span className="text-[8px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-700 px-1.5 py-0.5 rounded border border-amber-500/20" title={`Partial Fill ${t.partialFillNumber ? `#${t.partialFillNumber}` : ''} (${t.quantity}/${t.prescribedQuantity || '?'} - Balance Owed: ${t.balanceRemaining ?? '?'})`}>
+                                <span className="text-[8px] font-black uppercase tracking-wider bg-brand-yellow/30 text-brand-blue px-1.5 py-0.5 rounded border border-brand-yellow/60" title={`Partial Fill ${t.partialFillNumber ? `#${t.partialFillNumber}` : ''} (${t.quantity}/${t.prescribedQuantity || '?'} - Balance Owed: ${t.balanceRemaining ?? '?'})`}>
                                   PARTIAL{t.partialFillNumber ? ` #${t.partialFillNumber}` : ''}
                                 </span>
                               ) : isTxSplitFill(t) ? (
