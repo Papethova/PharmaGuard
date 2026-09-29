@@ -6231,8 +6231,8 @@ export default function App() {
                         )}
                       </div>
                       {isPartialFillActive && (
-                        <div className="space-y-2 pt-1 border-t border-brand-blue/10">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="space-y-2.5 pt-2 border-t border-brand-blue/10">
+                          <div className="space-y-2.5">
                             <div className="space-y-1">
                               <Label className="text-[10px] uppercase font-bold text-brand-blue/80">
                                 Total Prescribed Quantity <span className="text-red-500">*</span>
@@ -6250,14 +6250,14 @@ export default function App() {
                                 Reason for Partial
                               </Label>
                               <Select value={partialReason} onValueChange={(val: any) => setPartialReason(val)}>
-                                <SelectTrigger className="h-8 text-xs bg-brand-surface text-brand-dark-grey border-brand-grey/20">
+                                <SelectTrigger className="w-full h-8 text-xs bg-brand-surface text-brand-dark-grey border-brand-grey/20">
                                   <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-brand-surface">
-                                  <SelectItem value="OUT_OF_STOCK" className="text-xs text-brand-dark-grey">Insufficient Stock / Out of Stock</SelectItem>
-                                  <SelectItem value="INSURANCE_LIMIT" className="text-xs text-brand-dark-grey">Insurance / Plan Limitation</SelectItem>
-                                  <SelectItem value="PATIENT_REQUEST" className="text-xs text-brand-dark-grey">Patient / Prescriber Request</SelectItem>
-                                  <SelectItem value="OTHER" className="text-xs text-brand-dark-grey">Other (Specify in Notes)</SelectItem>
+                                <SelectContent className="bg-brand-surface min-w-[320px] w-full" align="start">
+                                  <SelectItem value="OUT_OF_STOCK" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Insufficient Stock / Out of Stock</SelectItem>
+                                  <SelectItem value="INSURANCE_LIMIT" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Insurance / Plan Limitation</SelectItem>
+                                  <SelectItem value="PATIENT_REQUEST" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Patient / Prescriber Request</SelectItem>
+                                  <SelectItem value="OTHER" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Other (Specify in Notes)</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
