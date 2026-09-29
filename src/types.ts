@@ -40,7 +40,7 @@ export interface Transaction {
   fillStage?: 'FULL' | 'PARTIAL' | 'COMPLETION';
   prescribedQuantity?: number;
   balanceRemaining?: number;
-  partialReason?: 'OUT_OF_STOCK' | 'INSURANCE_LIMIT' | 'PATIENT_REQUEST' | 'OTHER';
+  partialReason?: 'OUT_OF_STOCK' | 'INSURANCE_LIMIT' | 'PATIENT_REQUEST' | 'OTHER' | string;
   partialFillNumber?: number;
   reassignmentAudit?: {
     previousSubstanceId: string;

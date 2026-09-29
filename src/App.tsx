@@ -619,7 +619,8 @@ export default function App() {
   const [isSplitFill, setIsSplitFill] = useState(false);
   const [isPartialFillActive, setIsPartialFillActive] = useState(false);
   const [prescribedQuantity, setPrescribedQuantity] = useState("");
-  const [partialReason, setPartialReason] = useState<"OUT_OF_STOCK" | "INSURANCE_LIMIT" | "PATIENT_REQUEST" | "OTHER">("OUT_OF_STOCK");
+  const [partialReason, setPartialReason] = useState<string>("Insufficient stock / out of stock");
+  const [partialCustomReason, setPartialCustomReason] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -2704,6 +2705,10 @@ export default function App() {
             toast.error(`Prescribed quantity (${prescribedQuantity}) must be greater than dispensed amount (${amount}) for a partial fill. Otherwise, uncheck Partial Fill to record as a full dispense.`);
             return;
           }
+          if (partialReason === "Other" && !partialCustomReason.trim()) {
+            toast.error("Please specify the reasoning for selecting 'Other'.");
+            return;
+          }
         }
 
         if (isSplitFill) {
@@ -2852,6 +2857,10 @@ export default function App() {
       let isTxBalanceCompletion = false;
 
       if (transactionType === "OUT") {
+        const effectivePartialReason = partialReason === "Other"
+          ? (partialCustomReason.trim() ? `Other: ${partialCustomReason.trim()}` : "Other")
+          : partialReason;
+
         if (isContinuingPartial && existingPrescribedQuantity > 0) {
           txPrescribedQty = existingPrescribedQuantity;
           const newTotalDispensed = totalPriorDispensed + amount;
@@ -2860,7 +2869,7 @@ export default function App() {
           txFillStage = isTxBalanceCompletion ? 'COMPLETION' : 'PARTIAL';
           isTxPartial = true;
           txPartialFillNumber = rxMatches.length + 1;
-          txPartialReason = partialReason;
+          txPartialReason = effectivePartialReason;
         } else if (isPartialFillActive && Number(prescribedQuantity) > 0) {
           txPrescribedQty = Number(prescribedQuantity);
           txBalanceRemaining = Math.max(0, txPrescribedQty - amount);
@@ -2868,7 +2877,7 @@ export default function App() {
           txFillStage = isTxBalanceCompletion ? 'COMPLETION' : 'PARTIAL';
           isTxPartial = true;
           txPartialFillNumber = 1;
-          txPartialReason = partialReason;
+          txPartialReason = effectivePartialReason;
         }
       }
 
@@ -2877,7 +2886,9 @@ export default function App() {
         if (isTxBalanceCompletion) {
           txReason = reason ? `Balance Completed - ${reason}` : "Balance Completed";
         } else if (isTxPartial) {
-          const reasonLabel = partialReason === 'OUT_OF_STOCK' ? 'Out of Stock' : (partialReason === 'INSURANCE_LIMIT' ? 'Insurance Limitation' : (partialReason === 'PATIENT_REQUEST' ? 'Patient Request' : 'Partial Fill'));
+          const reasonLabel = partialReason === "Other"
+            ? (partialCustomReason.trim() ? `Other: ${partialCustomReason.trim()}` : "Other")
+            : (partialReason === 'OUT_OF_STOCK' ? 'Insufficient stock / out of stock' : partialReason);
           txReason = reason ? `Partial Fill #${txPartialFillNumber} (${reasonLabel}) - ${reason}` : `Partial Fill #${txPartialFillNumber} (${reasonLabel})`;
         } else if (isSplitFill) {
           txReason = reason ? `Split Fill - ${reason}` : "Split Fill Dispensed";
@@ -3848,7 +3859,8 @@ export default function App() {
     setIsSplitFill(false);
     setIsPartialFillActive(false);
     setPrescribedQuantity("");
-    setPartialReason("OUT_OF_STOCK");
+    setPartialReason("Insufficient stock / out of stock");
+    setPartialCustomReason("");
     setCapturedPhoto(null);
     setIsCameraActive(false);
     setUseSignatureFallback(false);
@@ -6251,16 +6263,38 @@ export default function App() {
                               </Label>
                               <Select value={partialReason} onValueChange={(val: any) => setPartialReason(val)}>
                                 <SelectTrigger className="w-full h-8 text-xs bg-brand-surface text-brand-dark-grey border-brand-grey/20">
-                                  <SelectValue />
+                                  <SelectValue>{partialReason}</SelectValue>
                                 </SelectTrigger>
                                 <SelectContent className="bg-brand-surface min-w-[320px] w-full" align="start">
-                                  <SelectItem value="OUT_OF_STOCK" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Insufficient Stock / Out of Stock</SelectItem>
-                                  <SelectItem value="INSURANCE_LIMIT" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Insurance / Plan Limitation</SelectItem>
-                                  <SelectItem value="PATIENT_REQUEST" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Patient / Prescriber Request</SelectItem>
-                                  <SelectItem value="OTHER" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">Other (Specify in Notes)</SelectItem>
+                                  <SelectItem value="Insufficient stock / out of stock" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
+                                    Insufficient stock / out of stock
+                                  </SelectItem>
+                                  <SelectItem value="Insurance / plan limitation" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
+                                    Insurance / plan limitation
+                                  </SelectItem>
+                                  <SelectItem value="Patient / prescriber request" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
+                                    Patient / prescriber request
+                                  </SelectItem>
+                                  <SelectItem value="Other" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
+                                    Other
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
+                            {partialReason === "Other" && (
+                              <div className="space-y-1">
+                                <Label className="text-[10px] uppercase font-bold text-brand-blue/80">
+                                  Specify Reasoning <span className="text-red-500">*</span>
+                                </Label>
+                                <Input
+                                  type="text"
+                                  placeholder="Enter specific reasoning for partial fill..."
+                                  value={partialCustomReason}
+                                  onChange={(e) => setPartialCustomReason(e.target.value)}
+                                  className="h-8 text-xs bg-brand-surface text-brand-dark-grey border-brand-grey/20 focus-visible:ring-brand-blue"
+                                />
+                              </div>
+                            )}
                           </div>
                           {prescribedQuantity && Number(prescribedQuantity) > 0 && (
                             <div className="p-2 bg-brand-surface rounded border border-brand-blue/15 flex items-center justify-between text-xs">
