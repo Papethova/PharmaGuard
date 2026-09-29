@@ -619,7 +619,7 @@ export default function App() {
   const [isSplitFill, setIsSplitFill] = useState(false);
   const [isPartialFillActive, setIsPartialFillActive] = useState(false);
   const [prescribedQuantity, setPrescribedQuantity] = useState("");
-  const [partialReason, setPartialReason] = useState<string>("Insufficient stock / out of stock");
+  const [partialReason, setPartialReason] = useState<string>("Insufficient stock");
   const [partialCustomReason, setPartialCustomReason] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
@@ -2888,7 +2888,7 @@ export default function App() {
         } else if (isTxPartial) {
           const reasonLabel = partialReason === "Other"
             ? (partialCustomReason.trim() ? `Other: ${partialCustomReason.trim()}` : "Other")
-            : (partialReason === 'OUT_OF_STOCK' ? 'Insufficient stock / out of stock' : partialReason);
+            : (partialReason === 'OUT_OF_STOCK' ? 'Insufficient stock' : partialReason);
           txReason = reason ? `Partial Fill #${txPartialFillNumber} (${reasonLabel}) - ${reason}` : `Partial Fill #${txPartialFillNumber} (${reasonLabel})`;
         } else if (isSplitFill) {
           txReason = reason ? `Split Fill - ${reason}` : "Split Fill Dispensed";
@@ -3859,7 +3859,7 @@ export default function App() {
     setIsSplitFill(false);
     setIsPartialFillActive(false);
     setPrescribedQuantity("");
-    setPartialReason("Insufficient stock / out of stock");
+    setPartialReason("Insufficient stock");
     setPartialCustomReason("");
     setCapturedPhoto(null);
     setIsCameraActive(false);
@@ -6266,14 +6266,14 @@ export default function App() {
                                   <SelectValue>{partialReason}</SelectValue>
                                 </SelectTrigger>
                                 <SelectContent className="bg-brand-surface min-w-[320px] w-full" align="start">
-                                  <SelectItem value="Insufficient stock / out of stock" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
-                                    Insufficient stock / out of stock
+                                  <SelectItem value="Insufficient stock" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
+                                    Insufficient stock
                                   </SelectItem>
-                                  <SelectItem value="Insurance / plan limitation" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
-                                    Insurance / plan limitation
+                                  <SelectItem value="Insurance/plan limitation" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
+                                    Insurance/plan limitation
                                   </SelectItem>
-                                  <SelectItem value="Patient / prescriber request" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
-                                    Patient / prescriber request
+                                  <SelectItem value="Patient/prescriber request" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
+                                    Patient/prescriber request
                                   </SelectItem>
                                   <SelectItem value="Other" className="text-xs text-brand-dark-grey py-2 px-2.5 cursor-pointer">
                                     Other
