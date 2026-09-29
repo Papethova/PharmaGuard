@@ -6623,7 +6623,7 @@ export default function App() {
 
                             if (isPartialPrescription) {
                               return (
-                                <div className="space-y-1.5">
+                                <div className="col-span-2 space-y-1.5 w-full">
                                   <div className="flex items-center justify-between">
                                     <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Prescription Fulfillment History</Label>
                                     <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
@@ -6716,7 +6716,7 @@ export default function App() {
 
                             // Fallback to standard multi-NDC split fill visualization
                             return (
-                              <div className="space-y-1.5">
+                              <div className="col-span-2 space-y-1.5 w-full">
                                 <div className="flex items-center justify-between">
                                   <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Split Fill Allocation</Label>
                                   <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
@@ -6775,9 +6775,7 @@ export default function App() {
                                 </div>
                               </div>
                             );
-                          })() : (
-                            <div className="hidden" />
-                          )}
+                          })() : null}
                         </div>
 
                         {viewingTransaction.type === 'ADJUST' && (
