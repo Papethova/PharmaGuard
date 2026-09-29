@@ -57,7 +57,15 @@
         "referenceNumber": { "type": "string" },
         "signature": { "type": "string" },
         "photo": { "type": "string" },
-        "witnessId": { "type": "string" }
+        "witnessId": { "type": "string" },
+        "isSplitFill": { "type": "boolean" },
+        "isPartialFill": { "type": "boolean" },
+        "isBalanceCompletion": { "type": "boolean" },
+        "fillStage": { "type": "string", "enum": ["FULL", "PARTIAL", "COMPLETION"] },
+        "prescribedQuantity": { "type": "number" },
+        "balanceRemaining": { "type": "number" },
+        "partialReason": { "type": "string" },
+        "partialFillNumber": { "type": "number" }
       },
       "required": ["substanceId", "type", "quantity", "timestamp", "performedBy"]
     },

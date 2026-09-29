@@ -35,6 +35,13 @@ export interface Transaction {
   photo?: string;
   witnessId?: string;
   isSplitFill?: boolean;
+  isPartialFill?: boolean;
+  isBalanceCompletion?: boolean;
+  fillStage?: 'FULL' | 'PARTIAL' | 'COMPLETION';
+  prescribedQuantity?: number;
+  balanceRemaining?: number;
+  partialReason?: 'OUT_OF_STOCK' | 'INSURANCE_LIMIT' | 'PATIENT_REQUEST' | 'OTHER';
+  partialFillNumber?: number;
   reassignmentAudit?: {
     previousSubstanceId: string;
     previousSubstanceName: string;

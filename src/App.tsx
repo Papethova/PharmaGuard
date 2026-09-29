@@ -617,6 +617,9 @@ export default function App() {
   const [reason, setReason] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
   const [isSplitFill, setIsSplitFill] = useState(false);
+  const [isPartialFillActive, setIsPartialFillActive] = useState(false);
+  const [prescribedQuantity, setPrescribedQuantity] = useState("");
+  const [partialReason, setPartialReason] = useState<"OUT_OF_STOCK" | "INSURANCE_LIMIT" | "PATIENT_REQUEST" | "OTHER">("OUT_OF_STOCK");
   const [selectedUser, setSelectedUser] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -2624,8 +2627,12 @@ export default function App() {
         return;
       }
 
+      const amount = Number(quantity);
       let finalRef = referenceNumber.trim();
       let rxMatches: Transaction[] = [];
+      let isContinuingPartial = false;
+      let existingPrescribedQuantity = 0;
+      let totalPriorDispensed = 0;
       
       if (transactionType === "OUT") {
         // Strip any existing prefix to avoid RX-RX-
@@ -2658,8 +2665,43 @@ export default function App() {
             return;
           }
 
-          if (!isSplitFill) {
+          // Check if this prescription is an active partial fill
+          const sortedPriorFills = [...rxMatches].sort((a, b) => {
+            const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+            const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+            return dateA - dateB;
+          });
+          totalPriorDispensed = sortedPriorFills.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
+          const foundPrescribedQty = sortedPriorFills.find(t => t.prescribedQuantity && Number(t.prescribedQuantity) > 0)?.prescribedQuantity;
+          const hasPartialFlag = sortedPriorFills.some(t => t.isPartialFill || t.fillStage === "PARTIAL" || t.fillStage === "COMPLETION" || (t.prescribedQuantity && Number(t.prescribedQuantity) > 0));
+
+          if (hasPartialFlag && foundPrescribedQty) {
+            existingPrescribedQuantity = foundPrescribedQty;
+            isContinuingPartial = true;
+            const remainingBalance = Math.max(0, foundPrescribedQty - totalPriorDispensed);
+
+            if (remainingBalance <= 0) {
+              toast.error(`This prescription has already been fully dispensed (${totalPriorDispensed} of ${foundPrescribedQty} units dispensed across ${sortedPriorFills.length} fills).`);
+              return;
+            }
+
+            if (amount > remainingBalance) {
+              toast.error(`Cannot dispense ${amount} units. Remaining authorized balance for this prescription is ${remainingBalance} units.`);
+              return;
+            }
+          } else if (!isSplitFill) {
             toast.error(`This RX number is already associated with an existing prescription (${rxMatches[0].substanceName} ${rxMatches[0].strength}). You must check 'Split Fill' first to dispense under this RX number.`);
+            return;
+          }
+        }
+
+        if (rxMatches.length === 0 && isPartialFillActive) {
+          if (!prescribedQuantity || isNaN(Number(prescribedQuantity)) || Number(prescribedQuantity) <= 0) {
+            toast.error("Please enter a valid total authorized quantity prescribed.");
+            return;
+          }
+          if (Number(prescribedQuantity) <= amount) {
+            toast.error(`Prescribed quantity (${prescribedQuantity}) must be greater than dispensed amount (${amount}) for a partial fill. Otherwise, uncheck Partial Fill to record as a full dispense.`);
             return;
           }
         }
@@ -2795,17 +2837,59 @@ export default function App() {
       if (!currentMed) throw new Error("Medication not discovered in node");
 
       const previousStock = currentMed.currentStock;
-      const amount = Number(quantity);
       let newStock = previousStock;
 
       if (transactionType === "IN") newStock += amount;
       else if (transactionType === "OUT") newStock -= amount;
       else if (transactionType === "ADJUST") newStock += amount;
 
+      let txFillStage: 'FULL' | 'PARTIAL' | 'COMPLETION' | undefined = undefined;
+      let txPrescribedQty: number | undefined = undefined;
+      let txBalanceRemaining: number | undefined = undefined;
+      let txPartialFillNumber: number | undefined = undefined;
+      let txPartialReason: string | undefined = undefined;
+      let isTxPartial = false;
+      let isTxBalanceCompletion = false;
+
+      if (transactionType === "OUT") {
+        if (isContinuingPartial && existingPrescribedQuantity > 0) {
+          txPrescribedQty = existingPrescribedQuantity;
+          const newTotalDispensed = totalPriorDispensed + amount;
+          txBalanceRemaining = Math.max(0, existingPrescribedQuantity - newTotalDispensed);
+          isTxBalanceCompletion = txBalanceRemaining === 0;
+          txFillStage = isTxBalanceCompletion ? 'COMPLETION' : 'PARTIAL';
+          isTxPartial = true;
+          txPartialFillNumber = rxMatches.length + 1;
+          txPartialReason = partialReason;
+        } else if (isPartialFillActive && Number(prescribedQuantity) > 0) {
+          txPrescribedQty = Number(prescribedQuantity);
+          txBalanceRemaining = Math.max(0, txPrescribedQty - amount);
+          isTxBalanceCompletion = txBalanceRemaining === 0;
+          txFillStage = isTxBalanceCompletion ? 'COMPLETION' : 'PARTIAL';
+          isTxPartial = true;
+          txPartialFillNumber = 1;
+          txPartialReason = partialReason;
+        }
+      }
+
+      let txReason = transactionType === "ADJUST" ? reason : (transactionType === "IN" ? "Inventory Addition" : "Verified");
+      if (transactionType === "OUT") {
+        if (isTxBalanceCompletion) {
+          txReason = reason ? `Balance Completed - ${reason}` : "Balance Completed";
+        } else if (isTxPartial) {
+          const reasonLabel = partialReason === 'OUT_OF_STOCK' ? 'Out of Stock' : (partialReason === 'INSURANCE_LIMIT' ? 'Insurance Limitation' : (partialReason === 'PATIENT_REQUEST' ? 'Patient Request' : 'Partial Fill'));
+          txReason = reason ? `Partial Fill #${txPartialFillNumber} (${reasonLabel}) - ${reason}` : `Partial Fill #${txPartialFillNumber} (${reasonLabel})`;
+        } else if (isSplitFill) {
+          txReason = reason ? `Split Fill - ${reason}` : "Split Fill Dispensed";
+        } else {
+          txReason = reason || "Dispensed";
+        }
+      }
+
       const transactionsRef = collection(db, "users", emailId, "transactions");
       const newTransactionDoc = doc(transactionsRef);
       
-      batch.set(newTransactionDoc, {
+      const newTxData: any = {
         substanceId: targetMedId,
         substanceName: currentMed.name,
         strength: currentMed.strength,
@@ -2818,12 +2902,36 @@ export default function App() {
         performedByName: users.find(u => u.id === selectedUser)?.name || user.displayName || user.email || "AUTHORIZED",
         performedByTitle: users.find(u => u.id === selectedUser)?.title || "",
         timestamp: serverTimestamp(),
-        reason: transactionType === "ADJUST" ? reason : (transactionType === "IN" ? "Inventory Addition" : transactionType === "OUT" ? (isSplitFill ? (reason ? `Split Fill - ${reason}` : "Split Fill Dispensed") : "Dispensed") : "Verified"),
+        reason: txReason,
         referenceNumber: finalRef,
         isSplitFill: transactionType === "OUT" && isSplitFill,
         signature,
         photo: ""
-      });
+      };
+
+      if (isTxPartial || isTxBalanceCompletion) {
+        newTxData.isPartialFill = true;
+        newTxData.isBalanceCompletion = isTxBalanceCompletion;
+        newTxData.fillStage = txFillStage;
+        if (txPrescribedQty !== undefined) newTxData.prescribedQuantity = txPrescribedQty;
+        if (txBalanceRemaining !== undefined) newTxData.balanceRemaining = txBalanceRemaining;
+        if (txPartialReason) newTxData.partialReason = txPartialReason;
+        if (txPartialFillNumber !== undefined) newTxData.partialFillNumber = txPartialFillNumber;
+      }
+
+      batch.set(newTransactionDoc, newTxData);
+
+      // When completing or logging a partial fill, ensure prior dispenses for this RX are tagged with prescribedQuantity
+      if (transactionType === "OUT" && isTxPartial && rxMatches.length > 0) {
+        for (const match of rxMatches) {
+          if (match.id && (!match.prescribedQuantity || !match.isPartialFill)) {
+            batch.update(doc(db, "users", emailId, "transactions", match.id), {
+              isPartialFill: true,
+              prescribedQuantity: txPrescribedQty
+            });
+          }
+        }
+      }
 
       // When completing a split fill, also tag all prior dispenses for this RX as split fills
       if (transactionType === "OUT" && isSplitFill && rxMatches.length > 0) {
@@ -2890,9 +2998,48 @@ export default function App() {
       };
     }
 
-    const priorMatch = matches[0];
-    const isAlternateNdc = matches.some(t => t.ndc !== currentMed.ndc);
-    const matchedAlternate = matches.find(t => t.ndc !== currentMed.ndc);
+    const sortedMatches = [...matches].sort((a, b) => {
+      const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+      const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+      return dateA - dateB;
+    });
+
+    const totalDispensedSoFar = sortedMatches.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
+    const recordedPrescribedQty = sortedMatches.find(t => t.prescribedQuantity && Number(t.prescribedQuantity) > 0)?.prescribedQuantity;
+    const hasPartialIndicator = sortedMatches.some(t => t.isPartialFill || t.fillStage === "PARTIAL" || t.fillStage === "COMPLETION" || (t.prescribedQuantity && Number(t.prescribedQuantity) > 0));
+
+    if (hasPartialIndicator && recordedPrescribedQty) {
+      const balanceRemaining = Math.max(0, recordedPrescribedQty - totalDispensedSoFar);
+      if (balanceRemaining <= 0) {
+        return {
+          status: "prescription_completed" as const,
+          prescribedQuantity: recordedPrescribedQty,
+          totalDispensed: totalDispensedSoFar,
+          balanceRemaining: 0,
+          priorFills: sortedMatches,
+          priorSubstanceName: sortedMatches[0].substanceName,
+          priorStrength: sortedMatches[0].strength,
+          priorRef: sortedMatches[0].referenceNumber,
+          message: `This prescription (${formatRefForDisplay(sortedMatches[0].referenceNumber)}) has already been completely filled (${totalDispensedSoFar} of ${recordedPrescribedQty} units dispensed across ${sortedMatches.length} fills).`
+        };
+      } else {
+        return {
+          status: "partial_active" as const,
+          prescribedQuantity: recordedPrescribedQty,
+          totalDispensed: totalDispensedSoFar,
+          balanceRemaining,
+          priorFills: sortedMatches,
+          priorSubstanceName: sortedMatches[0].substanceName,
+          priorStrength: sortedMatches[0].strength,
+          priorRef: sortedMatches[0].referenceNumber,
+          message: `Active Partial Fill Found: ${totalDispensedSoFar} of ${recordedPrescribedQty} units dispensed. Balance Owed: ${balanceRemaining} units.`
+        };
+      }
+    }
+
+    const priorMatch = sortedMatches[0];
+    const isAlternateNdc = sortedMatches.some(t => t.ndc !== currentMed.ndc);
+    const matchedAlternate = sortedMatches.find(t => t.ndc !== currentMed.ndc);
 
     return {
       status: "already_associated" as const,
@@ -2901,6 +3048,8 @@ export default function App() {
       priorSubstanceName: priorMatch.substanceName,
       priorStrength: priorMatch.strength,
       priorRef: priorMatch.referenceNumber,
+      totalDispensed: totalDispensedSoFar,
+      priorFills: sortedMatches,
       message: `This RX # is already associated with an existing prescription (${priorMatch.substanceName} ${priorMatch.strength}). You must check 'Split Fill' first to dispense under this RX number.`
     };
   }, [transactionType, referenceNumber, selectedSubstance, inventory, transactions]);
@@ -2926,7 +3075,7 @@ export default function App() {
     return false;
   }, [splitFillRxNumbers]);
 
-  const relatedSplitTransactions = useMemo(() => {
+  const relatedPrescriptionFills = useMemo(() => {
     if (!viewingTransaction || viewingTransaction.type !== "OUT" || !viewingTransaction.referenceNumber) {
       return [];
     }
@@ -2939,8 +3088,17 @@ export default function App() {
       return refNum === baseNumeric;
     });
 
-    const isSplit = isTxSplitFill(viewingTransaction) || matches.some(t => isTxSplitFill(t)) || matches.length > 1;
-    if (!isSplit) return [];
+    const isPartialOrBalance = viewingTransaction.isPartialFill || 
+      viewingTransaction.isBalanceCompletion || 
+      viewingTransaction.fillStage || 
+      viewingTransaction.prescribedQuantity ||
+      matches.some(t => t.isPartialFill || t.isBalanceCompletion || t.fillStage || t.prescribedQuantity);
+
+    const isSplit = isTxSplitFill(viewingTransaction) || matches.some(t => isTxSplitFill(t));
+
+    if (!isPartialOrBalance && !isSplit && matches.length <= 1) {
+      return [];
+    }
 
     return [...matches].sort((a, b) => {
       const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
@@ -2948,6 +3106,8 @@ export default function App() {
       return dateA - dateB;
     });
   }, [viewingTransaction, transactions, isTxSplitFill]);
+
+  const relatedSplitTransactions = relatedPrescriptionFills;
 
   const availableTargetSubstances = useMemo(() => {
     if (!viewingTransaction) return [];
@@ -3686,6 +3846,9 @@ export default function App() {
     setReason("");
     setReferenceNumber("");
     setIsSplitFill(false);
+    setIsPartialFillActive(false);
+    setPrescribedQuantity("");
+    setPartialReason("OUT_OF_STOCK");
     setCapturedPhoto(null);
     setIsCameraActive(false);
     setUseSignatureFallback(false);
@@ -5891,6 +6054,67 @@ export default function App() {
                         </div>
                       )}
 
+                      {splitFillInfo?.status === "prescription_completed" && (
+                        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-xs space-y-1 shadow-sm">
+                          <div className="font-bold text-red-700 flex items-center gap-1.5 text-xs">
+                            <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                            Prescription Fully Fulfilled
+                          </div>
+                          <p className="text-[11px] text-red-900/90 leading-tight">
+                            All {splitFillInfo.prescribedQuantity} authorized units under {formatRefForDisplay(referenceNumber.trim())} have already been dispensed across {splitFillInfo.priorFills?.length || 1} fills. No remaining balance owed.
+                          </p>
+                        </div>
+                      )}
+
+                      {splitFillInfo?.status === "partial_active" && (
+                        <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs space-y-2.5 shadow-sm">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="font-bold text-amber-800 flex items-center gap-1.5 text-xs">
+                                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                                Active Prescription Partial Fill Detected
+                              </div>
+                              <p className="text-[11px] text-amber-900/90 mt-0.5">
+                                Prescription <span className="font-bold text-brand-blue">{formatRefForDisplay(referenceNumber.trim())}</span> has an open balance.
+                              </p>
+                            </div>
+                            <span className="px-2 py-0.5 bg-amber-600 text-white text-[10px] font-extrabold rounded-full shrink-0 uppercase tracking-wide">
+                              {splitFillInfo.priorFills?.length || 1} Prior Fill{(splitFillInfo.priorFills?.length || 1) > 1 ? 's' : ''}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 p-2 bg-brand-surface rounded border border-amber-500/20 text-center">
+                            <div>
+                              <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Prescribed</div>
+                              <div className="text-sm font-bold text-brand-dark-grey">{splitFillInfo.prescribedQuantity}</div>
+                            </div>
+                            <div>
+                              <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Dispensed To Date</div>
+                              <div className="text-sm font-bold text-brand-blue">{splitFillInfo.totalDispensed}</div>
+                            </div>
+                            <div>
+                              <div className="text-[9px] uppercase font-bold text-amber-700">Balance Owed</div>
+                              <div className="text-sm font-black text-amber-700">{splitFillInfo.balanceRemaining}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between gap-2 pt-0.5">
+                            <span className="text-[11px] text-amber-900/80 font-medium">
+                              Dispensing now will link to this prescription.
+                            </span>
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => {
+                                setQuantity(String(splitFillInfo.balanceRemaining));
+                                if (!reason) setReason("Balance Completed");
+                              }}
+                              className="h-7 text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white px-2.5 shadow-sm shrink-0"
+                            >
+                              Fill Balance ({splitFillInfo.balanceRemaining})
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
                       {splitFillInfo?.status === "already_associated" && !isSplitFill && (
                         <div className="p-2.5 bg-brand-yellow/20 border border-brand-yellow/50 rounded-lg text-brand-dark-grey text-xs flex items-start justify-between gap-2 shadow-sm">
                           <div className="space-y-0.5">
@@ -5962,6 +6186,100 @@ export default function App() {
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value)}
                       />
+                    </div>
+                  )}
+
+                  {transactionType === "OUT" && splitFillInfo?.status === "partial_active" && quantity && (
+                    <div className="p-2 bg-amber-500/10 rounded border border-amber-500/20 text-xs flex items-center justify-between">
+                      <span className="text-amber-900 font-medium">
+                        Dispensing: <strong className="text-brand-blue">{quantity}</strong> of {splitFillInfo.balanceRemaining} owed
+                      </span>
+                      <span className="font-bold">
+                        {Number(quantity) === splitFillInfo.balanceRemaining ? (
+                          <span className="text-emerald-700 flex items-center gap-1">
+                            <Check className="h-3.5 w-3.5" /> Full Balance Complete (0 remaining)
+                          </span>
+                        ) : Number(quantity) < splitFillInfo.balanceRemaining ? (
+                          <span className="text-amber-800">
+                            Remaining after fill: {splitFillInfo.balanceRemaining - Number(quantity)} units
+                          </span>
+                        ) : (
+                          <span className="text-red-600">
+                            Exceeds balance owed by {Number(quantity) - splitFillInfo.balanceRemaining} units
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+
+                  {transactionType === "OUT" && splitFillInfo?.status !== "partial_active" && splitFillInfo?.status !== "prescription_completed" && (
+                    <div className="p-2.5 rounded-lg border border-brand-blue/20 bg-brand-blue/5 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-brand-blue">
+                          <input
+                            type="checkbox"
+                            checked={isPartialFillActive}
+                            onChange={(e) => setIsPartialFillActive(e.target.checked)}
+                            className="h-4 w-4 rounded border-brand-blue/30 text-brand-blue focus:ring-brand-blue accent-brand-blue cursor-pointer"
+                          />
+                          <span>Partial Fill (Balance Owed)</span>
+                        </label>
+                        {isPartialFillActive && (
+                          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 border border-amber-500/30">
+                            Partial Fill Mode
+                          </span>
+                        )}
+                      </div>
+                      {isPartialFillActive && (
+                        <div className="space-y-2 pt-1 border-t border-brand-blue/10">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-[10px] uppercase font-bold text-brand-blue/80">
+                                Total Prescribed Quantity <span className="text-red-500">*</span>
+                              </Label>
+                              <Input
+                                type="number"
+                                placeholder="e.g. 30"
+                                value={prescribedQuantity}
+                                onChange={(e) => setPrescribedQuantity(e.target.value)}
+                                className="h-8 text-xs bg-brand-surface text-brand-dark-grey border-brand-grey/20 focus-visible:ring-brand-blue"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-[10px] uppercase font-bold text-brand-blue/80">
+                                Reason for Partial
+                              </Label>
+                              <Select value={partialReason} onValueChange={(val: any) => setPartialReason(val)}>
+                                <SelectTrigger className="h-8 text-xs bg-brand-surface text-brand-dark-grey border-brand-grey/20">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-brand-surface">
+                                  <SelectItem value="OUT_OF_STOCK" className="text-xs text-brand-dark-grey">Insufficient Stock / Out of Stock</SelectItem>
+                                  <SelectItem value="INSURANCE_LIMIT" className="text-xs text-brand-dark-grey">Insurance / Plan Limitation</SelectItem>
+                                  <SelectItem value="PATIENT_REQUEST" className="text-xs text-brand-dark-grey">Patient / Prescriber Request</SelectItem>
+                                  <SelectItem value="OTHER" className="text-xs text-brand-dark-grey">Other (Specify in Notes)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          {prescribedQuantity && Number(prescribedQuantity) > 0 && (
+                            <div className="p-2 bg-brand-surface rounded border border-brand-blue/15 flex items-center justify-between text-xs">
+                              <span className="text-brand-dark-grey font-medium">
+                                Dispensing: <strong className="text-brand-blue">{quantity || 0}</strong>
+                              </span>
+                              <span className="font-bold">
+                                {Number(quantity) >= Number(prescribedQuantity) ? (
+                                  <span className="text-emerald-700">Full amount covered (uncheck Partial if full fill)</span>
+                                ) : (
+                                  <span className="text-amber-700">
+                                    Balance Owed: {Number(prescribedQuantity) - (Number(quantity) || 0)} units
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -6260,11 +6578,19 @@ export default function App() {
                             <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Reference #</Label>
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-sm text-brand-blue font-bold">{formatRefForDisplay(viewingTransaction.referenceNumber)}</span>
-                              {isTxSplitFill(viewingTransaction) && (
+                              {viewingTransaction.isBalanceCompletion || viewingTransaction.fillStage === "COMPLETION" ? (
+                                <span className="bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                                  Balance Completed
+                                </span>
+                              ) : (viewingTransaction.isPartialFill || viewingTransaction.fillStage === "PARTIAL") ? (
+                                <span className="bg-amber-500/10 text-amber-700 border border-amber-500/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                                  Partial Fill {viewingTransaction.partialFillNumber ? `#${viewingTransaction.partialFillNumber}` : ''}
+                                </span>
+                              ) : isTxSplitFill(viewingTransaction) ? (
                                 <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
                                   Split Fill
                                 </span>
-                              )}
+                              ) : null}
                             </div>
                           </div>
                           <div className="space-y-1">
@@ -6286,67 +6612,170 @@ export default function App() {
                             <div className="text-sm text-brand-dark-grey">{formatDateTime(viewingTransaction.timestamp)}</div>
                           </div>
 
-                          {/* Split Fill information below Performed By (user) in the empty space */}
-                          {relatedSplitTransactions.length > 0 && isTxSplitFill(viewingTransaction) ? (
-                            <div className="space-y-1.5">
-                              <div className="flex items-center justify-between">
-                                <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Split Fill Allocation</Label>
-                                <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
-                                  {relatedSplitTransactions.length > 1 ? `${relatedSplitTransactions.length}-Part Split` : "Split Rx"}
-                                </span>
-                              </div>
-                              <div className="p-2.5 bg-brand-surface rounded-lg border border-brand-blue/20 space-y-2 shadow-sm">
-                                <div className="text-[10px] text-brand-dark-grey/80 leading-tight">
-                                  Prescription split across multiple NDCs:
-                                </div>
+                          {/* Prescription Fulfillment / Split Fill Information */}
+                          {relatedPrescriptionFills.length > 0 ? (() => {
+                            const prescribedTotal = relatedPrescriptionFills.find(t => t.prescribedQuantity && Number(t.prescribedQuantity) > 0)?.prescribedQuantity;
+                            const cumulativeDispensed = relatedPrescriptionFills.reduce((sum, t) => sum + (Number(t.quantity) || 0), 0);
+                            const latestTx = relatedPrescriptionFills[relatedPrescriptionFills.length - 1];
+                            const isClosed = latestTx.fillStage === "COMPLETION" || latestTx.isBalanceCompletion || (prescribedTotal ? cumulativeDispensed >= prescribedTotal : false);
+                            const remainingBalance = prescribedTotal ? Math.max(0, prescribedTotal - cumulativeDispensed) : 0;
+                            const isPartialPrescription = prescribedTotal || viewingTransaction.isPartialFill || viewingTransaction.isBalanceCompletion || viewingTransaction.fillStage || relatedPrescriptionFills.some(t => t.isPartialFill || t.fillStage);
+
+                            if (isPartialPrescription) {
+                              return (
                                 <div className="space-y-1.5">
-                                  {relatedSplitTransactions.map((stx, idx) => {
-                                    const isCurrent = stx.id === viewingTransaction.id;
-                                    const ordinal = idx === 0 ? "1st" : idx === 1 ? "2nd" : idx === 2 ? "3rd" : `${idx + 1}th`;
-                                    return (
-                                      <div
-                                        key={stx.id || idx}
-                                        onClick={() => {
-                                          if (!isCurrent) setViewingTransaction(stx);
-                                        }}
-                                        title={!isCurrent ? "Click to view this split transaction" : undefined}
-                                        className={`p-2 rounded-md border flex items-center justify-between gap-2 text-xs transition-all ${
-                                          isCurrent
-                                            ? "bg-brand-blue/10 border-brand-blue/30 text-brand-blue font-bold"
-                                            : "bg-brand-light-grey/40 border-brand-grey/15 text-brand-dark-grey hover:border-brand-blue/30 hover:bg-brand-blue/5 cursor-pointer"
-                                        }`}
-                                      >
-                                        <div className="flex items-center gap-1.5 min-w-0">
-                                          <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
-                                            {ordinal} NDC
-                                          </span>
-                                          <span className="font-mono text-xs font-bold text-brand-dark-grey truncate">
-                                            {stx.ndc}
-                                          </span>
-                                          {isCurrent && (
-                                            <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue text-white px-1.5 py-0.2 rounded shrink-0">
-                                              Current
-                                            </span>
-                                          )}
-                                        </div>
-                                        <div className="text-xs font-black text-brand-blue shrink-0">
-                                          Qty: {stx.quantity}
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                                {relatedSplitTransactions.length > 1 && (
-                                  <div className="pt-1.5 border-t border-brand-blue/10 flex items-center justify-between text-[10px] font-bold text-brand-dark-grey/70">
-                                    <span>Total Split Dispensed:</span>
-                                    <span className="font-black text-brand-blue text-xs">
-                                      {relatedSplitTransactions.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0)} units
+                                  <div className="flex items-center justify-between">
+                                    <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Prescription Fulfillment History</Label>
+                                    <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                                      isClosed 
+                                        ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" 
+                                        : "bg-amber-500/10 text-amber-700 border-amber-500/20"
+                                    }`}>
+                                      {isClosed ? "Fully Fulfilled" : `Open Balance: ${remainingBalance} Owed`}
                                     </span>
                                   </div>
-                                )}
+                                  <div className="p-3 bg-brand-surface rounded-lg border border-brand-blue/20 space-y-2.5 shadow-sm">
+                                    {prescribedTotal ? (
+                                      <div className="grid grid-cols-3 gap-2 p-2 bg-brand-blue/5 rounded border border-brand-blue/10 text-center text-xs">
+                                        <div>
+                                          <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Prescribed</div>
+                                          <div className="text-xs font-bold text-brand-dark-grey">{prescribedTotal}</div>
+                                        </div>
+                                        <div>
+                                          <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Dispensed</div>
+                                          <div className="text-xs font-bold text-brand-blue">{cumulativeDispensed} / {prescribedTotal}</div>
+                                        </div>
+                                        <div>
+                                          <div className="text-[9px] uppercase font-bold text-brand-dark-grey/60">Status</div>
+                                          <div className={`text-xs font-black ${isClosed ? 'text-emerald-700' : 'text-amber-700'}`}>
+                                            {isClosed ? "Completed" : `${remainingBalance} Owed`}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ) : null}
+
+                                    <div className="space-y-1.5">
+                                      <div className="text-[10px] font-bold text-brand-dark-grey/70 uppercase tracking-wider">
+                                        Fulfillment Sequence ({relatedPrescriptionFills.length} Dispense{relatedPrescriptionFills.length > 1 ? 's' : ''}):
+                                      </div>
+                                      {relatedPrescriptionFills.map((stx, idx) => {
+                                        const isCurrent = stx.id === viewingTransaction.id;
+                                        const ordinal = idx === 0 ? "1st Fill" : idx === 1 ? "2nd Fill" : idx === 2 ? "3rd Fill" : `${idx + 1}th Fill`;
+                                        const isCompletion = stx.fillStage === "COMPLETION" || stx.isBalanceCompletion || (idx === relatedPrescriptionFills.length - 1 && isClosed);
+                                        return (
+                                          <div
+                                            key={stx.id || idx}
+                                            onClick={() => {
+                                              if (!isCurrent) setViewingTransaction(stx);
+                                            }}
+                                            title={!isCurrent ? "Click to view details for this fill" : undefined}
+                                            className={`p-2.5 rounded-lg border transition-all ${
+                                              isCurrent
+                                                ? "bg-brand-blue/10 border-brand-blue/30 text-brand-blue font-bold shadow-xs"
+                                                : "bg-brand-light-grey/40 border-brand-grey/15 text-brand-dark-grey hover:border-brand-blue/30 hover:bg-brand-blue/5 cursor-pointer"
+                                            }`}
+                                          >
+                                            <div className="flex items-center justify-between gap-2">
+                                              <div className="flex items-center gap-1.5 min-w-0">
+                                                <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                                  isCompletion ? "bg-emerald-500/15 text-emerald-700" : "bg-amber-500/15 text-amber-700"
+                                                }`}>
+                                                  {isCompletion ? "Final Balance" : ordinal}
+                                                </span>
+                                                <span className="text-[11px] text-brand-dark-grey/70 font-sans">
+                                                  {formatDateTime(stx.timestamp)}
+                                                </span>
+                                                {isCurrent && (
+                                                  <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue text-white px-1.5 py-0.2 rounded shrink-0">
+                                                    Viewing
+                                                  </span>
+                                                )}
+                                              </div>
+                                              <div className="text-xs font-black text-brand-blue shrink-0">
+                                                Qty: {stx.quantity}
+                                              </div>
+                                            </div>
+                                            <div className="mt-1 flex items-center justify-between text-[10px] text-brand-dark-grey/70">
+                                              <span className="truncate">
+                                                Staff: {escapeEmail(stx.performedByName)}
+                                              </span>
+                                              {stx.balanceRemaining !== undefined && stx.balanceRemaining !== null && (
+                                                <span className="font-semibold text-amber-700 shrink-0">
+                                                  {stx.balanceRemaining === 0 ? "Balance: 0 (Closed)" : `Owed after fill: ${stx.balanceRemaining}`}
+                                                </span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Fallback to standard multi-NDC split fill visualization
+                            return (
+                              <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                  <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Split Fill Allocation</Label>
+                                  <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
+                                    {relatedPrescriptionFills.length > 1 ? `${relatedPrescriptionFills.length}-Part Split` : "Split Rx"}
+                                  </span>
+                                </div>
+                                <div className="p-2.5 bg-brand-surface rounded-lg border border-brand-blue/20 space-y-2 shadow-sm">
+                                  <div className="text-[10px] text-brand-dark-grey/80 leading-tight">
+                                    Prescription split across multiple NDCs:
+                                  </div>
+                                  <div className="space-y-1.5">
+                                    {relatedPrescriptionFills.map((stx, idx) => {
+                                      const isCurrent = stx.id === viewingTransaction.id;
+                                      const ordinal = idx === 0 ? "1st" : idx === 1 ? "2nd" : idx === 2 ? "3rd" : `${idx + 1}th`;
+                                      return (
+                                        <div
+                                          key={stx.id || idx}
+                                          onClick={() => {
+                                            if (!isCurrent) setViewingTransaction(stx);
+                                          }}
+                                          title={!isCurrent ? "Click to view this split transaction" : undefined}
+                                          className={`p-2 rounded-md border flex items-center justify-between gap-2 text-xs transition-all ${
+                                            isCurrent
+                                              ? "bg-brand-blue/10 border-brand-blue/30 text-brand-blue font-bold"
+                                              : "bg-brand-light-grey/40 border-brand-grey/15 text-brand-dark-grey hover:border-brand-blue/30 hover:bg-brand-blue/5 cursor-pointer"
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-1.5 min-w-0">
+                                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-blue/15 text-brand-blue shrink-0">
+                                              {ordinal} NDC
+                                            </span>
+                                            <span className="font-mono text-xs font-bold text-brand-dark-grey truncate">
+                                              {stx.ndc}
+                                            </span>
+                                            {isCurrent && (
+                                              <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue text-white px-1.5 py-0.2 rounded shrink-0">
+                                                Current
+                                              </span>
+                                            )}
+                                          </div>
+                                          <div className="text-xs font-black text-brand-blue shrink-0">
+                                            Qty: {stx.quantity}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  {relatedPrescriptionFills.length > 1 && (
+                                    <div className="pt-1.5 border-t border-brand-blue/10 flex items-center justify-between text-[10px] font-bold text-brand-dark-grey/70">
+                                      <span>Total Split Dispensed:</span>
+                                      <span className="font-black text-brand-blue text-xs">
+                                        {relatedPrescriptionFills.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0)} units
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ) : (
+                            );
+                          })() : (
                             <div className="hidden" />
                           )}
                         </div>
@@ -7328,7 +7757,7 @@ export default function App() {
                               </TableCell>
                               <TableCell className="text-center py-1 h-10">
                                 {t.referenceNumber ? (
-                                  <div className="flex items-center justify-center gap-1.5">
+                                  <div className="flex items-center justify-center gap-1.5 flex-wrap">
                                     <span 
                                       className={`text-xs font-normal transition-colors ${
                                         viewingTransaction?.id === t.id 
@@ -7338,11 +7767,19 @@ export default function App() {
                                     >
                                       {t.referenceNumber}
                                     </span>
-                                    {isTxSplitFill(t) && (
+                                    {t.isBalanceCompletion || t.fillStage === "COMPLETION" ? (
+                                      <span className="text-[8px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-500/20" title={`Balance Completed (${t.prescribedQuantity ? `Total Prescribed: ${t.prescribedQuantity}` : 'Fulfilled'})`}>
+                                        BALANCE
+                                      </span>
+                                    ) : (t.isPartialFill || t.fillStage === "PARTIAL") ? (
+                                      <span className="text-[8px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-700 px-1.5 py-0.5 rounded border border-amber-500/20" title={`Partial Fill ${t.partialFillNumber ? `#${t.partialFillNumber}` : ''} (${t.quantity}/${t.prescribedQuantity || '?'} - Balance Owed: ${t.balanceRemaining ?? '?'})`}>
+                                        PARTIAL{t.partialFillNumber ? ` #${t.partialFillNumber}` : ''}
+                                      </span>
+                                    ) : isTxSplitFill(t) ? (
                                       <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue/10 text-brand-blue px-1.5 py-0.5 rounded border border-brand-blue/20" title="Split Fill across multiple NDCs">
                                         SPLIT
                                       </span>
-                                    )}
+                                    ) : null}
                                   </div>
                                 ) : (
                                   <span className="text-brand-dark-grey/40 italic">-</span>
@@ -8815,7 +9252,7 @@ export default function App() {
                         </TableCell>
                         <TableCell className="text-center py-1">
                           {t.referenceNumber ? (
-                            <div className="flex items-center justify-center gap-1.5">
+                            <div className="flex items-center justify-center gap-1.5 flex-wrap">
                               <span className={`transition-colors ${
                                 viewingTransaction?.id === t.id 
                                   ? "text-brand-yellow font-bold" 
@@ -8823,11 +9260,19 @@ export default function App() {
                               }`}>
                                 {formatRefForDisplay(t.referenceNumber)}
                               </span>
-                              {isTxSplitFill(t) && (
+                              {t.isBalanceCompletion || t.fillStage === "COMPLETION" ? (
+                                <span className="text-[8px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-500/20" title={`Balance Completed (${t.prescribedQuantity ? `Total Prescribed: ${t.prescribedQuantity}` : 'Fulfilled'})`}>
+                                  BALANCE
+                                </span>
+                              ) : (t.isPartialFill || t.fillStage === "PARTIAL") ? (
+                                <span className="text-[8px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-700 px-1.5 py-0.5 rounded border border-amber-500/20" title={`Partial Fill ${t.partialFillNumber ? `#${t.partialFillNumber}` : ''} (${t.quantity}/${t.prescribedQuantity || '?'} - Balance Owed: ${t.balanceRemaining ?? '?'})`}>
+                                  PARTIAL{t.partialFillNumber ? ` #${t.partialFillNumber}` : ''}
+                                </span>
+                              ) : isTxSplitFill(t) ? (
                                 <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue/10 text-brand-blue px-1.5 py-0.5 rounded border border-brand-blue/20" title="Split Fill across multiple NDCs">
                                   SPLIT
                                 </span>
-                              )}
+                              ) : null}
                             </div>
                           ) : (
                             <span className="text-brand-dark-grey/40 italic">-</span>
