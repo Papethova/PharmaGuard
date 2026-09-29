@@ -6031,7 +6031,7 @@ export default function App() {
                               onChange={(e) => setIsSplitFill(e.target.checked)}
                               className="h-3.5 w-3.5 rounded border-brand-blue/30 text-brand-blue focus:ring-brand-blue accent-brand-blue cursor-pointer"
                             />
-                            <span>Split Fill</span>
+                            <span>NDC Split Fill</span>
                           </label>
                         )}
                       </div>
@@ -6123,7 +6123,7 @@ export default function App() {
                               RX # Already Associated
                             </p>
                             <p className="text-[11px] text-brand-dark-grey/90 leading-tight">
-                              This RX # is already associated with an existing prescription record ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}). You must check <span className="font-bold text-brand-blue">Split Fill</span> to dispense under this RX number.
+                              This RX # is already associated with an existing prescription record ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}). You must check <span className="font-bold text-brand-blue">NDC Split Fill</span> to dispense under this RX number.
                             </p>
                           </div>
                           <Button
@@ -6132,7 +6132,7 @@ export default function App() {
                             onClick={() => setIsSplitFill(true)}
                             className="h-6 text-[10px] font-bold bg-brand-blue text-white hover:brightness-110 px-2 py-0 shrink-0 shadow-sm"
                           >
-                            Check Split Fill
+                            Check NDC Split Fill
                           </Button>
                         </div>
                       )}
@@ -6141,7 +6141,7 @@ export default function App() {
                         <div className="p-2.5 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs text-brand-blue flex items-center gap-1.5 font-bold">
                           <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
                           <span>
-                            Split Fill Active — dispensing under prescription {formatRefForDisplay(referenceNumber.trim())} ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength})
+                            NDC Split Fill Active — dispensing under prescription {formatRefForDisplay(referenceNumber.trim())} ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength})
                           </span>
                         </div>
                       )}
@@ -6150,9 +6150,9 @@ export default function App() {
                         <div className="p-2 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs text-brand-blue flex items-center gap-1.5 font-bold">
                           <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
                           {referenceNumber.trim() ? (
-                            <span>Split Fill Active — dispensing under prescription {formatRefForDisplay(referenceNumber.trim())}</span>
+                            <span>NDC Split Fill Active — dispensing under prescription {formatRefForDisplay(referenceNumber.trim())}</span>
                           ) : (
-                            <span>Split Fill Mode Enabled — enter the RX # above to link fill records</span>
+                            <span>NDC Split Fill Mode Enabled — enter the RX # above to link fill records</span>
                           )}
                         </div>
                       )}
