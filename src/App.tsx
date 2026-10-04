@@ -756,6 +756,9 @@ export default function App() {
   const [reconScheduleFilter, setReconScheduleFilter] = useState<"ALL" | "C-II" | "C-III/C-IV/C-V">(() => {
     return (localStorage.getItem("recon_reconScheduleFilter") as "ALL" | "C-II" | "C-III/C-IV/C-V") || "C-II";
   });
+  const [reconTiming, setReconTiming] = useState<"START" | "END">(() => {
+    return (localStorage.getItem("recon_reconTiming") as "START" | "END") || "END";
+  });
 
   const [reconCounts, setReconCounts] = useState<Record<string, string>>(() => {
     try {
@@ -827,6 +830,10 @@ export default function App() {
   }, [reconScheduleFilter]);
 
   useEffect(() => {
+    localStorage.setItem("recon_reconTiming", reconTiming);
+  }, [reconTiming]);
+
+  useEffect(() => {
     localStorage.setItem("recon_reconCounts", JSON.stringify(reconCounts));
   }, [reconCounts]);
 
@@ -874,6 +881,9 @@ export default function App() {
             break;
           case "recon_reconScheduleFilter":
             setReconScheduleFilter((val as any) || "C-II");
+            break;
+          case "recon_reconTiming":
+            setReconTiming((val as "START" | "END") || "END");
             break;
           case "recon_reconCounts":
             try { setReconCounts(val ? JSON.parse(val) : {}); } catch {}
@@ -3443,6 +3453,7 @@ export default function App() {
         witnessId: reconWitness && reconWitness !== "none" ? reconWitness : "",
         witnessName: witnessName,
         scheduleFilter: reconScheduleFilter,
+        executionTiming: reconTiming,
         items: reportedItems,
         reconSigData: signature,
         picSigData: picSignature,
@@ -3466,6 +3477,7 @@ export default function App() {
       setReconReasons({});
       setReconUser("");
       setReconWitness("");
+      setReconTiming("END");
       setReconSigData(null);
       setPicSigData(null);
       reconCanvasRef.current?.clear();
@@ -3476,6 +3488,7 @@ export default function App() {
       localStorage.removeItem("recon_reconReasons");
       localStorage.removeItem("recon_reconUser");
       localStorage.removeItem("recon_reconWitness");
+      localStorage.removeItem("recon_reconTiming");
       localStorage.removeItem("recon_reconSigData");
       localStorage.removeItem("recon_picSigData");
     } catch (error: any) {
@@ -5050,7 +5063,14 @@ export default function App() {
                 selectedHistoricalReport 
                   ? new Date(getTimestampMs(selectedHistoricalReport.timestamp)).toLocaleDateString()
                   : new Date().toLocaleDateString()
-              }</p>
+              }{(() => {
+                const timing = selectedHistoricalReport
+                  ? (selectedHistoricalReport.executionTiming || selectedHistoricalReport.reconTiming)
+                  : reconTiming;
+                if (!timing && selectedHistoricalReport) return "";
+                const isStart = timing === "START" || timing === "start" || String(timing).toLowerCase().includes("start");
+                return isStart ? " (Start of Business)" : " (End of Business)";
+              })()}</p>
             </div>
           </div>
 
@@ -8028,6 +8048,29 @@ export default function App() {
                           }`}
                         >
                           {filterVal}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-left">
+                    <Label className="text-[10px] uppercase font-black tracking-wider text-brand-blue/80 shrink-0">Timing</Label>
+                    <div className="flex items-center gap-1 bg-brand-surface p-1 rounded-full border border-brand-blue/20">
+                      {(["START", "END"] as const).map((timingVal) => (
+                        <Button
+                          key={timingVal}
+                          type="button"
+                          variant={reconTiming === timingVal ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => setReconTiming(timingVal)}
+                          className={`rounded-full px-4 h-8 text-xs font-extrabold tracking-wider transition-all ${
+                            reconTiming === timingVal
+                              ? "bg-brand-blue text-white shadow-sm"
+                              : "text-brand-blue hover:bg-brand-blue/5"
+                          }`}
+                        >
+                          <span className="hidden md:inline">{timingVal === "START" ? "Start of Business" : "End of Business"}</span>
+                          <span className="md:hidden">{timingVal === "START" ? "Start" : "End"}</span>
                         </Button>
                       ))}
                     </div>
