@@ -3158,7 +3158,22 @@ export default function App() {
       };
     }
 
-    // Case 4: C-III through C-V prescription found -> Show "Prescription Found" with Refill action button!
+    const lastFill = sortedMatches[sortedMatches.length - 1];
+    const lastFillRefillNumber = lastFill
+      ? (typeof lastFill.refillNumber === "number" && lastFill.refillNumber > 0
+          ? lastFill.refillNumber
+          : (getRefillNumber(lastFill.referenceNumber) > 0
+              ? getRefillNumber(lastFill.referenceNumber)
+              : (lastFill.isRefill ? 1 : 0)))
+      : 0;
+    const lastFillMs = lastFill ? getTimestampMs(lastFill.timestamp) : Date.now();
+    const lastFillDateObj = new Date(lastFillMs);
+    const lastFillDate = `${lastFillDateObj.getMonth() + 1}/${lastFillDateObj.getDate()}/${lastFillDateObj.getFullYear()}`;
+    const lastFillHistoryText = lastFillRefillNumber > 0
+      ? `refill ${lastFillRefillNumber} fill ${lastFillDate}`
+      : `original fill ${lastFillDate}`;
+
+    // Case 4: C-III through C-V prescription found -> Show "previous fill found for..." with Refill action button!
     return {
       status: "prescription_found_refillable" as const,
       schedule: currentMed.schedule,
@@ -3168,6 +3183,10 @@ export default function App() {
       priorRef: sortedMatches[0].referenceNumber,
       totalDispensed: sortedMatches.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0),
       priorFills: sortedMatches,
+      lastFill,
+      lastFillRefillNumber,
+      lastFillDate,
+      lastFillHistoryText,
       maxRefillNumber,
       nextRefillNumber,
       nextRefillRef,
@@ -6186,82 +6205,94 @@ export default function App() {
                         </div>
                       )}
 
-                      {(splitFillInfo?.status === "c2_already_dispensed" || splitFillInfo?.status === "c2_refill_prohibited") && (
-                        <div className="p-3 bg-brand-surface border border-brand-blue/30 rounded-lg text-xs space-y-1.5 shadow-sm">
-                          <div className="flex items-center justify-between">
-                            <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
-                              <AlertCircle className="h-4 w-4 text-brand-blue shrink-0" />
-                              Prescription Found (Schedule II)
-                            </div>
-                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30">
-                              C-II • No Refills Allowed
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-brand-dark-grey leading-tight">
-                            Prescription <strong className="text-brand-blue">{formatRefForDisplay(referenceNumber.trim())}</strong> is on file for {splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}. Under federal DEA regulations, Schedule II (C-II) controlled substances cannot be refilled. A new prescription is required.
-                          </p>
-                          {isSplitFill ? (
-                            <div className="pt-1 flex items-center gap-1.5 text-[11px] text-brand-blue font-bold">
-                              <Check className="h-3.5 w-3.5" strokeWidth={3} />
-                              <span>NDC Split Fill Active for this C-II dispense</span>
-                            </div>
-                          ) : (
-                            <p className="text-[10px] text-brand-dark-grey/70 pt-0.5">
-                              If this is a multi-NDC split for the initial fill, check <strong className="text-brand-blue">NDC Split Fill</strong> above.
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      {splitFillInfo?.status === "prescription_found_refillable" && (
-                        <div className="p-3 bg-brand-yellow/15 border border-brand-yellow/50 rounded-lg text-xs space-y-2.5 shadow-sm">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
+                      {(splitFillInfo?.status === "c2_already_dispensed" || splitFillInfo?.status === "c2_refill_prohibited") && (() => {
+                        const enteredRefTrimmed = referenceNumber.trim();
+                        const displayRxRef = enteredRefTrimmed.toLowerCase().startsWith("rx")
+                          ? enteredRefTrimmed
+                          : (enteredRefTrimmed ? `rx${enteredRefTrimmed}` : `rx${getBaseRxNumber(referenceNumber)}`);
+                        return (
+                          <div className="p-3 bg-brand-surface border border-brand-blue/30 rounded-lg text-xs space-y-1.5 shadow-sm">
+                            <div className="flex items-center justify-between">
                               <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
-                                <FileText className="h-4 w-4 text-brand-blue shrink-0" />
-                                Prescription Found
+                                <AlertCircle className="h-4 w-4 text-brand-blue shrink-0" />
+                                <span>previous fill found for {displayRxRef} (Schedule II)</span>
                               </div>
-                              <p className="text-[11px] text-brand-dark-grey mt-0.5">
-                                Existing prescription on file for <span className="font-bold text-brand-blue">{splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}</span>.
-                              </p>
+                              <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30">
+                                C-II • No Refills Allowed
+                              </span>
                             </div>
-                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 uppercase tracking-wide">
-                              {splitFillInfo.priorFills?.length || 1} Prior Fill{(splitFillInfo.priorFills?.length || 1) > 1 ? "s" : ""} • {splitFillInfo.schedule}
-                            </span>
+                            <p className="text-[11px] text-brand-dark-grey leading-tight">
+                              Prescription <strong className="text-brand-blue">{formatRefForDisplay(referenceNumber.trim())}</strong> is on file for {splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}. Under federal DEA regulations, Schedule II (C-II) controlled substances cannot be refilled. A new prescription is required.
+                            </p>
+                            {isSplitFill ? (
+                              <div className="pt-1 flex items-center gap-1.5 text-[11px] text-brand-blue font-bold">
+                                <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                                <span>NDC Split Fill Active for this C-II dispense</span>
+                              </div>
+                            ) : (
+                              <p className="text-[10px] text-brand-dark-grey/70 pt-0.5">
+                                If this is a multi-NDC split for the initial fill, check <strong className="text-brand-blue">NDC Split Fill</strong> above.
+                              </p>
+                            )}
                           </div>
+                        );
+                      })()}
 
-                          <div className="p-2 bg-brand-surface rounded border border-brand-blue/15 text-[11px] text-brand-dark-grey flex items-center justify-between">
-                            <span>
-                              History: <strong>{splitFillInfo.maxRefillNumber === 0 ? "Original Fill recorded" : `Original Fill through Refill #${splitFillInfo.maxRefillNumber}`}</strong>
-                            </span>
-                            <span className="text-brand-blue font-bold">
-                              Total Dispensed: {splitFillInfo.totalDispensed} units
-                            </span>
-                          </div>
+                      {splitFillInfo?.status === "prescription_found_refillable" && (() => {
+                        const enteredRefTrimmed = referenceNumber.trim();
+                        const displayRxRef = enteredRefTrimmed.toLowerCase().startsWith("rx")
+                          ? enteredRefTrimmed
+                          : (enteredRefTrimmed ? `rx${enteredRefTrimmed}` : `rx${getBaseRxNumber(referenceNumber)}`);
+                        return (
+                          <div className="p-3 bg-brand-yellow/35 border-2 border-brand-yellow rounded-lg text-xs space-y-2.5 shadow-sm">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
+                                  <FileText className="h-4 w-4 text-brand-blue shrink-0" />
+                                  <span>previous fill found for {displayRxRef}</span>
+                                </div>
+                                <p className="text-[11px] text-brand-dark-grey mt-0.5">
+                                  Existing prescription on file for <span className="font-bold text-brand-blue">{splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}</span>.
+                                </p>
+                              </div>
+                              <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 uppercase tracking-wide">
+                                {splitFillInfo.priorFills?.length || 1} Prior Fill{(splitFillInfo.priorFills?.length || 1) > 1 ? "s" : ""} • {splitFillInfo.schedule}
+                              </span>
+                            </div>
 
-                          <div className="flex items-center justify-between gap-2 pt-0.5">
-                            <span className="text-[11px] text-brand-dark-grey font-medium">
-                              Log an additional authorized fill under this RX:
-                            </span>
-                            <Button
-                              type="button"
-                              size="sm"
-                              onClick={() => {
-                                setReferenceNumber(splitFillInfo.nextRefillRef);
-                                setIsPartialFillActive(false);
-                                setPrescribedQuantity("");
-                              }}
-                              className="h-7 text-[11px] font-bold bg-brand-blue hover:brightness-110 text-brand-yellow px-3 shadow-sm shrink-0 border border-brand-blue/30 flex items-center gap-1.5 cursor-pointer"
-                            >
-                              <Plus className="h-3.5 w-3.5" />
-                              Refill Prescription (-R{splitFillInfo.nextRefillNumber})
-                            </Button>
+                            <div className="p-2 bg-brand-surface rounded border border-brand-blue/15 text-[11px] text-brand-dark-grey flex items-center justify-between">
+                              <span>
+                                History: <strong>{splitFillInfo.lastFillHistoryText}</strong>
+                              </span>
+                              <span className="text-brand-blue font-bold">
+                                Total Dispensed: {splitFillInfo.totalDispensed} units
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 pt-0.5">
+                              <span className="text-[11px] text-brand-dark-grey font-medium">
+                                Log an additional authorized fill under this RX:
+                              </span>
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => {
+                                  setReferenceNumber(splitFillInfo.nextRefillRef);
+                                  setIsPartialFillActive(false);
+                                  setPrescribedQuantity("");
+                                }}
+                                className="h-7 text-[11px] font-bold bg-brand-blue hover:brightness-110 text-brand-yellow px-3 shadow-sm shrink-0 border border-brand-blue/30 flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                                Refill Prescription (-R{splitFillInfo.nextRefillNumber})
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {splitFillInfo?.status === "refill_active" && (
-                        <div className="p-3 bg-brand-yellow/15 border border-brand-yellow/60 rounded-lg text-xs space-y-1.5 shadow-sm">
+                        <div className="p-3 bg-brand-yellow/35 border-2 border-brand-yellow rounded-lg text-xs space-y-1.5 shadow-sm">
                           <div className="flex items-center justify-between">
                             <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
                               <Check className="h-4 w-4 text-brand-blue" strokeWidth={2.5} />
