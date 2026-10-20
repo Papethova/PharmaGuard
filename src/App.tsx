@@ -21,6 +21,7 @@ import {
   Trash2,
   LogOut,
   Folder,
+  FileText,
   Check,
   Settings,
   Shield,
@@ -292,6 +293,20 @@ const formatRefForDisplay = (ref: string | undefined) => {
     return `VER-${month}${day}${shortYear}-${suffix}`;
   }
   return ref;
+};
+
+const getBaseRxNumber = (ref: string | undefined): string => {
+  if (!ref) return "";
+  let clean = ref.trim().replace(/^RX-/i, "");
+  // Strip refill designators like -R1, -R01, R1, _R1, etc.
+  clean = clean.replace(/[-_]?[Rr]\d+$/, "");
+  return clean.trim();
+};
+
+const getRefillNumber = (ref: string | undefined): number => {
+  if (!ref) return 0;
+  const match = ref.trim().match(/[-_]?[Rr](\d+)$/);
+  return match ? parseInt(match[1], 10) : 0;
 };
 
 const getTimestampMs = (ts: any): number => {
@@ -2646,19 +2661,26 @@ export default function App() {
       let totalPriorDispensed = 0;
       
       if (transactionType === "OUT") {
-        // Strip any existing prefix to avoid RX-RX-
-        let baseNumeric = finalRef.replace(/^RX-/, "");
-        // Also strip any pre-existing refill designator like R1, R2, etc. (suffix match matching R followed by digits)
-        baseNumeric = baseNumeric.replace(/R\d+$/, "");
+        const baseNumeric = getBaseRxNumber(finalRef);
+        const enteredRefillNum = getRefillNumber(finalRef);
         
         // Count existing transactions that share this exact base RX number
         const normalizedBase = baseNumeric.toLowerCase();
         rxMatches = transactions.filter(t => {
           if (t.type !== "OUT" || !t.referenceNumber) return false;
-          let ref = t.referenceNumber.trim();
-          let refNum = ref.replace(/^RX-/, "");
-          refNum = refNum.replace(/R\d+$/, "");
-          return refNum.toLowerCase() === normalizedBase;
+          return getBaseRxNumber(t.referenceNumber).toLowerCase() === normalizedBase;
+        });
+
+        if (enteredRefillNum > 0) {
+          finalRef = `RX-${baseNumeric}-R${enteredRefillNum}`;
+        } else {
+          finalRef = `RX-${baseNumeric}`;
+        }
+
+        const exactRefMatches = rxMatches.filter(t => {
+          const tRef = (t.referenceNumber || "").trim().toUpperCase();
+          const targetRef = finalRef.toUpperCase();
+          return tRef === targetRef || tRef === `RX-${targetRef}` || (tRef.replace(/^RX-/, "") === targetRef.replace(/^RX-/, ""));
         });
 
         const currentMed = inventory.find(s => s.id === medId);
@@ -2676,33 +2698,63 @@ export default function App() {
             return;
           }
 
-          // Check if this prescription is an active partial fill
-          const sortedPriorFills = [...rxMatches].sort((a, b) => {
-            const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
-            const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
-            return dateA - dateB;
+          // Schedule II medications cannot be refilled under federal law
+          const isC2Med = currentMed.schedule === "C-II" || rxMatches.some(t => {
+            const med = inventory.find(s => s.id === t.substanceId);
+            return med?.schedule === "C-II";
           });
-          totalPriorDispensed = sortedPriorFills.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
-          const foundPrescribedQty = sortedPriorFills.find(t => t.prescribedQuantity && Number(t.prescribedQuantity) > 0)?.prescribedQuantity;
-          const hasPartialFlag = sortedPriorFills.some(t => t.isPartialFill || t.fillStage === "PARTIAL" || t.fillStage === "COMPLETION" || (t.prescribedQuantity && Number(t.prescribedQuantity) > 0));
 
-          if (hasPartialFlag && foundPrescribedQty) {
-            existingPrescribedQuantity = foundPrescribedQty;
-            isContinuingPartial = true;
-            const remainingBalance = Math.max(0, foundPrescribedQty - totalPriorDispensed);
-
-            if (remainingBalance <= 0) {
-              toast.error(`This prescription has already been fully dispensed (${totalPriorDispensed} of ${foundPrescribedQty} units dispensed across ${sortedPriorFills.length} fills).`);
-              return;
-            }
-
-            if (amount > remainingBalance) {
-              toast.error(`Cannot dispense ${amount} units. Remaining authorized balance for this prescription is ${remainingBalance} units.`);
-              return;
-            }
-          } else if (!isSplitFill) {
-            toast.error(`This RX number is already associated with an existing prescription (${rxMatches[0].substanceName} ${rxMatches[0].strength}). You must check 'Split Fill' first to dispense under this RX number.`);
+          if (isC2Med && enteredRefillNum > 0) {
+            toast.error("Schedule II (C-II) prescriptions cannot be refilled under federal law.");
             return;
+          }
+
+          // If this exact fill was already dispensed:
+          if (exactRefMatches.length > 0) {
+            // Check if this prescription is an active partial fill
+            const sortedPriorFills = [...exactRefMatches].sort((a, b) => {
+              const dateA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+              const dateB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+              return dateA - dateB;
+            });
+            totalPriorDispensed = sortedPriorFills.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
+            const foundPrescribedQty = sortedPriorFills.find(t => t.prescribedQuantity && Number(t.prescribedQuantity) > 0)?.prescribedQuantity;
+            const hasPartialFlag = sortedPriorFills.some(t => t.isPartialFill || t.fillStage === "PARTIAL" || t.fillStage === "COMPLETION" || (t.prescribedQuantity && Number(t.prescribedQuantity) > 0));
+
+            if (hasPartialFlag && foundPrescribedQty) {
+              existingPrescribedQuantity = foundPrescribedQty;
+              isContinuingPartial = true;
+              const remainingBalance = Math.max(0, foundPrescribedQty - totalPriorDispensed);
+
+              if (remainingBalance <= 0) {
+                toast.error(`This prescription fill (${finalRef}) has already been fully dispensed (${totalPriorDispensed} of ${foundPrescribedQty} units dispensed).`);
+                return;
+              }
+
+              if (amount > remainingBalance) {
+                toast.error(`Cannot dispense ${amount} units. Remaining authorized balance for this fill is ${remainingBalance} units.`);
+                return;
+              }
+            } else if (!isSplitFill) {
+              if (isC2Med) {
+                toast.error(`Prescription ${finalRef} is already recorded. Schedule II (C-II) medications cannot be refilled. Check 'NDC Split Fill' if splitting.`);
+                return;
+              }
+              const maxRefillNumber = rxMatches.reduce((max, t) => Math.max(max, getRefillNumber(t.referenceNumber)), 0);
+              toast.error(`This RX fill (${finalRef}) has already been dispensed. Click 'Refill Prescription (-R${maxRefillNumber + 1})' to log a refill, or check 'NDC Split Fill'.`);
+              return;
+            }
+          } else {
+            // New refill under base RX (exactRefMatches.length === 0, rxMatches.length > 0)
+            if (isC2Med) {
+              toast.error("Schedule II (C-II) prescriptions cannot be refilled under federal law.");
+              return;
+            }
+            if (enteredRefillNum === 0 && !isSplitFill) {
+              const maxRefillNumber = rxMatches.reduce((max, t) => Math.max(max, getRefillNumber(t.referenceNumber)), 0);
+              toast.error(`This RX number is already on file. Click 'Refill Prescription (-R${maxRefillNumber + 1})' to log a refill, or check 'NDC Split Fill'.`);
+              return;
+            }
           }
         }
 
@@ -2719,18 +2771,6 @@ export default function App() {
             toast.error("Please specify the reasoning for selecting 'Other'.");
             return;
           }
-        }
-
-        if (isSplitFill) {
-          // In split fill mode, dispense is part of the same fill across alternate NDCs.
-          // Retain the base fill reference number without incrementing the refill counter.
-          const latestMatch = rxMatches.length > 0 ? rxMatches[0] : null;
-          const matchRef = latestMatch?.referenceNumber?.trim() || "";
-          const refillSuffixMatch = matchRef.match(/R\d+$/);
-          const refillSuffix = refillSuffixMatch ? refillSuffixMatch[0] : "";
-          finalRef = `RX-${baseNumeric}${refillSuffix}`;
-        } else {
-          finalRef = `RX-${baseNumeric}`;
         }
       } else if (transactionType === "IN") {
         const numeric = finalRef.replace(/^INV-/, "");
@@ -2892,6 +2932,9 @@ export default function App() {
       }
 
       let txReason = transactionType === "ADJUST" ? reason : (transactionType === "IN" ? "Inventory Addition" : "Verified");
+      const refillNum = transactionType === "OUT" ? getRefillNumber(finalRef) : 0;
+      const isRefillTx = transactionType === "OUT" && refillNum > 0;
+
       if (transactionType === "OUT") {
         if (isTxBalanceCompletion) {
           txReason = reason ? `Balance Completed - ${reason}` : "Balance Completed";
@@ -2901,7 +2944,13 @@ export default function App() {
             : (partialReason === 'OUT_OF_STOCK' ? 'Insufficient stock' : partialReason);
           txReason = reason ? `Partial Fill #${txPartialFillNumber} (${reasonLabel}) - ${reason}` : `Partial Fill #${txPartialFillNumber} (${reasonLabel})`;
         } else if (isSplitFill) {
-          txReason = reason ? `Split Fill - ${reason}` : "Split Fill Dispensed";
+          if (isRefillTx) {
+            txReason = reason ? `Refill #${refillNum} Split Fill - ${reason}` : `Refill #${refillNum} Split Fill Dispensed`;
+          } else {
+            txReason = reason ? `Split Fill - ${reason}` : "Split Fill Dispensed";
+          }
+        } else if (isRefillTx) {
+          txReason = reason ? `Refill #${refillNum} - ${reason}` : `Refill #${refillNum} Dispensed`;
         } else {
           txReason = reason || "Dispensed";
         }
@@ -2926,6 +2975,8 @@ export default function App() {
         reason: txReason,
         referenceNumber: finalRef,
         isSplitFill: transactionType === "OUT" && isSplitFill,
+        isRefill: isRefillTx,
+        refillNumber: isRefillTx ? refillNum : undefined,
         signature,
         photo: ""
       };
@@ -2989,15 +3040,14 @@ export default function App() {
 
   const splitFillInfo = useMemo(() => {
     if (transactionType !== "OUT" || !referenceNumber.trim() || !selectedSubstance) return null;
-    const baseNumeric = referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+    const baseNumeric = getBaseRxNumber(referenceNumber).toLowerCase();
     if (!baseNumeric) return null;
     const currentMed = inventory.find(s => s.id === selectedSubstance);
     if (!currentMed) return null;
 
     const matches = transactions.filter(t => {
       if (t.type !== "OUT" || !t.referenceNumber) return false;
-      const refNum = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
-      return refNum === baseNumeric;
+      return getBaseRxNumber(t.referenceNumber).toLowerCase() === baseNumeric;
     });
 
     if (matches.length === 0) return null;
@@ -3025,53 +3075,103 @@ export default function App() {
       return dateA - dateB;
     });
 
-    const totalDispensedSoFar = sortedMatches.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
-    const recordedPrescribedQty = sortedMatches.find(t => t.prescribedQuantity && Number(t.prescribedQuantity) > 0)?.prescribedQuantity;
-    const hasPartialIndicator = sortedMatches.some(t => t.isPartialFill || t.fillStage === "PARTIAL" || t.fillStage === "COMPLETION" || (t.prescribedQuantity && Number(t.prescribedQuantity) > 0));
+    const isC2 = currentMed.schedule === "C-II" || matches.some(t => {
+      const med = inventory.find(s => s.id === t.substanceId);
+      return med?.schedule === "C-II";
+    });
 
-    if (hasPartialIndicator && recordedPrescribedQty) {
-      const balanceRemaining = Math.max(0, recordedPrescribedQty - totalDispensedSoFar);
-      if (balanceRemaining <= 0) {
+    const enteredRefillNumber = getRefillNumber(referenceNumber);
+    const enteredRefUpper = referenceNumber.trim().toUpperCase();
+
+    // Check if the exact entered reference number matches an already dispensed fill in the ledger
+    const exactFillMatches = sortedMatches.filter(t => {
+      const tRef = (t.referenceNumber || "").trim().toUpperCase();
+      return tRef === enteredRefUpper || 
+             tRef === `RX-${enteredRefUpper}` || 
+             (tRef.replace(/^RX-/, "") === enteredRefUpper.replace(/^RX-/, ""));
+    });
+
+    const hasExactMatch = exactFillMatches.length > 0;
+    const maxRefillNumber = sortedMatches.reduce((max, t) => Math.max(max, getRefillNumber(t.referenceNumber)), 0);
+    const nextRefillNumber = maxRefillNumber + 1;
+    const nextRefillRef = `RX-${getBaseRxNumber(referenceNumber)}-R${nextRefillNumber}`;
+
+    // Case 1: The user typed or selected a new refill suffix (e.g. -R1) that does NOT yet exist in the ledger
+    if (!hasExactMatch && enteredRefillNumber > 0) {
+      if (isC2) {
         return {
-          status: "prescription_completed" as const,
-          prescribedQuantity: recordedPrescribedQty,
-          totalDispensed: totalDispensedSoFar,
-          balanceRemaining: 0,
-          priorFills: sortedMatches,
+          status: "c2_refill_prohibited" as const,
+          schedule: currentMed.schedule,
           priorSubstanceName: sortedMatches[0].substanceName,
           priorStrength: sortedMatches[0].strength,
           priorRef: sortedMatches[0].referenceNumber,
-          message: `This prescription (${formatRefForDisplay(sortedMatches[0].referenceNumber)}) has already been completely filled (${totalDispensedSoFar} of ${recordedPrescribedQty} units dispensed across ${sortedMatches.length} fills).`
+          message: "Under federal law, Schedule II (C-II) controlled substances cannot be refilled. A new prescription is required."
         };
-      } else {
+      }
+      return {
+        status: "refill_active" as const,
+        refillNumber: enteredRefillNumber,
+        baseRx: `RX-${getBaseRxNumber(referenceNumber)}`,
+        schedule: currentMed.schedule,
+        priorSubstanceName: sortedMatches[0].substanceName,
+        priorStrength: sortedMatches[0].strength,
+        priorRef: sortedMatches[0].referenceNumber,
+        priorFills: sortedMatches,
+        message: `Prescription Refill Active: Refill #${enteredRefillNumber} (-R${enteredRefillNumber})`
+      };
+    }
+
+    // Case 2: Check if this specific fill was a partial fill with remaining balance
+    const relevantFillsForPartial = hasExactMatch ? exactFillMatches : sortedMatches;
+    const totalDispensedForFill = relevantFillsForPartial.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
+    const recordedPrescribedQty = relevantFillsForPartial.find(t => t.prescribedQuantity && Number(t.prescribedQuantity) > 0)?.prescribedQuantity;
+    const hasPartialIndicator = relevantFillsForPartial.some(t => t.isPartialFill || t.fillStage === "PARTIAL" || t.fillStage === "COMPLETION" || (t.prescribedQuantity && Number(t.prescribedQuantity) > 0));
+
+    if (hasPartialIndicator && recordedPrescribedQty) {
+      const balanceRemaining = Math.max(0, recordedPrescribedQty - totalDispensedForFill);
+      if (balanceRemaining > 0) {
         return {
           status: "partial_active" as const,
           prescribedQuantity: recordedPrescribedQty,
-          totalDispensed: totalDispensedSoFar,
+          totalDispensed: totalDispensedForFill,
           balanceRemaining,
-          priorFills: sortedMatches,
+          priorFills: relevantFillsForPartial,
           priorSubstanceName: sortedMatches[0].substanceName,
           priorStrength: sortedMatches[0].strength,
-          priorRef: sortedMatches[0].referenceNumber,
-          message: `Active Partial Fill Found: ${totalDispensedSoFar} of ${recordedPrescribedQty} units dispensed. Balance Owed: ${balanceRemaining} units.`
+          priorRef: relevantFillsForPartial[0].referenceNumber,
+          message: `Active Partial Fill Found: ${totalDispensedForFill} of ${recordedPrescribedQty} units dispensed. Balance Owed: ${balanceRemaining} units.`
         };
       }
     }
 
-    const priorMatch = sortedMatches[0];
-    const isAlternateNdc = sortedMatches.some(t => t.ndc !== currentMed.ndc);
-    const matchedAlternate = sortedMatches.find(t => t.ndc !== currentMed.ndc);
+    // Case 3: The exact fill was already dispensed on Schedule II (C-II)
+    if (isC2) {
+      return {
+        status: "c2_already_dispensed" as const,
+        schedule: currentMed.schedule,
+        priorSubstanceName: sortedMatches[0].substanceName,
+        priorStrength: sortedMatches[0].strength,
+        priorRef: sortedMatches[0].referenceNumber,
+        priorFills: sortedMatches,
+        totalDispensed: sortedMatches.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0),
+        message: `Prescription record on file for ${sortedMatches[0].substanceName} ${sortedMatches[0].strength}. Under federal law, Schedule II (C-II) prescriptions cannot be refilled.`
+      };
+    }
 
+    // Case 4: C-III through C-V prescription found -> Show "Prescription Found" with Refill action button!
     return {
-      status: "already_associated" as const,
-      isAlternateNdc,
-      alternateNdc: matchedAlternate?.ndc || priorMatch.ndc,
-      priorSubstanceName: priorMatch.substanceName,
-      priorStrength: priorMatch.strength,
-      priorRef: priorMatch.referenceNumber,
-      totalDispensed: totalDispensedSoFar,
+      status: "prescription_found_refillable" as const,
+      schedule: currentMed.schedule,
+      baseRx: `RX-${getBaseRxNumber(referenceNumber)}`,
+      priorSubstanceName: sortedMatches[0].substanceName,
+      priorStrength: sortedMatches[0].strength,
+      priorRef: sortedMatches[0].referenceNumber,
+      totalDispensed: sortedMatches.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0),
       priorFills: sortedMatches,
-      message: `This RX # is already associated with an existing prescription (${priorMatch.substanceName} ${priorMatch.strength}). You must check 'Split Fill' first to dispense under this RX number.`
+      maxRefillNumber,
+      nextRefillNumber,
+      nextRefillRef,
+      message: `Prescription found for ${sortedMatches[0].substanceName} ${sortedMatches[0].strength}. Click Refill Prescription to advance to -R${nextRefillNumber}.`
     };
   }, [transactionType, referenceNumber, selectedSubstance, inventory, transactions]);
 
@@ -3079,7 +3179,7 @@ export default function App() {
     const set = new Set<string>();
     for (const t of transactions) {
       if (t.type === "OUT" && t.referenceNumber && t.isSplitFill) {
-        const base = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+        const base = getBaseRxNumber(t.referenceNumber).toLowerCase();
         if (base) set.add(base);
       }
     }
@@ -3090,7 +3190,7 @@ export default function App() {
     if (!t) return false;
     if (t.isSplitFill) return true;
     if (t.type === "OUT" && t.referenceNumber) {
-      const base = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+      const base = getBaseRxNumber(t.referenceNumber).toLowerCase();
       if (base && splitFillRxNumbers.has(base)) return true;
     }
     return false;
@@ -3100,13 +3200,12 @@ export default function App() {
     if (!viewingTransaction || viewingTransaction.type !== "OUT" || !viewingTransaction.referenceNumber) {
       return [];
     }
-    const baseNumeric = viewingTransaction.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
+    const baseNumeric = getBaseRxNumber(viewingTransaction.referenceNumber).toLowerCase();
     if (!baseNumeric) return [];
 
     const matches = transactions.filter(t => {
       if (t.type !== "OUT" || !t.referenceNumber) return false;
-      const refNum = t.referenceNumber.trim().replace(/^RX-/, "").replace(/R\d+$/, "").toLowerCase();
-      return refNum === baseNumeric;
+      return getBaseRxNumber(t.referenceNumber).toLowerCase() === baseNumeric;
     });
 
     const isPartialOrBalance = viewingTransaction.isPartialFill || 
@@ -3116,8 +3215,9 @@ export default function App() {
       matches.some(t => t.isPartialFill || t.isBalanceCompletion || t.fillStage || t.prescribedQuantity);
 
     const isSplit = isTxSplitFill(viewingTransaction) || matches.some(t => isTxSplitFill(t));
+    const hasRefills = matches.some(t => getRefillNumber(t.referenceNumber) > 0);
 
-    if (!isPartialOrBalance && !isSplit && matches.length <= 1) {
+    if (!isPartialOrBalance && !isSplit && !hasRefills && matches.length <= 1) {
       return [];
     }
 
@@ -6080,21 +6180,106 @@ export default function App() {
                       />
 
                       {splitFillInfo?.status === "mismatch" && (
-                        <div className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-xs font-semibold flex items-start gap-1.5">
-                          <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                        <div className="p-2.5 bg-brand-surface border border-brand-grey/30 rounded-lg text-brand-dark-grey text-xs font-semibold flex items-start gap-1.5 shadow-sm">
+                          <AlertCircle className="h-4 w-4 text-brand-blue shrink-0 mt-0.5" />
                           <span>{splitFillInfo.message}</span>
                         </div>
                       )}
 
-                      {splitFillInfo?.status === "prescription_completed" && (
-                        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-xs space-y-1 shadow-sm">
-                          <div className="font-bold text-red-700 flex items-center gap-1.5 text-xs">
-                            <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
-                            Prescription Fully Fulfilled
+                      {(splitFillInfo?.status === "c2_already_dispensed" || splitFillInfo?.status === "c2_refill_prohibited") && (
+                        <div className="p-3 bg-brand-surface border border-brand-blue/30 rounded-lg text-xs space-y-1.5 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
+                              <AlertCircle className="h-4 w-4 text-brand-blue shrink-0" />
+                              Prescription Found (Schedule II)
+                            </div>
+                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30">
+                              C-II • No Refills Allowed
+                            </span>
                           </div>
-                          <p className="text-[11px] text-red-900/90 leading-tight">
-                            All {splitFillInfo.prescribedQuantity} authorized units under {formatRefForDisplay(referenceNumber.trim())} have already been dispensed across {splitFillInfo.priorFills?.length || 1} fills. No remaining balance owed.
+                          <p className="text-[11px] text-brand-dark-grey leading-tight">
+                            Prescription <strong className="text-brand-blue">{formatRefForDisplay(referenceNumber.trim())}</strong> is on file for {splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}. Under federal DEA regulations, Schedule II (C-II) controlled substances cannot be refilled. A new prescription is required.
                           </p>
+                          {isSplitFill ? (
+                            <div className="pt-1 flex items-center gap-1.5 text-[11px] text-brand-blue font-bold">
+                              <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                              <span>NDC Split Fill Active for this C-II dispense</span>
+                            </div>
+                          ) : (
+                            <p className="text-[10px] text-brand-dark-grey/70 pt-0.5">
+                              If this is a multi-NDC split for the initial fill, check <strong className="text-brand-blue">NDC Split Fill</strong> above.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {splitFillInfo?.status === "prescription_found_refillable" && (
+                        <div className="p-3 bg-brand-yellow/15 border border-brand-yellow/50 rounded-lg text-xs space-y-2.5 shadow-sm">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
+                                <FileText className="h-4 w-4 text-brand-blue shrink-0" />
+                                Prescription Found
+                              </div>
+                              <p className="text-[11px] text-brand-dark-grey mt-0.5">
+                                Existing prescription on file for <span className="font-bold text-brand-blue">{splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}</span>.
+                              </p>
+                            </div>
+                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 uppercase tracking-wide">
+                              {splitFillInfo.priorFills?.length || 1} Prior Fill{(splitFillInfo.priorFills?.length || 1) > 1 ? "s" : ""} • {splitFillInfo.schedule}
+                            </span>
+                          </div>
+
+                          <div className="p-2 bg-brand-surface rounded border border-brand-blue/15 text-[11px] text-brand-dark-grey flex items-center justify-between">
+                            <span>
+                              History: <strong>{splitFillInfo.maxRefillNumber === 0 ? "Original Fill recorded" : `Original Fill through Refill #${splitFillInfo.maxRefillNumber}`}</strong>
+                            </span>
+                            <span className="text-brand-blue font-bold">
+                              Total Dispensed: {splitFillInfo.totalDispensed} units
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2 pt-0.5">
+                            <span className="text-[11px] text-brand-dark-grey font-medium">
+                              Log an additional authorized fill under this RX:
+                            </span>
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => {
+                                setReferenceNumber(splitFillInfo.nextRefillRef);
+                                setIsPartialFillActive(false);
+                                setPrescribedQuantity("");
+                              }}
+                              className="h-7 text-[11px] font-bold bg-brand-blue hover:brightness-110 text-brand-yellow px-3 shadow-sm shrink-0 border border-brand-blue/30 flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                              Refill Prescription (-R{splitFillInfo.nextRefillNumber})
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {splitFillInfo?.status === "refill_active" && (
+                        <div className="p-3 bg-brand-yellow/15 border border-brand-yellow/60 rounded-lg text-xs space-y-1.5 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
+                              <Check className="h-4 w-4 text-brand-blue" strokeWidth={2.5} />
+                              <span>Prescription Refill Active: Refill #{splitFillInfo.refillNumber}</span>
+                            </div>
+                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 font-mono">
+                              -R{splitFillInfo.refillNumber}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-brand-dark-grey leading-tight">
+                            Dispensing under authorized prescription <strong className="text-brand-blue">{splitFillInfo.baseRx}</strong> ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength} • Schedule {splitFillInfo.schedule}). Enter quantity and sign below.
+                          </p>
+                          {isSplitFill && (
+                            <div className="pt-1 flex items-center gap-1.5 text-[11px] text-brand-blue font-bold">
+                              <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                              <span>NDC Split Fill Active for Refill #{splitFillInfo.refillNumber}</span>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -6144,37 +6329,6 @@ export default function App() {
                               Fill Balance ({splitFillInfo.balanceRemaining})
                             </Button>
                           </div>
-                        </div>
-                      )}
-
-                      {splitFillInfo?.status === "already_associated" && !isSplitFill && (
-                        <div className="p-2.5 bg-brand-yellow/20 border border-brand-yellow/50 rounded-lg text-brand-dark-grey text-xs flex items-start justify-between gap-2 shadow-sm">
-                          <div className="space-y-0.5">
-                            <p className="font-bold text-brand-blue text-[11px] flex items-center gap-1">
-                              <AlertCircle className="h-3.5 w-3.5 text-brand-blue shrink-0" />
-                              RX # Already Associated
-                            </p>
-                            <p className="text-[11px] text-brand-dark-grey/90 leading-tight">
-                              This RX # is already associated with an existing prescription record ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}). You must check <span className="font-bold text-brand-blue">NDC Split Fill</span> to dispense under this RX number.
-                            </p>
-                          </div>
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={() => setIsSplitFill(true)}
-                            className="h-6 text-[10px] font-bold bg-brand-blue text-white hover:brightness-110 px-2 py-0 shrink-0 shadow-sm"
-                          >
-                            Check NDC Split Fill
-                          </Button>
-                        </div>
-                      )}
-
-                      {isSplitFill && splitFillInfo?.status === "already_associated" && (
-                        <div className="p-2.5 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs text-brand-blue flex items-center gap-1.5 font-bold">
-                          <Check className="h-3.5 w-3.5 text-brand-blue shrink-0" strokeWidth={3} />
-                          <span>
-                            NDC Split Fill Active — dispensing under prescription {formatRefForDisplay(referenceNumber.trim())} ({splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength})
-                          </span>
                         </div>
                       )}
 
@@ -6236,7 +6390,7 @@ export default function App() {
                             Remaining after fill: <span className="text-brand-blue font-black">{splitFillInfo.balanceRemaining - Number(quantity)} units</span>
                           </span>
                         ) : (
-                          <span className="text-red-600">
+                          <span className="text-brand-dark-grey font-bold">
                             Exceeds balance owed by {Number(quantity) - splitFillInfo.balanceRemaining} units
                           </span>
                         )}
@@ -6244,7 +6398,7 @@ export default function App() {
                     </div>
                   )}
 
-                  {transactionType === "OUT" && splitFillInfo?.status !== "partial_active" && splitFillInfo?.status !== "prescription_completed" && (
+                  {transactionType === "OUT" && splitFillInfo?.status !== "partial_active" && splitFillInfo?.status !== "prescription_found_refillable" && splitFillInfo?.status !== "c2_already_dispensed" && splitFillInfo?.status !== "c2_refill_prohibited" && (
                     <div className="p-2.5 rounded-lg border border-brand-blue/20 bg-brand-blue/5 space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-brand-blue">
@@ -6714,8 +6868,16 @@ export default function App() {
                                       </div>
                                       {relatedPrescriptionFills.map((stx, idx) => {
                                         const isCurrent = stx.id === viewingTransaction.id;
+                                        const rNum = getRefillNumber(stx.referenceNumber);
                                         const ordinal = idx === 0 ? "1st Fill" : idx === 1 ? "2nd Fill" : idx === 2 ? "3rd Fill" : `${idx + 1}th Fill`;
                                         const isCompletion = stx.fillStage === "COMPLETION" || stx.isBalanceCompletion || (idx === relatedPrescriptionFills.length - 1 && isClosed);
+                                        const fillBadgeText = isCompletion 
+                                          ? "Final Balance" 
+                                          : rNum > 0 
+                                            ? `Refill #${rNum}` 
+                                            : idx === 0 
+                                              ? "Original Fill" 
+                                              : ordinal;
                                         return (
                                           <div
                                             key={stx.id || idx}
@@ -6734,7 +6896,7 @@ export default function App() {
                                                 <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
                                                   isCompletion ? "bg-brand-blue text-brand-yellow" : "bg-brand-yellow/30 text-brand-blue border border-brand-yellow/50"
                                                 }`}>
-                                                  {isCompletion ? "Final Balance" : ordinal}
+                                                  {fillBadgeText}
                                                 </span>
                                                 <span className="text-[11px] text-brand-dark-grey/70 font-sans">
                                                   {formatDateTime(stx.timestamp)}
@@ -6751,7 +6913,7 @@ export default function App() {
                                             </div>
                                             <div className="mt-1 flex items-center justify-between text-[10px] text-brand-dark-grey/70">
                                               <span className="truncate">
-                                                Staff: {escapeEmail(stx.performedByName)}
+                                                Ref: {formatRefForDisplay(stx.referenceNumber)} • Staff: {escapeEmail(stx.performedByName)}
                                               </span>
                                               {stx.balanceRemaining !== undefined && stx.balanceRemaining !== null && (
                                                 <span className="font-semibold text-brand-blue shrink-0">
@@ -6762,6 +6924,76 @@ export default function App() {
                                           </div>
                                         );
                                       })}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            const hasRefillInList = relatedPrescriptionFills.some(t => getRefillNumber(t.referenceNumber) > 0);
+                            const refillCount = relatedPrescriptionFills.filter(t => getRefillNumber(t.referenceNumber) > 0).length;
+
+                            if (hasRefillInList) {
+                              return (
+                                <div className="col-span-2 space-y-1.5 w-full">
+                                  <div className="flex items-center justify-between">
+                                    <Label className="text-[10px] uppercase font-bold text-brand-blue/60">Prescription Refill & Fill History</Label>
+                                    <span className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
+                                      {relatedPrescriptionFills.length} Dispenses ({refillCount} Refill{refillCount !== 1 ? 's' : ''})
+                                    </span>
+                                  </div>
+                                  <div className="p-2.5 bg-brand-surface rounded-lg border border-brand-blue/20 space-y-2 shadow-sm">
+                                    <div className="text-[10px] text-brand-dark-grey/80 leading-tight">
+                                      Prescription dispenses and refills under RX-{getBaseRxNumber(viewingTransaction.referenceNumber)}:
+                                    </div>
+                                    <div className="space-y-1.5">
+                                      {relatedPrescriptionFills.map((stx, idx) => {
+                                        const isCurrent = stx.id === viewingTransaction.id;
+                                        const rNum = getRefillNumber(stx.referenceNumber);
+                                        const fillLabel = rNum > 0 ? `Refill #${rNum}` : "Original Fill";
+                                        return (
+                                          <div
+                                            key={stx.id || idx}
+                                            onClick={() => {
+                                              if (!isCurrent) setViewingTransaction(stx);
+                                            }}
+                                            title={!isCurrent ? "Click to view this fill" : undefined}
+                                            className={`p-2 rounded-md border flex items-center justify-between gap-2 text-xs transition-all ${
+                                              isCurrent
+                                                ? "bg-brand-blue/10 border-brand-blue/30 text-brand-blue font-bold shadow-xs"
+                                                : "bg-brand-light-grey/40 border-brand-grey/15 text-brand-dark-grey hover:border-brand-blue/30 hover:bg-brand-blue/5 cursor-pointer"
+                                            }`}
+                                          >
+                                            <div className="flex items-center gap-1.5 min-w-0">
+                                              <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                                rNum > 0 ? "bg-brand-yellow/30 text-brand-blue border border-brand-yellow/50" : "bg-brand-blue/15 text-brand-blue"
+                                              } shrink-0`}>
+                                                {fillLabel}
+                                              </span>
+                                              <span className="font-mono text-xs font-bold text-brand-dark-grey truncate">
+                                                {formatRefForDisplay(stx.referenceNumber)}
+                                              </span>
+                                              <span className="text-[11px] text-brand-dark-grey/60 font-sans">
+                                                {formatDateTime(stx.timestamp)}
+                                              </span>
+                                              {isCurrent && (
+                                                <span className="text-[8px] font-black uppercase tracking-wider bg-brand-blue text-white px-1.5 py-0.2 rounded shrink-0">
+                                                  Viewing
+                                                </span>
+                                              )}
+                                            </div>
+                                            <div className="text-xs font-black text-brand-blue shrink-0">
+                                              Qty: {stx.quantity}
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                    <div className="pt-1.5 border-t border-brand-blue/10 flex items-center justify-between text-[10px] font-bold text-brand-dark-grey/70">
+                                      <span>Total Dispensed Across Fills:</span>
+                                      <span className="font-black text-brand-blue text-xs">
+                                        {relatedPrescriptionFills.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0)} units
+                                      </span>
                                     </div>
                                   </div>
                                 </div>

@@ -37,6 +37,8 @@ export interface Transaction {
   isSplitFill?: boolean;
   isPartialFill?: boolean;
   isBalanceCompletion?: boolean;
+  isRefill?: boolean;
+  refillNumber?: number;
   fillStage?: 'FULL' | 'PARTIAL' | 'COMPLETION';
   prescribedQuantity?: number;
   balanceRemaining?: number;
