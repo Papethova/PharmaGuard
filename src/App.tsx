@@ -6207,9 +6207,11 @@ export default function App() {
 
                       {(splitFillInfo?.status === "c2_already_dispensed" || splitFillInfo?.status === "c2_refill_prohibited") && (() => {
                         const enteredRefTrimmed = referenceNumber.trim();
-                        const displayRxRef = enteredRefTrimmed.toLowerCase().startsWith("rx")
-                          ? enteredRefTrimmed
-                          : (enteredRefTrimmed ? `rx${enteredRefTrimmed}` : `rx${getBaseRxNumber(referenceNumber)}`);
+                        const displayRxRef = enteredRefTrimmed
+                          ? (enteredRefTrimmed.toLowerCase().startsWith("rx")
+                              ? enteredRefTrimmed.replace(/^rx/i, "RX")
+                              : `RX${enteredRefTrimmed}`)
+                          : `RX${getBaseRxNumber(referenceNumber)}`;
                         return (
                           <div className="p-3 bg-brand-surface border border-brand-blue/30 rounded-lg text-xs space-y-1.5 shadow-sm">
                             <div className="flex items-center justify-between">
@@ -6217,7 +6219,7 @@ export default function App() {
                                 <AlertCircle className="h-4 w-4 text-brand-blue shrink-0" />
                                 <span>previous fill found for {displayRxRef} (Schedule II)</span>
                               </div>
-                              <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30">
+                              <span className="px-2 py-0.5 bg-brand-blue text-white text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30">
                                 C-II • No Refills Allowed
                               </span>
                             </div>
@@ -6240,11 +6242,13 @@ export default function App() {
 
                       {splitFillInfo?.status === "prescription_found_refillable" && (() => {
                         const enteredRefTrimmed = referenceNumber.trim();
-                        const displayRxRef = enteredRefTrimmed.toLowerCase().startsWith("rx")
-                          ? enteredRefTrimmed
-                          : (enteredRefTrimmed ? `rx${enteredRefTrimmed}` : `rx${getBaseRxNumber(referenceNumber)}`);
+                        const displayRxRef = enteredRefTrimmed
+                          ? (enteredRefTrimmed.toLowerCase().startsWith("rx")
+                              ? enteredRefTrimmed.replace(/^rx/i, "RX")
+                              : `RX${enteredRefTrimmed}`)
+                          : `RX${getBaseRxNumber(referenceNumber)}`;
                         return (
-                          <div className="p-3 bg-brand-yellow/35 border-2 border-brand-yellow rounded-lg text-xs space-y-2.5 shadow-sm">
+                          <div className="p-3 bg-brand-yellow border-2 border-brand-blue/20 rounded-lg text-xs space-y-2.5 shadow-sm">
                             <div className="flex items-start justify-between gap-2">
                               <div>
                                 <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
@@ -6255,7 +6259,7 @@ export default function App() {
                                   Existing prescription on file for <span className="font-bold text-brand-blue">{splitFillInfo.priorSubstanceName} {splitFillInfo.priorStrength}</span>.
                                 </p>
                               </div>
-                              <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 uppercase tracking-wide">
+                              <span className="px-2 py-0.5 bg-brand-blue text-white text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 uppercase tracking-wide">
                                 {splitFillInfo.priorFills?.length || 1} Prior Fill{(splitFillInfo.priorFills?.length || 1) > 1 ? "s" : ""} • {splitFillInfo.schedule}
                               </span>
                             </div>
@@ -6281,7 +6285,7 @@ export default function App() {
                                   setIsPartialFillActive(false);
                                   setPrescribedQuantity("");
                                 }}
-                                className="h-7 text-[11px] font-bold bg-brand-blue hover:brightness-110 text-brand-yellow px-3 shadow-sm shrink-0 border border-brand-blue/30 flex items-center gap-1.5 cursor-pointer"
+                                className="h-7 text-[11px] font-bold bg-brand-blue hover:brightness-110 text-white px-3 shadow-sm shrink-0 border border-brand-blue/30 flex items-center gap-1.5 cursor-pointer"
                               >
                                 <Plus className="h-3.5 w-3.5" />
                                 Refill Prescription (-R{splitFillInfo.nextRefillNumber})
@@ -6292,13 +6296,13 @@ export default function App() {
                       })()}
 
                       {splitFillInfo?.status === "refill_active" && (
-                        <div className="p-3 bg-brand-yellow/35 border-2 border-brand-yellow rounded-lg text-xs space-y-1.5 shadow-sm">
+                        <div className="p-3 bg-brand-yellow border-2 border-brand-blue/20 rounded-lg text-xs space-y-1.5 shadow-sm">
                           <div className="flex items-center justify-between">
                             <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
                               <Check className="h-4 w-4 text-brand-blue" strokeWidth={2.5} />
                               <span>Prescription Refill Active: Refill #{splitFillInfo.refillNumber}</span>
                             </div>
-                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 font-mono">
+                            <span className="px-2 py-0.5 bg-brand-blue text-white text-[10px] font-extrabold rounded-full shrink-0 border border-brand-blue/30 font-mono">
                               -R{splitFillInfo.refillNumber}
                             </span>
                           </div>
@@ -6326,7 +6330,7 @@ export default function App() {
                                 Prescription <span className="font-bold text-brand-blue">{formatRefForDisplay(referenceNumber.trim())}</span> has an open balance.
                               </p>
                             </div>
-                            <span className="px-2 py-0.5 bg-brand-blue text-brand-yellow text-[10px] font-extrabold rounded-full shrink-0 uppercase tracking-wide border border-brand-blue/30">
+                            <span className="px-2 py-0.5 bg-brand-blue text-white text-[10px] font-extrabold rounded-full shrink-0 uppercase tracking-wide border border-brand-blue/30">
                               {splitFillInfo.priorFills?.length || 1} Prior Fill{(splitFillInfo.priorFills?.length || 1) > 1 ? 's' : ''}
                             </span>
                           </div>
