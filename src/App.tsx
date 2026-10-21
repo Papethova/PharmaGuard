@@ -2661,6 +2661,16 @@ export default function App() {
       let totalPriorDispensed = 0;
       
       if (transactionType === "OUT") {
+        const currentMed = inventory.find(s => s.id === medId);
+        if (currentMed && amount > currentMed.currentStock) {
+          toast.error(
+            currentMed.currentStock <= 0
+              ? `Insufficient inventory: Cannot dispense. ${currentMed.name} ${currentMed.strength} is out of stock (0 units on hand).`
+              : `Insufficient inventory: Cannot dispense ${amount} units. Only ${currentMed.currentStock} units available in stock.`
+          );
+          return;
+        }
+
         const baseNumeric = getBaseRxNumber(finalRef);
         const enteredRefillNum = getRefillNumber(finalRef);
         
@@ -2683,7 +2693,6 @@ export default function App() {
           return tRef === targetRef || tRef === `RX-${targetRef}` || (tRef.replace(/^RX-/, "") === targetRef.replace(/^RX-/, ""));
         });
 
-        const currentMed = inventory.find(s => s.id === medId);
         if (rxMatches.length > 0 && currentMed) {
           const mismatch = rxMatches.find(t => {
             const tName = t.substanceName || "";
@@ -2897,6 +2906,12 @@ export default function App() {
       if (transactionType === "IN") newStock += amount;
       else if (transactionType === "OUT") newStock -= amount;
       else if (transactionType === "ADJUST") newStock += amount;
+
+      if (transactionType === "OUT" && newStock < 0) {
+        toast.error(`Insufficient inventory: Cannot dispense ${amount} units. Only ${previousStock} units available in stock.`);
+        setIsSubmitting(false);
+        return;
+      }
 
       let txFillStage: 'FULL' | 'PARTIAL' | 'COMPLETION' | undefined = undefined;
       let txPrescribedQty: number | undefined = undefined;
@@ -6248,7 +6263,7 @@ export default function App() {
                               : `RX${enteredRefTrimmed}`)
                           : `RX${getBaseRxNumber(referenceNumber)}`;
                         return (
-                          <div className="p-3 bg-brand-yellow border-2 border-brand-blue/20 rounded-lg text-xs space-y-2.5 shadow-sm">
+                          <div className="p-3 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs space-y-2.5 shadow-sm">
                             <div className="flex items-start justify-between gap-2">
                               <div>
                                 <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
@@ -6296,7 +6311,7 @@ export default function App() {
                       })()}
 
                       {splitFillInfo?.status === "refill_active" && (
-                        <div className="p-3 bg-brand-yellow border-2 border-brand-blue/20 rounded-lg text-xs space-y-1.5 shadow-sm">
+                        <div className="p-3 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs space-y-1.5 shadow-sm">
                           <div className="flex items-center justify-between">
                             <div className="font-bold text-brand-blue flex items-center gap-1.5 text-xs">
                               <Check className="h-4 w-4 text-brand-blue" strokeWidth={2.5} />
@@ -6551,7 +6566,11 @@ export default function App() {
                     </div>
 
                     {selectedSubstance && quantity && transactionType !== "VERIFY" && (
-                      <div className="p-2 bg-brand-blue/5 rounded-lg border border-brand-blue/10 flex justify-between items-center h-9 shadow-sm">
+                      <div className={`p-2 rounded-lg border flex justify-between items-center h-9 shadow-sm ${
+                        transactionType === "OUT" && Number(quantity) > (inventory.find(i => i.id === selectedSubstance)?.currentStock || 0)
+                          ? "bg-brand-blue/10 border-brand-blue/30"
+                          : "bg-brand-blue/5 border-brand-blue/10"
+                      }`}>
                         <span className="text-sm font-bold text-brand-blue uppercase">Projected</span>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-black font-bold flex items-center gap-2">
@@ -6570,6 +6589,18 @@ export default function App() {
                       </div>
                     )}
                   </div>
+
+                  {transactionType === "OUT" && selectedSubstance && quantity && Number(quantity) > (inventory.find(i => i.id === selectedSubstance)?.currentStock || 0) && (
+                    <div className="p-2.5 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs space-y-1">
+                      <div className="flex items-center gap-1.5 font-bold text-brand-blue">
+                        <AlertCircle className="h-4 w-4 shrink-0 text-brand-blue" />
+                        <span>Insufficient Inventory Available</span>
+                      </div>
+                      <p className="text-[11px] text-brand-dark-grey leading-tight">
+                        Cannot dispense <strong className="text-brand-blue">{quantity}</strong> units. Only <strong className="text-brand-blue">{inventory.find(i => i.id === selectedSubstance)?.currentStock || 0}</strong> units are in stock. Dispensing that would push stock negative is blocked.
+                      </p>
+                    </div>
+                  )}
 
                       <div className="grid gap-1.5">
                         {false ? (
@@ -6716,11 +6747,12 @@ export default function App() {
                     Cancel
                   </Button>
                   <Button 
-                    className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl order-1 sm:order-2 disabled:opacity-100"
+                    className="flex-1 h-12 text-xs font-black uppercase tracking-widest bg-brand-yellow text-brand-blue hover:brightness-110 shadow-lg shadow-brand-yellow/20 transition-all active:scale-[0.98] rounded-xl order-1 sm:order-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleLogTransaction}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (transactionType === "OUT" && !!selectedSubstance && !!quantity && Number(quantity) > (inventory.find(i => i.id === selectedSubstance)?.currentStock || 0))}
                   >
                     {isSubmitting ? "Logging..." : 
+                     (transactionType === "OUT" && selectedSubstance && quantity && Number(quantity) > (inventory.find(i => i.id === selectedSubstance)?.currentStock || 0)) ? "Insufficient Stock" :
                      transactionType === "OUT" ? "Dispense" : 
                      transactionType === "IN" ? "Add" : 
                      transactionType === "ADJUST" ? "Adjust" : 
