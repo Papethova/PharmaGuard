@@ -6593,11 +6593,11 @@ export default function App() {
                   {transactionType === "OUT" && selectedSubstance && quantity && Number(quantity) > (inventory.find(i => i.id === selectedSubstance)?.currentStock || 0) && (
                     <div className="p-2.5 bg-brand-blue/5 border border-brand-blue/20 rounded-lg text-xs space-y-1">
                       <div className="flex items-center gap-1.5 font-bold text-brand-blue">
-                        <AlertCircle className="h-4 w-4 shrink-0 text-brand-blue" />
+                        <AlertCircle className="h-4 w-4 shrink-0 text-brand-blue fill-brand-yellow" />
                         <span>Insufficient Inventory Available</span>
                       </div>
                       <p className="text-[11px] text-brand-dark-grey leading-tight">
-                        Cannot dispense <strong className="text-brand-blue">{quantity}</strong> units. Only <strong className="text-brand-blue">{inventory.find(i => i.id === selectedSubstance)?.currentStock || 0}</strong> units are in stock. Dispensing that would push stock negative is blocked.
+                        Cannot dispense <strong className="text-brand-blue">{quantity}</strong> units. Only <strong className="text-brand-blue">{inventory.find(i => i.id === selectedSubstance)?.currentStock || 0}</strong> units are in stock.
                       </p>
                     </div>
                   )}
