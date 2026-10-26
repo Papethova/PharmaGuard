@@ -2991,25 +2991,35 @@ export default function App() {
         referenceNumber: finalRef,
         isSplitFill: transactionType === "OUT" && isSplitFill,
         isRefill: isRefillTx,
-        refillNumber: isRefillTx ? refillNum : undefined,
         signature,
         photo: ""
       };
 
+      if (isRefillTx && refillNum > 0) {
+        newTxData.refillNumber = refillNum;
+      }
+
       if (isTxPartial || isTxBalanceCompletion) {
         newTxData.isPartialFill = true;
         newTxData.isBalanceCompletion = isTxBalanceCompletion;
-        newTxData.fillStage = txFillStage;
+        if (txFillStage) newTxData.fillStage = txFillStage;
         if (txPrescribedQty !== undefined) newTxData.prescribedQuantity = txPrescribedQty;
         if (txBalanceRemaining !== undefined) newTxData.balanceRemaining = txBalanceRemaining;
         if (txPartialReason) newTxData.partialReason = txPartialReason;
         if (txPartialFillNumber !== undefined) newTxData.partialFillNumber = txPartialFillNumber;
       }
 
+      // Ensure no undefined values are written to Firestore
+      Object.keys(newTxData).forEach(key => {
+        if (newTxData[key] === undefined) {
+          delete newTxData[key];
+        }
+      });
+
       batch.set(newTransactionDoc, newTxData);
 
       // When completing or logging a partial fill, ensure prior dispenses for this RX are tagged with prescribedQuantity
-      if (transactionType === "OUT" && isTxPartial && rxMatches.length > 0) {
+      if (transactionType === "OUT" && isTxPartial && rxMatches.length > 0 && txPrescribedQty !== undefined) {
         for (const match of rxMatches) {
           if (match.id && (!match.prescribedQuantity || !match.isPartialFill)) {
             batch.update(doc(db, "users", emailId, "transactions", match.id), {
